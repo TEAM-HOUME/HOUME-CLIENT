@@ -1,0 +1,80 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="시작하기/소개"
+  parameters={{
+    docs: {
+      description: {
+        component: 'HOUME 프로젝트에서 Storybook을 사용하는 방법과 폴더 구조를 소개합니다.',
+      },
+    },
+  }}
+/>
+
+# HOUME Storybook
+
+## Storybook이란?
+
+Storybook은 UI 컴포넌트를 독립적으로 개발할 수 있는 도구입니다.
+
+- 🏗️ **구축** 컴포넌트를 독립적으로 개발
+- 📖 **문서화** 컴포넌트 API와 사용 사례 기록
+- 🧪 **테스트** 컴포넌트 동작과 엣지 케이스 검증
+
+## 프로젝트 아키텍처
+
+HOUME은 **도메인 기반, 기능별 아키텍처**를 따릅니다:
+
+```
+src/
+├── pages/[feature]/     # 기능별 코드
+│   ├── components/     # 기능 컴포넌트
+│   └── ...
+├── shared/             # 공유 컴포넌트 및 유틸리티
+├── layout/             # 레이아웃 컴포넌트
+└── stories/            # Storybook 스토리
+```
+
+## 스토리 작성 위치
+
+모든 컴포넌트의 스토리는 `src/stories/` 디렉토리 내에서 관리합니다.
+
+이는 스토리 구조를 통일성 있게 유지하고, 컴포넌트 문서화를 한 곳에서 집중적으로 관리하기 위함입니다.
+
+> 컴포넌트의 실제 위치와 관계없이 스토리는 `src/stories/` 폴더 안에서만 작성해주세요.
+
+## 스토리 파일 작성 규칙
+
+파일명: `컴포넌트명.stories.tsx`
+
+- (ex) `MyModal.stories.tsx`, `SearchForm.stories.tsx`
+
+> 필요 시 `src/stories/` 하위에 기능별 디렉토리(`modals/`, `forms/` 등)를 만들어도 괜찮습니다.  
+> 단, 최상위 `src/stories/` 폴더 안에서만 관리되어야 합니다.
+
+## Storybook 사용법
+
+### 탐색
+- **기능별** 또는 **공유** 카테고리로 컴포넌트 탐색
+- 각 컴포넌트는 다양한 상태를 보여주는 여러 **스토리**를 포함
+- **Controls** 패널을 사용하여 컴포넌트 props와 상호작용
+- **Docs** 탭에서 자세한 API 문서 확인
+
+### 개발 워크플로우
+1. 각 기능 디렉토리에 컴포넌트 생성
+2. `src/stories/`에 다양한 사용 사례를 문서화하는 스토리 작성
+3. 독립적인 개발과 테스트를 위해 Storybook 활용
+4. 애플리케이션 코드에서 컴포넌트 참조
+
+## 🚀 Storybook 실행
+
+```bash
+pnpm storybook
+```
+
+## 개발 시작하기
+
+```bash
+# 개발 서버 실행
+pnpm dev
+```
