@@ -31,3 +31,10 @@ dist-ssr
 .env.production.local
 
 .eslintcache
+
+*storybook.log
+storybook-static
+
+# Others
+.claude
+CLAUDE.md
