@@ -1,10 +1,11 @@
 import * as styles from './chargeBtn.css';
 
 interface ChargeButtonProps extends React.ComponentProps<'button'> {
+  children: React.ReactNode;
   isActive?: boolean;
 }
 
-const ChargeButton = ({ isActive = true }: ChargeButtonProps) => {
+const ChargeButton = ({ children, isActive = true }: ChargeButtonProps) => {
   return (
     <button
       type="button"
@@ -12,7 +13,7 @@ const ChargeButton = ({ isActive = true }: ChargeButtonProps) => {
         state: isActive ? 'active' : 'disabled',
       })}
     >
-      충전하기
+      {children}
     </button>
   );
 };

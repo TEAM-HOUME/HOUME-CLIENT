@@ -19,12 +19,14 @@ type Story = StoryObj<typeof ChargeButton>;
 
 export const Active: Story = {
   args: {
+    children: '충전하기',
     isActive: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
+    children: '충전하기',
     isActive: false,
   },
 };
