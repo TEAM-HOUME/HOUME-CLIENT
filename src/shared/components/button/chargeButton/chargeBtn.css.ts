@@ -12,6 +12,7 @@ export const chargeButton = recipe({
     ...fontStyle('caption_m_12'),
     color: colorVars.color.primary,
     transition: 'all 0.2s ease-in-out',
+    border: 'none',
   },
   variants: {
     state: {
