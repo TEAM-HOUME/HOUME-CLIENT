@@ -27,6 +27,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
+    "@vanilla-extract/recipes": "^0.5.7",
     "axios": "^1.10.0",
     "lint-staged": "^16.1.2",
     "react": "^19.1.0",
