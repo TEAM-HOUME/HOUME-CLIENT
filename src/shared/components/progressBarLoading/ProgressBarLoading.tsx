@@ -1,16 +1,21 @@
 import * as styles from './ProgressBarLoading.css';
-import startIcon from '@/shared/assets/icons/startIcon.svg';
-import loadingIcon from '@/shared/assets/icons/loadingIcon.svg';
-import completeIcon from '@/shared/assets/icons/completeIcon.svg';
 
-export const ProgressBarLoading = () => {
-  const icons = [startIcon, loadingIcon, completeIcon];
+export type ProgressBarLoadingVariant = 'start' | 'loading' | 'complete';
 
+interface ProgressBarLoadingProps {
+  variant: ProgressBarLoadingVariant;
+  text?: string;
+}
+
+const ProgressBarLoading = ({ variant, text }: ProgressBarLoadingProps) => {
   return (
     <div className={styles.wrapper}>
-      {icons.map((icon, index) => (
-        <img key={index} src={icon} alt={`progress-${index + 1}`} />
-      ))}
+      <div className={styles.backgroundBar}>
+        <div className={styles.fillVariants({ variant })} />
+      </div>
+      {text && <p className={styles.textWrapper}>{text}</p>}
     </div>
   );
 };
+
+export default ProgressBarLoading;
