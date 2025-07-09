@@ -9,9 +9,3 @@ export const wrapper = style({
   gap: '1rem',
   flexShrink: 0,
 });
-
-export const row = style({
-  display: 'flex',
-  justifyContent: 'space-between',
-  width: '100%',
-});
