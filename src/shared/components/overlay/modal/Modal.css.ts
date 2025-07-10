@@ -3,10 +3,18 @@ import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
 
-export const container = style({
+export const backdrop = style({
   position: 'fixed',
   inset: 0,
-  margin: 'auto',
+  background: 'rgba(0, 0, 0, 0.08)',
+  zIndex: zIndex.backdrop,
+});
+
+export const container = style({
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   zIndex: zIndex.modal,
   display: 'flex',
   flexDirection: 'column',
@@ -17,6 +25,7 @@ export const container = style({
   alignItems: 'center',
   gap: '3.2rem',
   borderRadius: '2rem',
+  border: 0,
 });
 
 export const info = style({

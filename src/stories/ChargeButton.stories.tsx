@@ -1,5 +1,5 @@
+import ChargeButton from '@components/button/chargeButton/ChargeButton';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import ChargeButton from '@/shared/components/button/chargeButton/chargeBtn';
 
 const meta: Meta<typeof ChargeButton> = {
   title: 'Button/ChargeButton',
