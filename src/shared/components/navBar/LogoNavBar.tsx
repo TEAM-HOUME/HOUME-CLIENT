@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import LogoIcon from '@shared/assets/icons/logoIcon.svg?react';
 import ProfileIcon from '@shared/assets/icons/profileIcon.svg?react';
 import * as styles from './LogoNavBar.css';

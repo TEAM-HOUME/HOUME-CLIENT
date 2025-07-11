@@ -9,7 +9,7 @@
 //
 // isAuthenticated 는 임시 하드코딩 값이며, 추후 useAuth 훅 등의 실제 인증 상태로 교체될 예정입니다.
 // ------------------------------
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router';
 import { ROUTES } from '@/routes/paths';
 import RootLayout from '@/layout/RootLayout';
 import ProtectedRoute from '@/routes/ProtectedRoute';

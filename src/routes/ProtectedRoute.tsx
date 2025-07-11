@@ -4,7 +4,7 @@
 //
 // createBrowserRouter 객체 트리에서 중간 노드로 사용해
 // 하위(children) 라우트를 한 번에 보호할 수 있습니다.
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 import { ROUTES } from '@/routes/paths';
 
 interface ProtectedRouteProps {

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import BackIcon from '@shared/assets/icons/backIcon.svg?react';
 import * as styles from './TitleNavBar.css';
 import * as btnStyles from './LoginNavBtn.css';
