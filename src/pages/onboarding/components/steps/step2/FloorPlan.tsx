@@ -1,7 +1,6 @@
 // Step 2
 import { useEffect, useState } from 'react';
 import * as styles from './FloorPlan.css';
-import type { OpenSheetKey } from '@/pages/onboarding/types/OpenSheet';
 import FloorCard from '@/shared/components/card/floorCard/FloorCard';
 import { mockimages } from '@/pages/onboarding/constants/step2MockData';
 import NoMatchButton from '@/shared/components/button/noMatchButton/NoMatchButton';
@@ -11,7 +10,7 @@ import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
 const FloorPlan = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [openSheet, setOpenSheet] = useState<OpenSheetKey>(null);
+  const [openSheet, setOpenSheet] = useState<null | 'noMatch' | 'flip'>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [chosenImage, setChosenImage] = useState<{
     id: number;
