@@ -1,6 +1,17 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+
+const fadeInUp = keyframes({
+  '0%': {
+    opacity: 0,
+    transform: 'translateY(1rem)',
+  },
+  '100%': {
+    opacity: 1,
+    transform: 'translateY(0)',
+  },
+});
 
 export const wrapper = style({
   display: 'flex',
@@ -15,6 +26,7 @@ export const titleWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
+  animation: `${fadeInUp} 1.2s ease-out forwards`,
 });
 
 export const title = style({
@@ -36,6 +48,7 @@ export const placeholderBox = style({
   height: '22rem',
   backgroundColor: colorVars.color.gray100,
   borderRadius: '16px',
+  animation: `${fadeInUp} 1.2s ease-out forwards`,
 });
 
 export const buttonGroup = style({
