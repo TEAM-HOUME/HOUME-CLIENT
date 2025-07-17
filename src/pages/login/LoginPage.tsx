@@ -1,3 +1,4 @@
+import LoginBeforeImage from '@assets/icons/loginBefore.png';
 import * as styles from './loginPage.css';
 import { KAKAO_AUTH_URL } from './constants/kakaoLoginPath';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
@@ -23,7 +24,13 @@ const LoginPage = () => {
           결과를 저장하고 다시 볼 수 있어요.
         </p>
       </div>
-      <div className={styles.imgbox}></div>
+      <div className={styles.imgbox}>
+        <img
+          src={LoginBeforeImage}
+          alt="로그인 전 이미지"
+          className={styles.loginImg}
+        />
+      </div>
       <div className={styles.btnarea}>
         <CtaButton typeVariant="kakao" onClick={handleKakaoLogin}>
           카카오 로그인

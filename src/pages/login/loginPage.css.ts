@@ -30,6 +30,12 @@ export const content = style({
 
 export const imgbox = style({
   width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+});
+
+export const loginImg = style({
+  width: '37.5rem',
   height: '34.4rem',
 });
 
