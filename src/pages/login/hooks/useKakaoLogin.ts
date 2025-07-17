@@ -44,7 +44,7 @@ export const useKakaoLogin = () => {
     },
     onError: (error) => {
       console.error('[useKakaoLogin] 로그인 실패:', error);
-      alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      // 오류 처리는 KakaoCallback 컴포넌트에서 useErrorHandler로 처리
     },
   });
 };
