@@ -35,35 +35,35 @@ HOUME는 사용자가 자신만의 개성 있는 공간을 디자인하고 꾸�
           <img 
             src="https://github.com/user-attachments/assets/8379c9f8-117c-4877-b11f-a072f300e398"
             alt="엄경호" 
-            style="width: 360px;"
+            style="width: 140px; height: 224px"
           />
         </td>
         <td>
           <img 
             src="https://github.com/user-attachments/assets/19b88a4d-f69c-45e4-9759-d8d5992ce052"
             alt="박소이" 
-            style="width: 360px;"
+            style="width: 140px; height: 224px"
           />
         </td>
         <td>
           <img 
             src="https://github.com/user-attachments/assets/3a5c0623-8950-4628-af66-5e653088bc9c"
             alt="임지성" 
-            style="width: 360px;"
+            style="width: 140px; height: 224px"
           />
         </td>
         <td>
           <img 
             src="https://github.com/user-attachments/assets/bf9ee9cd-02de-417e-b683-c6762f6679e8"
             alt="조성하" 
-            style="width: 360px;"
+            style="width: 140px; height: 224px"
           />
         </td>
         <td>
           <img 
             src="https://github.com/user-attachments/assets/2bd6e242-9efb-47a5-9b9f-444797a28295"
             alt="문혜성" 
-            style="width: 360px;"
+            style="width: 140px; height: 224px"
           />
         </td>
       </tr>
