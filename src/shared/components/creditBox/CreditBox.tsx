@@ -27,21 +27,23 @@ const CreditBox = ({ credit, disabled = false }: CreditBoxProps) => {
 
   return (
     <div className={styles.boxWrapper}>
-      <div className={styles.textContainer}>
-        <span className={styles.infoText} id="credit-label">
-          보유 크레딧
-        </span>
-        <span className={styles.creditText} aria-labelledby="credit-label">
-          {credit}
-        </span>
+      <div className={styles.contentWrapper}>
+        <div className={styles.textContainer}>
+          <span className={styles.infoText} id="credit-label">
+            보유 크레딧
+          </span>
+          <span className={styles.creditText} aria-labelledby="credit-label">
+            {credit}
+          </span>
+        </div>
+        <ChargeButton
+          disabled={disabled || isChargeDisabled}
+          onClick={handleChargeClick}
+          isActive={!isChargeDisabled}
+        >
+          충전하기
+        </ChargeButton>
       </div>
-      <ChargeButton
-        disabled={disabled || isChargeDisabled}
-        onClick={handleChargeClick}
-        isActive={!isChargeDisabled}
-      >
-        충전하기
-      </ChargeButton>
     </div>
   );
 };

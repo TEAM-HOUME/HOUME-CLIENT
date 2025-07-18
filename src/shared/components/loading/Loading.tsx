@@ -6,7 +6,10 @@ interface LoadingProps {
   show?: boolean;
 }
 
-const Loading: React.FC<LoadingProps> = ({ text = '로딩중', show = true }) => {
+const Loading: React.FC<LoadingProps> = ({
+  text = '로딩 중입니다',
+  show = true,
+}) => {
   if (!show) return null;
 
   return (

@@ -73,13 +73,26 @@ export const postCreditLog = async () => {
   });
 };
 
+// 이미지 생성 api
 export const generateImage = async (
   requestData: GenerateImageRequest
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: '/api/v1/generated-images/generate',
+    url: '/api/v2/generated-images/generate',
     body: requestData,
+  };
+
+  return await request<GenerateImageResponse['data']>(config);
+};
+
+// 이미지 생성 폴백 api
+export const checkGenerateImageStatus = async (
+  houseId: number
+): Promise<GenerateImageResponse['data']> => {
+  const config: RequestConfig = {
+    method: HTTPMethod.GET,
+    url: `/api/v1/generated-images/generate?houseId=${houseId}`,
   };
 
   return await request<GenerateImageResponse['data']>(config);

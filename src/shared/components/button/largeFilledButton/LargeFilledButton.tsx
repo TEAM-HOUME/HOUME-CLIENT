@@ -23,7 +23,7 @@ const LargeFilled = ({
       onClick={onClick}
       className={styles.largeFilled({
         state: isError ? 'error' : isActive ? 'active' : 'disabled',
-        selected: isSelected,
+        selected: isError ? false : isSelected,
         buttonSize,
       })}
       {...props}

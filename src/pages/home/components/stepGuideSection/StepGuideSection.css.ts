@@ -48,10 +48,18 @@ export const imageGap = style({
   marginTop: '2rem',
 });
 
-export const resultLandImage = style({
-  width: '37.5rem',
-  height: '24rem',
-  backgroundColor: colorVars.color.gray100,
+export const resultImageContainer = style({
+  width: '100%',
+  padding: '0 2rem',
   marginBottom: '4rem',
+});
+
+export const resultLandImage = style({
+  width: '100%',
+  aspectRatio: '3 / 2',
+  backgroundColor: colorVars.color.gray100,
   objectFit: 'cover',
+  borderRadius: '16px',
+  display: 'block',
+  boxSizing: 'border-box',
 });

@@ -6,10 +6,9 @@ export const container = style({
   display: 'flex',
   width: '100%',
   minWidth: '33.5rem',
-  minHeight: '33.2rem',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  borderRadius: '1.6rem',
+  borderRadius: '16px',
   overflow: 'hidden',
   backgroundColor: colorVars.color.gray000,
 });
@@ -17,7 +16,7 @@ export const container = style({
 export const imgbox = style({
   width: '100%',
   minWidth: '33.5rem',
-  height: '22rem',
+  aspectRatio: '3/2',
   overflow: 'hidden',
   objectFit: 'cover', // 비율 유지하며 영역 완전히 채움
   objectPosition: 'center', // 이미지 중앙 부분 표시
@@ -42,4 +41,6 @@ export const textbox = style({
 
 export const title = style({
   ...fontStyle('title_m_16'),
+  paddingLeft: '0.4rem',
+  paddingRight: '0.4rem',
 });
