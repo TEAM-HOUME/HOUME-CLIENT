@@ -1,6 +1,7 @@
 import { colorVars } from '@styles/tokens/color.css';
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -8,6 +9,7 @@ export const wrapper = style({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '1.6rem 2rem 2rem 2rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const infoSection = style({
@@ -80,7 +82,8 @@ export const imageContainer = style({
   position: 'relative',
   width: '100%',
   minWidth: '33.5rem',
-  height: '33.5rem',
+  aspectRatio: '1 / 1',
+  height: 'auto',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -91,7 +94,7 @@ export const currentImageArea = style({
   position: 'absolute',
   width: '100%',
   minWidth: '33.5rem',
-  height: '33.5rem',
+  aspectRatio: '1 / 1',
   overflow: 'hidden',
   transition: 'transform 0.6s ease, opacity 0.6s ease',
   transform: 'translateY(0)',
@@ -108,7 +111,7 @@ export const nextImageArea = style({
   position: 'absolute',
   width: '91%',
   minWidth: '30.5rem',
-  height: '30.5rem',
+  aspectRatio: '1 / 1',
   borderRadius: '16px',
   overflow: 'hidden',
   transition:
@@ -120,7 +123,7 @@ export const nextImageArea = style({
 export const nextImageAreaActive = style({
   width: '100%',
   minWidth: '33.5rem',
-  height: '33.5rem',
+  aspectRatio: '1 / 1',
   transform: 'translateY(0)',
   opacity: 1,
 });

@@ -3,6 +3,7 @@ import {
   useLocation,
   useNavigate,
   useSearchParams,
+  useMatch,
 } from 'react-router-dom';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
@@ -10,6 +11,7 @@ const GeneratePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isBackIcon = useMatch('/generate/result');
 
   // 마이페이지에서 온 경우 체크
   const from = searchParams.get('from');
@@ -38,7 +40,7 @@ const GeneratePage = () => {
     <main>
       <TitleNavBar
         title={title}
-        isBackIcon={true}
+        isBackIcon={!!isBackIcon}
         isLoginBtn={false}
         onBackClick={handleBackClick}
       />

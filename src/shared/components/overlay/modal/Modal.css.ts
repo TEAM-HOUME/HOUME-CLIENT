@@ -1,16 +1,23 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
+
+const fadeIn = keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+});
 
 export const backdrop = style({
   position: 'fixed',
   inset: 0,
   background: 'rgba(0, 0, 0, 0.2)',
   zIndex: zIndex.backdrop,
+  animation: `${fadeIn} 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
 });
 
 export const container = style({
+  backgroundColor: colorVars.color.gray000,
   position: 'fixed',
   top: '50%',
   left: '50%',
@@ -26,11 +33,13 @@ export const container = style({
   gap: '3.2rem',
   borderRadius: '2rem',
   border: 0,
+  animation: `${fadeIn} 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
+  willChange: 'opacity',
 });
 
 export const info = style({
   display: 'flex',
-  width: '25rem',
+  width: '22.8rem',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',

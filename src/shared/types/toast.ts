@@ -1,3 +1,4 @@
+import { Slide } from 'react-toastify';
 import type { ToastContainerProps } from 'react-toastify';
 
 export const TOAST_TYPE = {
@@ -31,4 +32,5 @@ export const toastConfig: ToastContainerProps = {
   toastStyle: {
     ...toastStyle,
   },
+  transition: Slide,
 };

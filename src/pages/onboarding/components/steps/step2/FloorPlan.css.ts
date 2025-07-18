@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   width: '100%',
@@ -14,6 +15,7 @@ export const container = style({
   justifyContent: 'center',
   alignItems: 'flex-start',
   padding: '2rem 2rem 4rem 2rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const gridbox = style({

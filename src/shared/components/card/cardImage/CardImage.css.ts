@@ -88,8 +88,8 @@ export const disabledcardimg = style([
 export const checkbox = recipe({
   base: {
     position: 'absolute',
-    top: '0.8rem',
-    right: '0.8rem',
+    top: '1rem',
+    right: '1rem',
     width: '2rem',
     height: '2rem',
     borderRadius: '9999px',
@@ -98,6 +98,8 @@ export const checkbox = recipe({
     justifyContent: 'center',
     zIndex: 1,
     ...fontStyle('body_m_14'),
+    transition:
+      'width 0.2s ease, height 0.2s ease, background-color 0.2s ease, color 0.2s ease',
   },
   variants: {
     state: {
@@ -115,6 +117,8 @@ export const checkbox = recipe({
         backgroundColor: colorVars.color.primary,
         border: 'none',
         color: colorVars.color.gray000,
+        width: '2.4rem',
+        height: '2.4rem',
       },
       disabled: {
         display: 'none',

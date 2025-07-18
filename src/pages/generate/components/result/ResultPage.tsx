@@ -2,7 +2,8 @@ import { useState } from 'react';
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
 import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
-import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
+import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
+import Loading from '@components/loading/Loading';
 import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
@@ -18,7 +19,6 @@ import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import HeadingText from '@/shared/components/text/HeadingText';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Modal from '@/shared/components/overlay/modal/Modal';
-import Loading from '@/shared/components/loading/Loading';
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (
@@ -72,9 +72,7 @@ const ResultPage = () => {
   }
 
   // result가 있을 때만 mutation hook들 호출 (조건부 렌더링을 위해)
-  const { mutate: sendPreference } = usePreferenceMutation(
-    result?.imageId || 0
-  );
+  const { mutate: sendPreference } = usePreferenceMutation();
   const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   const { mutate: sendCreditLogs } = useCreditLogMutation();
 
@@ -91,17 +89,7 @@ const ResultPage = () => {
 
   const handleVote = (isLike: boolean) => {
     setSelected(isLike ? 'like' : 'dislike');
-    sendPreference(
-      { isLike },
-      {
-        onSuccess: () => {
-          console.log('성공');
-        },
-        onError: (e) => {
-          console.error(e);
-        },
-      }
-    );
+    sendPreference({ imageId: result.imageId, isLike });
   };
 
   const handleOpenModal = () => {
@@ -173,6 +161,7 @@ const ResultPage = () => {
             <CtaButton
               aria-label="프리미엄 가구 추천 기능 잠금 해제"
               buttonSize={'small'}
+              fontSize={'body'}
               onClick={handleOpenModal}
             >
               가구 추천받기
