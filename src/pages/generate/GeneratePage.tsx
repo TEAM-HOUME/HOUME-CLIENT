@@ -1,9 +1,10 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useMatch } from 'react-router-dom';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
 const GeneratePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isBackIcon = useMatch('/generate/result');
 
   // 현재 경로에 따라 뒤로가기 로직 결정
   const handleBackClick = () => {
@@ -20,7 +21,7 @@ const GeneratePage = () => {
     <main>
       <TitleNavBar
         title={'스타일링 이미지 생성'}
-        isBackIcon={true}
+        isBackIcon={!!isBackIcon}
         isLoginBtn={false}
         onBackClick={handleBackClick}
       />
