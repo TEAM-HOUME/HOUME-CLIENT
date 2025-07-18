@@ -116,7 +116,7 @@ const ResultPage = () => {
   return (
     <div className={styles.wrapper}>
       <section className={styles.headerSection}>
-        <HeadingText title={headerTitle} content="" />
+        {!isFromMypage && <HeadingText title={headerTitle} content="" />}
         <div className={styles.infoSection}>
           <p className={styles.infoText}>
             {`${result.equilibrium}에 거주하며 ${result.tagName}한 취향을 가진\n${result.name}님을 위한 맞춤 인테리어 스타일링이에요!`}
