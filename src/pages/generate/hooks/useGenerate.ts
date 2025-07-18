@@ -93,16 +93,14 @@ export const useGenerateImageApi = () => {
       // API 완료 신호를 Zustand store에 저장
       setApiCompleted(true);
 
-      // 약간의 지연 후 navigate (프로그레스 바가 100% 되는 시간 고려)
-      setTimeout(() => {
-        navigate('/generate/result', {
-          state: {
-            result: data,
-          },
-          replace: true,
-        });
-        resetFunnel(); // 성공 시에도 초기화
-      }, 2000); // 2초 지연 (프로그레스 바 완료 시간)
+      // 즉시 결과 페이지로 이동
+      navigate('/generate/result', {
+        state: {
+          result: data,
+        },
+        replace: true,
+      });
+      resetFunnel(); // 성공 시에도 초기화
 
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
@@ -118,7 +116,7 @@ export const useGenerateImageStatusCheck = (
 ) => {
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
-  const { resetGenerate } = useGenerateStore();
+  const { resetGenerate, setApiCompleted } = useGenerateStore();
 
   const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
@@ -141,6 +139,10 @@ export const useGenerateImageStatusCheck = (
   useEffect(() => {
     if (query.isSuccess && query.data) {
       resetGenerate();
+
+      // API 완료 신호를 Zustand store에 저장
+      setApiCompleted(true);
+
       console.log('상태 체크 성공:', query.data);
       // 성공 시 결과 페이지로 이동
       navigate('/generate/result', {
