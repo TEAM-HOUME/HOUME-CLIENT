@@ -12,6 +12,7 @@ import {
   postLikeStack,
   postPreference,
 } from '../apis/generate';
+import { useGenerateStore } from '../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../types/GenerateType';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { queryClient } from '@/shared/apis/queryClient';
@@ -27,10 +28,14 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useResultData = (imageId: number) => {
+export const useResultData = (
+  imageId: number,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: [QUERY_KEY.GENERATE_RESULT, imageId],
     queryFn: () => getResultData(imageId),
+    ...options,
   });
 };
 
@@ -74,19 +79,30 @@ export const useGenerateImageApi = () => {
   // const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
+  const { setApiCompleted } = useGenerateStore();
 
   const generateImageRequest = useMutation({
-    mutationFn: (userInfo: GenerateImageRequest) => generateImage(userInfo),
+    mutationFn: (userInfo: GenerateImageRequest) => {
+      console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
+      return generateImage(userInfo);
+    },
     onSuccess: (data) => {
-      console.log('이미지 생성 요청 결과: ', data);
-      // 성공 시 자동으로 ResultPage로 이동
-      navigate('/generate/result', {
-        state: {
-          result: data,
-        },
-        replace: true,
-      });
-      resetFunnel(); // 성공 시에도 초기화
+      console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
+
+      // API 완료 신호를 Zustand store에 저장
+      setApiCompleted(true);
+
+      // 약간의 지연 후 navigate (프로그레스 바가 100% 되는 시간 고려)
+      setTimeout(() => {
+        navigate('/generate/result', {
+          state: {
+            result: data,
+          },
+          replace: true,
+        });
+        resetFunnel(); // 성공 시에도 초기화
+      }, 2000); // 2초 지연 (프로그레스 바 완료 시간)
+
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });

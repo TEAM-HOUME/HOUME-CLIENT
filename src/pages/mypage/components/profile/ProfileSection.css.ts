@@ -19,7 +19,7 @@ export const profileBox = style({
 export const iconWrapper = style({
   width: '11.2rem',
   height: '11.2rem',
-  borderRadius: '99.9rem',
+  borderRadius: '999px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

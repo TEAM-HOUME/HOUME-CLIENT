@@ -9,7 +9,7 @@ export const flipButtonBase = style({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '0.8rem',
-  borderRadius: '99.9rem',
+  borderRadius: '999px',
   transition: 'all 0.2s ease-in-out',
   border: 'none',
   flexShrink: 0,

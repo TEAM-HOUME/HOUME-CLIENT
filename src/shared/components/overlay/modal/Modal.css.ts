@@ -31,7 +31,7 @@ export const container = style({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '3.2rem',
-  borderRadius: '2rem',
+  borderRadius: '20px',
   border: 0,
   animation: `${fadeIn} 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
   willChange: 'opacity',

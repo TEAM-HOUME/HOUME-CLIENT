@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { useImageGenerationFunnel } from './hooks/useImageGenerationFunnel.hooks';
 import Step1HouseInfo from './components/steps/step1/Step1HouseInfo';
 import Step2FloorPlan from './components/steps/step2/Step2FloorPlan';
@@ -13,18 +12,6 @@ import FunnelLayout from './components/layout/FunnelLayout';
 
 export const ImageGenerationFunnel = () => {
   const funnel = useImageGenerationFunnel();
-  const prevStepRef = useRef<string | null>(null);
-
-  // 현재 스텝 가져오기
-  const currentStep = funnel.step;
-
-  // 다음 스텝 이동 시 스크롤 최상단으로 이동(뒤로가기에는 적용 안됨)
-  useEffect(() => {
-    if (prevStepRef.current !== null && prevStepRef.current !== currentStep) {
-      window.scrollTo(0, 0);
-    }
-    prevStepRef.current = currentStep;
-  }, [currentStep]);
 
   return (
     <FunnelLayout>
