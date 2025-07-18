@@ -46,9 +46,9 @@ export const useHateStackMutation = () => {
 };
 
 // 결과 이미지 선호도 전송용 (POST)
-export const usePreferenceMutation = (imageId: number) => {
+export const usePreferenceMutation = () => {
   return useMutation({
-    mutationFn: ({ isLike }: { isLike: boolean }) =>
+    mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postPreference(imageId, isLike),
   });
 };
