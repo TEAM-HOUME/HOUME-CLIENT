@@ -47,7 +47,7 @@ const HomePage = () => {
    * 플로팅 버튼 클릭 핸들러
    * - 로그인 안됨: 로그인 페이지로 이동
    * - 로그인됨 + 크레딧 있음: onboarding 이미지 생성 플로우로 이동
-   * - 로그인됨 + 크레딧 없음: 마이페이지로 이동
+   * - 로그인됨 + 크레딧 없음: 버튼 비활성화로 인해 클릭 불가
    */
   const handleCtaButtonClick = () => {
     if (!isLoggedIn) {
@@ -58,12 +58,11 @@ const HomePage = () => {
     // 로딩 중이면 클릭 무시
     if (isUserDataLoading) return;
 
-    // 크레딧이 있으면 onboarding으로, 없으면 마이페이지로
+    // 크레딧이 있으면 onboarding으로 이동
     if (userData?.CreditCount && userData.CreditCount > 0) {
       navigate(ROUTES.ONBOARDING);
-    } else {
-      navigate(ROUTES.MYPAGE);
     }
+    // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
   };
 
   // 개발용 로그 (추후 제거 예정)
@@ -87,7 +86,16 @@ const HomePage = () => {
       </div>
       <div className={styles.buttonContainer}>
         {/* 로그인 상태와 크레딧에 따라 하단 플로팅 버튼 동적 변경 */}
-        <CtaButton onClick={handleCtaButtonClick}>{getButtonText()}</CtaButton>
+        <CtaButton
+          onClick={handleCtaButtonClick}
+          isActive={
+            !isLoggedIn ||
+            isUserDataLoading ||
+            (userData?.CreditCount && userData.CreditCount > 0)
+          }
+        >
+          {getButtonText()}
+        </CtaButton>
       </div>
     </main>
   );
