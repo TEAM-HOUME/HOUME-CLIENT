@@ -29,7 +29,7 @@ const SettingSection = () => {
       <div className={styles.divider} />
 
       <div className={styles.buttonArea}>
-        {settingItems.map(({ id, label, onClick }, index) => (
+        {settingItems.map(({ id, label, onClick }) => (
           <div key={id}>
             <button
               className={styles.settingButton}
@@ -38,9 +38,7 @@ const SettingSection = () => {
             >
               <span className={styles.buttonText}>{label}</span>
             </button>
-            {index < settingItems.length - 1 && (
-              <div className={styles.divider} />
-            )}
+            <div className={styles.divider} />
           </div>
         ))}
       </div>
