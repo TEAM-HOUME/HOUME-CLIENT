@@ -39,8 +39,11 @@ export const radioImageBox = style({
 });
 
 export const radioImage = style({
-  width: '33.5rem',
+  width: '100%',
+  height: '100%',
   borderRadius: '16px',
+  objectFit: 'cover',
+  objectPosition: 'center',
 });
 
 export const buttonGroup = style({
