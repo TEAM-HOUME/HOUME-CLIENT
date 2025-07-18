@@ -18,13 +18,15 @@ const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
     switch (buttonType) {
       case 'login':
         return (
-          <button
-            type="button"
+          <div
+            className={styles.rightdiv}
             onClick={() => navigate(ROUTES.LOGIN)}
-            className={btnStyles.loginNav}
+            style={{ cursor: 'pointer' }}
           >
-            로그인
-          </button>
+            <button type="button" className={btnStyles.loginNav}>
+              로그인
+            </button>
+          </div>
         );
       case 'profile':
         return (
@@ -42,7 +44,7 @@ const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
       <div className={styles.leftdiv}>
         <LogoIcon />
       </div>
-      <div className={styles.rightdiv}>{handleRenderBtn()}</div>
+      {handleRenderBtn()}
     </nav>
   );
 };
