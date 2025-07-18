@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
 import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
@@ -75,6 +75,13 @@ const ResultPage = () => {
   const { mutate: sendPreference } = usePreferenceMutation();
   const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   const { mutate: sendCreditLogs } = useCreditLogMutation();
+
+  // 마이페이지에서 온 경우 기존 isLike 상태를 버튼에 반영
+  useEffect(() => {
+    if (isFromMypage && mypageResult?.isLike !== undefined) {
+      setSelected(mypageResult.isLike ? 'like' : 'dislike');
+    }
+  }, [isFromMypage, mypageResult?.isLike]);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
