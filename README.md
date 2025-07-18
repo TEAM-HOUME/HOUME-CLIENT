@@ -9,9 +9,6 @@
 <img width="5760" height="3240" alt="Slide 16_9 - 167" src="https://github.com/user-attachments/assets/073163d3-85f2-44d3-af8c-89d833538062" />
 <img width="1920" height="1080" alt="Slide 16_9 - 176" src="https://github.com/user-attachments/assets/9f36894d-65b6-42cc-9699-7c9d275cf308" />
 
-
-
-
 <br/> <strong>"나다운 집을 만들어주는 여정, 하우미"</strong>
 
 나만의 개성과 취향이 담긴 공간을 만들어가는 특별한 경험을 제공하는 서비스입니다.
@@ -430,9 +427,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 <div align="center">
 
-
 ---
-
 
 <img width="1920" height="1080" alt="Slide 16_9 - 49" src="https://github.com/user-attachments/assets/5ee6dc3f-c86d-463a-a7d5-291a415c2ded" />
 
@@ -443,8 +438,3 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger';
 <div align="center">
   <strong>🏠 나다운 집을 만들어가는 여정, HOUME 🏠</strong>
 </div>
-
-
-
-
-

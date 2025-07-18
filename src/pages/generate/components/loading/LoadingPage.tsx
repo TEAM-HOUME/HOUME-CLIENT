@@ -7,8 +7,8 @@ import {
   useLikeStackMutation,
   useHateStackMutation,
   useGenerateImageApi,
+  useGenerateImageStatusCheck,
 } from '../../hooks/useGenerate';
-import { useGenerateStore } from '../../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../../types/GenerateType';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -21,7 +21,7 @@ const LoadingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
-  const { resetGenerate } = useGenerateStore();
+  // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
   // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
   const requestData: GenerateImageRequest | null =
@@ -29,24 +29,27 @@ const LoadingPage = () => {
       ?.generateImageRequest || null;
   const generateImageRequest = useGenerateImageApi();
 
+  useGenerateImageStatusCheck(requestData?.houseId || 0, true);
+
   useEffect(() => {
     if (requestData) {
       console.log('이미지 생성 요청 시작:', requestData);
-
-      // API 요청 시작 시 store 리셋
-      resetGenerate();
-
-      // 이미 진행 중인 요청이 있으면 중복 실행 방지
-      if (generateImageRequest.isIdle) {
-        generateImageRequest.mutate(requestData);
-      } else {
-        console.log('이미지 생성 요청이 이미 진행 중이므로 스킵');
-      }
+      generateImageRequest.mutate(requestData, {
+        onError: (error: any) => {
+          // 재요청 코드 42900 확인
+          if (error?.response?.data?.code === 42900) {
+            console.log('재요청 필요, 상태 체크 시작');
+            // setShouldCheckStatus(true);
+          } else {
+            console.error('이미지 생성 실패:', error);
+          }
+        },
+      });
     } else {
       console.log('requestData is null, redirect to /onboarding');
       navigate(ROUTES.ONBOARDING);
     }
-  }, [requestData, navigate, resetGenerate]); // resetGenerate 의존성 추가
+  }, [requestData, navigate]); // resetGenerate 의존성 추가
   // ... 이미지 생성 api 코드 끝
 
   const [currentPage, setCurrentPage] = useState(0);
