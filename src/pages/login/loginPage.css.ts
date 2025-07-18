@@ -61,4 +61,5 @@ export const aside = style({
 export const link = style({
   textDecoration: 'underline',
   textUnderlineOffset: '2px',
+  cursor: 'pointer',
 });

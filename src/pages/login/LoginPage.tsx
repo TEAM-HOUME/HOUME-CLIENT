@@ -39,7 +39,7 @@ const LoginPage = () => {
         <aside className={styles.aside}>
           가입 시{' '}
           <a
-            href="https://github.com/TEAM-HOUME"
+            href=""
             className={styles.link}
             target="_blank"
             rel="noopener noreferrer"
@@ -48,7 +48,7 @@ const LoginPage = () => {
           </a>{' '}
           및{' '}
           <a
-            href="https://github.com/TEAM-HOUME"
+            href=""
             className={styles.link}
             target="_blank"
             rel="noopener noreferrer"
