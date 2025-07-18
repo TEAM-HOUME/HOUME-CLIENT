@@ -13,6 +13,10 @@ export const flipButtonBase = style({
   transition: 'all 0.2s ease-in-out',
   border: 'none',
   flexShrink: 0,
+
+  ':active': {
+    backgroundColor: colorVars.color.primary_light1,
+  },
 });
 
 export const flipButtonVariants = styleVariants({

@@ -29,8 +29,8 @@ export const title = style({
 export const body = style({
   ...fontStyle('body_r_14'),
   color: colorVars.color.gray700,
-  whiteSpace: 'pre-wrap',
-  wordBreak: 'normal',
+  wordBreak: 'keep-all', // 단어 단위 줄바꿈(한글)
+  overflowWrap: 'break-word', // 너무 긴 단어 강제 줄바꿈
   alignSelf: 'stretch',
 });
 
