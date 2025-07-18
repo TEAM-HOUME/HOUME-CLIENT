@@ -2,6 +2,11 @@
 
 ![HOUME Logo](https://img.shields.io/badge/HOUME-나다운%20집을%20만들어주는%20여정-6F00FF?style=for-the-badge)
 <img width="7680" height="4320" alt="Slide 16_9 - 154" src="https://github.com/user-attachments/assets/ac72d5ec-b96e-4eaa-bf28-8e60e3d19a25" />
+<img width="7680" height="4320" alt="Slide 16_9 - 178" src="https://github.com/user-attachments/assets/0983921e-06a2-419e-8a86-b0ff16a61528" />
+<img width="1920" height="1080" alt="Slide 16_9 - 180" src="https://github.com/user-attachments/assets/62100a23-18e0-40ab-b9a7-a74e1f5e9a32" />
+<img width="7680" height="4320" alt="Slide 16_9 - 181" src="https://github.com/user-attachments/assets/7943a277-2e2a-4015-bf7f-45f4bfc02b38" />
+<img width="7680" height="4320" alt="Slide 16_9 - 182" src="https://github.com/user-attachments/assets/dcf87579-e345-47bf-bec3-eb6243cc3e48" />
+
 
 
 
