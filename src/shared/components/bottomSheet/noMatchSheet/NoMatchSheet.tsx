@@ -58,7 +58,7 @@ const NoMatchSheet = ({
       >
         <div className={styles.contentWapper}>
           <div className={styles.dragHandleContainer}>
-            <DragHandle />
+            <DragHandle onClick={onClose} />
           </div>
           <div className={styles.infoTextContainer}>
             <span className={styles.infoText}>

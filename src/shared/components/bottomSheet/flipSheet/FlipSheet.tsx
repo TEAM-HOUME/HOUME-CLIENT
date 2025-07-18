@@ -50,7 +50,7 @@ const FlipSheet = ({
       >
         <div className={styles.imageArea}>
           <div className={styles.dragHandleContainer}>
-            <DragHandle />
+            <DragHandle onClick={onClose} />
           </div>
           <p className={styles.infoText}>이미지를 좌우반전 할 수 있어요</p>
           <div className={styles.imageContainer}>
