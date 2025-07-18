@@ -23,7 +23,7 @@ const FunnelLayout = ({ children }: FunnelLayoutProps) => {
     if (!isOnboardingPage) return;
 
     // 브라우저 뒤로가기 이벤트 처리
-    const handlePopState = (event: PopStateEvent) => {
+    const handlePopState = () => {
       // 뒤로가기를 막기 위해 현재 위치를 다시 푸시
       window.history.pushState(null, '', window.location.pathname);
       setShowExitPopup(true);
