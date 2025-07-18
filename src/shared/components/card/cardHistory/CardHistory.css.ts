@@ -41,4 +41,6 @@ export const textbox = style({
 
 export const title = style({
   ...fontStyle('title_m_16'),
+  paddingLeft: '0.4rem',
+  paddingRight: '0.4rem',
 });
