@@ -89,9 +89,7 @@ const HomePage = () => {
         <CtaButton
           onClick={handleCtaButtonClick}
           isActive={
-            !isLoggedIn ||
-            isUserDataLoading ||
-            (userData?.CreditCount && userData.CreditCount > 0)
+            !isLoggedIn || isUserDataLoading || (userData?.CreditCount ?? 0) > 0
           }
         >
           {getButtonText()}
