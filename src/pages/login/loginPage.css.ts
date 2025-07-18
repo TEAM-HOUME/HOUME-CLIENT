@@ -33,7 +33,6 @@ export const content = style({
 export const imgbox = style({
   width: '100%',
   height: '34.4rem',
-  background: colorVars.color.gray100,
   animation: animationTokens.fadeInUpFast,
 });
 
