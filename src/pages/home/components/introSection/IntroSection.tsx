@@ -1,6 +1,10 @@
 import { useState, type ChangeEvent } from 'react';
 import * as styles from './IntroSection.css';
-import { INTERIOR_OPTIONS, type InteriorOption } from '../../types/options';
+import {
+  INTERIOR_IMAGES,
+  INTERIOR_OPTIONS,
+  type InteriorOption,
+} from '../../types/options';
 import SmallFilledButton from '@/shared/components/button/smallFilledButton/SmallFilledButton';
 
 const IntroSection = () => {
@@ -23,10 +27,14 @@ const IntroSection = () => {
           <br />
           AI 기반 이미지로 나만의 공간 스타일링을 제안해드려요.
         </p>
-
-        <div className={styles.placeholderBox} />
       </div>
-
+      <div className={styles.radioImageBox}>
+        <img
+          src={INTERIOR_IMAGES[selected]}
+          alt={selected}
+          className={styles.radioImage}
+        />
+      </div>
       <div
         className={styles.buttonGroup}
         role="radiogroup"

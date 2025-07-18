@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import SignupImage from '@assets/icons/loginAfter.png';
 import * as styles from './SignupCompletePage.css';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
@@ -27,7 +28,14 @@ const SignupCompletePage = () => {
           토큰 1개를 선물로 드렸어요.
         </p>
       </div>
-      <div className={styles.imgbox}></div>
+      <div className={styles.imgbox}>
+        <img
+          src={SignupImage}
+          alt="회원가입 완료 이미지"
+          className={styles.signUpImg}
+          loading="lazy"
+        />
+      </div>
       <div className={styles.btnarea}>
         <CtaButton onClick={handleGoToOnboarding}>이미지 만들러가기</CtaButton>
       </div>
