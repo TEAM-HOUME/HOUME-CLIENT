@@ -30,8 +30,8 @@ export const useMoodBoardQuery = (
   return useQuery({
     queryKey: ['moodBoardImages', limit],
     queryFn: () => getMoodBoardImage(limit),
-    staleTime: 1 * 60 * 1000,
-    gcTime: 2 * 60 * 1000,
+    staleTime: 3 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 };
 
@@ -42,7 +42,7 @@ export const usePrefetchMoodBoard = () => {
     queryClient.prefetchQuery({
       queryKey: ['moodBoardImages', limit],
       queryFn: () => getMoodBoardImage(limit),
-      staleTime: 1 * 60 * 1000,
+      staleTime: 3 * 60 * 1000,
     });
   };
   return { prefetchMoodBoard };
