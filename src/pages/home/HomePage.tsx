@@ -60,7 +60,7 @@ const HomePage = () => {
 
     // 크레딧이 있으면 onboarding으로, 없으면 마이페이지로
     if (userData?.CreditCount && userData.CreditCount > 0) {
-      navigate(ROUTES.ONBOARDING);
+      navigate(`${ROUTES.ONBOARDING}?from=home`);
     } else {
       navigate(ROUTES.MYPAGE);
     }

@@ -2,11 +2,29 @@ import * as styles from './Popup.css';
 
 interface PopupProps {
   onClose: () => void;
+  onConfirm?: () => void; // 확인/나가기 버튼 클릭 시 호출
   title: string;
   detail: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
-const Popup = ({ onClose, title, detail }: PopupProps) => {
+const Popup = ({
+  onClose,
+  onConfirm,
+  title,
+  detail,
+  confirmText = '나가기',
+  cancelText = '취소',
+}: PopupProps) => {
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm();
+    } else {
+      onClose();
+    }
+  };
+
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <dialog
@@ -21,11 +39,11 @@ const Popup = ({ onClose, title, detail }: PopupProps) => {
         </div>
 
         <div className={styles.buttonBox}>
-          <button type="button" className={styles.exit} onClick={onClose}>
-            나가기
+          <button type="button" className={styles.exit} onClick={handleConfirm}>
+            {confirmText}
           </button>
           <button type="button" className={styles.cancel} onClick={onClose}>
-            취소
+            {cancelText}
           </button>
         </div>
       </dialog>

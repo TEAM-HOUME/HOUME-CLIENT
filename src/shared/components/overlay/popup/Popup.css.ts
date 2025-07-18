@@ -38,11 +38,13 @@ export const info = style({
 export const title = style({
   ...fontStyle('heading_sb_18'),
   color: colorVars.color.gray900,
+  whiteSpace: 'pre-line',
 });
 
 export const detail = style({
   ...fontStyle('body_r_14'),
   color: colorVars.color.gray700,
+  whiteSpace: 'pre-line',
 });
 
 export const buttonBox = style({

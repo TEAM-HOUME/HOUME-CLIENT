@@ -12,7 +12,7 @@ const SignupCompletePage = () => {
   const navigate = useNavigate();
 
   const handleGoToOnboarding = () => {
-    navigate(ROUTES.ONBOARDING);
+    navigate(`${ROUTES.ONBOARDING}?from=signup-complete`);
   };
 
   return (
