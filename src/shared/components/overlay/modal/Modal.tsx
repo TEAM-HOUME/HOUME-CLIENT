@@ -32,7 +32,7 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      <dialog
+      <div
         className={styles.container}
         role="dialog"
         aria-modal="true"
@@ -55,7 +55,7 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
             <span className={styles.exitButtonText}>나가기</span>
           </button>
         </div>
-      </dialog>
+      </div>
     </div>
   );
 };

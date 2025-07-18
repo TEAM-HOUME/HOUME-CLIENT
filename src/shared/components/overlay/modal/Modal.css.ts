@@ -11,6 +11,7 @@ export const backdrop = style({
 });
 
 export const container = style({
+  backgroundColor: colorVars.color.gray000,
   position: 'fixed',
   top: '50%',
   left: '50%',
@@ -30,7 +31,7 @@ export const container = style({
 
 export const info = style({
   display: 'flex',
-  width: '25rem',
+  width: '22.8rem',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
@@ -69,7 +70,6 @@ export const count = style({
 export const creditImg = style({
   width: '22.8rem',
   height: '12rem',
-  background: colorVars.color.gray100,
 });
 
 export const buttonBox = style({
