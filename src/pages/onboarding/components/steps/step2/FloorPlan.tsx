@@ -43,7 +43,6 @@ const FloorPlan = ({
       text: '주소가 성공적으로 제출되었어요',
       type: 'success',
       options: {
-        style: { marginBottom: '1.6rem' },
         autoClose: 3000,
       },
     });

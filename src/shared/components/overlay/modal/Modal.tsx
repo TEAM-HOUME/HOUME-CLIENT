@@ -21,11 +21,6 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
     notify({
       text: '결제는 아직 준비 중인 기능이에요',
       type: 'warning',
-      options: {
-        style: {
-          marginBottom: '2rem',
-        },
-      },
     });
     setIsButtonActive(false);
   };
