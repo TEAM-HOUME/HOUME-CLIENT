@@ -49,7 +49,7 @@ export const resultSection = style({
 export const imgArea = recipe({
   base: {
     width: '100%',
-    height: '22rem',
+    aspectRatio: '16 / 9',
     borderRadius: '16px',
     objectFit: 'cover', // 비율 유지하며 영역 완전히 채움
     objectPosition: 'center', // 이미지 중앙 부분 표시

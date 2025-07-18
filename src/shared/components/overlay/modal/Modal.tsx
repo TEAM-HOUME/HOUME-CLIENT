@@ -3,6 +3,8 @@ import CreditIcon from '@assets/icons/modalCoin.png';
 import CtaButton from '../../button/ctaButton/CtaButton';
 import { useToast } from '../../toast/useToast';
 import * as styles from './Modal.css';
+import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import { useUserStore } from '@/store/useUserStore';
 
 export interface ModalProps {
   onClose: () => void;
@@ -13,6 +15,15 @@ export interface ModalProps {
 const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
   const { notify } = useToast();
   const [isButtonActive, setIsButtonActive] = useState(true);
+
+  // 로그인 상태 확인
+  const accessToken = useUserStore((state) => state.accessToken);
+  const isLoggedIn = !!accessToken;
+
+  // 사용자 크레딧 정보 조회
+  const { data: userData, isLoading: isUserDataLoading } = useMyPageUser({
+    enabled: isLoggedIn, // 로그인 상태일 때만 API 호출
+  });
 
   const handleOpenToast = () => {
     // 크레딧 액션 콜백이 있으면 실행
@@ -42,7 +53,9 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
           <p className={styles.title}>{title}</p>
           <div className={styles.creditBox}>
             <span className={styles.label}>보유 크레딧</span>
-            <span className={styles.count}>0</span>
+            <span className={styles.count}>
+              {isUserDataLoading ? '로딩중...' : (userData?.CreditCount ?? 0)}
+            </span>
           </div>
           <img src={CreditIcon} alt="크레딧 아이콘" />
         </div>
