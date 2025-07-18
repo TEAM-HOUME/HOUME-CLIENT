@@ -5,14 +5,14 @@ interface CtaButtonProps extends React.ComponentProps<'button'> {
   children: React.ReactNode;
   isActive?: boolean;
   typeVariant?: 'default' | 'kakao';
-  buttonSize?: 'small' | 'medium' | 'large';
+  buttonSize?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
 const CtaButton = ({
   children,
   isActive = true,
   typeVariant = 'default',
-  buttonSize = 'large',
+  buttonSize = 'xlarge',
   ...props
 }: CtaButtonProps) => {
   return (
@@ -28,8 +28,14 @@ const CtaButton = ({
         })}
         {...props}
       >
-        {typeVariant === 'kakao' && <KakaoIcon />}
-        {children}
+        {typeVariant === 'kakao' ? (
+          <span className={styles.kakaoContent}>
+            <KakaoIcon className={styles.kakaoIcon} />
+            <span className={styles.kakaoText}>{children}</span>
+          </span>
+        ) : (
+          children
+        )}
       </button>
     </div>
   );

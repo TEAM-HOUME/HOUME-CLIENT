@@ -61,11 +61,29 @@ export const CtaButton = recipe({
       medium: {
         height: '4.4rem',
       },
-      large: {},
+      large: {
+        height: '5.2rem',
+      },
+      xlarge: {},
     },
   },
   defaultVariants: {
     state: 'active',
     type: 'default',
   },
+});
+
+export const kakaoContent = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.8rem',
+});
+
+export const kakaoIcon = style({
+  flexShrink: 0,
+});
+
+export const kakaoText = style({
+  lineHeight: 1,
+  alignSelf: 'flex-end',
 });
