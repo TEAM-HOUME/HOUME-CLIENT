@@ -1,10 +1,12 @@
 import { style } from '@vanilla-extract/css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   width: '100%',
   height: '100%',
   display: 'flex',
   alignItems: 'center',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const container = style({

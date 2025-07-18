@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const container = style({
   background: colorVars.color.bg_grad,
@@ -16,6 +17,7 @@ export const textbox = style({
   textAlign: 'center',
   padding: '4rem 2rem 2rem 2rem',
   color: colorVars.color.gray900,
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const title = style({
@@ -31,6 +33,8 @@ export const content = style({
 export const imgbox = style({
   width: '100%',
   height: '34.4rem',
+  background: colorVars.color.gray100,
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const btnarea = style({

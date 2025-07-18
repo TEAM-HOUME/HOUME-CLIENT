@@ -1,6 +1,7 @@
 import { colorVars } from '@styles/tokens/color.css';
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -8,6 +9,7 @@ export const wrapper = style({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '1.6rem 2rem 2rem 2rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const infoSection = style({
