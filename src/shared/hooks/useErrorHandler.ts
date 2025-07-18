@@ -74,6 +74,35 @@ export const useErrorHandler = (context: PageContext) => {
    */
   const handleError = useCallback(
     (error: Error | unknown, type: ErrorType, customMessage?: string) => {
+      // SESSION_EXPIRED 에러는 특별 처리 (토큰 만료 상황)
+      if (error instanceof Error && error.message === 'SESSION_EXPIRED') {
+        console.error(`[${context}] Session expired, redirecting to login`);
+
+        // 토스트 중복 방지 체크
+        const message = '세션이 만료되었습니다. 다시 로그인해주세요.';
+        const now = Date.now();
+
+        if (
+          lastErrorRef.current &&
+          lastErrorRef.current.message === message &&
+          now - lastErrorRef.current.timestamp < TOAST_COOLDOWN
+        ) {
+          return;
+        }
+
+        lastErrorRef.current = { message, timestamp: now };
+
+        notify({
+          text: message,
+          type: 'warning',
+        });
+
+        setTimeout(() => {
+          navigate(ROUTES.LOGIN);
+        }, 1000);
+        return;
+      }
+
       // 에러 로깅
       console.error(`[${context}] ${type} error:`, error);
 

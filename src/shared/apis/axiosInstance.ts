@@ -61,6 +61,10 @@ axiosInstance.interceptors.response.use(
 
         localStorage.setItem('accessToken', newAccessToken);
 
+        // Zustand 상태도 동기화
+        const { useUserStore } = await import('../../store/useUserStore');
+        useUserStore.getState().setAccessToken(newAccessToken);
+
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
@@ -68,10 +72,13 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest); // 원래 요청 재시도
       } catch (refreshError) {
         console.error('[axiosInstance] 토큰 재발급 실패:', refreshError);
-        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-        // 인터셉터에서는 직접 네비게이션하지 않고 에러를 던짐
-        // 컴포넌트에서 에러를 처리하여 네비게이션 처리
-        return Promise.reject(refreshError);
+
+        // 상태 정리 (alert 제거하고 에러만 던지기)
+        const { useUserStore } = await import('../../store/useUserStore');
+        useUserStore.getState().clearUser();
+
+        // 에러만 던지고 UI 처리는 상위 컴포넌트에서 담당
+        return Promise.reject(new Error('SESSION_EXPIRED'));
       }
     }
 
