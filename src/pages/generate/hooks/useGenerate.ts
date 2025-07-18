@@ -79,7 +79,7 @@ export const useGenerateImageApi = () => {
   // const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
-  const { setApiCompleted } = useGenerateStore();
+  const { setApiCompleted, resetGenerate } = useGenerateStore();
 
   const generateImageRequest = useMutation({
     mutationFn: (userInfo: GenerateImageRequest) => {
@@ -88,6 +88,7 @@ export const useGenerateImageApi = () => {
     },
     onSuccess: (data) => {
       console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
+      resetGenerate();
 
       // API 완료 신호를 Zustand store에 저장
       setApiCompleted(true);
@@ -117,6 +118,7 @@ export const useGenerateImageStatusCheck = (
 ) => {
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
+  const { resetGenerate } = useGenerateStore();
 
   const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
@@ -138,6 +140,7 @@ export const useGenerateImageStatusCheck = (
   // 성공 시 처리, useGenerateImageStatusCheck 커스텀 훅이 LoadingPage에서 호출되면 useEffect()가 계속 상태 체크
   useEffect(() => {
     if (query.isSuccess && query.data) {
+      resetGenerate();
       console.log('상태 체크 성공:', query.data);
       // 성공 시 결과 페이지로 이동
       navigate('/generate/result', {
