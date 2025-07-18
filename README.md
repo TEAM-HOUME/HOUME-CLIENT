@@ -1,8 +1,9 @@
 # HOUME
 
 ![HOUME Logo](https://img.shields.io/badge/HOUME-나다운%20집을%20만들어주는%20여정-6F00FF?style=for-the-badge)
+<img width="7680" height="4320" alt="Slide 16_9 - 154" src="https://github.com/user-attachments/assets/ac72d5ec-b96e-4eaa-bf28-8e60e3d19a25" />
 
-<img width="5940" height="4200" alt="Mask group" src="https://github.com/user-attachments/assets/a81f9453-b170-4136-8959-3178a5d12f80" />
+
 
 <br/> <strong>"나다운 집을 만들어주는 여정, 하우미"</strong>
 
@@ -422,28 +423,21 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 <div align="center">
 
-### 🌟
-
-**"Alone we can do so little, together we can do so much."**  
-_- Helen Keller_
-
-<br>
-
-_우리가 함께하는 여정은 혼자서는 갈 수 없는 곳으로 우리를 데려다줍니다._
-
-_실패를 두려워하지 마세요._  
-_넘어져도 서로 일으켜 세워줄 팀원들이 있습니다._  
-_모든 오류는 배움의 기회이고, 모든 이슈는 성장의 계단입니다._
-
-_혼자가 아닌 우리이기에 더 멀리 갈 수 있습니다._  
-_HOUME 끝까지 파이팅입니다._
-
-</div>
-
-<br>
 
 ---
+
+
+<img width="1920" height="1080" alt="Slide 16_9 - 49" src="https://github.com/user-attachments/assets/5ee6dc3f-c86d-463a-a7d5-291a415c2ded" />
+
+<br/>
+<br/>
+<br/>
 
 <div align="center">
   <strong>🏠 나다운 집을 만들어가는 여정, HOUME 🏠</strong>
 </div>
+
+
+
+
+
