@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useFloorPlanApi } from './useStep2Api.hooks';
 import { useFunnelStore } from '../stores/useFunnelStore';
+import { usePrefetchMoodBoard } from './useStep3Api.hooks';
 import type { CompletedFloorPlan, ImageGenerateSteps } from '../types/funnel';
 
 // interface SelectedFloorPlanTypes {
@@ -27,6 +28,11 @@ export const useStep2FloorPlan = (
     step2.floorPlanId || null
   );
   const [isMirror, setIsMirror] = useState<boolean>(step2.isMirror || false);
+
+  // 무드보드 이미지 사전로딩
+  const { prefetchMoodBoard } = usePrefetchMoodBoard();
+  prefetchMoodBoard();
+  console.log('prefetch 완료');
 
   // 컴포넌트 마운트 시 현재 스텝 설정
   useEffect(() => {
