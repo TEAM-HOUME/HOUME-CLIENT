@@ -32,18 +32,13 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
     notify({
       text: '결제는 아직 준비 중인 기능이에요',
       type: 'warning',
-      options: {
-        style: {
-          marginBottom: '2rem',
-        },
-      },
     });
     setIsButtonActive(false);
   };
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      <dialog
+      <div
         className={styles.container}
         role="dialog"
         aria-modal="true"
@@ -72,7 +67,7 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
             <span className={styles.exitButtonText}>나가기</span>
           </button>
         </div>
-      </dialog>
+      </div>
     </div>
   );
 };

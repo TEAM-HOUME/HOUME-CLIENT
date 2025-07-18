@@ -6,6 +6,7 @@ import {
 } from '../types/funnel';
 import { useHouseInfoApi } from './useStep1Api.hooks';
 import { useFunnelStore } from '../stores/useFunnelStore';
+import { usePrefetchMoodBoard } from './useStep3Api.hooks';
 
 interface FormErrors {
   houseType?: string;
@@ -19,6 +20,11 @@ export const useStep1HouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
 
   // Zustand store에서 상태 가져오기
   const { step1, setStep1Data, setCurrentStep } = useFunnelStore();
+
+  // 무드보드 이미지 사전로딩
+  const { prefetchMoodBoard } = usePrefetchMoodBoard();
+  prefetchMoodBoard();
+  console.log('prefetch 완료');
 
   // useEffect(() => {
   //   // 한 프레임 뒤에 실행 (persist 복원 후)
