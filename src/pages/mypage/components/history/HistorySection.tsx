@@ -54,7 +54,7 @@ const HistorySection = () => {
           <CardHistory
             key={history.imageId}
             src={history.generatedImageUrl}
-            title={`${history.tasteTag} 인테리어 스타일링`}
+            title={`${history.tasteTag}의 ${history.equilibrium} ${history.houseForm}`}
             btnText="가구 추천 보러가기"
             onClick={() => handleViewResult(history.imageId)}
           />
