@@ -4,7 +4,7 @@ import CtaButton from '../../button/ctaButton/CtaButton';
 import { useToast } from '../../toast/useToast';
 import * as styles from './Modal.css';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
-import { useUserStore } from '@/shared/store/userStore';
+import { useUserStore } from '@/store/useUserStore';
 
 export interface ModalProps {
   onClose: () => void;
