@@ -28,7 +28,7 @@ const MultiOptionGroup = <T = string,>({
   options,
   selected = [],
   onButtonClick,
-  selectedCount,
+  selectedCount = 0,
   maxSelect,
   isAlertPresented = false,
   error,

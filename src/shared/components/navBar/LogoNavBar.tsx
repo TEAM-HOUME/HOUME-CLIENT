@@ -30,15 +30,9 @@ const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
         );
       case 'profile':
         return (
-          <div className={styles.rightdiv}>
-            <button
-              type="button"
-              onClick={() => navigate(ROUTES.MYPAGE)}
-              className={styles.profileicon}
-            >
-              <ProfileIcon />
-            </button>
-          </div>
+          <button type="button" onClick={() => navigate(ROUTES.MYPAGE)}>
+            <ProfileIcon />
+          </button>
         );
       default:
         return null;

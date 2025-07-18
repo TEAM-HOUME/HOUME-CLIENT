@@ -8,6 +8,7 @@ interface UseToastParams {
   type?: ToastType;
   options?: ToastOptions;
   ariaLabel?: string;
+  marginBottom?: string;
 }
 
 export const useToast = () => {
@@ -28,6 +29,7 @@ export const useToast = () => {
       type = 'success',
       options,
       ariaLabel = '토스트 알림',
+      marginBottom = '2rem',
     }: UseToastParams) => {
       // 1) 현재 toastId에 해당하는 toast가 떠있는지 확인, 떠있다면 해당 toast를 dismiss
       if (toastId.current !== null && toast.isActive(toastId.current)) {
@@ -39,6 +41,7 @@ export const useToast = () => {
         ...options,
         ariaLabel: ariaLabel,
         style: {
+          marginBottom: marginBottom,
           ...toastStyle,
           ...options?.style,
         },

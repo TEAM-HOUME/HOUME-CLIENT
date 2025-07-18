@@ -20,12 +20,6 @@ export const leftdiv = style({
   height: '7.2rem',
 });
 
-export const profileicon = style({
-  width: '2.8rem',
-  height: '2.8rem',
-  cursor: 'pointer',
-});
-
 export const rightdiv = style({
   display: 'flex',
   justifyContent: 'center',
