@@ -23,7 +23,9 @@ export const useStep1HouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
 
   // 무드보드 이미지 사전로딩
   const { prefetchMoodBoard } = usePrefetchMoodBoard();
-  prefetchMoodBoard();
+  useEffect(() => {
+    prefetchMoodBoard();
+  }, [prefetchMoodBoard]);
   console.log('prefetch 완료');
 
   // useEffect(() => {
