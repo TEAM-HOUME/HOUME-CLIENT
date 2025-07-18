@@ -64,18 +64,46 @@ export const useStep1HouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
     });
   }, [formData]);
 
-  // 입력값 3개 입력 여부 확인
-  const isFormCompleted = !!(
-    formData.houseType &&
-    formData.roomType &&
-    formData.areaType
-  );
+  // 개별 필드 변경 시 해당 필드의 에러 초기화
+  useEffect(() => {
+    if (errors.houseType) {
+      setErrors((prev) => {
+        const { houseType, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, [formData.houseType]);
+
+  useEffect(() => {
+    if (errors.roomType) {
+      setErrors((prev) => {
+        const { roomType, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, [formData.roomType]);
+
+  useEffect(() => {
+    if (errors.areaType) {
+      setErrors((prev) => {
+        const { areaType, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, [formData.areaType]);
 
   // 제한된 값(아파트, 투룸 등)을 선택했는지 검증
   const validateFormFields = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (isFormCompleted) {
+    // 모든 필드가 선택된 경우에만 제한값 검증 실행
+    const isAllFieldsSelected = !!(
+      formData.houseType &&
+      formData.roomType &&
+      formData.areaType
+    );
+
+    if (isAllFieldsSelected) {
       if (
         formData.houseType &&
         HOUSE_INFO_VALIDATION.restrictedValues.houseType.includes(
@@ -97,6 +125,14 @@ export const useStep1HouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
     setErrors(newErrors);
     return Object.values(newErrors).length === 0;
   };
+
+  // 입력값 3개 입력 여부 확인 및 에러 상태 확인
+  const isFormCompleted = !!(
+    formData.houseType &&
+    formData.roomType &&
+    formData.areaType &&
+    Object.values(errors).length === 0
+  );
 
   // isFormCompleted == true일 때 버튼 enable -> handleSubmit 실행 가능
   const handleSubmit = (onNext: (data: CompletedHouseInfo) => void) => {
