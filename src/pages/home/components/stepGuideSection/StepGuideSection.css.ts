@@ -15,7 +15,7 @@ export const landingImage = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '0.8rem',
-  marginTop: '12rem',
+  marginTop: '2.5rem',
   marginBottom: '4rem',
   alignItems: 'center',
 });

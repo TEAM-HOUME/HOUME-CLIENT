@@ -33,6 +33,9 @@ const IntroSection = () => {
           src={INTERIOR_IMAGES[selected]}
           alt={selected}
           className={styles.radioImage}
+          style={{
+            transition: 'all 0.3s ease-out',
+          }}
         />
       </div>
       <div
