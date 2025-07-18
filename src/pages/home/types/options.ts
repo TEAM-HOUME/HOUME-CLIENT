@@ -1,7 +1,7 @@
-import Rest from '@assets/images/landingRest.png';
-import RemoteWork from '@assets/images/landingRemoteWork.png';
-import Movie from '@assets/images/landingMovie.png';
-import Cafe from '@assets/images/landingHomeCafe.png';
+import Rest from '@assets/images/landingRest.webp';
+import RemoteWork from '@assets/images/landingRemoteWork.webp';
+import Movie from '@assets/images/landingMovie.webp';
+import Cafe from '@assets/images/landingHomeCafe.webp';
 
 export const INTERIOR_OPTIONS = [
   '휴식형',
