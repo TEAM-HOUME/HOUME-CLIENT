@@ -1,4 +1,3 @@
-import React from 'react';
 import { useImageGenerationFunnel } from './hooks/useImageGenerationFunnel.hooks';
 import Step1HouseInfo from './components/steps/step1/Step1HouseInfo';
 import Step2FloorPlan from './components/steps/step2/Step2FloorPlan';
