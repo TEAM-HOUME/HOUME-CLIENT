@@ -88,7 +88,7 @@ globalStyle('body', {
   overflowWrap: 'break-word', // 긴 단어 자동 줄바꿈
 
   // 레이아웃
-  minHeight: '100%',
+  minHeight: layoutVars.height,
   minWidth: layoutVars.minWidth, // 최소 너비 제한
   maxWidth: layoutVars.maxWidth, // 최대 너비 제한
   marginLeft: 'auto', // 가로 중앙 정렬
