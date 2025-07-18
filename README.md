@@ -1,8 +1,8 @@
 # HOUME
 
-![HOUME Logo](https://img.shields.io/badge/HOUME-나다운%20집을%20만들어주는%20여정-FF6B6B?style=for-the-badge)
+![HOUME Logo](https://img.shields.io/badge/HOUME-나다운%20집을%20만들어주는%20여정-6F00FF?style=for-the-badge)
 
-![KakaoTalk_Photo_2025-07-04-16-46-13](https://github.com/user-attachments/assets/4fe7a3ca-f2ef-4970-a6f6-51930e887c41)
+<img width="5940" height="4200" alt="Mask group" src="https://github.com/user-attachments/assets/a81f9453-b170-4136-8959-3178a5d12f80" />
 
 <br/> <strong>"나다운 집을 만들어주는 여정, 하우미"</strong>
 
