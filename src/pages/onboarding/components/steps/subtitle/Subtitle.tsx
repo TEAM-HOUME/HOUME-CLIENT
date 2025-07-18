@@ -17,7 +17,7 @@ const Subtitle = ({
     <div className={styles.subTextBox}>
       <span className={styles.subtitle}>{subtitle}</span>
       {caption && <span className={styles.caption}>{caption}</span>}
-      {count && maxCount && (
+      {count != undefined && maxCount && (
         <span className={styles.caption}>
           (<span className={styles.count}>{count}</span>
           <span className={styles.slash}>/</span>
