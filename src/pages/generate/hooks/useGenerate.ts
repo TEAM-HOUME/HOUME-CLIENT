@@ -25,10 +25,14 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useResultData = (imageId: number) => {
+export const useResultData = (
+  imageId: number,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: [QUERY_KEY.GENERATE_RESULT, imageId],
     queryFn: () => getResultData(imageId),
+    ...options,
   });
 };
 

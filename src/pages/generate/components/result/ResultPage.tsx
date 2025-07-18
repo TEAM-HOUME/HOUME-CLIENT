@@ -11,12 +11,30 @@ import {
   useResultData,
 } from '../../hooks/useGenerate';
 import type { GenerateImageData } from '../../types/GenerateType';
+import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
+import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import HeadingText from '@/shared/components/text/HeadingText';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Modal from '@/shared/components/overlay/modal/Modal';
 import Loading from '@/shared/components/loading/Loading';
+
+// 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
+const convertMypageDataToGenerateData = (
+  mypageData: MyPageImageDetailData,
+  imageId: number
+): GenerateImageData => {
+  return {
+    imageId,
+    imageUrl: mypageData.generatedImageUrl,
+    isMirror: false, // 마이페이지에서는 미러 정보를 제공하지 않음
+    equilibrium: mypageData.equilibrium,
+    houseForm: mypageData.houseForm,
+    tagName: mypageData.tasteTag,
+    name: mypageData.name,
+  };
+};
 
 const ResultPage = () => {
   const location = useLocation();
@@ -30,12 +48,27 @@ const ResultPage = () => {
 
   // 2차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
   const imageId = searchParams.get('imageId');
+  const from = searchParams.get('from');
+  const isFromMypage = from === 'mypage';
   const shouldFetchFromAPI = !result && !!imageId;
-  const { data: apiResult, isLoading } = useResultData(Number(imageId || 0));
+
+  // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
+  const { data: apiResult, isLoading } = useResultData(Number(imageId || 0), {
+    enabled: shouldFetchFromAPI && !isFromMypage,
+  });
+
+  const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
+    Number(imageId || 0),
+    { enabled: shouldFetchFromAPI && isFromMypage }
+  );
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
-    result = apiResult as GenerateImageData;
+    if (isFromMypage && mypageResult) {
+      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+    } else if (!isFromMypage && apiResult) {
+      result = apiResult as GenerateImageData;
+    }
   }
 
   // result가 있을 때만 mutation hook들 호출 (조건부 렌더링을 위해)
@@ -46,7 +79,7 @@ const ResultPage = () => {
   const { mutate: sendCreditLogs } = useCreditLogMutation();
 
   // 로딩 중이면 로딩 표시
-  if (!result && isLoading) {
+  if (!result && (isLoading || mypageLoading)) {
     return <Loading text="결과를 불러오는 중..." />;
   }
 
@@ -85,9 +118,7 @@ const ResultPage = () => {
   // if (isLoading) return <div>로딩중</div>;
   // if (isError || !data) return <div>에러 발생!</div>;
 
-  // 마이페이지에서 온 경우 체크
-  const from = searchParams.get('from');
-  const isFromMypage = from === 'mypage';
+  // 마이페이지에서 온 경우 체크 (이미 위에서 정의했으므로 제거)
 
   // 조건부 헤더 타이틀 설정
   const headerTitle = isFromMypage
