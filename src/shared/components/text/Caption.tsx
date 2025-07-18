@@ -1,3 +1,4 @@
+// Caption.tsx
 import { captionBox, textVariants } from './Caption.css';
 
 interface CaptionProps {
@@ -11,7 +12,9 @@ const Caption = ({ code, option }: CaptionProps) => {
       <span className={textVariants.strong}>{code}</span>
       <span className={textVariants.normal}>을 선택하면</span>
       <span className={textVariants.highlight}>{option}</span>
-      <span className={textVariants.normal}>이(가) 이미지에 포함돼요.</span>
+      <span className={textVariants.normalSmall}>
+        이(가) 이미지에 포함돼요.
+      </span>
     </div>
   );
 };

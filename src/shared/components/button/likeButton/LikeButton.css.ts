@@ -12,7 +12,7 @@ export const likeButton = recipe({
     justifyContent: 'center',
     alignItems: 'center',
     gap: '0.8rem',
-    borderRadius: '0.6rem',
+    borderRadius: '6px',
     ...fontStyle('body_r_14'),
     color: colorVars.color.gray800,
     transition: 'all 0.2s ease-in-out',

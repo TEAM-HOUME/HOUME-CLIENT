@@ -1,59 +1,55 @@
 import { useEffect, useState } from 'react';
 import * as styles from './LoadingPage.css';
 import { PROGRESS_CONFIG } from '../../constants/progressConfig';
+import { useGenerateStore } from '../../stores/useGenerateStore';
 
 const ProgressLoadingBar = () => {
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
+  const { isApiCompleted } = useGenerateStore();
 
+  // 90%까지 천천히 증가
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    let timeout: ReturnType<typeof setTimeout> | null = null;
+    if (isDone) return;
 
-    // 90% 까지 (1분 기준 약 49.5초)
-    if (!isDone) {
-      interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= PROGRESS_CONFIG.SLOW_PHASE_END) {
-            if (interval) clearInterval(interval);
-            return PROGRESS_CONFIG.SLOW_PHASE_END;
-          }
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= PROGRESS_CONFIG.SLOW_PHASE_END) {
+          return PROGRESS_CONFIG.SLOW_PHASE_END;
+        }
+        return prev + PROGRESS_CONFIG.SLOW_INCREMENT;
+      });
+    }, PROGRESS_CONFIG.SLOW_INTERVAL);
 
-          return prev + PROGRESS_CONFIG.SLOW_INCREMENT;
-        });
-      }, PROGRESS_CONFIG.SLOW_INTERVAL); // 0.1씩 0.1초마다 = 1% 오르는데 0.1초
-
-      // 완료되는 시간 (완료 신호)
-      timeout = setTimeout(() => {
-        setIsDone(true);
-      }, PROGRESS_CONFIG.TOTAL_TIME);
-    } else {
-      // 완료되었을 때
-      interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= PROGRESS_CONFIG.FAST_PHASE_END) {
-            if (interval) clearInterval(interval);
-            return PROGRESS_CONFIG.FAST_PHASE_END;
-          }
-          return prev + PROGRESS_CONFIG.FAST_INCREMENT;
-        });
-      }, PROGRESS_CONFIG.FAST_INTERVAL); // 0.1씩 약 0.122초마다
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-      if (timeout) clearTimeout(timeout);
-    };
+    return () => clearInterval(interval);
   }, [isDone]);
 
-  // 주석: navigate는 useGenerateImageApi에서 이미 처리되므로 제거
-  // useEffect(() => {
-  //   if (progress === 100) {
-  //     setTimeout(() => {
-  //       navigate('/generate/result');
-  //     }, 1000);
-  //   }
-  // }, [progress, navigate]);
+  // 90%→100% 빠르게 증가
+  useEffect(() => {
+    if (!isDone) return;
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= PROGRESS_CONFIG.FAST_PHASE_END) {
+          console.log(
+            '📊 프로그레스 바 100% 완료:',
+            new Date().toLocaleTimeString()
+          );
+          return PROGRESS_CONFIG.FAST_PHASE_END;
+        }
+        return prev + PROGRESS_CONFIG.FAST_INCREMENT;
+      });
+    }, PROGRESS_CONFIG.FAST_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [isDone]);
+
+  // API 완료 시 isDone = true
+  useEffect(() => {
+    if (isApiCompleted && !isDone) {
+      setIsDone(true);
+    }
+  }, [isApiCompleted, isDone]);
 
   return (
     <div className={styles.progressBarBox}>

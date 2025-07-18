@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const container = style({
   display: 'flex',
@@ -10,6 +11,7 @@ export const container = style({
   padding: '1.6rem 2rem 0 2rem',
   justifyContent: 'center',
   alignItems: 'center',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const title = style({
@@ -31,7 +33,6 @@ export const fieldtitle = style({
   width: '100%',
   ...fontStyle('title_sb_16'),
   color: colorVars.color.gray800,
-  marginBottom: '1.2rem',
 });
 
 export const flexbox = style({

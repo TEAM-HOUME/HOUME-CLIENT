@@ -43,7 +43,7 @@ const Step4MainActivity = ({ context }: Step4MainActivityProps) => {
     <div className={common.container}>
       <FunnelHeader
         title={`마지막 단계예요!`}
-        detail={`집에서 주로 하는 활동과\n현재 갖고 있는 가구에 대해 알려주세요.`}
+        detail={`집에서 주로 하는 활동과\n배치가 필요한 가구에 대해 알려주세요.`}
         currentStep={4}
         image={FUNNELHEADER_IMAGES[4]}
       />

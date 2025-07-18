@@ -9,7 +9,6 @@ import NoMatchSheet from '@/shared/components/bottomSheet/noMatchSheet/NoMatchSh
 import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
 import { useToast } from '@/shared/components/toast/useToast';
 import { useBottomSheetAddress } from '@/pages/onboarding/hooks/useBottomSheetAddress';
-import { usePrefetchMoodBoard } from '@/pages/onboarding/hooks/useStep3Api.hooks';
 
 interface FloorPlanProps {
   floorPlanList: FloorPlanList[];
@@ -34,7 +33,6 @@ const FloorPlan = ({
   const [openSheet, setOpenSheet] = useState<OpenSheetKey>(null);
   const { notify } = useToast();
   const { mutate: postAddress } = useBottomSheetAddress();
-  const { prefetchMoodBoard } = usePrefetchMoodBoard();
 
   // toast를 NoMatchSheet의 상위 컴포넌트인 FloorPlan에서 호출해야
   // toast의 option에 준 autoClose가 정상적으로 적용됨
@@ -45,7 +43,6 @@ const FloorPlan = ({
       text: '주소가 성공적으로 제출되었어요',
       type: 'success',
       options: {
-        style: { marginBottom: '1.6rem' },
         autoClose: 3000,
       },
     });
@@ -53,11 +50,6 @@ const FloorPlan = ({
 
   const handleImageClick = (id: number) => {
     onImageSelect(id);
-
-    // 무드보드 이미지 사전로딩
-    prefetchMoodBoard();
-    console.log('prefetch 완료');
-
     handleOpenSheet('flip');
   };
 

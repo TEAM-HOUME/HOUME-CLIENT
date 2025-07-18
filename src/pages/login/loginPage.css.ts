@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const container = style({
   background: colorVars.color.bg_grad,
@@ -16,6 +17,7 @@ export const textbox = style({
   textAlign: 'center',
   ...fontStyle('title_m_16'),
   padding: '4rem 2rem 2rem 2rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const title = style({
@@ -30,7 +32,15 @@ export const content = style({
 
 export const imgbox = style({
   width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+export const loginImg = style({
+  width: '37.5rem',
   height: '34.4rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const btnarea = style({
@@ -54,4 +64,5 @@ export const aside = style({
 export const link = style({
   textDecoration: 'underline',
   textUnderlineOffset: '2px',
+  cursor: 'pointer',
 });

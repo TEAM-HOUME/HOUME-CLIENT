@@ -24,7 +24,7 @@ const HistorySection = () => {
         <section className={styles.container}>
           <p className={styles.title}>이미지 생성 히스토리</p>
         </section>
-        <Loading text="히스토리를 불러오는 중..." />
+        <Loading />
       </>
     );
   }
@@ -50,13 +50,13 @@ const HistorySection = () => {
       <p className={styles.title}>이미지 생성 히스토리</p>
 
       {hasImages ? (
-        imagesData.histories.map((history, index) => (
+        imagesData.histories.map((history) => (
           <CardHistory
-            key={index}
-            src={history.imageUrl}
-            title={`${history.tagName} 인테리어 스타일링`}
+            key={history.imageId}
+            src={history.generatedImageUrl}
+            title={`${history.tasteTag}의 ${history.equilibrium} ${history.houseForm}`}
             btnText="가구 추천 보러가기"
-            onClick={() => handleViewResult(index)} // TODO: 실제 imageId로 수정 필요
+            onClick={() => handleViewResult(history.imageId)}
           />
         ))
       ) : (

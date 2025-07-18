@@ -51,9 +51,14 @@ const MyPage = () => {
     return (
       <>
         <div className={styles.contentWrapper}>
-          <TitleNavBar title="마이페이지" isBackIcon isLoginBtn={false} />
+          <TitleNavBar
+            title="마이페이지"
+            isBackIcon
+            isLoginBtn={false}
+            onBackClick={() => navigate(ROUTES.HOME)}
+          />
         </div>
-        <Loading text="사용자 정보를 불러오는 중..." />
+        <Loading />
       </>
     );
   }
@@ -65,7 +70,12 @@ const MyPage = () => {
 
   return (
     <div className={styles.contentWrapper}>
-      <TitleNavBar title="마이페이지" isBackIcon isLoginBtn={false} />
+      <TitleNavBar
+        title="마이페이지"
+        isBackIcon
+        isLoginBtn={false}
+        onBackClick={() => navigate(ROUTES.HOME)}
+      />
       <ProfileSection
         userName={userData.name || '사용자'}
         credit={userData.CreditCount ?? 0}

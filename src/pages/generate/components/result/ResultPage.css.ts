@@ -3,6 +3,7 @@ import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -28,6 +29,7 @@ export const infoSection = style({
   padding: '1.2rem 1.6rem',
   borderRadius: '12px',
   width: '100%',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const infoText = style({
@@ -49,10 +51,11 @@ export const resultSection = style({
 export const imgArea = recipe({
   base: {
     width: '100%',
-    height: '22rem',
+    aspectRatio: '3 / 2',
     borderRadius: '16px',
     objectFit: 'cover', // 비율 유지하며 영역 완전히 채움
     objectPosition: 'center', // 이미지 중앙 부분 표시
+    animation: animationTokens.fadeInUpFast,
   },
   variants: {
     mirrored: {

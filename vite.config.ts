@@ -26,6 +26,9 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    host: true,
+  },
   test: {
     projects: [
       {

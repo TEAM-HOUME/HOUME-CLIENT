@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
+  checkGenerateImageStatus,
   generateImage,
   getResultData,
   getStackData,
@@ -10,6 +12,7 @@ import {
   postLikeStack,
   postPreference,
 } from '../apis/generate';
+import { useGenerateStore } from '../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../types/GenerateType';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { queryClient } from '@/shared/apis/queryClient';
@@ -25,10 +28,14 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useResultData = (imageId: number) => {
+export const useResultData = (
+  imageId: number,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: [QUERY_KEY.GENERATE_RESULT, imageId],
     queryFn: () => getResultData(imageId),
+    ...options,
   });
 };
 
@@ -46,9 +53,9 @@ export const useHateStackMutation = () => {
 };
 
 // 결과 이미지 선호도 전송용 (POST)
-export const usePreferenceMutation = (imageId: number) => {
+export const usePreferenceMutation = () => {
   return useMutation({
-    mutationFn: ({ isLike }: { isLike: boolean }) =>
+    mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postPreference(imageId, isLike),
   });
 };
@@ -72,12 +79,21 @@ export const useGenerateImageApi = () => {
   // const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
+  const { setApiCompleted, resetGenerate } = useGenerateStore();
 
   const generateImageRequest = useMutation({
-    mutationFn: (userInfo: GenerateImageRequest) => generateImage(userInfo),
+    mutationFn: (userInfo: GenerateImageRequest) => {
+      console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
+      return generateImage(userInfo);
+    },
     onSuccess: (data) => {
-      console.log('이미지 생성 요청 결과: ', data);
-      // 성공 시 자동으로 ResultPage로 이동
+      console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
+      resetGenerate();
+
+      // API 완료 신호를 Zustand store에 저장
+      setApiCompleted(true);
+
+      // 즉시 결과 페이지로 이동
       navigate('/generate/result', {
         state: {
           result: data,
@@ -85,9 +101,68 @@ export const useGenerateImageApi = () => {
         replace: true,
       });
       resetFunnel(); // 성공 시에도 초기화
+
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });
 
   return generateImageRequest;
+};
+
+// 이미지 생성 폴백
+export const useGenerateImageStatusCheck = (
+  houseId: number,
+  shouldStart: boolean
+) => {
+  const navigate = useNavigate();
+  const { resetFunnel } = useFunnelStore();
+  const { resetGenerate, setApiCompleted } = useGenerateStore();
+
+  const query = useQuery({
+    queryKey: ['generateImageStatus', houseId],
+    queryFn: () => checkGenerateImageStatus(houseId),
+    enabled: shouldStart,
+    refetchInterval: 7000, // 5초
+    refetchIntervalInBackground: true,
+    retry: (failureCount) => {
+      // 최대 10번 재시도
+      if (failureCount >= 9) {
+        console.error('최대 재시도 횟수 초과');
+        return false;
+      }
+      console.log(`상태 체크 재시도 ${failureCount + 1}/10`);
+      return true;
+    },
+  });
+
+  // 성공 시 처리, useGenerateImageStatusCheck 커스텀 훅이 LoadingPage에서 호출되면 useEffect()가 계속 상태 체크
+  useEffect(() => {
+    if (query.isSuccess && query.data) {
+      resetGenerate();
+
+      // API 완료 신호를 Zustand store에 저장
+      setApiCompleted(true);
+
+      console.log('상태 체크 성공:', query.data);
+      // 성공 시 결과 페이지로 이동
+      navigate('/generate/result', {
+        state: {
+          result: query.data,
+        },
+        replace: true,
+      });
+      resetFunnel();
+      queryClient.invalidateQueries({ queryKey: ['generateImage'] });
+    }
+  }, [query.isSuccess, query.data, navigate, resetFunnel]);
+
+  // 에러 시 처리
+  useEffect(() => {
+    if (query.isError) {
+      navigate('/onboarding');
+      console.log('fallback api 이미지 생성 실패');
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };
