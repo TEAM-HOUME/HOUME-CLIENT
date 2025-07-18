@@ -2,7 +2,7 @@ import { useState } from 'react';
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
 import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
-import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
