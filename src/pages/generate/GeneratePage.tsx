@@ -1,15 +1,33 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
 const GeneratePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // 마이페이지에서 온 경우 체크
+  const from = searchParams.get('from');
+  const isFromMypage = from === 'mypage';
+
+  // 조건부 타이틀 설정
+  const title = isFromMypage ? '가구 추천' : '스타일링 이미지 생성';
 
   // 현재 경로에 따라 뒤로가기 로직 결정
   const handleBackClick = () => {
     if (location.pathname === '/generate/result') {
-      // ResultPage에서는 랜딩페이지로 이동
-      navigate('/');
+      if (isFromMypage) {
+        // 마이페이지에서 온 경우 마이페이지로 이동
+        navigate('/mypage');
+      } else {
+        // 일반 생성 플로우에서는 랜딩페이지로 이동
+        navigate('/');
+      }
     } else {
       // 그 외의 경우 (LoadingPage 등)는 한 단계 이전으로 이동
       navigate(-1);
@@ -19,7 +37,7 @@ const GeneratePage = () => {
   return (
     <main>
       <TitleNavBar
-        title={'스타일링 이미지 생성'}
+        title={title}
         isBackIcon={true}
         isLoginBtn={false}
         onBackClick={handleBackClick}

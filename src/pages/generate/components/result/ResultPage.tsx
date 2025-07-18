@@ -85,10 +85,19 @@ const ResultPage = () => {
   // if (isLoading) return <div>로딩중</div>;
   // if (isError || !data) return <div>에러 발생!</div>;
 
+  // 마이페이지에서 온 경우 체크
+  const from = searchParams.get('from');
+  const isFromMypage = from === 'mypage';
+
+  // 조건부 헤더 타이틀 설정
+  const headerTitle = isFromMypage
+    ? '저장된 스타일링 이미지예요!'
+    : '이미지 생성이 완료됐어요!';
+
   return (
     <div className={styles.wrapper}>
       <section className={styles.headerSection}>
-        <HeadingText title="이미지 생성이 완료됐어요!" content="" />
+        <HeadingText title={headerTitle} content="" />
         <div className={styles.infoSection}>
           <p className={styles.infoText}>
             {`${result.equilibrium}에 거주하며 ${result.tagName}한 취향을 가진\n${result.name}님을 위한 맞춤 인테리어 스타일링이에요!`}
