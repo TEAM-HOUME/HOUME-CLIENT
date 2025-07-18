@@ -30,6 +30,7 @@ export interface MyPageImageDetailData {
   tasteTag: string; // 서버 응답 필드명 그대로 사용
   name: string;
   generatedImageUrl: string; // 서버 응답 필드명 그대로 사용
+  isLike: boolean; // 이미지 선호도 여부
 }
 
 export type MyPageImageDetailResponse = BaseResponse<MyPageImageDetailData>;
