@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
     <OverlayProvider>
       <App />
       <ToastContainer {...toastConfig} />
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
     </OverlayProvider>
   </QueryClientProvider>
   // </StrictMode>

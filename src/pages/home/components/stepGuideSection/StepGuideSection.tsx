@@ -3,6 +3,7 @@ import InfoLandingImage from '@assets/images/landingInfoImage.png';
 import LandingImage3_1 from '@assets/images/landingImage3-1.png';
 import LandingImage3_2 from '@assets/images/landingImage3-2.png';
 import LandingImage3_3 from '@assets/images/landingImage3-3.png';
+import LandingImage4 from '@assets/images/landingImage4.png';
 import * as styles from './StepGuideSection.css.ts';
 import TitleStep from '@/shared/components/titleStep/TitleStep';
 
@@ -58,7 +59,11 @@ const StepGuideSection = () => {
         </div>
       </div>
 
-      <div className={styles.resultLandImage} />
+      <img
+        src={LandingImage4}
+        alt="결과 이미지"
+        className={styles.resultLandImage}
+      />
     </section>
   );
 };

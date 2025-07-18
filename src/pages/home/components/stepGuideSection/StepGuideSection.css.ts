@@ -49,9 +49,10 @@ export const imageGap = style({
 });
 
 export const resultLandImage = style({
-  width: '37.5rem',
-  height: '24rem',
+  width: '33.5rem',
+  height: '25rem',
   backgroundColor: colorVars.color.gray100,
   marginBottom: '4rem',
   objectFit: 'cover',
+  borderRadius: '16px',
 });
