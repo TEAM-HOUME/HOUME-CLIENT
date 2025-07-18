@@ -28,11 +28,7 @@ const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
         );
       case 'profile':
         return (
-          <button
-            type="button"
-            onClick={() => navigate(ROUTES.MYPAGE)}
-            className={styles.profileicon}
-          >
+          <button type="button" onClick={() => navigate(ROUTES.MYPAGE)}>
             <ProfileIcon />
           </button>
         );

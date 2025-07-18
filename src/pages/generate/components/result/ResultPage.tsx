@@ -100,6 +100,7 @@ const ResultPage = () => {
             <CtaButton
               aria-label="프리미엄 가구 추천 기능 잠금 해제"
               buttonSize={'small'}
+              fontSize={'body'}
               onClick={handleOpenModal}
             >
               가구 추천받기
