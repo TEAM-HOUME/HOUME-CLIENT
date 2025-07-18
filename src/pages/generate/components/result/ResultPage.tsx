@@ -83,7 +83,7 @@ const ResultPage = () => {
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
-    return <Loading text="결과를 불러오는 중..." />;
+    return <Loading />;
   }
 
   // 여전히 데이터가 없으면 홈으로 리다이렉션
