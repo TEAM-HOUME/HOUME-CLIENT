@@ -5,7 +5,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
-  padding: '2rem 0rem 2.4rem',
+  padding: '4.4rem 2rem 6rem 2rem',
   alignItems: 'flex-start',
   alignSelf: 'stretch',
 });
