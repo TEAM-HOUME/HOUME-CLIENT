@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
 import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
@@ -42,6 +42,11 @@ const ResultPage = () => {
 
   // Hook들을 최상단에 배치
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
+
+  // 페이지 이동 시 스크롤 위치 초기화
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (location.state as { result?: GenerateImageData })?.result;
