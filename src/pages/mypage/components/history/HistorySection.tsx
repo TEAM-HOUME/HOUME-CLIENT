@@ -24,7 +24,7 @@ const HistorySection = () => {
         <section className={styles.container}>
           <p className={styles.title}>이미지 생성 히스토리</p>
         </section>
-        <Loading text="히스토리를 불러오는 중..." />
+        <Loading />
       </>
     );
   }

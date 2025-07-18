@@ -51,10 +51,10 @@ const KakaoCallback = () => {
   }, [isError, error, handleError]);
 
   if (isPending) {
-    return <Loading text="카카오 로그인 처리 중..." />;
+    return <Loading />;
   }
 
-  return <Loading text="로그인 중..." />;
+  return <Loading />;
 };
 
 export default KakaoCallback;

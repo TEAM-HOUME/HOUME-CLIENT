@@ -58,7 +58,7 @@ const MyPage = () => {
             onBackClick={() => navigate(ROUTES.HOME)}
           />
         </div>
-        <Loading text="사용자 정보를 불러오는 중..." />
+        <Loading />
       </>
     );
   }

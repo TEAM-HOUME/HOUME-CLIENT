@@ -74,7 +74,7 @@ const LoadingPage = () => {
     }
   }, [isError, isLoading, currentImages, error, handleError]);
 
-  if (isLoading) return <Loading text="로딩중" />;
+  if (isLoading) return <Loading />;
 
   // 에러 상황 체크
   const hasError =
