@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -14,6 +15,7 @@ export const titleWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
+  animation: animationTokens.fadeInUpSlow,
 });
 
 export const title = style({

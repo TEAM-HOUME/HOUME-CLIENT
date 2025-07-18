@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const container = style({
   display: 'flex',
@@ -25,6 +26,7 @@ export const wrapper = style({
 export const optionGroupWrapper = style({
   display: 'flex',
   flexDirection: 'column',
+  animation: animationTokens.fadeInUpFast,
 });
 
 // step4의 '가구'를 감싸는 wrapper
@@ -32,6 +34,7 @@ export const subWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '2.4rem',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const subOptionGroupWrapper = style({
