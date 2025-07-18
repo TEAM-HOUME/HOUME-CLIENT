@@ -78,7 +78,7 @@ export const generateImage = async (
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: '/api/v1/generated-images/generate',
+    url: '/api/v2/generated-images/generate',
     body: requestData,
   };
 
