@@ -29,6 +29,7 @@ export const infoSection = style({
   padding: '1.2rem 1.6rem',
   borderRadius: '12px',
   width: '100%',
+  animation: animationTokens.fadeInUpFast,
 });
 
 export const infoText = style({
