@@ -20,11 +20,16 @@ export const leftdiv = style({
   height: '7.2rem',
 });
 
+export const profileicon = style({
+  cursor: 'pointer',
+  padding: '0 1.6rem',
+});
+
 export const rightdiv = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  width: '8rem',
+  minWidth: '8rem',
   height: '4.8rem',
   padding: '1.2rem 1.6rem',
 });
