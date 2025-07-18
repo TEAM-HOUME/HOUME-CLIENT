@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
+  checkGenerateImageStatus,
   generateImage,
   getResultData,
   getStackData,
@@ -90,4 +92,56 @@ export const useGenerateImageApi = () => {
   });
 
   return generateImageRequest;
+};
+
+// 이미지 생성 폴백
+export const useGenerateImageStatusCheck = (
+  houseId: number,
+  shouldStart: boolean
+) => {
+  const navigate = useNavigate();
+  const { resetFunnel } = useFunnelStore();
+
+  const query = useQuery({
+    queryKey: ['generateImageStatus', houseId],
+    queryFn: () => checkGenerateImageStatus(houseId),
+    enabled: shouldStart,
+    refetchInterval: 7000, // 5초
+    refetchIntervalInBackground: true,
+    retry: (failureCount) => {
+      // 최대 10번 재시도
+      if (failureCount >= 9) {
+        console.error('최대 재시도 횟수 초과');
+        return false;
+      }
+      console.log(`상태 체크 재시도 ${failureCount + 1}/10`);
+      return true;
+    },
+  });
+
+  // 성공 시 처리, useGenerateImageStatusCheck 커스텀 훅이 LoadingPage에서 호출되면 useEffect()가 계속 상태 체크
+  useEffect(() => {
+    if (query.isSuccess && query.data) {
+      console.log('상태 체크 성공:', query.data);
+      // 성공 시 결과 페이지로 이동
+      navigate('/generate/result', {
+        state: {
+          result: query.data,
+        },
+        replace: true,
+      });
+      resetFunnel();
+      queryClient.invalidateQueries({ queryKey: ['generateImage'] });
+    }
+  }, [query.isSuccess, query.data, navigate, resetFunnel]);
+
+  // 에러 시 처리
+  useEffect(() => {
+    if (query.isError) {
+      navigate('/onboarding');
+      console.log('fallback api 이미지 생성 실패');
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };
