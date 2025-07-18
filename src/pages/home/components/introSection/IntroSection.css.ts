@@ -32,15 +32,22 @@ export const description = style({
 
 export const radioImageBox = style({
   width: '100%',
-  height: '22.3rem',
+  borderRadius: '16px',
+  aspectRatio: '3 / 2',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  marginBottom: '1.6rem',
+  overflow: 'hidden',
 });
 
 export const radioImage = style({
-  width: '33.5rem',
-  borderRadius: '16px',
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+  display: 'block',
+  boxSizing: 'border-box',
 });
 
 export const buttonGroup = style({
@@ -48,13 +55,15 @@ export const buttonGroup = style({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '0.7rem',
-  marginTop: '1.6rem',
   width: '100%',
 });
 
 export const radioButtonLabel = style({
-  display: 'inline-block',
-  width: '100%',
+  display: 'flex',
+  flex: '0 0 calc((100% - 2.1rem) / 4)',
+  minWidth: '6rem',
+  maxWidth: '10rem',
+  cursor: 'pointer',
 });
 
 export const radioButton = style({
