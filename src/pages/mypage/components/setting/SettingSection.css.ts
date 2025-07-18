@@ -13,7 +13,7 @@ export const container = style({
 export const title = style({
   ...fontStyle('title_sb_16'),
   color: colorVars.color.gray800,
-  padding: '0rem 2rem 2.4rem',
+  padding: '0rem 0rem 2.4rem 0rem',
 });
 
 export const buttonArea = style({
@@ -26,7 +26,7 @@ export const settingButton = style({
   display: 'flex',
   alignItems: 'center',
   height: '4rem',
-  padding: '1.2rem 2rem',
+  padding: '1.2rem 0rem',
   gap: '1rem',
 });
 
