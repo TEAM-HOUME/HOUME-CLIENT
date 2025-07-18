@@ -32,6 +32,7 @@ export const imgbox = style({
   width: '100%',
   display: 'flex',
   justifyContent: 'center',
+  alignItems: 'center',
 });
 
 export const loginImg = style({

@@ -33,6 +33,7 @@ const SignupCompletePage = () => {
           src={SignupImage}
           alt="회원가입 완료 이미지"
           className={styles.signUpImg}
+          loading="lazy"
         />
       </div>
       <div className={styles.btnarea}>

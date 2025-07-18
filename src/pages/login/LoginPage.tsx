@@ -29,6 +29,7 @@ const LoginPage = () => {
           src={LoginBeforeImage}
           alt="로그인 전 이미지"
           className={styles.loginImg}
+          loading="lazy"
         />
       </div>
       <div className={styles.btnarea}>
