@@ -1,23 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
 import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
+import Loading from '@components/loading/Loading';
 import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
   usePreferenceMutation,
   useCreditLogMutation,
+  useResultData,
 } from '../../hooks/useGenerate';
 import type { GenerateImageData } from '../../types/GenerateType';
+import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
+import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import HeadingText from '@/shared/components/text/HeadingText';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Modal from '@/shared/components/overlay/modal/Modal';
 
+// 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
+const convertMypageDataToGenerateData = (
+  mypageData: MyPageImageDetailData,
+  imageId: number
+): GenerateImageData => {
+  return {
+    imageId,
+    imageUrl: mypageData.generatedImageUrl,
+    isMirror: false, // 마이페이지에서는 미러 정보를 제공하지 않음
+    equilibrium: mypageData.equilibrium,
+    houseForm: mypageData.houseForm,
+    tagName: mypageData.tasteTag,
+    name: mypageData.name,
+  };
+};
+
 const ResultPage = () => {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   // Hook들을 최상단에 배치
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
@@ -25,10 +46,47 @@ const ResultPage = () => {
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (location.state as { result?: GenerateImageData })?.result;
 
+  // 2차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
+  const imageId = searchParams.get('imageId');
+  const from = searchParams.get('from');
+  const isFromMypage = from === 'mypage';
+  const shouldFetchFromAPI = !result && !!imageId;
+
+  // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
+  const { data: apiResult, isLoading } = useResultData(Number(imageId || 0), {
+    enabled: shouldFetchFromAPI && !isFromMypage,
+  });
+
+  const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
+    Number(imageId || 0),
+    { enabled: shouldFetchFromAPI && isFromMypage }
+  );
+
+  // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
+  if (shouldFetchFromAPI) {
+    if (isFromMypage && mypageResult) {
+      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+    } else if (!isFromMypage && apiResult) {
+      result = apiResult as GenerateImageData;
+    }
+  }
+
   // result가 있을 때만 mutation hook들 호출 (조건부 렌더링을 위해)
   const { mutate: sendPreference } = usePreferenceMutation();
   const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   const { mutate: sendCreditLogs } = useCreditLogMutation();
+
+  // 마이페이지에서 온 경우 기존 isLike 상태를 버튼에 반영
+  useEffect(() => {
+    if (isFromMypage && mypageResult?.isLike !== undefined) {
+      setSelected(mypageResult.isLike ? 'like' : 'dislike');
+    }
+  }, [isFromMypage, mypageResult?.isLike]);
+
+  // 로딩 중이면 로딩 표시
+  if (!result && (isLoading || mypageLoading)) {
+    return <Loading />;
+  }
 
   // 여전히 데이터가 없으면 홈으로 리다이렉션
   if (!result) {
@@ -52,10 +110,20 @@ const ResultPage = () => {
     sendFurnituresLogs();
   };
 
+  // if (isLoading) return <div>로딩중</div>;
+  // if (isError || !data) return <div>에러 발생!</div>;
+
+  // 마이페이지에서 온 경우 체크 (이미 위에서 정의했으므로 제거)
+
+  // 조건부 헤더 타이틀 설정
+  const headerTitle = isFromMypage
+    ? '저장된 스타일링 이미지예요!'
+    : '이미지 생성이 완료됐어요!';
+
   return (
     <div className={styles.wrapper}>
       <section className={styles.headerSection}>
-        <HeadingText title="이미지 생성이 완료됐어요!" content="" />
+        {!isFromMypage && <HeadingText title={headerTitle} content="" />}
         <div className={styles.infoSection}>
           <p className={styles.infoText}>
             {`${result.equilibrium}에 거주하며 ${result.tagName}한 취향을 가진\n${result.name}님을 위한 맞춤 인테리어 스타일링이에요!`}

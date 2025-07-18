@@ -25,7 +25,7 @@ export const usePatchSignup = () => {
     // 회원가입 실패 시 실행되는 함수
     onError: (error) => {
       console.error('[usePatchSignup] 회원가입 실패:', error);
-      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      // alert 제거 - useErrorHandler에서 처리하도록 위임
     },
   });
 };

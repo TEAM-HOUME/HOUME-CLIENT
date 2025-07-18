@@ -21,7 +21,7 @@ export const CtaButton = recipe({
     height: '5.6rem',
     padding: '1.7rem 0',
     gap: '0.8rem',
-    borderRadius: '99.9rem',
+    borderRadius: '999px',
     ...fontStyle('title_m_16'),
     color: colorVars.color.gray000,
     transition: 'all 0.2s ease-in-out',

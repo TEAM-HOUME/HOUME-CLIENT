@@ -39,6 +39,7 @@ const OptionGroup = <T = string,>({
             key={String(option.code)}
             isActive={true}
             isSelected={selected === option.code}
+            isError={selected === option.code && !!error}
             onClick={() => onButtonClick(option.code)}
           >
             {option.label}
