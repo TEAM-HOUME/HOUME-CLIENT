@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useFunnelStore } from '@pages/onboarding/stores/useFunnelStore'; // 경로는 실제 경로로 수정
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import Popup from '@/shared/components/overlay/popup/Popup';
-import { ROUTES } from '@/routes/paths';
 
 interface FunnelLayoutProps {
   children: React.ReactNode;
@@ -15,6 +15,9 @@ const FunnelLayout = ({ children }: FunnelLayoutProps) => {
   const [searchParams] = useSearchParams();
   const isOnboardingPage = location.pathname === '/onboarding';
   const fromPage = searchParams.get('from'); // 'home' 또는 'signup-complete'
+
+  // Zustand store에서 resetFunnel 함수 가져오기
+  const resetFunnel = useFunnelStore((state) => state.resetFunnel);
 
   useEffect(() => {
     if (!isOnboardingPage) return;
@@ -49,14 +52,17 @@ const FunnelLayout = ({ children }: FunnelLayoutProps) => {
   };
 
   const handleExit = () => {
+    // 퍼널 데이터 초기화
+    resetFunnel();
+
     // 실제로 나가기 (이벤트 리스너 제거 후 적절한 페이지로 리다이렉트)
     window.removeEventListener('popstate', () => {});
 
     // from 파라미터에 따라 다른 페이지로 리다이렉트
     if (fromPage === 'home') {
-      navigate(ROUTES.HOME || '/');
+      navigate('/');
     } else if (fromPage === 'signup-complete') {
-      navigate(ROUTES.SIGNUPCOMPLETE || '/signup/complete'); // 또는 ROUTES.SIGNUP_COMPLETE가 있다면 그것을 사용
+      navigate('/signup/complete'); // 또는 ROUTES.SIGNUP_COMPLETE가 있다면 그것을 사용
     } else {
       // 기본값: 이전 페이지로 이동
       navigate(-1);
