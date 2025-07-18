@@ -48,7 +48,11 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
         </div>
 
         <div className={styles.buttonBox}>
-          <CtaButton onClick={handleOpenToast} isActive={isButtonActive}>
+          <CtaButton
+            onClick={handleOpenToast}
+            isActive={isButtonActive}
+            buttonSize="large"
+          >
             크레딧 결제하기
           </CtaButton>
           <button type="button" className={styles.exitButton} onClick={onClose}>

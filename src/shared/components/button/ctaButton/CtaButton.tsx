@@ -6,6 +6,7 @@ interface CtaButtonProps extends React.ComponentProps<'button'> {
   isActive?: boolean;
   typeVariant?: 'default' | 'kakao';
   buttonSize?: 'small' | 'medium' | 'large' | 'xlarge';
+  fontSize?: 'default' | 'body';
 }
 
 const CtaButton = ({
@@ -13,6 +14,7 @@ const CtaButton = ({
   isActive = true,
   typeVariant = 'default',
   buttonSize = 'xlarge',
+  fontSize = 'default',
   ...props
 }: CtaButtonProps) => {
   return (
@@ -25,6 +27,7 @@ const CtaButton = ({
           state: isActive ? 'active' : 'disabled',
           type: typeVariant,
           buttonSize: buttonSize,
+          font: fontSize,
         })}
         {...props}
       >

@@ -16,7 +16,7 @@ const CardHistory = ({ src, title, btnText, onClick }: CardHistoryProps) => {
       </div>
       <div className={styles.textbox}>
         <h1 className={styles.title}>{title}</h1>
-        <CtaButton buttonSize={'medium'} onClick={onClick}>
+        <CtaButton buttonSize={'medium'} fontSize={'body'} onClick={onClick}>
           {btnText}
         </CtaButton>
       </div>
