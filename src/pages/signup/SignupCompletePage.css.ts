@@ -39,7 +39,6 @@ export const imgbox = style({
 export const signUpImg = style({
   width: '37.5rem',
   height: '34.4rem',
-  background: colorVars.color.gray100,
   animation: animationTokens.fadeInUpFast,
 });
 
