@@ -28,7 +28,7 @@ export const cardcontainer = recipe({
         height: '100%',
         backgroundColor: 'transparent',
         pointerEvents: 'none',
-        borderRadius: '1.6rem',
+        borderRadius: '16px',
         transition: 'background-color 0.3s ease',
       },
     },

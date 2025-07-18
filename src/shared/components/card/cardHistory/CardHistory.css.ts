@@ -8,7 +8,7 @@ export const container = style({
   minWidth: '33.5rem',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  borderRadius: '1.6rem',
+  borderRadius: '16px',
   overflow: 'hidden',
   backgroundColor: colorVars.color.gray000,
 });

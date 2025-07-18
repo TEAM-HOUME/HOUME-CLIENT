@@ -11,7 +11,7 @@ export const boxWrapper = style({
   height: '4rem',
   padding: '0rem 0.8rem 0rem 1.6rem',
   maxWidth: '100%',
-  borderRadius: '0.6rem',
+  borderRadius: '6px',
   flexShrink: 0,
 });
 

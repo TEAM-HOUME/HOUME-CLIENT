@@ -11,7 +11,7 @@ export const cardReview = style({
   minWidth: '31.5rem',
   padding: '3.2rem',
   gap: '1.6rem',
-  borderRadius: '1.6rem',
+  borderRadius: '16px',
   background: colorVars.color.gray000,
 });
 
