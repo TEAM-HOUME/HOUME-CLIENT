@@ -10,8 +10,8 @@ export type MyPageUserResponse = BaseResponse<MyPageUserData>;
 
 // 마이페이지 이미지 생성 이력 조회 API
 export interface MyPageImageHistory {
-  imageUrl: string; // 서버: generatedImageUrl → 클라이언트: imageUrl (GenerateType과 통일)
-  tagName: string; // 서버: tasteTag → 클라이언트: tagName (GenerateType과 통일)
+  generatedImageUrl: string; // 서버 응답 필드명 그대로 사용
+  tasteTag: string; // 서버 응답 필드명 그대로 사용
   equilibrium: string;
   houseForm: string;
   imageId: number;
@@ -27,9 +27,9 @@ export type MyPageImagesResponse = BaseResponse<MyPageImagesData>;
 export interface MyPageImageDetailData {
   equilibrium: string;
   houseForm: string;
-  tagName: string; // 서버: tasteTag → 클라이언트: tagName (GenerateType과 통일)
+  tasteTag: string; // 서버 응답 필드명 그대로 사용
   name: string;
-  imageUrl: string; // 서버: generatedImageUrl → 클라이언트: imageUrl (GenerateType과 통일)
+  generatedImageUrl: string; // 서버 응답 필드명 그대로 사용
 }
 
 export type MyPageImageDetailResponse = BaseResponse<MyPageImageDetailData>;
