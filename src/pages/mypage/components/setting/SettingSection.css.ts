@@ -36,7 +36,8 @@ export const buttonText = style({
 });
 
 export const divider = style({
-  width: '100%',
+  width: 'calc(100% + 4rem)',
   height: '0.1rem',
   backgroundColor: colorVars.color.gray100,
+  marginLeft: '-2rem',
 });
