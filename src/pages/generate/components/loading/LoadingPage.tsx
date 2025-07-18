@@ -8,6 +8,7 @@ import {
   useHateStackMutation,
   useGenerateImageApi,
 } from '../../hooks/useGenerate';
+import { useGenerateStore } from '../../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../../types/GenerateType';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -20,6 +21,7 @@ const LoadingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
+  const { resetGenerate } = useGenerateStore();
 
   // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
   const requestData: GenerateImageRequest | null =
@@ -31,6 +33,9 @@ const LoadingPage = () => {
     if (requestData) {
       console.log('이미지 생성 요청 시작:', requestData);
 
+      // API 요청 시작 시 store 리셋
+      resetGenerate();
+
       // 이미 진행 중인 요청이 있으면 중복 실행 방지
       if (generateImageRequest.isIdle) {
         generateImageRequest.mutate(requestData);
@@ -41,7 +46,7 @@ const LoadingPage = () => {
       console.log('requestData is null, redirect to /onboarding');
       navigate(ROUTES.ONBOARDING);
     }
-  }, [requestData, navigate]); // generateImageRequest 의존성 제거
+  }, [requestData, navigate, resetGenerate]); // resetGenerate 의존성 추가
   // ... 이미지 생성 api 코드 끝
 
   const [currentPage, setCurrentPage] = useState(0);
