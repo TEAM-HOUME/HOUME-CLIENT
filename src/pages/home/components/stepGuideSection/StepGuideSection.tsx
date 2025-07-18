@@ -59,11 +59,13 @@ const StepGuideSection = () => {
         </div>
       </div>
 
-      <img
-        src={LandingImage4}
-        alt="결과 이미지"
-        className={styles.resultLandImage}
-      />
+      <div className={styles.resultImageContainer}>
+        <img
+          src={LandingImage4}
+          alt="결과 이미지"
+          className={styles.resultLandImage}
+        />
+      </div>
     </section>
   );
 };
