@@ -66,7 +66,7 @@ export const carouselSection = style({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '5.2rem',
+  gap: '3.2rem',
   width: '100%',
 });
 
