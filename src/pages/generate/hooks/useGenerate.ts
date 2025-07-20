@@ -77,9 +77,9 @@ export const useCreditLogMutation = () => {
 // 이미지 생성 api
 export const useGenerateImageApi = () => {
   // const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
-  const { setApiCompleted, resetGenerate } = useGenerateStore();
+  const { setApiCompleted, setNavigationData, resetGenerate } =
+    useGenerateStore();
 
   const generateImageRequest = useMutation({
     mutationFn: (userInfo: GenerateImageRequest) => {
@@ -90,18 +90,14 @@ export const useGenerateImageApi = () => {
       console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
       resetGenerate();
 
-      // API 완료 신호를 Zustand store에 저장
+      // API 완료 신호 및 네비게이션 데이터를 Zustand store에 저장
+      setNavigationData(data);
       setApiCompleted(true);
 
-      // 즉시 결과 페이지로 이동
-      navigate('/generate/result', {
-        state: {
-          result: data,
-        },
-        replace: true,
-      });
-      resetFunnel(); // 성공 시에도 초기화
+      // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
+      console.log('🔄 프로그래스 바 완료 대기 중...');
 
+      resetFunnel(); // 성공 시에도 초기화
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });
@@ -116,7 +112,8 @@ export const useGenerateImageStatusCheck = (
 ) => {
   const navigate = useNavigate();
   const { resetFunnel } = useFunnelStore();
-  const { resetGenerate, setApiCompleted } = useGenerateStore();
+  const { resetGenerate, setApiCompleted, setNavigationData } =
+    useGenerateStore();
 
   const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
@@ -140,21 +137,18 @@ export const useGenerateImageStatusCheck = (
     if (query.isSuccess && query.data) {
       resetGenerate();
 
-      // API 완료 신호를 Zustand store에 저장
+      // API 완료 신호 및 네비게이션 데이터를 Zustand store에 저장
+      setNavigationData(query.data);
       setApiCompleted(true);
 
       console.log('상태 체크 성공:', query.data);
-      // 성공 시 결과 페이지로 이동
-      navigate('/generate/result', {
-        state: {
-          result: query.data,
-        },
-        replace: true,
-      });
+      console.log('🔄 프로그래스 바 완료 대기 중...');
+
+      // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
       resetFunnel();
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     }
-  }, [query.isSuccess, query.data, navigate, resetFunnel]);
+  }, [query.isSuccess, query.data, resetFunnel]);
 
   // 에러 시 처리
   useEffect(() => {

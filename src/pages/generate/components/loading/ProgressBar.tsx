@@ -3,7 +3,11 @@ import * as styles from './LoadingPage.css';
 import { PROGRESS_CONFIG } from '../../constants/progressConfig';
 import { useGenerateStore } from '../../stores/useGenerateStore';
 
-const ProgressLoadingBar = () => {
+interface ProgressLoadingBarProps {
+  onComplete?: () => void;
+}
+
+const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const { isApiCompleted } = useGenerateStore();
@@ -35,6 +39,12 @@ const ProgressLoadingBar = () => {
             '📊 프로그레스 바 100% 완료:',
             new Date().toLocaleTimeString()
           );
+
+          // 100% 완료 시 onComplete 콜백 호출
+          if (onComplete) {
+            setTimeout(() => onComplete(), 100); // 약간의 지연 후 호출
+          }
+
           return PROGRESS_CONFIG.FAST_PHASE_END;
         }
         return prev + PROGRESS_CONFIG.FAST_INCREMENT;

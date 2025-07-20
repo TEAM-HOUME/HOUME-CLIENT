@@ -9,6 +9,7 @@ import {
   useGenerateImageApi,
   useGenerateImageStatusCheck,
 } from '../../hooks/useGenerate';
+import { useGenerateStore } from '../../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../../types/GenerateType';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -21,6 +22,7 @@ const LoadingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
+  const { isApiCompleted, navigationData } = useGenerateStore();
   // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
   // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
@@ -102,6 +104,22 @@ const LoadingPage = () => {
         ? nextImages[0]
         : undefined;
 
+  // 프로그래스 바 완료 시 페이지 이동 처리
+  const handleProgressComplete = () => {
+    if (navigationData && isApiCompleted) {
+      console.log(
+        '🎯 프로그래스 바 완료 후 페이지 이동:',
+        new Date().toLocaleTimeString()
+      );
+      navigate('/generate/result', {
+        state: {
+          result: navigationData,
+        },
+        replace: true,
+      });
+    }
+  };
+
   const handleVote = (isLike: boolean) => {
     if (isLoading) return;
 
@@ -142,7 +160,7 @@ const LoadingPage = () => {
   return (
     <div className={styles.wrapper}>
       <section className={styles.infoSection}>
-        <ProgressBar />
+        <ProgressBar onComplete={handleProgressComplete} />
         <p className={styles.infoText}>
           마음에 드는 가구를 선택하면, <br />
           하우미가 사용자님의 취향을 더 잘 이해할 수 있어요!

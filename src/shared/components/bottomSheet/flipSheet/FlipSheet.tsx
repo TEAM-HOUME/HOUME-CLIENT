@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import clsx from 'clsx';
 import DragHandle from '@components/dragHandle/DragHandle';
 import CtaButton from '@components/button/ctaButton/CtaButton';
-import { useBottomSheetDrag } from '@hooks/useBottomSheetDrag';
 import * as styles from './FlipSheet.css';
 import FilpButton from '@/shared/components/button/flipButton/FlipButton';
 
@@ -26,7 +25,6 @@ const FlipSheet = ({
   isFlipped,
 }: FlipSheetProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null); // bottom sheet DOM 참조
-  const dragHandlers = useBottomSheetDrag({ sheetRef, onClose });
 
   // CSS transition이 끝났을 때 호출
   const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
@@ -52,7 +50,7 @@ const FlipSheet = ({
       >
         <div className={styles.imageArea}>
           <div className={styles.dragHandleContainer}>
-            <DragHandle {...dragHandlers} />
+            <DragHandle onClick={onClose} />
           </div>
           <p className={styles.infoText}>이미지를 좌우반전 할 수 있어요</p>
           <div className={styles.imageContainer}>
