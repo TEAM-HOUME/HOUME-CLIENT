@@ -14,12 +14,12 @@ import { useStep1HouseInfo } from '@/pages/onboarding/hooks/useStep1HouseInfo.ho
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/onboarding/constants/headerImages';
 
-interface Step1HouseInfoProps {
+interface HouseInfoProps {
   context: ImageGenerateSteps['HouseInfo'];
   onNext: (data: CompletedHouseInfo) => void;
 }
 
-const Step1HouseInfo = ({ context, onNext }: Step1HouseInfoProps) => {
+const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
     useStep1HouseInfo(context);
 
@@ -80,4 +80,4 @@ const Step1HouseInfo = ({ context, onNext }: Step1HouseInfoProps) => {
   );
 };
 
-export default Step1HouseInfo;
+export default HouseInfo;

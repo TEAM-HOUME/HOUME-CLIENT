@@ -1,4 +1,4 @@
-export interface FloorPlanList {
+export interface FloorPlanData {
   id: number;
   form: string;
   structure: string;
@@ -9,6 +9,6 @@ export interface FloorPlanResponse {
   code: number;
   msg: string;
   data: {
-    floorPlanList: FloorPlanList[];
+    floorPlanList: FloorPlanData[];
   };
 }

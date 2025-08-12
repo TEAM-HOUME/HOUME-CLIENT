@@ -1,26 +1,26 @@
 // FloorPlan.tsx
 import { useEffect, useState } from 'react';
-import * as styles from './FloorPlan.css';
+import * as styles from './FloorPlanList.css';
 import type { OpenSheetKey } from '@/pages/onboarding/types/OpenSheet';
-import { type FloorPlanList } from '@/pages/onboarding/types/apis/step2Api.types';
-import FloorCard from '@/shared/components/card/floorCard/FloorCard';
+import { type FloorPlanData } from '@/pages/onboarding/types/apis/step2Api.types';
+import FloorPlanItem from '@/shared/components/card/floorCard/FloorCard';
 import NoMatchButton from '@/shared/components/button/noMatchButton/NoMatchButton';
 import NoMatchSheet from '@/shared/components/bottomSheet/noMatchSheet/NoMatchSheet';
 import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
 import { useToast } from '@/shared/components/toast/useToast';
 import { useBottomSheetAddress } from '@/pages/onboarding/hooks/useBottomSheetAddress';
 
-interface FloorPlanProps {
-  floorPlanList: FloorPlanList[];
+interface FloorPlanListProps {
+  floorPlanList: FloorPlanData[];
   selectedId: number | null;
   isMirror: boolean;
-  selectedImage: FloorPlanList | null | undefined;
+  selectedImage: FloorPlanData | null | undefined;
   onImageSelect: (id: number) => void;
   onFlipToggle: () => void;
   onFloorPlanSelection: () => void;
 }
 
-const FloorPlan = ({
+const FloorPlanList = ({
   floorPlanList,
   selectedId,
   isMirror,
@@ -28,7 +28,7 @@ const FloorPlan = ({
   onImageSelect,
   onFlipToggle,
   onFloorPlanSelection,
-}: FloorPlanProps) => {
+}: FloorPlanListProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [openSheet, setOpenSheet] = useState<OpenSheetKey>(null);
   const { notify } = useToast();
@@ -84,13 +84,13 @@ const FloorPlan = ({
     <section className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.gridbox}>
-          {floorPlanList.map((item: FloorPlanList) => (
+          {floorPlanList.map((item: FloorPlanData) => (
             <button
               type="button"
               key={item.id}
               onClick={() => handleImageClick(item.id)}
             >
-              <FloorCard
+              <FloorPlanItem
                 src={item.floorPlanImage}
                 selected={selectedId === item.id}
               />
@@ -130,4 +130,4 @@ const FloorPlan = ({
   );
 };
 
-export default FloorPlan;
+export default FloorPlanList;

@@ -1,7 +1,7 @@
 // Step2FloorPlan.tsx (UI만 담당)
 import { useEffect } from 'react';
-import FloorPlan from './FloorPlan';
-import * as styles from './Step2FloorPlan.css';
+import FloorPlanList from './FloorPlanList';
+import * as styles from './FloorPlan.css';
 import FunnelHeader from '../../header/FunnelHeader';
 import type {
   CompletedFloorPlan,
@@ -70,7 +70,7 @@ const Step2FloorPlan = ({ context, onNext }: Step2FloorPlanProps) => {
         size="short"
       />
 
-      <FloorPlan
+      <FloorPlanList
         floorPlanList={floorPlanList}
         selectedId={selectedId}
         isMirror={isMirror}
