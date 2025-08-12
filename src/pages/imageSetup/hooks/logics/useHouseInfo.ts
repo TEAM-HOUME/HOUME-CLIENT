@@ -19,7 +19,11 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   const selectHouseInfoRequest = useHouseInfoApi();
 
   // Zustand store에서 상태 가져오기
-  const { step1, setStep1Data, setCurrentStep } = useFunnelStore();
+  const {
+    houseInfo: step1,
+    sethouseInfoData: setStep1Data,
+    setCurrentStep,
+  } = useFunnelStore();
 
   // 무드보드 이미지 사전로딩
   const { prefetchMoodBoard } = usePrefetchMoodBoard();

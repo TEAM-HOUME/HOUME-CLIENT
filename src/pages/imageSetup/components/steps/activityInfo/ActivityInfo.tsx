@@ -15,7 +15,7 @@ import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 
 interface ActivityInfoProps {
-  context: ImageSetupSteps['MainActivity'];
+  context: ImageSetupSteps['ActivityInfo'];
 }
 
 const ActivityInfo = ({ context }: ActivityInfoProps) => {

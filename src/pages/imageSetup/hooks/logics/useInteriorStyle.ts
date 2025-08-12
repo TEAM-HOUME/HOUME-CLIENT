@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MAX_MOOD_BOARD_SELECTION } from '../../constants/step3.constants';
+import { MAX_MOOD_BOARD_SELECTION } from '../../constants/interiorStyle';
 import { useFunnelStore } from '../../stores/useFunnelStore';
 import type {
   CompletedInteriorTaste,
@@ -7,11 +7,15 @@ import type {
 } from '../../types/funnel';
 
 export const useInteriorStyle = (
-  context: ImageSetupSteps['InteriorTaste'],
+  context: ImageSetupSteps['InteriorStyle'],
   onNext: (data: CompletedInteriorTaste) => void
 ) => {
   // Zustand store에서 상태 가져오기
-  const { step3, setStep3Data, setCurrentStep } = useFunnelStore();
+  const {
+    interiorStyle: step3,
+    setInteriorStyleData: setStep3Data,
+    setCurrentStep,
+  } = useFunnelStore();
 
   const [selectedImages, setSelectedImages] = useState<number[]>(
     step3.moodBoardIds || []

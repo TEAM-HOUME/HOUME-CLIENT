@@ -1,7 +1,7 @@
 import type {
   SelectHouseInfoRequest,
   SelectHouseInfoResponse,
-} from '../types/apis/step1Api.types';
+} from '../types/apis/houseInfo';
 import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 
 export const selectHouseInfo = async (

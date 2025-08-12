@@ -34,7 +34,7 @@ export const ImageSetup = () => {
         FloorPlan={funnel.Render.with({
           events: {
             selectedFloorPlan: (data: CompletedFloorPlan, { history }) => {
-              history.push('InteriorTaste', data);
+              history.push('InteriorStyle', data);
             },
           },
           render({ dispatch, context }) {
@@ -46,25 +46,25 @@ export const ImageSetup = () => {
             );
           },
         })}
-        InteriorTaste={funnel.Render.with({
+        InteriorStyle={funnel.Render.with({
           events: {
-            selectInteriorTaste: (
+            selectInteriorStyle: (
               data: CompletedInteriorTaste,
               { history }
             ) => {
-              history.push('MainActivity', data);
+              history.push('ActivityInfo', data);
             },
           },
           render({ dispatch, context }) {
             return (
               <InteriorStyle
                 context={context}
-                onNext={(data) => dispatch('selectInteriorTaste', data)}
+                onNext={(data) => dispatch('selectInteriorStyle', data)}
               />
             );
           },
         })}
-        MainActivity={funnel.Render.with({
+        ActivityInfo={funnel.Render.with({
           events: {},
           render({ context }) {
             return <ActivityInfo context={context} />;

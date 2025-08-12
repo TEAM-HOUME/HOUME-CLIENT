@@ -20,7 +20,7 @@ export type ImageSetupSteps = {
     houseId: number;
     floorPlan?: FloorPlan;
   };
-  InteriorTaste: {
+  InteriorStyle: {
     houseType: HouseType;
     roomType: RoomType;
     areaType: AreaType;
@@ -28,7 +28,7 @@ export type ImageSetupSteps = {
     floorPlan: FloorPlan;
     moodBoardIds?: number[];
   };
-  MainActivity: {
+  ActivityInfo: {
     houseType: HouseType;
     roomType: RoomType;
     areaType: AreaType;
@@ -43,6 +43,5 @@ export type ImageSetupSteps = {
 
 export type CompletedHouseInfo = Required<ImageSetupSteps['HouseInfo']>;
 export type CompletedFloorPlan = Required<ImageSetupSteps['FloorPlan']>;
-export type CompletedInteriorTaste = Required<ImageSetupSteps['InteriorTaste']>;
-// MainActivity(STEP4)의 '기타가구'는 필수 입력란이 아니므로 추후 수정 예정
-export type CompletedMainActivity = Required<ImageSetupSteps['MainActivity']>;
+export type CompletedInteriorTaste = Required<ImageSetupSteps['InteriorStyle']>;
+export type CompletedMainActivity = Required<ImageSetupSteps['ActivityInfo']>;

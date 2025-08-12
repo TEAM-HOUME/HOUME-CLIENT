@@ -7,23 +7,23 @@ import type {
   RoomType,
 } from '../types/funnel';
 
-interface Step1State {
+interface HouseInfoState {
   houseType?: HouseType;
   roomType?: RoomType;
   areaType?: AreaType;
   houseId?: number;
 }
 
-interface Step2State {
+interface FloorPlanState {
   floorPlanId?: number;
   isMirror?: boolean;
 }
 
-interface Step3State {
+interface InteriorStyleState {
   moodBoardIds?: number[];
 }
 
-interface Step4State {
+interface ActivityInfoState {
   primaryUsage?: PrimaryUsage;
   bedTypeId?: number;
   otherFurnitureIds?: number[];
@@ -31,19 +31,19 @@ interface Step4State {
 
 interface FunnelStore {
   // 각 스텝의 상태
-  step1: Step1State;
-  step2: Step2State;
-  step3: Step3State;
-  step4: Step4State;
+  houseInfo: HouseInfoState;
+  floorPlan: FloorPlanState;
+  interiorStyle: InteriorStyleState;
+  activityInfo: ActivityInfoState;
 
   // 현재 스텝
   currentStep: number;
 
   // 액션
-  setStep1Data: (data: Partial<Step1State>) => void;
-  setStep2Data: (data: Partial<Step2State>) => void;
-  setStep3Data: (data: Partial<Step3State>) => void;
-  setStep4Data: (data: Partial<Step4State>) => void;
+  sethouseInfoData: (data: Partial<HouseInfoState>) => void;
+  setFloorPlanData: (data: Partial<FloorPlanState>) => void;
+  setInteriorStyleData: (data: Partial<InteriorStyleState>) => void;
+  setActivityInfoData: (data: Partial<ActivityInfoState>) => void;
   setCurrentStep: (step: number) => void;
 
   // 전체 상태 초기화
@@ -54,10 +54,10 @@ interface FunnelStore {
 }
 
 const initialState = {
-  step1: {},
-  step2: {},
-  step3: {},
-  step4: {},
+  houseInfo: {},
+  floorPlan: {},
+  interiorStyle: {},
+  activityInfo: {},
   currentStep: 1,
 };
 
@@ -68,24 +68,24 @@ export const useFunnelStore = create<FunnelStore>()(
       ...initialState,
 
       // state: 퍼널의 전체 데이터(step1,2,3,4) 저장
-      setStep1Data: (data) =>
+      sethouseInfoData: (data) =>
         set((state) => ({
-          step1: { ...state.step1, ...data },
+          houseInfo: { ...state.houseInfo, ...data },
         })),
 
-      setStep2Data: (data) =>
+      setFloorPlanData: (data) =>
         set((state) => ({
-          step2: { ...state.step2, ...data },
+          floorPlan: { ...state.floorPlan, ...data },
         })),
 
-      setStep3Data: (data) =>
+      setInteriorStyleData: (data) =>
         set((state) => ({
-          step3: { ...state.step3, ...data },
+          interiorStyle: { ...state.interiorStyle, ...data },
         })),
 
-      setStep4Data: (data) =>
+      setActivityInfoData: (data) =>
         set((state) => ({
-          step4: { ...state.step4, ...data },
+          activityInfo: { ...state.activityInfo, ...data },
         })),
 
       setCurrentStep: (step) => set({ currentStep: step }),
@@ -99,14 +99,14 @@ export const useFunnelStore = create<FunnelStore>()(
         set((state) => {
           const newState = { ...state };
           if (step < 2) {
-            newState.step2 = {};
-            newState.step3 = {};
-            newState.step4 = {};
+            newState.floorPlan = {};
+            newState.interiorStyle = {};
+            newState.activityInfo = {};
           } else if (step < 3) {
-            newState.step3 = {};
-            newState.step4 = {};
+            newState.interiorStyle = {};
+            newState.activityInfo = {};
           } else if (step < 4) {
-            newState.step4 = {};
+            newState.activityInfo = {};
           }
           return newState;
         }),

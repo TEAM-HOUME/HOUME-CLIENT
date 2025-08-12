@@ -20,7 +20,11 @@ export const useFloorPlan = (
   console.log('도면 데이터: ', data);
 
   // Zustand 스토어에서 상태 가져오기
-  const { step2, setStep2Data, setCurrentStep } = useFunnelStore();
+  const {
+    floorPlan: step2,
+    setFloorPlanData: setStep2Data,
+    setCurrentStep,
+  } = useFunnelStore();
 
   // Zustand에서 이전 선택값 가져와서 초기화
   const [selectedId, setSelectedId] = useState<number | null>(

@@ -16,7 +16,7 @@ import axiosInstance from '@shared/apis/axiosInstance';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
-} from '../types/apis/moodBoard';
+} from '../types/apis/interiorStyle';
 
 export const getMoodBoardImage = async (
   limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT

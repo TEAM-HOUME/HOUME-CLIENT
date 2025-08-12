@@ -27,11 +27,15 @@ const isValidActivityKey = (
 //   otherFurnitures?: string;
 // }
 
-export const useActivityInfo = (context: ImageSetupSteps['MainActivity']) => {
+export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   const navigate = useNavigate();
 
   // Zustand store에서 상태 가져오기
-  const { step4, setStep4Data, setCurrentStep } = useFunnelStore();
+  const {
+    activityInfo: step4,
+    setActivityInfoData: setStep4Data,
+    setCurrentStep,
+  } = useFunnelStore();
 
   // 크레딧 가드 훅 (이미지 생성 시 1크레딧 필요)
   const { checkCredit, isChecking } = useCreditGuard(1);
