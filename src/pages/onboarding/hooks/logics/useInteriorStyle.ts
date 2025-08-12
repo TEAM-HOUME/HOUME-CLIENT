@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MAX_MOOD_BOARD_SELECTION } from '../constants/step3.constants';
-import { useFunnelStore } from '../stores/useFunnelStore';
+import { MAX_MOOD_BOARD_SELECTION } from '../../constants/step3.constants';
+import { useFunnelStore } from '../../stores/useFunnelStore';
 import type {
   CompletedInteriorTaste,
   ImageGenerateSteps,
-} from '../types/funnel';
+} from '../../types/funnel';
 
-export const useStep3InteriorTaste = (
+export const useInteriorStyle = (
   context: ImageGenerateSteps['InteriorTaste'],
   onNext: (data: CompletedInteriorTaste) => void
 ) => {

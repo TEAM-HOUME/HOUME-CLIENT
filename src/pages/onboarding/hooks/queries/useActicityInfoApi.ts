@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { selectHouseInfo } from '../apis/HouseInfo';
-import { type SelectHouseInfoRequest } from '../types/apis/step1Api.types';
+import { selectHouseInfo } from '../../apis/HouseInfo';
+import { type SelectHouseInfoRequest } from '../../types/apis/step1Api.types';
 
 export const useHouseInfoApi = () => {
   const queryClient = useQueryClient();

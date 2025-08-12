@@ -16,7 +16,7 @@ import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageItem,
 } from '@/pages/onboarding/types/apis/moodBoard';
-import { useMoodBoardQuery } from '@/pages/onboarding/hooks/useStep3Api.hooks';
+import { useMoodBoardQuery } from '@/pages/onboarding/hooks/queries/useInteriorStyleApi';
 import CardImage from '@/shared/components/card/cardImage/CardImage';
 import SkeletonCardImage from '@/shared/components/card/cardImage/SkeletonCardImage';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';

@@ -3,10 +3,10 @@ import {
   HOUSE_INFO_VALIDATION,
   type CompletedHouseInfo,
   type ImageGenerateSteps,
-} from '../types/funnel';
-import { useHouseInfoApi } from './useStep1Api.hooks';
-import { useFunnelStore } from '../stores/useFunnelStore';
-import { usePrefetchMoodBoard } from './useStep3Api.hooks';
+} from '../../types/funnel';
+import { useHouseInfoApi } from '../queries/useActicityInfoApi';
+import { useFunnelStore } from '../../stores/useFunnelStore';
+import { usePrefetchMoodBoard } from '../queries/useInteriorStyleApi';
 
 interface FormErrors {
   houseType?: string;
@@ -14,7 +14,7 @@ interface FormErrors {
   areaType?: string;
 }
 
-export const useStep1HouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
+export const useHouseInfo = (context: ImageGenerateSteps['HouseInfo']) => {
   // 집 구조 선택 API 요청
   const selectHouseInfoRequest = useHouseInfoApi();
 

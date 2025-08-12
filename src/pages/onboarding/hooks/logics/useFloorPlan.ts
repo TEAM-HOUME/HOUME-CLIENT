@@ -1,8 +1,11 @@
 // useStep2FloorPlan.hooks.ts (로직 담당)
 import { useCallback, useEffect, useState } from 'react';
-import { useFloorPlanApi } from './useStep2Api.hooks';
-import { useFunnelStore } from '../stores/useFunnelStore';
-import type { CompletedFloorPlan, ImageGenerateSteps } from '../types/funnel';
+import { useFloorPlanApi } from '../queries/useFloorPlanApi';
+import { useFunnelStore } from '../../stores/useFunnelStore';
+import type {
+  CompletedFloorPlan,
+  ImageGenerateSteps,
+} from '../../types/funnel';
 
 // interface SelectedFloorPlanTypes {
 //   id: number;
@@ -10,7 +13,7 @@ import type { CompletedFloorPlan, ImageGenerateSteps } from '../types/funnel';
 //   flipped: boolean;
 // }
 
-export const useStep2FloorPlan = (
+export const useFloorPlan = (
   context: ImageGenerateSteps['FloorPlan'],
   onNext: (data: CompletedFloorPlan) => void
 ) => {

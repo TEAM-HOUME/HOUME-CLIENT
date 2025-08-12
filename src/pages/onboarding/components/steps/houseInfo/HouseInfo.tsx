@@ -10,7 +10,7 @@ import {
   HOUSE_INFO_OPTIONS,
 } from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
-import { useStep1HouseInfo } from '@/pages/onboarding/hooks/useStep1HouseInfo.hooks';
+import { useHouseInfo } from '@/pages/onboarding/hooks/logics/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/onboarding/constants/headerImages';
 
@@ -21,7 +21,7 @@ interface HouseInfoProps {
 
 const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
-    useStep1HouseInfo(context);
+    useHouseInfo(context);
 
   const houseTypeOptions = Object.values(HOUSE_INFO_OPTIONS.HOUSING_TYPES);
   const roomTypeOptions = Object.values(HOUSE_INFO_OPTIONS.ROOM_TYPES);

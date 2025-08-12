@@ -7,7 +7,7 @@ import type {
   CompletedFloorPlan,
   ImageGenerateSteps,
 } from '../../../types/funnel';
-import { useStep2FloorPlan } from '@/pages/onboarding/hooks/useStep2FloorPlan.hooks';
+import { useFloorPlan } from '@/pages/onboarding/hooks/logics/useFloorPlan';
 import { FUNNELHEADER_IMAGES } from '@/pages/onboarding/constants/headerImages';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
@@ -31,7 +31,7 @@ const Step2FloorPlan = ({ context, onNext }: Step2FloorPlanProps) => {
     handleImageSelect,
     handleFlipToggle,
     handleFloorPlanSelection,
-  } = useStep2FloorPlan(context, onNext);
+  } = useFloorPlan(context, onNext);
 
   useEffect(() => {
     if (isError) {

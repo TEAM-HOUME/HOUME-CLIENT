@@ -4,8 +4,8 @@ import {
   MAIN_ACTIVITY_OPTIONS,
   MAIN_ACTIVITY_VALIDATION,
   type ImageGenerateSteps,
-} from '../types/funnel';
-import { useFunnelStore } from '../stores/useFunnelStore';
+} from '../../types/funnel';
+import { useFunnelStore } from '../../stores/useFunnelStore';
 import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
@@ -27,7 +27,7 @@ const isValidActivityKey = (
 //   otherFurnitures?: string;
 // }
 
-export const useStep4MainActivity = (
+export const useActivityInfo = (
   context: ImageGenerateSteps['MainActivity']
 ) => {
   const navigate = useNavigate();

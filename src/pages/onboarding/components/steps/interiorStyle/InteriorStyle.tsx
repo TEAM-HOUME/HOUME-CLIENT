@@ -7,17 +7,17 @@ import type {
   ImageGenerateSteps,
 } from '../../../types/funnel';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { useStep3InteriorTaste } from '@/pages/onboarding/hooks/useStep3InteriorTaste.hooks';
+import { useInteriorStyle } from '@/pages/onboarding/hooks/logics/useInteriorStyle';
 import { FUNNELHEADER_IMAGES } from '@/pages/onboarding/constants/headerImages';
 
-interface Step3InteriorTasteProps {
+interface InteriorStyleProps {
   context: ImageGenerateSteps['InteriorTaste'];
   onNext: (data: CompletedInteriorTaste) => void;
 }
 
-const Step3InteriorTaste = ({ context, onNext }: Step3InteriorTasteProps) => {
+const InteriorStyle = ({ context, onNext }: InteriorStyleProps) => {
   const { selectedImages, handleImageSelect, handleNext, isDataComplete } =
-    useStep3InteriorTaste(context, onNext);
+    useInteriorStyle(context, onNext);
 
   return (
     <div className={styles.container}>
@@ -41,4 +41,4 @@ const Step3InteriorTaste = ({ context, onNext }: Step3InteriorTasteProps) => {
   );
 };
 
-export default Step3InteriorTaste;
+export default InteriorStyle;

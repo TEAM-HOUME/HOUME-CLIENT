@@ -1,9 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMoodBoardImage } from '../apis/MoodBoardImage';
+import { getMoodBoardImage } from '../../apis/MoodBoardImage';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
-} from '../types/apis/moodBoard';
+} from '../../types/apis/moodBoard';
 
 /**
  * 무드보드 이미지를 가져오는 커스텀 훅입니다.

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { postAddress } from '../apis/BottomSheetAddress';
-import type { BottomSheetAddressRequest } from '../types/apis/bottomSheetAddress.types';
+import { postAddress } from '../../apis/BottomSheetAddress';
+import type { BottomSheetAddressRequest } from '../../types/apis/bottomSheetAddress.types';
 
 export const useBottomSheetAddress = () => {
   return useMutation({

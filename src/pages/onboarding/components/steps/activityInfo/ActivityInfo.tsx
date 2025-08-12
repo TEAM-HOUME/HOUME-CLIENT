@@ -10,15 +10,15 @@ import OptionGroup from '../optionGroup/OptionGroup';
 import MainTitle from '../title/Maintitle';
 import SubOptionGroup from '../optionGroup/SubOptionGroup';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
-import { useStep4MainActivity } from '@/pages/onboarding/hooks/useStep4MainActivity.hooks';
+import { useActivityInfo } from '@/pages/onboarding/hooks/logics/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/onboarding/constants/headerImages';
 
-interface Step4MainActivityProps {
+interface ActivityInfoProps {
   context: ImageGenerateSteps['MainActivity'];
 }
 
-const Step4MainActivity = ({ context }: Step4MainActivityProps) => {
+const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
     localFormData,
     setFormData,
@@ -29,7 +29,7 @@ const Step4MainActivity = ({ context }: Step4MainActivityProps) => {
     getRequiredFurnitureLabels,
     handleOnClick,
     isButtonActive,
-  } = useStep4MainActivity(context);
+  } = useActivityInfo(context);
 
   const primaryUsageOptions = Object.values(
     MAIN_ACTIVITY_OPTIONS.PRIMARY_USAGE
@@ -113,4 +113,4 @@ const Step4MainActivity = ({ context }: Step4MainActivityProps) => {
   );
 };
 
-export default Step4MainActivity;
+export default ActivityInfo;
