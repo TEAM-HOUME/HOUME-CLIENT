@@ -1,0 +1,1 @@
+export const MAX_MOOD_BOARD_SELECTION = 5;
