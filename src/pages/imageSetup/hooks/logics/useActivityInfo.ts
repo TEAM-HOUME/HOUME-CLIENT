@@ -32,8 +32,8 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // Zustand store에서 상태 가져오기
   const {
-    activityInfo: step4,
-    setActivityInfoData: setStep4Data,
+    activityInfo: activityInfo,
+    setActivityInfoData: setActivityInfoData,
     setCurrentStep,
   } = useFunnelStore();
 
@@ -49,10 +49,10 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // 초기값 설정: funnel의 context보다 zustand store 우선
   const [localFormData, setLocalFormData] = useState({
-    primaryUsage: step4.primaryUsage || context.primaryUsage,
-    bedTypeId: step4.bedTypeId || context.bedTypeId,
+    primaryUsage: activityInfo.primaryUsage || context.primaryUsage,
+    bedTypeId: activityInfo.bedTypeId || context.bedTypeId,
     otherFurnitureIds:
-      step4.otherFurnitureIds || context.otherFurnitureIds || [],
+      activityInfo.otherFurnitureIds || context.otherFurnitureIds || [],
   });
 
   // TODO: 코드 확인
@@ -62,9 +62,9 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
         typeof updater === 'function' ? updater(localFormData) : updater;
 
       setLocalFormData(newData);
-      setStep4Data(newData); // Zustand 동시 업데이트
+      setActivityInfoData(newData); // Zustand 동시 업데이트
     },
-    [localFormData, setStep4Data]
+    [localFormData, setActivityInfoData]
   );
 
   //   const [errors, setErrors] = useState<FormErrors>({});

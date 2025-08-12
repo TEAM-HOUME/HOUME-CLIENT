@@ -20,8 +20,8 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   // Zustand store에서 상태 가져오기
   const {
-    houseInfo: step1,
-    sethouseInfoData: setStep1Data,
+    houseInfo: houseInfo,
+    sethouseInfoData: setHouseInfoData,
     setCurrentStep,
   } = useFunnelStore();
 
@@ -46,9 +46,9 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   // 초기값 설정: funnel의 context보다 zustand store 우선
   const [formData, setFormData] = useState({
-    houseType: step1.houseType || context.houseType,
-    roomType: step1.roomType || context.roomType,
-    areaType: step1.areaType || context.areaType,
+    houseType: houseInfo.houseType || context.houseType,
+    roomType: houseInfo.roomType || context.roomType,
+    areaType: houseInfo.areaType || context.areaType,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -61,7 +61,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   useEffect(() => {
     // setStep1Data({ }) 안에 있는 데이터가 setStep1Data의 정의에 의해 spread돼서 zustand의 state에 저장됨
     // houseType, roomType, areaType 중 하나만 바뀌어도 그냥 셋 다 spread돼서 저장되는 것
-    setStep1Data({
+    setHouseInfoData({
       houseType: formData.houseType,
       roomType: formData.roomType,
       areaType: formData.areaType,
@@ -169,7 +169,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
           console.log(res);
 
           // zustand store에 houseId 저장
-          setStep1Data({
+          setHouseInfoData({
             ...selectedHouseInfo,
             houseId: res.houseId,
           });

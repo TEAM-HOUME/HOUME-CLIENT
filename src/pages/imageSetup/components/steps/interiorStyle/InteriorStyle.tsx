@@ -3,7 +3,7 @@ import MoodBoard from './MoodBoard';
 import * as styles from './InteriorStyle.css';
 import FunnelHeader from '../../header/FunnelHeader';
 import type {
-  CompletedInteriorTaste,
+  CompletedInteriorStyle,
   ImageSetupSteps,
 } from '../../../types/funnel';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
@@ -11,8 +11,8 @@ import { useInteriorStyle } from '@/pages/imageSetup/hooks/logics/useInteriorSty
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 
 interface InteriorStyleProps {
-  context: ImageSetupSteps['InteriorTaste'];
-  onNext: (data: CompletedInteriorTaste) => void;
+  context: ImageSetupSteps['InteriorStyle'];
+  onNext: (data: CompletedInteriorStyle) => void;
 }
 
 const InteriorStyle = ({ context, onNext }: InteriorStyleProps) => {

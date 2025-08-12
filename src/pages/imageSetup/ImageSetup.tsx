@@ -1,12 +1,12 @@
 import { useImageSetup } from './hooks/useImageGeneration';
 import HouseInfo from './components/steps/houseInfo/HouseInfo';
-import Step2FloorPlan from './components/steps/floorPlan/FloorPlan';
+import FloorPlan from './components/steps/floorPlan/FloorPlan';
 import InteriorStyle from './components/steps/interiorStyle/InteriorStyle';
 import ActivityInfo from './components/steps/activityInfo/ActivityInfo';
 import {
   type CompletedHouseInfo,
   type CompletedFloorPlan,
-  type CompletedInteriorTaste,
+  type CompletedInteriorStyle,
 } from './types/funnel';
 import FunnelLayout from './components/layout/FunnelLayout';
 
@@ -39,7 +39,7 @@ export const ImageSetup = () => {
           },
           render({ dispatch, context }) {
             return (
-              <Step2FloorPlan
+              <FloorPlan
                 context={context}
                 onNext={(data) => dispatch('selectedFloorPlan', data)}
               />
@@ -49,7 +49,7 @@ export const ImageSetup = () => {
         InteriorStyle={funnel.Render.with({
           events: {
             selectInteriorStyle: (
-              data: CompletedInteriorTaste,
+              data: CompletedInteriorStyle,
               { history }
             ) => {
               history.push('ActivityInfo', data);

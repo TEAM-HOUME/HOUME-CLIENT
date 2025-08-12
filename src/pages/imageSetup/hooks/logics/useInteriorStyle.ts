@@ -2,23 +2,23 @@ import { useCallback, useEffect, useState } from 'react';
 import { MAX_MOOD_BOARD_SELECTION } from '../../constants/interiorStyle';
 import { useFunnelStore } from '../../stores/useFunnelStore';
 import type {
-  CompletedInteriorTaste,
+  CompletedInteriorStyle,
   ImageSetupSteps,
 } from '../../types/funnel';
 
 export const useInteriorStyle = (
   context: ImageSetupSteps['InteriorStyle'],
-  onNext: (data: CompletedInteriorTaste) => void
+  onNext: (data: CompletedInteriorStyle) => void
 ) => {
   // Zustand store에서 상태 가져오기
   const {
-    interiorStyle: step3,
-    setInteriorStyleData: setStep3Data,
+    interiorStyle: interiorStyle,
+    setInteriorStyleData: setinteriorStyleData,
     setCurrentStep,
   } = useFunnelStore();
 
   const [selectedImages, setSelectedImages] = useState<number[]>(
-    step3.moodBoardIds || []
+    interiorStyle.moodBoardIds || []
   );
 
   // 컴포넌트 마운트 시 현재 스텝 설정
@@ -27,7 +27,7 @@ export const useInteriorStyle = (
   }, []);
 
   useEffect(() => {
-    setStep3Data({
+    setinteriorStyleData({
       moodBoardIds: selectedImages,
     });
   }, [selectedImages]);

@@ -43,5 +43,5 @@ export type ImageSetupSteps = {
 
 export type CompletedHouseInfo = Required<ImageSetupSteps['HouseInfo']>;
 export type CompletedFloorPlan = Required<ImageSetupSteps['FloorPlan']>;
-export type CompletedInteriorTaste = Required<ImageSetupSteps['InteriorStyle']>;
-export type CompletedMainActivity = Required<ImageSetupSteps['ActivityInfo']>;
+export type CompletedInteriorStyle = Required<ImageSetupSteps['InteriorStyle']>;
+export type CompletedActivityInfo = Required<ImageSetupSteps['ActivityInfo']>;

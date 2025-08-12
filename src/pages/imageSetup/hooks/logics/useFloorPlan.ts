@@ -1,4 +1,4 @@
-// useStep2FloorPlan.hooks.ts (로직 담당)
+// useFloorPlan.hooks.ts (로직 담당)
 import { useCallback, useEffect, useState } from 'react';
 import { useFloorPlanApi } from '../queries/useFloorPlanApi';
 import { useFunnelStore } from '../../stores/useFunnelStore';
@@ -14,23 +14,25 @@ export const useFloorPlan = (
   context: ImageSetupSteps['FloorPlan'],
   onNext: (data: CompletedFloorPlan) => void
 ) => {
-  // Step2FloorPlan 컴포넌트 렌더링 -> useStep2FloorPlan 훅 실행
+  // FloorPlan 컴포넌트 렌더링 -> useFloorPlan 훅 실행
   // -> useFloorPlanQuery 실행 -> 데이터 fetching
   const { data, isLoading, error, isError } = useFloorPlanApi();
   console.log('도면 데이터: ', data);
 
   // Zustand 스토어에서 상태 가져오기
   const {
-    floorPlan: step2,
-    setFloorPlanData: setStep2Data,
+    floorPlan: floorPlan,
+    setFloorPlanData: setFloorPlanData,
     setCurrentStep,
   } = useFunnelStore();
 
   // Zustand에서 이전 선택값 가져와서 초기화
   const [selectedId, setSelectedId] = useState<number | null>(
-    step2.floorPlanId || null
+    floorPlan.floorPlanId || null
   );
-  const [isMirror, setIsMirror] = useState<boolean>(step2.isMirror || false);
+  const [isMirror, setIsMirror] = useState<boolean>(
+    floorPlan.isMirror || false
+  );
 
   // 컴포넌트 마운트 시 현재 스텝 설정
   useEffect(() => {
@@ -40,7 +42,7 @@ export const useFloorPlan = (
   // 선택 상태가 변경될 때마다 Zustand에 저장
   useEffect(() => {
     if (selectedId !== null) {
-      setStep2Data({
+      setFloorPlanData({
         floorPlanId: selectedId,
         isMirror: isMirror,
       });

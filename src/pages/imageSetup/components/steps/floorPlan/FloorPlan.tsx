@@ -12,12 +12,12 @@ import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
-interface Step2FloorPlanProps {
+interface FloorPlanProps {
   context: ImageSetupSteps['FloorPlan'];
   onNext: (data: CompletedFloorPlan) => void;
 }
 
-const Step2FloorPlan = ({ context, onNext }: Step2FloorPlanProps) => {
+const FloorPlan = ({ context, onNext }: FloorPlanProps) => {
   const { handleError } = useErrorHandler('imageSetup');
 
   const {
@@ -83,4 +83,4 @@ const Step2FloorPlan = ({ context, onNext }: Step2FloorPlanProps) => {
   );
 };
 
-export default Step2FloorPlan;
+export default FloorPlan;
