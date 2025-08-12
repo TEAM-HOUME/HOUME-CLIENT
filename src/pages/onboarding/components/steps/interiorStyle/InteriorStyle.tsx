@@ -1,6 +1,6 @@
 // Step 3
 import MoodBoard from './MoodBoard';
-import * as styles from './Step3InteriorTaste.css';
+import * as styles from './InteriorStyle.css';
 import FunnelHeader from '../../header/FunnelHeader';
 import type {
   CompletedInteriorTaste,

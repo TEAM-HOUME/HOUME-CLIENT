@@ -1,8 +1,8 @@
 import { useImageGenerationFunnel } from './hooks/useImageGenerationFunnel.hooks';
 import HouseInfo from './components/steps/houseInfo/HouseInfo';
 import Step2FloorPlan from './components/steps/floorPlan/FloorPlan';
-import Step3InteriorTaste from './components/steps/step3/Step3InteriorTaste';
-import Step4MainActivity from './components/steps/step4/Step4MainActivity';
+import Step3InteriorTaste from './components/steps/interiorStyle/InteriorStyle';
+import Step4MainActivity from './components/steps/activityInfo/ActivityInfo';
 import {
   type CompletedHouseInfo,
   type CompletedFloorPlan,
