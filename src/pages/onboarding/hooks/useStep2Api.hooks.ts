@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getFloorPlan } from '../apis/step2';
+import { getFloorPlan } from '../apis/FloorPlan';
 
 export const useFloorPlanApi = () => {
   const query = useQuery({
