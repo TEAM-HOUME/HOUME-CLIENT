@@ -18,7 +18,7 @@ interface Step2FloorPlanProps {
 }
 
 const Step2FloorPlan = ({ context, onNext }: Step2FloorPlanProps) => {
-  const { handleError } = useErrorHandler('onboarding');
+  const { handleError } = useErrorHandler('imageSetup');
 
   const {
     floorPlanList,

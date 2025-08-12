@@ -16,7 +16,7 @@ import { useGenerateStore } from '../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../types/GenerateType';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { queryClient } from '@/shared/apis/queryClient';
-import { useFunnelStore } from '@/pages/onboarding/stores/useFunnelStore';
+import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
 
 export const useStackData = (page: number, options: { enabled: boolean }) => {
   return useQuery({
@@ -153,7 +153,7 @@ export const useGenerateImageStatusCheck = (
   // 에러 시 처리
   useEffect(() => {
     if (query.isError) {
-      navigate('/onboarding');
+      navigate('/imageSetup');
       console.log('fallback api 이미지 생성 실패');
     }
   }, [query.isError, query.error]);

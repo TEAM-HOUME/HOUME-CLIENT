@@ -6,7 +6,7 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   SIGNUPCOMPLETE: '/signup/complete',
-  ONBOARDING: '/onboarding',
+  imageSetup: '/imageSetup',
   GENERATE: '/generate',
   MYPAGE: '/mypage',
   OAUTH: '/oauth/kakao/callback',

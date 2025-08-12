@@ -15,7 +15,7 @@ import * as styles from './MoodBoard.css';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageItem,
-} from '@/pages/imageSetup/types/apis/moodBoard';
+} from '@/pages/imageSetup/types/apis/interiorStyle';
 import { useMoodBoardQuery } from '@/pages/imageSetup/hooks/queries/useInteriorStyleApi';
 import CardImage from '@/shared/components/card/cardImage/CardImage';
 import SkeletonCardImage from '@/shared/components/card/cardImage/SkeletonCardImage';
@@ -27,7 +27,7 @@ interface MoodBoardProps {
 }
 
 const MoodBoard = ({ selectedImages, onImageSelect }: MoodBoardProps) => {
-  const { handleError } = useErrorHandler('onboarding');
+  const { handleError } = useErrorHandler('imageSetup');
 
   /**
    * 이미지의 선택 순서를 반환하는 함수
