@@ -4,7 +4,7 @@ import {
   type CompletedHouseInfo,
   type ImageSetupSteps,
 } from '../../types/funnel';
-import { useHouseInfoApi } from '../queries/useActicityInfoApi';
+import { useHouseInfoApi } from '../queries/useActivityInfoApi';
 import { useFunnelStore } from '../../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../queries/useInteriorStyleApi';
 
