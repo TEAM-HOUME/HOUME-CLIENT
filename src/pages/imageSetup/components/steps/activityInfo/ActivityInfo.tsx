@@ -10,7 +10,7 @@ import OptionGroup from '../optionGroup/OptionGroup';
 import MainTitle from '../title/Maintitle';
 import SubOptionGroup from '../optionGroup/SubOptionGroup';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
-import { useActivityInfo } from '@/pages/imageSetup/hooks/logics/useActivityInfo';
+import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 

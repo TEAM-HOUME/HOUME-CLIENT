@@ -10,7 +10,7 @@ import {
   HOUSE_INFO_OPTIONS,
 } from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
-import { useHouseInfo } from '@/pages/imageSetup/hooks/logics/useHouseInfo';
+import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 

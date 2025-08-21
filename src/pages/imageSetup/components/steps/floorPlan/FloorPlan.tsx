@@ -7,7 +7,7 @@ import type {
   CompletedFloorPlan,
   ImageSetupSteps,
 } from '../../../types/funnel';
-import { useFloorPlan } from '@/pages/imageSetup/hooks/logics/useFloorPlan';
+import { useFloorPlan } from '@/pages/imageSetup/hooks/useFloorPlan';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';

@@ -7,7 +7,7 @@ import type {
   ImageSetupSteps,
 } from '../../../types/funnel';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { useInteriorStyle } from '@/pages/imageSetup/hooks/logics/useInteriorStyle';
+import { useInteriorStyle } from '@/pages/imageSetup/hooks/useInteriorStyle';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 
 interface InteriorStyleProps {

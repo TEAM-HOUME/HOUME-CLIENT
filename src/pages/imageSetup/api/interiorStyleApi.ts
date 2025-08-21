@@ -1,19 +1,48 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMoodBoardImage } from '../../apis/MoodBoardImage';
+import axiosInstance from '@shared/apis/axiosInstance';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
-} from '../../types/apis/interiorStyle';
+} from '../types/apis/interiorStyle';
 
+// API Functions
+/**
+ * 무드보드 이미지를 가져옵니다.
+ *
+ * @returns Promise<MoodBoardImageResponse> - 무드보드 이미지 저장 결과 메시지
+ *
+ * @example
+ * ```typescript
+ * const result = await getMoodBoardImage();
+ * console.log(result.data); // 무드보드 이미지 데이터
+ * ```
+ */
+const getMoodBoardImage = async (
+  limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT
+): Promise<MoodBoardImageResponse> => {
+  try {
+    const response = await axiosInstance.get<MoodBoardImageResponse>(
+      '/api/v1/moodboard-images',
+      {
+        params: { limit },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('[moodboard] 요청 실패:', error.response);
+    throw error;
+  }
+};
+
+// Query Hooks
 /**
  * 무드보드 이미지를 가져오는 커스텀 훅입니다.
  *
- * @param {number} [cursor=0] - 페이징을 위한 커서 값 (현재 미사용)
  * @param {number} [limit=18] - 한 번에 가져올 이미지 개수
  * @returns {import('@tanstack/react-query').UseQueryResult<MoodBoardImageResponse, Error>} React Query의 쿼리 결과 객체
  *
  * @example
- * const { data, isLoading, error } = useMoodBoardImage(0, 10);
+ * const { data, isLoading, error } = useMoodBoardImage(10);
  */
 export const useMoodBoardImage = (
   limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT

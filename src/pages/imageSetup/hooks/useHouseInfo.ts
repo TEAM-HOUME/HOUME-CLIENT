@@ -3,10 +3,10 @@ import {
   HOUSE_INFO_VALIDATION,
   type CompletedHouseInfo,
   type ImageSetupSteps,
-} from '../../types/funnel';
-import { useHouseInfoApi } from '../queries/useActivityInfoApi';
-import { useFunnelStore } from '../../stores/useFunnelStore';
-import { usePrefetchMoodBoard } from '../queries/useInteriorStyleApi';
+} from '../types/funnel';
+import { useHouseInfoApi } from '../api/houseInfoApi';
+import { useFunnelStore } from '../stores/useFunnelStore';
+import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
 
 interface FormErrors {
   houseType?: string;

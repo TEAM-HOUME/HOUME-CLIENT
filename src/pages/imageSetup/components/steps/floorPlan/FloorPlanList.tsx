@@ -8,7 +8,7 @@ import NoMatchButton from '@/shared/components/button/noMatchButton/NoMatchButto
 import NoMatchSheet from '@/shared/components/bottomSheet/noMatchSheet/NoMatchSheet';
 import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
 import { useToast } from '@/shared/components/toast/useToast';
-import { useBottomSheetAddress } from '@/pages/imageSetup/hooks/logics/useBottomSheetAddress';
+import { useBottomSheetAddress } from '@/pages/imageSetup/hooks/useBottomSheetAddress';
 
 interface FloorPlanListProps {
   floorPlanList: FloorPlanData[];
