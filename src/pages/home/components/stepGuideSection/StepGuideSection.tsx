@@ -88,12 +88,12 @@ const StepGuideSection = () => {
       {/* 결과 이미지 */}
       <AnimatedSection animationType="fadeIn" delay={200} duration={1000}>
         <div className={styles.resultImageContainer}>
-        <img
-          src={LandingImage4}
-          alt="결과 이미지"
-          className={styles.resultLandImage}
-        />
-      </div>
+          <img
+            src={LandingImage4}
+            alt="결과 이미지"
+            className={styles.resultLandImage}
+          />
+        </div>
       </AnimatedSection>
     </section>
   );
