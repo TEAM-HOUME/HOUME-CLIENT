@@ -36,5 +36,5 @@ type DeepValues<T> = T extends object
   ? { [K in keyof T]: DeepValues<T[K]> }[keyof T]
   : T;
 
-// 자동으로 모든 엔드포인트 문자열 추출 (한 줄!)
+// 자동으로 모든 엔드포인트 문자열 추출
 export type ApiEndpoint = DeepValues<typeof API_ENDPOINT>;
