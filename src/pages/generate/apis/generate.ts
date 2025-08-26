@@ -1,4 +1,4 @@
-import { API_URL } from '@constants/apiURL';
+import { API_URL } from '@constants/apiEndpoints';
 import type { CarouselItem, ImageStackResponse } from '../types/GenerateType';
 import type {
   GenerateImageRequest,
@@ -11,7 +11,7 @@ import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 export const getStackData = async (page: number): Promise<CarouselItem[]> => {
   const res = await request<ImageStackResponse>({
     method: HTTPMethod.GET,
-    url: API_URL.GENERATE_CAROUSELS,
+    url: API_URL.GENERATE.CAROUSELS,
     query: { page },
   });
   return res.carouselResponseDTOS ?? [];
@@ -21,7 +21,7 @@ export const getStackData = async (page: number): Promise<CarouselItem[]> => {
 export const postLikeStack = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
-    url: API_URL.GENERATE_CAROUSELS_LIKE,
+    url: API_URL.GENERATE.CAROUSELS_LIKE,
     query: {
       carouselId,
     },
@@ -31,7 +31,7 @@ export const postLikeStack = async (carouselId: number) => {
 export const postHateStack = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
-    url: API_URL.GENERATE_CAROUSELS_HATE,
+    url: API_URL.GENERATE.CAROUSELS_HATE,
     query: {
       carouselId,
     },
@@ -43,7 +43,7 @@ export const postHateStack = async (carouselId: number) => {
 export const getResultData = async (imageId: number) => {
   return request({
     method: HTTPMethod.GET,
-    url: `${API_URL.GENERATE_IMAGE_PREFERENCE}/${imageId}/preference`,
+    url: `${API_URL.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
   });
 };
 
@@ -51,7 +51,7 @@ export const getResultData = async (imageId: number) => {
 export const postPreference = async (imageId: number, isLike: boolean) => {
   return request({
     method: HTTPMethod.POST,
-    url: `${API_URL.GENERATE_IMAGE_PREFERENCE}/${imageId}/preference`,
+    url: `${API_URL.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
     body: {
       isLike,
     },
@@ -62,7 +62,7 @@ export const postPreference = async (imageId: number, isLike: boolean) => {
 export const postFurnitureLog = async () => {
   return request({
     method: HTTPMethod.POST,
-    url: API_URL.ANALYTICS_FURNITURE_LOGS,
+    url: API_URL.ANALYTICS.FURNITURE_LOGS,
   });
 };
 
@@ -70,7 +70,7 @@ export const postFurnitureLog = async () => {
 export const postCreditLog = async () => {
   return request({
     method: HTTPMethod.POST,
-    url: API_URL.ANALYTICS_CREDIT_LOGS,
+    url: API_URL.ANALYTICS.CREDIT_LOGS,
   });
 };
 
@@ -80,7 +80,7 @@ export const generateImage = async (
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: API_URL.GENERATE_IMAGE_V2,
+    url: API_URL.GENERATE.IMAGE_V2,
     body: requestData,
   };
 
@@ -93,7 +93,7 @@ export const checkGenerateImageStatus = async (
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: `${API_URL.GENERATE_IMAGE_STATUS}?houseId=${houseId}`,
+    url: `${API_URL.GENERATE.IMAGE_STATUS}?houseId=${houseId}`,
   };
 
   return await request<GenerateImageResponse['data']>(config);

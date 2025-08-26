@@ -12,7 +12,7 @@
  * ```
  */
 
-import { API_URL } from '@constants/apiURL';
+import { API_URL } from '@constants/apiEndpoints';
 import axiosInstance from '@shared/apis/axiosInstance';
 import {
   MOOD_BOARD_CONSTANTS,
@@ -24,7 +24,7 @@ export const getMoodBoardImage = async (
 ): Promise<MoodBoardImageResponse> => {
   try {
     const response = await axiosInstance.get<MoodBoardImageResponse>(
-      API_URL.ONBOARDING_MOODBOARD_IMAGES,
+      API_URL.ONBOARDING.MOODBOARD_IMAGES,
       {
         params: { limit },
       }

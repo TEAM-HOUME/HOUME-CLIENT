@@ -1,4 +1,4 @@
-import { API_URL } from '@constants/apiURL';
+import { API_URL } from '@constants/apiEndpoints';
 import type {
   SelectHouseInfoRequest,
   SelectHouseInfoResponse,
@@ -10,7 +10,7 @@ export const selectHouseInfo = async (
 ): Promise<SelectHouseInfoResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: API_URL.ONBOARDING_HOUSING_SELECTIONS,
+    url: API_URL.ONBOARDING.HOUSING_SELECTIONS,
     body: requestData,
   };
 
