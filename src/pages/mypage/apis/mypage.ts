@@ -1,4 +1,4 @@
-import { API_URL } from '@constants/apiEndpoints';
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import type {
   MyPageUserResponse,
   MyPageImagesResponse,
@@ -13,7 +13,7 @@ import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 export const getMyPageUser = async (): Promise<MyPageUserResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: API_URL.USER.MYPAGE,
+    url: API_ENDPOINT.USER.MYPAGE,
   };
 
   return await request<MyPageUserResponse['data']>(config);
@@ -28,7 +28,7 @@ export const getMyPageImages = async (): Promise<
 > => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: API_URL.USER.MYPAGE_IMAGES,
+    url: API_ENDPOINT.USER.MYPAGE_IMAGES,
   };
 
   return await request<MyPageImagesResponse['data']>(config);
@@ -43,7 +43,7 @@ export const getMyPageImageDetail = async (
 ): Promise<MyPageImageDetailResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: `${API_URL.USER.MYPAGE_IMAGE_DETAIL}/${imageId}`,
+    url: `${API_ENDPOINT.USER.MYPAGE_IMAGE_DETAIL}/${imageId}`,
   };
 
   return await request<MyPageImageDetailResponse['data']>(config);

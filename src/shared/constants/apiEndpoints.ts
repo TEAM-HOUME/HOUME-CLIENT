@@ -1,4 +1,4 @@
-export const API_URL = {
+export const API_ENDPOINT = {
   AUTH: {
     KAKAO_CALLBACK: '/oauth/kakao/callback',
     LOGOUT: '/logout',
@@ -37,4 +37,4 @@ type DeepValues<T> = T extends object
   : T;
 
 // 자동으로 모든 엔드포인트 문자열 추출 (한 줄!)
-export type ApiEndpoint = DeepValues<typeof API_URL>;
+export type ApiEndpoint = DeepValues<typeof API_ENDPOINT>;
