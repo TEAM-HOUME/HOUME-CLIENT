@@ -14,6 +14,7 @@
  * console.log(response.accessToken); // 액세스 토큰
  * ```
  */
+import { API_URL } from '@constants/apiURL';
 import axiosInstance from '@shared/apis/axiosInstance';
 import type { BaseResponse } from '@shared/types/apis';
 import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
@@ -25,7 +26,7 @@ export const getKakaoLogin = async (
 
   // AxiosInstance를 사용해서 서버에 요청
   const response = await axiosInstance.get<BaseResponse<KakaoLoginResponse>>(
-    '/oauth/kakao/callback',
+    API_URL.AUTH_KAKAO_CALLBACK,
     { params: { code } }
   );
 

@@ -12,6 +12,7 @@
  * console.log(result.message); // "로그아웃되었습니다"
  * ```
  */
+import { API_URL } from '@constants/apiURL';
 import axiosInstance from '@shared/apis/axiosInstance';
 import type { LogoutResponse } from '../types/auth';
 
@@ -20,7 +21,9 @@ export const postLogout = async (): Promise<LogoutResponse> => {
   // console.log('[logout] 로그아웃 요청 시작');
 
   try {
-    const response = await axiosInstance.post<LogoutResponse>('/logout');
+    const response = await axiosInstance.post<LogoutResponse>(
+      API_URL.AUTH_LOGOUT
+    );
 
     // console.log('[logout] 응답 성공:', response.data);
     return response.data;
