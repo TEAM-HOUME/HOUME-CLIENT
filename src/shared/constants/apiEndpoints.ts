@@ -31,5 +31,10 @@ export const API_URL = {
   },
 } as const;
 
-export type ApiUrlKeys = keyof typeof API_URL;
-export type ApiUrlValues = (typeof API_URL)[ApiUrlKeys];
+// 헬퍼 타입: 중첩된 객체의 모든 리프(leaf) 값들을 추출
+type DeepValues<T> = T extends object
+  ? { [K in keyof T]: DeepValues<T[K]> }[keyof T]
+  : T;
+
+// 자동으로 모든 엔드포인트 문자열 추출 (한 줄!)
+export type ApiEndpoint = DeepValues<typeof API_URL>;
