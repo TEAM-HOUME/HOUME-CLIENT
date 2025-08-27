@@ -9,18 +9,29 @@ interface NoMatchSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onExited?: () => void;
+  onSubmit: (region: string, address: string) => void;
 }
 
 export const NoMatchSheet = ({
   isOpen,
   onClose,
   onExited,
+  onSubmit,
 }: NoMatchSheetProps) => {
   const userName = useUserStore((state) => state.userName);
 
   const [region, setRegion] = useState('');
   const [address, setAddress] = useState('');
   const isFilled = region.trim() !== '' && address.trim() !== '';
+
+  const handleSubmit = () => {
+    if (isFilled && onSubmit) {
+      onSubmit(region, address);
+      // 제출 후 폼 초기화
+      setRegion('');
+      setAddress('');
+    }
+  };
 
   return (
     <BottomSheetWrapper
@@ -62,14 +73,7 @@ export const NoMatchSheet = ({
       </div>
 
       <div className={styles.buttonContainer}>
-        <CtaButton
-          onClick={() => {
-            if (isFilled) {
-              console.log('Form submitted:', { region, address });
-            }
-          }}
-          disabled={!isFilled}
-        >
+        <CtaButton onClick={handleSubmit} disabled={!isFilled}>
           제출하기
         </CtaButton>
       </div>
