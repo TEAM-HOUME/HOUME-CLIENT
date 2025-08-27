@@ -82,11 +82,11 @@ export const dragHandleContainer = style({
   height: '2.8rem',
   alignItems: 'center',
   justifyContent: 'center',
-  pointerEvents: 'auto',
   cursor: 'grab',
   userSelect: 'none',
-  touchAction: 'manipulation',
+  touchAction: 'none',
   overscrollBehavior: 'none',
+
   WebkitUserSelect: 'none',
   WebkitTouchCallout: 'none',
   WebkitTapHighlightColor: 'transparent',
@@ -94,9 +94,6 @@ export const dragHandleContainer = style({
   selectors: {
     '&:active': {
       cursor: 'grabbing',
-    },
-    '&:hover': {
-      cursor: 'grab',
     },
     '&:focus': {
       outline: 'none',

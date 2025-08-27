@@ -74,10 +74,9 @@ export const dragHandleContainer = style({
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '2rem',
-  pointerEvents: 'auto', // 드래그 핸들은 클릭 가능하게
-  cursor: 'grab', // 드래그 가능함을 나타내는 커서
-  userSelect: 'none', // 텍스트 선택 방지
-  touchAction: 'pan-y', // 세로 방향 터치 드래그 허용
+  cursor: 'grab',
+  userSelect: 'none',
+  touchAction: 'none',
 
   // 드래그 중일 때 커서 변경
   selectors: {
