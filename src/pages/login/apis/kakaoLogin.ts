@@ -17,6 +17,7 @@
 import axiosInstance from '@shared/apis/axiosInstance';
 import type { BaseResponse } from '@shared/types/apis';
 import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
+import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
 
 export const getKakaoLogin = async (
   code: string
@@ -40,7 +41,9 @@ export const getKakaoLogin = async (
       '[kakaoLogin] 사용 가능한 헤더:',
       Object.keys(response.headers)
     );
-    throw new Error('액세스 토큰이 없습니다.');
+    throw new Error(
+      RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] || '액세스 토큰이 없습니다.'
+    );
   }
 
   return {

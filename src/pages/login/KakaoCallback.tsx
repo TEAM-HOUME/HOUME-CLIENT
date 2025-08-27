@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { useKakaoLogin } from './hooks/useKakaoLogin';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
 
 const KakaoCallback = () => {
   // 오류 핸들러
@@ -36,7 +37,9 @@ const KakaoCallback = () => {
     } else {
       console.error('[KakaoCallback] 인가 코드가 없습니다.');
       handleError(
-        new Error('인가 코드가 없습니다'),
+        new Error(
+          RESPONSE_MESSAGE[HTTP_STATUS.BAD_REQUEST] || '인가 코드가 없습니다'
+        ),
         'auth',
         '로그인 처리 중 오류가 발생했습니다.'
       );
