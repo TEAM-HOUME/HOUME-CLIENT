@@ -1,19 +1,13 @@
 /* 회원가입 API 함수 */
-import axiosInstance from '@shared/apis/axiosInstance';
 import type { SignupRequest, SignupResponse } from '../types/apis/signup';
+import { HTTPMethod, request } from '@/shared/apis/request';
 
 export const patchSignup = async (
   data: SignupRequest
 ): Promise<SignupResponse> => {
-  try {
-    const response = await axiosInstance.patch<SignupResponse>(
-      '/api/v1/sign-up',
-      data
-    );
-    return response.data;
-  } catch (error: any) {
-    console.error('[signup] 요청 실패:', error.response?.data);
-    console.error('[signup] 상태 코드:', error.response?.status);
-    throw error;
-  }
+  return request({
+    method: HTTPMethod.PATCH,
+    url: '/api/v1/sign-up',
+    body: data as unknown as Record<string, unknown>,
+  });
 };

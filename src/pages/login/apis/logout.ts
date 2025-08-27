@@ -12,21 +12,12 @@
  * console.log(result.message); // "로그아웃되었습니다"
  * ```
  */
-import axiosInstance from '@shared/apis/axiosInstance';
 import type { LogoutResponse } from '../types/auth';
+import { HTTPMethod, request } from '@/shared/apis/request';
 
-// AxiosInstance를 직접 사용해서 서버에 로그아웃 요청
 export const postLogout = async (): Promise<LogoutResponse> => {
-  // console.log('[logout] 로그아웃 요청 시작');
-
-  try {
-    const response = await axiosInstance.post<LogoutResponse>('/logout');
-
-    // console.log('[logout] 응답 성공:', response.data);
-    return response.data;
-  } catch (error: any) {
-    console.error('[logout] 요청 실패:', error.response?.data);
-    console.error('[logout] 상태 코드:', error.response?.status);
-    throw error;
-  }
+  return request({
+    method: HTTPMethod.POST,
+    url: '/logout',
+  });
 };
