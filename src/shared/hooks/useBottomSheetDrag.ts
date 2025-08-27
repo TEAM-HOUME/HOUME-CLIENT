@@ -10,11 +10,11 @@ export const useBottomSheetDrag = ({
   threshold = 100,
 }: UseBottomSheetDragProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false); // 드래그 중 여부
   const startYRef = useRef(0);
   const currentYRef = useRef(0);
 
-  // 닫기 애니메이션
+  // 닫기 애니메이션 (시트 변경 후 onClose 호출)
   const animateClose = useCallback(() => {
     if (!sheetRef.current) {
       onClose();

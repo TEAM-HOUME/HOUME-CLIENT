@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
+import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const backdrop = style({
   position: 'fixed',
@@ -25,8 +26,8 @@ export const sheetWrapper = style({
   left: '50%',
   transform: 'translate(-50%, 100%)', // 초기 위치
   width: '100%',
-  maxWidth: '500px',
-  backgroundColor: 'white',
+  maxWidth: '50rem',
+  backgroundColor: colorVars.color.gray000,
   borderTopLeftRadius: '20px',
   borderTopRightRadius: '20px',
   transition: 'transform 0.3s ease-in-out',
@@ -44,8 +45,8 @@ export const sheetWrapperCollapsed = style({
 });
 
 export const contentWrapper = style({
-  padding: '20px',
-  minHeight: '300px',
+  padding: '2rem',
+  minHeight: '30rem',
 });
 
 export const dragHandleContainer = style({
@@ -53,6 +54,6 @@ export const dragHandleContainer = style({
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
-  height: '24px',
-  marginBottom: '20px',
+  height: '2.4rem',
+  marginBottom: '2rem',
 });
