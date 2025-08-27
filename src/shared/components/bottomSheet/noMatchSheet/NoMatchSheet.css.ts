@@ -39,6 +39,7 @@ export const sheetWrapper = style({
   zIndex: zIndex.sheet,
   overflow: 'hidden',
   userSelect: 'none', // 텍스트 선택 방지
+  touchAction: 'none', // 모바일에서 화면 스크롤 방지
 
   // 드래그 중일 때만 transition 비활성화
   selectors: {
@@ -74,6 +75,16 @@ export const dragHandleContainer = style({
   alignItems: 'center',
   marginBottom: '2rem',
   pointerEvents: 'auto', // 드래그 핸들은 클릭 가능하게
+  cursor: 'grab', // 드래그 가능함을 나타내는 커서
+  userSelect: 'none', // 텍스트 선택 방지
+  touchAction: 'pan-y', // 세로 방향 터치 드래그 허용
+
+  // 드래그 중일 때 커서 변경
+  selectors: {
+    '&:active': {
+      cursor: 'grabbing',
+    },
+  },
 });
 
 export const infoTextContainer = style({
