@@ -30,7 +30,6 @@ export const sheetWrapper = style({
   backgroundColor: colorVars.color.gray000,
   borderTopLeftRadius: '20px',
   borderTopRightRadius: '20px',
-  transition: 'transform 0.3s ease-in-out',
   zIndex: zIndex.sheet,
 });
 
