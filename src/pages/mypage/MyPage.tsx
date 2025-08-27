@@ -36,8 +36,8 @@ const MyPage = () => {
   });
 
   useEffect(() => {
-    if (isLoggedIn && (isUserError || (!userData && !isUserLoading))) {
-      handleError(error || new Error('User data load failed'), 'api');
+    if (isLoggedIn && isUserError && error) {
+      handleError(error, 'api');
     }
   }, [isLoggedIn, isUserError, userData, isUserLoading, error, handleError]);
 
