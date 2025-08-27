@@ -1,89 +1,156 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 
 interface UseBottomSheetDragProps {
-  sheetRef: React.RefObject<HTMLDivElement | null>;
   onClose: () => void;
-  threshold?: number;
+  threshold?: number; // 드래그로 닫히는 임계치(px)
 }
 
-const DRAG_CLOSE_THRESHOLD_PX = 200;
-
-export function useBottomSheetDrag({
-  sheetRef,
+export const useBottomSheetDrag = ({
   onClose,
-  threshold = DRAG_CLOSE_THRESHOLD_PX,
-}: UseBottomSheetDragProps) {
-  const startY = useRef(0); // 드래그 시작 Y좌표
-  const currentY = useRef(0); // 현재 드래그된 Y거리
-  const isDragging = useRef(false); // 드래그 중 상태
+  threshold = 100,
+}: UseBottomSheetDragProps) => {
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const startYRef = useRef(0);
+  const currentYRef = useRef(0);
 
-  // 위치 업데이트 함수
-  const updateSheetPosition = (deltaY: number) => {
-    if (deltaY > 0 && sheetRef.current) {
-      currentY.current = deltaY;
-      sheetRef.current.style.transition = '';
-      sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
-    }
-  };
-
-  // 드래그 종료 함수
-  const finishDrag = () => {
-    if (!isDragging.current || !sheetRef.current) return;
-    isDragging.current = false;
-    sheetRef.current.style.transition = 'transform 0.3s ease';
-    sheetRef.current.style.transform = 'translate(-50%, 0)';
-    if (currentY.current > threshold) {
+  // 닫기 애니메이션
+  const animateClose = useCallback(() => {
+    if (!sheetRef.current) {
       onClose();
+      return;
     }
-    currentY.current = 0;
-  };
+    const el = sheetRef.current;
+    el.style.transition = 'transform 0.3s ease-in-out';
+    el.style.transform = 'translate(-50%, 100%)';
 
-  // 터치 이벤트
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    startY.current = e.touches[0].clientY;
-    isDragging.current = true;
-  };
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current) return;
-    const deltaY = e.touches[0].clientY - startY.current;
-    updateSheetPosition(deltaY);
-  };
-  const handleTouchEnd = () => {
-    finishDrag();
-  };
+    window.setTimeout(() => {
+      el.style.transition = '';
+      el.style.transform = '';
+      onClose();
+    }, 300);
+  }, [onClose]);
 
-  // 마우스 이벤트
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    startY.current = e.clientY;
-    isDragging.current = true;
-    document.addEventListener('mousemove', handleMouseMove as any);
-    document.addEventListener('mouseup', handleMouseUp as any);
-  };
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging.current) return;
-    const deltaY = e.clientY - startY.current;
-    updateSheetPosition(deltaY);
-  };
-  const handleMouseUp = () => {
-    finishDrag();
-    document.removeEventListener('mousemove', handleMouseMove as any);
-    document.removeEventListener('mouseup', handleMouseUp as any);
-  };
+  // 마우스 드래그
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
 
+      setIsDragging(true);
+      startYRef.current = e.clientY;
+      currentYRef.current = e.clientY;
+
+      const handleMouseMove = (ev: MouseEvent) => {
+        if (!isDragging) return;
+
+        ev.preventDefault();
+        const deltaY = ev.clientY - startYRef.current;
+        currentYRef.current = ev.clientY;
+
+        if (deltaY > 0 && sheetRef.current) {
+          const translateY = Math.min(deltaY, threshold);
+          sheetRef.current.style.transform = `translate(-50%, ${translateY}px)`;
+          sheetRef.current.style.transition = 'none';
+        }
+      };
+
+      const handleMouseUp = (ev: MouseEvent) => {
+        setIsDragging(false);
+        const deltaY = ev.clientY - startYRef.current;
+
+        if (sheetRef.current) {
+          if (deltaY > threshold) {
+            animateClose();
+          } else {
+            sheetRef.current.style.transform = 'translate(-50%, 0)';
+            sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+          }
+        }
+
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    [threshold, animateClose, isDragging]
+  );
+
+  // 터치 드래그
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      // 모바일 터치 이벤트 강화
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsDragging(true);
+      startYRef.current = e.touches[0].clientY;
+      currentYRef.current = e.touches[0].clientY;
+
+      const handleTouchMove = (ev: TouchEvent) => {
+        if (!isDragging) return;
+
+        // 모바일에서 스크롤 방지
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const deltaY = ev.touches[0].clientY - startYRef.current;
+        currentYRef.current = ev.touches[0].clientY;
+
+        if (deltaY > 0 && sheetRef.current) {
+          const translateY = Math.min(deltaY, threshold);
+          sheetRef.current.style.transform = `translate(-50%, ${translateY}px)`;
+          sheetRef.current.style.transition = 'none';
+        }
+      };
+
+      const handleTouchEnd = (ev: TouchEvent) => {
+        setIsDragging(false);
+
+        const deltaY = currentYRef.current - startYRef.current;
+
+        if (sheetRef.current) {
+          if (deltaY > threshold) {
+            animateClose();
+          } else {
+            sheetRef.current.style.transform = 'translate(-50%, 0)';
+            sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+          }
+        }
+
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+
+      // 모바일 터치 이벤트 리스너 등록
+      document.addEventListener('touchmove', handleTouchMove, {
+        passive: false,
+        capture: true,
+      });
+      document.addEventListener('touchend', handleTouchEnd, {
+        capture: true,
+      });
+    },
+    [threshold, animateClose, isDragging]
+  );
+
+  // 정리
   useEffect(() => {
-    // 언마운트 시 이벤트 해제
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove as any);
-      document.removeEventListener('mouseup', handleMouseUp as any);
+      if (sheetRef.current) {
+        sheetRef.current.style.transition = '';
+        sheetRef.current.style.transform = '';
+      }
     };
   }, []);
 
   return {
-    onTouchStart: handleTouchStart,
-    onTouchMove: handleTouchMove,
-    onTouchEnd: handleTouchEnd,
-    onMouseDown: handleMouseDown,
+    sheetRef,
+    isDragging,
+    handleMouseDown,
+    handleTouchStart,
+    closeWithAnimation: animateClose,
   };
-}
+};
