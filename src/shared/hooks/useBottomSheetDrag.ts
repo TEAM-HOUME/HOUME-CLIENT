@@ -106,7 +106,7 @@ export const useBottomSheetDrag = ({
         }
       };
 
-      const handleTouchEnd = (ev: TouchEvent) => {
+      const handleTouchEnd = () => {
         setIsDragging(false);
 
         const deltaY = currentYRef.current - startYRef.current;
@@ -126,7 +126,7 @@ export const useBottomSheetDrag = ({
 
       // 모바일 터치 이벤트 리스너 등록
       document.addEventListener('touchmove', handleTouchMove, {
-        passive: false,
+        passive: false, // 드래그 중 페이지 스크롤 방지
         capture: true,
       });
       document.addEventListener('touchend', handleTouchEnd, {
@@ -138,10 +138,11 @@ export const useBottomSheetDrag = ({
 
   // 정리
   useEffect(() => {
+    const el = sheetRef.current;
     return () => {
-      if (sheetRef.current) {
-        sheetRef.current.style.transition = '';
-        sheetRef.current.style.transform = '';
+      if (el) {
+        el.style.transition = '';
+        el.style.transform = '';
       }
     };
   }, []);
