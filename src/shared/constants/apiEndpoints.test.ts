@@ -160,7 +160,7 @@ describe('API_ENDPOINT 상수 테스트', () => {
       type ExtendedEndpoints = typeof extendedEndpoints;
       type ExtendedValues = ExtendedEndpoints[keyof ExtendedEndpoints];
 
-      expectTypeOf<ExtendedValues>().toMatchTypeOf<object>();
+      expectTypeOf<ExtendedValues>().toBeObject();
     });
 
     it('기존 도메인에 새 엔드포인트 추가 시 자동 감지되어야 함', () => {
