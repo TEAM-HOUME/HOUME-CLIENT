@@ -15,7 +15,7 @@ import HomePage from '@/pages/home/HomePage';
 import LoginPage from '@/pages/login/LoginPage';
 import SignupPage from '@/pages/signup/SignupPage';
 import GeneratePage from '@/pages/generate/GeneratePage';
-import { ImageGenerationFunnel } from '@/pages/onboarding/ImageGenerationFunnel';
+import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import MyPage from '@/pages/mypage/MyPage';
 import KakaoCallback from '@/pages/login/KakaoCallback';
 import SignupCompletePage from '@/pages/signup/SignupCompletePage';
@@ -47,8 +47,8 @@ const publicRoutes = [
 // 보호된 라우트 그룹 (인증 필요)
 const protectedRoutes = [
   {
-    path: ROUTES.ONBOARDING,
-    element: <ImageGenerationFunnel />,
+    path: ROUTES.imageSetup,
+    element: <ImageSetup />,
   },
   {
     path: ROUTES.GENERATE,

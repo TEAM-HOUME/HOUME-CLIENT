@@ -11,8 +11,8 @@ const SignupCompletePage = () => {
   const userName = useUserStore((state) => state.userName);
   const navigate = useNavigate();
 
-  const handleGoToOnboarding = () => {
-    navigate(ROUTES.ONBOARDING);
+  const handleGoToImageSetup = () => {
+    navigate(ROUTES.imageSetup);
   };
 
   return (
@@ -37,7 +37,7 @@ const SignupCompletePage = () => {
         />
       </div>
       <div className={styles.btnarea}>
-        <CtaButton onClick={handleGoToOnboarding}>이미지 만들러가기</CtaButton>
+        <CtaButton onClick={handleGoToImageSetup}>이미지 만들러가기</CtaButton>
       </div>
     </div>
   );
