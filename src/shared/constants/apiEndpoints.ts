@@ -11,11 +11,12 @@ export const API_ENDPOINT = {
     MYPAGE_IMAGE_DETAIL: (imageId: number) =>
       `/api/v1/mypage/images/${imageId}`,
   },
-  ONBOARDING: {
-    HOUSING_SELECTIONS: '/api/v1/housing-selections',
-    HOUSE_TEMPLATES: '/api/v1/house-templates',
-    MOODBOARD_IMAGES: '/api/v1/moodboard-images',
-    ADDRESSES: '/api/v1/addresses',
+  IMAGE_SETUP: {
+    HOUSE_INFO: '/api/v1/housing-selections',
+    FLOOR_PLAN: '/api/v1/house-templates',
+    INTERIOR_STYLE: '/api/v1/moodboard-images',
+    ACTIVITY_INFO: '/api/v1/activity-selections',
+    ADDRESS_SEARCH: '/api/v1/addresses',
   },
   GENERATE: {
     CAROUSELS: '/api/v1/carousels',
