@@ -4,6 +4,7 @@ import type {
   SelectHouseInfoResponse,
 } from '../types/apis/houseInfo';
 import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
 const selectHouseInfo = async (
@@ -11,7 +12,7 @@ const selectHouseInfo = async (
 ): Promise<SelectHouseInfoResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: '/api/v1/housing-selections',
+    url: API_ENDPOINT.IMAGE_SETUP.HOUSE_INFO,
     body: requestData,
   };
 

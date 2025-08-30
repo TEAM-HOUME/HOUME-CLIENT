@@ -1,3 +1,4 @@
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import type { CarouselItem, ImageStackResponse } from '../types/GenerateType';
 import type {
   GenerateImageRequest,
@@ -10,7 +11,7 @@ import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 export const getStackData = async (page: number): Promise<CarouselItem[]> => {
   const res = await request<ImageStackResponse>({
     method: HTTPMethod.GET,
-    url: '/api/v1/carousels',
+    url: API_ENDPOINT.GENERATE.CAROUSELS,
     query: { page },
   });
   return res.carouselResponseDTOS ?? [];
@@ -20,7 +21,7 @@ export const getStackData = async (page: number): Promise<CarouselItem[]> => {
 export const postLikeStack = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
-    url: `/api/v1/carousels/like`,
+    url: API_ENDPOINT.GENERATE.CAROUSELS_LIKE,
     query: {
       carouselId,
     },
@@ -30,7 +31,7 @@ export const postLikeStack = async (carouselId: number) => {
 export const postHateStack = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
-    url: `/api/v1/carousels/hate`,
+    url: API_ENDPOINT.GENERATE.CAROUSELS_HATE,
     query: {
       carouselId,
     },
@@ -42,7 +43,7 @@ export const postHateStack = async (carouselId: number) => {
 export const getResultData = async (imageId: number) => {
   return request({
     method: HTTPMethod.GET,
-    url: `/api/v1/generated-images/${imageId}/preference`,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
   });
 };
 
@@ -50,7 +51,7 @@ export const getResultData = async (imageId: number) => {
 export const postPreference = async (imageId: number, isLike: boolean) => {
   return request({
     method: HTTPMethod.POST,
-    url: `/api/v1/generated-images/${imageId}/preference`,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
     body: {
       isLike,
     },
@@ -61,7 +62,7 @@ export const postPreference = async (imageId: number, isLike: boolean) => {
 export const postFurnitureLog = async () => {
   return request({
     method: HTTPMethod.POST,
-    url: '/api/v1/furnitures/logs',
+    url: API_ENDPOINT.ANALYTICS.FURNITURE_LOGS,
   });
 };
 
@@ -69,7 +70,7 @@ export const postFurnitureLog = async () => {
 export const postCreditLog = async () => {
   return request({
     method: HTTPMethod.POST,
-    url: '/api/v1/credits/logs',
+    url: API_ENDPOINT.ANALYTICS.CREDIT_LOGS,
   });
 };
 
@@ -79,7 +80,7 @@ export const generateImage = async (
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
-    url: '/api/v2/generated-images/generate',
+    url: API_ENDPOINT.GENERATE.IMAGE_V2,
     body: requestData,
   };
 
@@ -92,7 +93,7 @@ export const checkGenerateImageStatus = async (
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: `/api/v1/generated-images/generate?houseId=${houseId}`,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_STATUS}?houseId=${houseId}`,
   };
 
   return await request<GenerateImageResponse['data']>(config);

@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { type FloorPlanResponse } from '../types/apis/floorPlan';
 import { HTTPMethod, type RequestConfig, request } from '@/shared/apis/request';
+import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
 const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: '/api/v1/house-templates',
+    url: API_ENDPOINT.IMAGE_SETUP.FLOOR_PLAN,
   };
 
   return await request<FloorPlanResponse['data']>(config);

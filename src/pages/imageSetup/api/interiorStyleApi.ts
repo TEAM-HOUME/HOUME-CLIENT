@@ -4,6 +4,7 @@ import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
 } from '../types/apis/interiorStyle';
+import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
 /**
@@ -22,7 +23,7 @@ const getMoodBoardImage = async (
 ): Promise<MoodBoardImageResponse> => {
   try {
     const response = await axiosInstance.get<MoodBoardImageResponse>(
-      '/api/v1/moodboard-images',
+      API_ENDPOINT.IMAGE_SETUP.INTERIOR_STYLE,
       {
         params: { limit },
       }
