@@ -8,7 +8,8 @@ export const API_ENDPOINT = {
     SIGN_UP: '/api/v1/sign-up',
     MYPAGE: '/api/v1/mypage/user',
     MYPAGE_IMAGES: '/api/v1/mypage/images',
-    MYPAGE_IMAGE_DETAIL: '/api/v1/mypage/images',
+    MYPAGE_IMAGE_DETAIL: (imageId: number) =>
+      `/api/v1/mypage/images/${imageId}`,
   },
   ONBOARDING: {
     HOUSING_SELECTIONS: '/api/v1/housing-selections',
@@ -32,7 +33,7 @@ export const API_ENDPOINT = {
 } as const;
 
 // 헬퍼 타입: 중첩된 객체의 모든 리프(leaf) 값들을 추출
-type DeepValues<T> = T extends object
+export type DeepValues<T> = T extends object
   ? { [K in keyof T]: DeepValues<T[K]> }[keyof T]
   : T;
 

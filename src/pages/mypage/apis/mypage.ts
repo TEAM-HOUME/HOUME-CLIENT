@@ -43,7 +43,7 @@ export const getMyPageImageDetail = async (
 ): Promise<MyPageImageDetailResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: `${API_ENDPOINT.USER.MYPAGE_IMAGE_DETAIL}/${imageId}`,
+    url: API_ENDPOINT.USER.MYPAGE_IMAGE_DETAIL(imageId),
   };
 
   return await request<MyPageImageDetailResponse['data']>(config);
