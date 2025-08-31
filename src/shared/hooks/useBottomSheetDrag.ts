@@ -11,7 +11,8 @@ export const useBottomSheetDrag = ({
   threshold = 100,
 }: UseBottomSheetDragProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
-  const [isDragging, setIsDragging] = useState(false); // 드래그 중 여부
+  const [isDragging, setIsDragging] = useState(false); // 드래그 중 여부 (UI용)
+  const isDraggingRef = useRef(false); // 리스너 가드용
 
   // 닫기 애니메이션 (시트 변경 후 onClose 호출)
   const animateClose = useCallback(() => {
@@ -37,10 +38,12 @@ export const useBottomSheetDrag = ({
       e.stopPropagation();
 
       setIsDragging(true);
+      isDraggingRef.current = true;
       const startY = e.clientY;
 
       const handlePointerMove = (ev: PointerEvent) => {
         if (!isDragging) return;
+        if (!isDraggingRef.current) return;
 
         ev.preventDefault();
         ev.stopPropagation();
@@ -56,6 +59,7 @@ export const useBottomSheetDrag = ({
 
       const handlePointerUp = (ev: PointerEvent) => {
         setIsDragging(false);
+        isDraggingRef.current = false;
         const deltaY = ev.clientY - startY;
 
         if (sheetRef.current) {

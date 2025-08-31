@@ -66,6 +66,30 @@ export const BottomSheetWrapper = ({
       // 드래그 시작 상태 설정 (useRef로 즉시 반영)
       isDraggingRef.current = true;
       const startY = e.clientY;
+      const target = e.currentTarget as HTMLElement;
+
+      // 포인터 캡처 설정 (윈도우 밖 이동 시에도 이벤트 수신)
+      target.setPointerCapture?.(e.pointerId);
+
+      // 이벤트 리스너 정리 함수
+      const cleanup = () => {
+        target.releasePointerCapture?.(e.pointerId);
+        target.removeEventListener('pointermove', handlePointerMove);
+        target.removeEventListener('pointerup', handlePointerUp);
+        target.removeEventListener('pointercancel', handlePointerCancel);
+        target.removeEventListener('lostpointercapture', handlePointerCancel);
+      };
+
+      // 포인터 취소/캡처 해제 시 정리
+      const handlePointerCancel = () => {
+        isDraggingRef.current = false;
+        // 원위치로 복귀
+        if (sheetRef.current) {
+          sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
+          sheetRef.current.style.transform = 'translate(-50%, 0)';
+        }
+        cleanup();
+      };
 
       // 드래그 중 실시간 움직임 처리
       const handlePointerMove = (ev: PointerEvent) => {
@@ -105,16 +129,20 @@ export const BottomSheetWrapper = ({
           }
         }
 
-        // 이벤트 리스너 정리
-        document.removeEventListener('pointermove', handlePointerMove);
-        document.removeEventListener('pointerup', handlePointerUp);
+        cleanup();
       };
 
-      // 전역 이벤트 리스너 등록
-      document.addEventListener('pointermove', handlePointerMove, {
-        passive: false, // 페이지 스크롤 방지
+      // 대상 요소에 이벤트 리스너 등록
+      target.addEventListener('pointermove', handlePointerMove, {
+        passive: false,
       });
-      document.addEventListener('pointerup', handlePointerUp, {
+      target.addEventListener('pointerup', handlePointerUp, {
+        passive: false,
+      });
+      target.addEventListener('pointercancel', handlePointerCancel, {
+        passive: false,
+      });
+      target.addEventListener('lostpointercapture', handlePointerCancel, {
         passive: false,
       });
     },
