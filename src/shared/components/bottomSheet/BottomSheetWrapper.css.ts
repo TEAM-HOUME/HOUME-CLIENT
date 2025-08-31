@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 
@@ -8,7 +8,7 @@ export const backdrop = style({
   left: 0,
   width: '100%',
   height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backgroundColor: colorVars.color.gray999_50,
   opacity: 0,
   visibility: 'hidden',
   transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
@@ -33,14 +33,9 @@ export const sheetWrapper = style({
   zIndex: zIndex.sheet,
 });
 
-// 확장된 상태
-export const sheetWrapperExpanded = style({
-  transform: 'translate(-50%, 0)',
-});
-
-// 접힌 상태
-export const sheetWrapperCollapsed = style({
-  transform: 'translate(-50%, 100%)',
+export const sheetState = styleVariants({
+  expanded: { transform: 'translate(-50%, 0)' }, // 확장된 상태
+  collapsed: { transform: 'translate(-50%, 100%)' }, // 접힌 상태
 });
 
 export const contentWrapper = style({
@@ -55,4 +50,6 @@ export const dragHandleContainer = style({
   width: '100%',
   height: '2.4rem',
   marginBottom: '2rem',
+  touchAction: 'none',
+  userSelect: 'none',
 });

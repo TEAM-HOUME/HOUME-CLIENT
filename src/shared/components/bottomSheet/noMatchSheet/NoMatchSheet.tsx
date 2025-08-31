@@ -25,21 +25,15 @@ export const NoMatchSheet = ({
   const isFilled = region.trim() !== '' && address.trim() !== '';
 
   const handleSubmit = () => {
-    if (isFilled && onSubmit) {
-      onSubmit(region, address);
-      // 제출 후 폼 초기화
-      setRegion('');
-      setAddress('');
-    }
+    if (!isFilled) return;
+    onSubmit(region, address);
+    setRegion('');
+    setAddress('');
+    onClose();
   };
 
   return (
-    <BottomSheetWrapper
-      isOpen={isOpen}
-      onClose={onClose}
-      onExited={onExited}
-      threshold={150}
-    >
+    <BottomSheetWrapper isOpen={isOpen} onClose={onClose} onExited={onExited}>
       <div className={styles.infoTextContainer}>
         <span className={styles.infoText}>
           하우미는 점차 집 구조 템플릿을 <br />

@@ -9,7 +9,7 @@ export const backdrop = style({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backgroundColor: colorVars.color.gray999_50,
   zIndex: zIndex.backdrop,
   opacity: 0,
   visibility: 'hidden',

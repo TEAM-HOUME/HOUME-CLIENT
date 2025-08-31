@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react';
 import { useRef, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
-import * as styles from './flipSheet/FlipSheet.css';
+import * as styles from './BottomSheetWrapper.css';
 import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
+import {
+  SHEET_DURATION_MS,
+  SHEET_BASIC_THRESHOLD,
+} from '@/shared/constants/bottomSheet';
 
 interface BottomSheetWrapperProps {
   isOpen: boolean;
@@ -17,7 +21,7 @@ export const BottomSheetWrapper = ({
   onClose,
   onExited,
   children,
-  threshold = 150,
+  threshold = SHEET_BASIC_THRESHOLD,
 }: BottomSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
@@ -27,7 +31,7 @@ export const BottomSheetWrapper = ({
     if (sheetRef.current) {
       if (isOpen) {
         // 열린 상태
-        sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+        sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
         sheetRef.current.style.transform = 'translate(-50%, 0)';
       } else {
         // 닫힌 상태
@@ -45,7 +49,7 @@ export const BottomSheetWrapper = ({
     }
     const sheet = sheetRef.current;
     // 하단으로 이동 후 onClose 호출
-    sheet.style.transition = 'transform 0.3s ease-in-out';
+    sheet.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
     sheet.style.transform = 'translate(-50%, 100%)';
 
     setTimeout(() => {
@@ -89,14 +93,14 @@ export const BottomSheetWrapper = ({
         if (sheetRef.current) {
           if (deltaY > threshold) {
             // threshold를 넘으면 닫기
-            sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+            sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
             sheetRef.current.style.transform = 'translate(-50%, 100%)';
             setTimeout(() => {
               onClose();
             }, 300);
           } else {
             // threshold 미만이면 원위치로 복귀
-            sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+            sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
             sheetRef.current.style.transform = 'translate(-50%, 0)';
           }
         }
@@ -130,13 +134,14 @@ export const BottomSheetWrapper = ({
       <div
         ref={sheetRef}
         data-sheet="true"
+        role="dialog"
+        aria-modal="true"
         className={clsx(
           styles.sheetWrapper,
-          isOpen ? styles.sheetWrapperExpanded : styles.sheetWrapperCollapsed
+          styles.sheetState[isOpen ? 'expanded' : 'collapsed']
         )}
         onTransitionEnd={onExited}
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         <div
           className={styles.contentWrapper}

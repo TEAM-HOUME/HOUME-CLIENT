@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { SHEET_DURATION_MS } from '../constants/bottomSheet';
 
 interface UseBottomSheetDragProps {
   onClose: () => void;
@@ -19,7 +20,7 @@ export const useBottomSheetDrag = ({
       return;
     }
     const el = sheetRef.current;
-    el.style.transition = 'transform 0.3s ease-in-out';
+    el.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
     el.style.transform = 'translate(-50%, 100%)';
 
     window.setTimeout(() => {
@@ -62,7 +63,7 @@ export const useBottomSheetDrag = ({
             animateClose();
           } else {
             sheetRef.current.style.transform = 'translate(-50%, 0)';
-            sheetRef.current.style.transition = 'transform 0.3s ease-in-out';
+            sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
           }
         }
 

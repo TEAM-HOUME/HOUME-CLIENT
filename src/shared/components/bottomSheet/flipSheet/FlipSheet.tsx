@@ -23,12 +23,7 @@ export const FlipSheet = ({
   isFlipped,
 }: FlipSheetProps) => {
   return (
-    <BottomSheetWrapper
-      isOpen={isOpen}
-      onClose={onClose}
-      onExited={onExited}
-      threshold={150}
-    >
+    <BottomSheetWrapper isOpen={isOpen} onClose={onClose} onExited={onExited}>
       <div className={styles.imageArea}>
         <p className={styles.infoText}>이미지를 좌우반전 할 수 있어요</p>
         <div className={styles.imageContainer}>
