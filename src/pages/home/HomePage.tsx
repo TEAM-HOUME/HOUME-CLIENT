@@ -38,7 +38,7 @@ const HomePage = () => {
   /**
    * 플로팅 버튼 클릭 핸들러
    * - 로그인 안됨: 로그인 페이지로 이동
-   * - 로그인됨 + 크레딧 있음: onboarding 이미지 생성 플로우로 이동
+   * - 로그인됨 + 크레딧 있음: imageSetup 이미지 생성 플로우로 이동
    * - 로그인됨 + 크레딧 없음: 버튼 비활성화로 인해 클릭 불가
    */
   const handleCtaButtonClick = () => {
@@ -49,9 +49,9 @@ const HomePage = () => {
 
     if (isUserDataLoading) return;
 
-    // 크레딧이 있으면 onboarding으로 이동
+    // 크레딧이 있으면 imageSetup 이동
     if (userData?.CreditCount && userData.CreditCount > 0) {
-      navigate(ROUTES.ONBOARDING);
+      navigate(ROUTES.imageSetup);
     }
     // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
   };

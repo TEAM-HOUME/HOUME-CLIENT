@@ -12,12 +12,13 @@
  * console.log(result.message); // "로그아웃되었습니다"
  * ```
  */
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import type { LogoutResponse } from '../types/auth';
 import { HTTPMethod, request } from '@/shared/apis/request';
 
 export const postLogout = async (): Promise<LogoutResponse> => {
   return request({
     method: HTTPMethod.POST,
-    url: '/logout',
+    url: API_ENDPOINT.AUTH.LOGOUT,
   });
 };
