@@ -13,11 +13,14 @@ export const backdrop = style({
   visibility: 'hidden',
   transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
   zIndex: zIndex.backdrop,
+  touchAction: 'none',
+  pointerEvents: 'none',
 });
 
 export const backdropVisible = style({
   opacity: 1,
   visibility: 'visible',
+  pointerEvents: 'auto',
 });
 
 export const sheetWrapper = style({

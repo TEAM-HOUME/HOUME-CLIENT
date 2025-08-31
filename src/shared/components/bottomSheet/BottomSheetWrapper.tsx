@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useRef, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
-import * as styles from './BottomSheetWrapper.css';
+import * as styles from './BottomSheetWrapper.css.ts';
 import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 import {
   SHEET_DURATION_MS,

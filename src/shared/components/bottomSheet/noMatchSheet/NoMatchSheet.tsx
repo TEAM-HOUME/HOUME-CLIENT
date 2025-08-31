@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import TextField from '@components/textField/TextField';
 import CtaButton from '@components/button/ctaButton/CtaButton';
 import * as styles from './NoMatchSheet.css';
@@ -24,13 +24,13 @@ export const NoMatchSheet = ({
   const [address, setAddress] = useState('');
   const isFilled = region.trim() !== '' && address.trim() !== '';
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!isFilled) return;
     onSubmit(region, address);
     setRegion('');
     setAddress('');
     onClose();
-  };
+  }, [isFilled, onSubmit, region, address, onClose]);
 
   return (
     <BottomSheetWrapper isOpen={isOpen} onClose={onClose} onExited={onExited}>
