@@ -2,6 +2,7 @@ import { isAxiosError } from 'axios';
 import { RESPONSE_MESSAGE } from '../constants/response';
 import axiosInstance from './axiosInstance';
 import type { BaseResponse } from '@shared/types/apis';
+import type { ApiEndpoint } from '../constants/apiEndpoints';
 
 export const HTTPMethod = {
   GET: 'GET',
@@ -14,7 +15,7 @@ export const HTTPMethod = {
 export type HTTPMethodType = (typeof HTTPMethod)[keyof typeof HTTPMethod];
 export interface RequestConfig {
   method: HTTPMethodType;
-  url: string;
+  url: ApiEndpoint;
   query?: Record<string, string | number | boolean>;
   body?: Record<string, unknown>;
 }
