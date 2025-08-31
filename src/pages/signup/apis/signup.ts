@@ -1,4 +1,5 @@
 /* 회원가입 API 함수 */
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import axiosInstance from '@shared/apis/axiosInstance';
 import type { SignupRequest, SignupResponse } from '../types/apis/signup';
 
@@ -7,7 +8,7 @@ export const patchSignup = async (
 ): Promise<SignupResponse> => {
   try {
     const response = await axiosInstance.patch<SignupResponse>(
-      '/api/v1/sign-up',
+      API_ENDPOINT.USER.SIGN_UP,
       data
     );
     return response.data;

@@ -35,7 +35,7 @@ export const useErrorHandler = (context: PageContext) => {
           api: ROUTES.HOME,
           network: ROUTES.HOME,
         },
-        onboarding: {
+        imageSetup: {
           loading: ROUTES.HOME,
           api: ROUTES.HOME,
           network: ROUTES.HOME,
