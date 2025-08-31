@@ -14,7 +14,7 @@ const HistorySection = () => {
   };
 
   const handleCreateImage = () => {
-    navigate('/onboarding');
+    navigate('/imageSetup');
   };
 
   // 로딩 상태
