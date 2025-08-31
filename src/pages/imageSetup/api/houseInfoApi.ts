@@ -9,14 +9,14 @@ import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 // API Functions
 const selectHouseInfo = async (
   requestData: SelectHouseInfoRequest
-): Promise<SelectHouseInfoResponse['data']> => {
+): Promise<SelectHouseInfoResponse> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
     url: API_ENDPOINT.IMAGE_SETUP.HOUSE_INFO,
     body: requestData,
   };
 
-  return await request<SelectHouseInfoResponse['data']>(config);
+  return await request<SelectHouseInfoResponse>(config);
 };
 
 // Query Hooks
