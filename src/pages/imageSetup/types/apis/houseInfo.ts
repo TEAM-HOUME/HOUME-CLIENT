@@ -1,30 +1,29 @@
-// 집구조 요청 GET API
-export interface HouseOptionItem {
+// 주거 옵션 조회 (GET)
+export interface HousingOptionItem {
   code: string;
   label: string;
 }
 
-export interface HouseOptionsResponse {
-  houseTypes: HouseOptionItem[];
-  roomTypes: HouseOptionItem[];
-  areaTypes: HouseOptionItem[];
+export interface HousingOptionsResponse {
+  houseTypes: HousingOptionItem[];
+  roomTypes: HousingOptionItem[];
+  areaTypes: HousingOptionItem[];
 }
 
 // 유니온 타입 추출
-export type HouseTypeCode = HouseOptionsResponse['houseTypes'][number]['code'];
-export type RoomTypeCode = HouseOptionsResponse['roomTypes'][number]['code'];
-export type AreaTypeCode = HouseOptionsResponse['areaTypes'][number]['code'];
+export type HouseTypeCode =
+  HousingOptionsResponse['houseTypes'][number]['code'];
+export type RoomTypeCode = HousingOptionsResponse['roomTypes'][number]['code'];
+export type AreaTypeCode = HousingOptionsResponse['areaTypes'][number]['code'];
 
-// 데이터 부분만 따로 추출한 타입
-export type HouseOptionsData = HouseOptionsResponse;
-
-// 집구조 선택 POST API
-export interface SelectHouseInfoRequest extends Record<string, unknown> {
+// 주거 선택 전송 (POST)
+export interface HousingSelectionRequest extends Record<string, unknown> {
   houseType: string;
   roomType: string;
   areaType: string;
   isValid: boolean;
 }
-export interface SelectHouseInfoResponse {
+
+export interface HousingSelectionResponse {
   houseId: number;
 }

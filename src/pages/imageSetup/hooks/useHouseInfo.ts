@@ -4,7 +4,7 @@ import {
   type CompletedHouseInfo,
   type ImageSetupSteps,
 } from '../types/funnel';
-import { useHouseInfoApi } from '../api/houseInfoApi';
+import { useHousingSelection } from '../api/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
 
@@ -15,8 +15,8 @@ interface FormErrors {
 }
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
-  // 집 구조 선택 API 요청
-  const selectHouseInfoRequest = useHouseInfoApi();
+  // 주거 선택 API 요청
+  const housingSelection = useHousingSelection();
 
   // Zustand store에서 상태 가져오기
   const {
@@ -162,7 +162,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
       isValid: isValidInput,
     };
 
-    selectHouseInfoRequest.mutate(requestData, {
+    housingSelection.mutate(requestData, {
       onSuccess: (res) => {
         if (res) {
           console.log('유효한 주거정보, House ID:', res.houseId);
