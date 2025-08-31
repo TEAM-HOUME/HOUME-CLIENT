@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import axiosInstance from '@shared/apis/axiosInstance';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
 } from '../types/apis/interiorStyle';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
+import { HTTPMethod, request } from '@/shared/apis/request';
 
 // API Functions
 /**
@@ -21,18 +21,11 @@ import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 const getMoodBoardImage = async (
   limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT
 ): Promise<MoodBoardImageResponse> => {
-  try {
-    const response = await axiosInstance.get<MoodBoardImageResponse>(
-      API_ENDPOINT.IMAGE_SETUP.INTERIOR_STYLE,
-      {
-        params: { limit },
-      }
-    );
-    return response.data;
-  } catch (error: any) {
-    console.error('[moodboard] 요청 실패:', error.response);
-    throw error;
-  }
+  return request({
+    method: HTTPMethod.GET,
+    url: API_ENDPOINT.IMAGE_SETUP.INTERIOR_STYLE,
+    query: { limit },
+  });
 };
 
 // Query Hooks
