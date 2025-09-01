@@ -2,17 +2,16 @@
 import type { HousingOptionsResponse } from '../apis/houseInfo';
 
 // 주거 옵션 Union 타입 추출
-export type HouseTypeCode =
-  HousingOptionsResponse['houseTypes'][number]['code'];
-// "OFFICETEL" | "VILLA" | "APARTMENT" | "ETC" 타입
-export type RoomTypeCode = HousingOptionsResponse['roomTypes'][number]['code'];
-export type AreaTypeCode = HousingOptionsResponse['areaTypes'][number]['code'];
+// ex: "OFFICETEL" | "VILLA" | "APARTMENT" | "ETC"
+export type HouseType = HousingOptionsResponse['houseTypes'][number]['code'];
+export type RoomType = HousingOptionsResponse['roomTypes'][number]['code'];
+export type AreaType = HousingOptionsResponse['areaTypes'][number]['code'];
 
 // HouseInfo 스텝 폼 데이터 타입
 export interface HouseInfoFormData {
-  houseType?: HouseTypeCode;
-  roomType?: RoomTypeCode;
-  areaType?: AreaTypeCode;
+  houseType?: HouseType;
+  roomType?: RoomType;
+  areaType?: AreaType;
 }
 
 // HouseInfo 스텝 에러 타입
