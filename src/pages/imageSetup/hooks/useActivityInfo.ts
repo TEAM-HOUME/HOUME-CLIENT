@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MAIN_ACTIVITY_OPTIONS,
-  MAIN_ACTIVITY_VALIDATION,
-  type ImageSetupSteps,
-} from '../types/funnel';
+import { MAIN_ACTIVITY_OPTIONS } from '../types/funnel/options';
+import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
 import { useFunnelStore } from '../stores/useFunnelStore';
+import type { ImageSetupSteps } from '../types/funnel/steps';
 import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';

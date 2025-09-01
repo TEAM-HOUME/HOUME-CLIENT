@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import {
-  HOUSE_INFO_VALIDATION,
-  type CompletedHouseInfo,
-  type ImageSetupSteps,
-} from '../types/funnel';
+import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
 import { useHousingSelectionMutation } from '../api/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
+import type {
+  CompletedHouseInfo,
+  ImageSetupSteps,
+} from '../types/funnel/steps';
 import type { HouseInfoErrors } from '../types/funnel/houseInfo';
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {

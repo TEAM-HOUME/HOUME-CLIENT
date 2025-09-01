@@ -5,7 +5,7 @@ import type {
   HouseType,
   PrimaryUsage,
   RoomType,
-} from '../types/funnel';
+} from '../types/funnel/options';
 
 interface HouseInfoState {
   houseType?: HouseType;

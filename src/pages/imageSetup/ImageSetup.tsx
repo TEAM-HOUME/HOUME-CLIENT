@@ -7,7 +7,7 @@ import {
   type CompletedHouseInfo,
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
-} from './types/funnel';
+} from './types/funnel/steps';
 import FunnelLayout from './components/layout/FunnelLayout';
 
 export const ImageSetup = () => {

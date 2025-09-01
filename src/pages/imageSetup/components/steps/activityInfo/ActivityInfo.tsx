@@ -2,10 +2,10 @@
 import * as common from '../StepCommon.css';
 import FunnelHeader from '../../header/FunnelHeader';
 import {
-  MAIN_ACTIVITY_OPTIONS,
   type ImageSetupSteps,
   type PrimaryUsage,
-} from '../../../types/funnel';
+} from '../../../types/funnel/steps';
+import { MAIN_ACTIVITY_OPTIONS } from '../../../types/funnel/options';
 import OptionGroup from '../optionGroup/OptionGroup';
 import MainTitle from '../title/Maintitle';
 import SubOptionGroup from '../optionGroup/SubOptionGroup';

@@ -6,7 +6,7 @@ import FunnelHeader from '../../header/FunnelHeader';
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
-} from '../../../types/funnel';
+} from '../../../types/funnel/steps';
 import { useFloorPlan } from '@/pages/imageSetup/hooks/useFloorPlan';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import Loading from '@/shared/components/loading/Loading';

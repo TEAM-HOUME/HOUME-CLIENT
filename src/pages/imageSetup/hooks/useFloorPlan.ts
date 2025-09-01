@@ -2,7 +2,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useFloorPlanApi } from '../api/floorPlanApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
-import type { CompletedFloorPlan, ImageSetupSteps } from '../types/funnel';
+import type {
+  CompletedFloorPlan,
+  ImageSetupSteps,
+} from '../types/funnel/steps';
 
 // interface SelectedFloorPlanTypes {
 //   id: number;

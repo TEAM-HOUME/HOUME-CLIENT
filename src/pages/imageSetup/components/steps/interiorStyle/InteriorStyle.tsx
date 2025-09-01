@@ -5,7 +5,7 @@ import FunnelHeader from '../../header/FunnelHeader';
 import type {
   CompletedInteriorStyle,
   ImageSetupSteps,
-} from '../../../types/funnel';
+} from '../../../types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { useInteriorStyle } from '@/pages/imageSetup/hooks/useInteriorStyle';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';

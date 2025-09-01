@@ -1,16 +1,16 @@
 // Step 1
 import * as styles from '../StepCommon.css';
 import OptionGroup from '../optionGroup/OptionGroup';
-import {
-  type CompletedHouseInfo,
-  type ImageSetupSteps,
-} from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
 import type {
-  HouseTypeCode,
-  RoomTypeCode,
-  AreaTypeCode,
-} from '../../../types/funnel/houseInfo';
+  CompletedHouseInfo,
+  ImageSetupSteps,
+} from '../../../types/funnel/steps';
+import type {
+  HouseType,
+  RoomType,
+  AreaType,
+} from '../../../types/funnel/options';
 import { useHousingOptionsQuery } from '@/pages/imageSetup/api/houseInfoApi';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
@@ -42,7 +42,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
       />
 
       <div className={styles.wrapper}>
-        <OptionGroup<HouseTypeCode>
+        <OptionGroup<HouseType>
           title="주거 형태"
           options={houseTypeOptions}
           selected={formData.houseType}
@@ -52,7 +52,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           error={errors.houseType}
         />
 
-        <OptionGroup<RoomTypeCode>
+        <OptionGroup<RoomType>
           title="구조"
           options={roomTypeOptions}
           selected={formData.roomType}
@@ -62,7 +62,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           error={errors.roomType}
         />
 
-        <OptionGroup<AreaTypeCode>
+        <OptionGroup<AreaType>
           title="평형"
           options={areaTypeOptions}
           selected={formData.areaType}
