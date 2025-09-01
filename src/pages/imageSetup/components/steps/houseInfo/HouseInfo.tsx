@@ -3,13 +3,15 @@ import * as styles from '../StepCommon.css';
 import OptionGroup from '../optionGroup/OptionGroup';
 import {
   type CompletedHouseInfo,
-  type HouseType,
   type ImageSetupSteps,
-  type AreaType,
-  type RoomType,
-  HOUSE_INFO_OPTIONS,
 } from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
+import type {
+  HouseTypeCode,
+  RoomTypeCode,
+  AreaTypeCode,
+} from '../../../types/apis/houseInfo';
+import { useHousingOptionsQuery } from '@/pages/imageSetup/api/houseInfoApi';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
@@ -23,9 +25,12 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
     useHouseInfo(context);
 
-  const houseTypeOptions = Object.values(HOUSE_INFO_OPTIONS.HOUSING_TYPES);
-  const roomTypeOptions = Object.values(HOUSE_INFO_OPTIONS.ROOM_TYPES);
-  const areaTypeOptions = Object.values(HOUSE_INFO_OPTIONS.AREA_TYPES);
+  // 서버에서 주거 옵션 데이터 가져오기 (캐시에서 즉시 사용)
+  const { data: housingOptions } = useHousingOptionsQuery();
+
+  const houseTypeOptions = housingOptions?.houseTypes || [];
+  const roomTypeOptions = housingOptions?.roomTypes || [];
+  const areaTypeOptions = housingOptions?.areaTypes || [];
 
   return (
     <div className={styles.container}>
@@ -37,7 +42,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
       />
 
       <div className={styles.wrapper}>
-        <OptionGroup<HouseType>
+        <OptionGroup<HouseTypeCode>
           title="주거 형태"
           options={houseTypeOptions}
           selected={formData.houseType}
@@ -47,7 +52,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           error={errors.houseType}
         />
 
-        <OptionGroup<RoomType>
+        <OptionGroup<RoomTypeCode>
           title="구조"
           options={roomTypeOptions}
           selected={formData.roomType}
@@ -57,7 +62,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           error={errors.roomType}
         />
 
-        <OptionGroup<AreaType>
+        <OptionGroup<AreaTypeCode>
           title="평형"
           options={areaTypeOptions}
           selected={formData.areaType}

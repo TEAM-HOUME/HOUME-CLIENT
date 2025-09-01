@@ -7,30 +7,37 @@ import type {
 import { HTTPMethod, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
-// 주거 옵션 조회 (GET)
-export const useHousingOptions = () => {
-  return useQuery({
-    queryKey: ['housing-options'],
-    queryFn: () =>
-      request<HousingOptionsResponse>({
-        method: HTTPMethod.GET,
-        url: API_ENDPOINT.IMAGE_SETUP.HOUSE_OPTIONS,
-      }),
-    // TODO: 캐싱 정책 통일할 것들 통일(주거 옵션, 무드보드, 도면 등)
-    // staleTime: Infinity, // 정적 데이터이므로 무한 캐싱
-    // gcTime: 1000 * 60 * 60 * 24, // 24시간 가비지 컬렉션
+// API Functions
+const getHousingOptions = async (): Promise<HousingOptionsResponse> => {
+  return await request<HousingOptionsResponse>({
+    method: HTTPMethod.GET,
+    url: API_ENDPOINT.IMAGE_SETUP.HOUSE_OPTIONS,
   });
 };
 
-// 주거 선택 전송 (POST)
-export const useHousingSelection = () => {
+const postHousingSelection = async (
+  requestData: HousingSelectionRequest
+): Promise<HousingSelectionResponse> => {
+  return await request<HousingSelectionResponse>({
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.IMAGE_SETUP.HOUSE_INFO,
+    body: requestData,
+  });
+};
+
+// Query Hooks
+export const useHousingOptionsQuery = () => {
+  return useQuery({
+    queryKey: ['housing-options'], // App.tsx에서 호출한 쿼리와 같은 QueryKey값으로 캐시에서 조회
+    queryFn: getHousingOptions,
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
+};
+
+export const useHousingSelectionMutation = () => {
   return useMutation({
-    mutationFn: (requestData: HousingSelectionRequest) =>
-      request<HousingSelectionResponse>({
-        method: HTTPMethod.POST,
-        url: API_ENDPOINT.IMAGE_SETUP.HOUSE_INFO,
-        body: requestData,
-      }),
-    // onSuccess, onError 콜백은 훅 호출부에 구현
+    mutationFn: postHousingSelection,
+    // 훅 호출부에서 onSuccess, onError 콜백 처리
   });
 };

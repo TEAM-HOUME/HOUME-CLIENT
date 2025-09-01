@@ -55,7 +55,7 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
       activityInfo.otherFurnitureIds || context.otherFurnitureIds || [],
   });
 
-  // TODO: 코드 확인
+  // TODO(지성): 코드 확인
   const updateFormData = useCallback(
     (updater: any) => {
       const newData =
@@ -88,7 +88,7 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
     )
       return [];
 
-    // TODO: 코드 리팩토링
+    // TODO(지성): 코드 리팩토링
     const requiredCodes =
       MAIN_ACTIVITY_VALIDATION.combinationRules[localFormData.primaryUsage]
         ?.requiredFurnitures || [];
@@ -183,7 +183,7 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
         isMirror: context.floorPlan.isMirror,
       },
       moodBoardIds: context.moodBoardIds,
-      // TODO: 주요활동, 침대, 그 외 가구들 ID값
+      // TODO(지성): 주요활동, 침대, 그 외 가구들 ID값
       activity: localFormData.primaryUsage,
       bedId: localFormData.bedTypeId,
       selectiveIds: localFormData.otherFurnitureIds,

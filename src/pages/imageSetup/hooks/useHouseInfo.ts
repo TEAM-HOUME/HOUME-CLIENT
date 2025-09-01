@@ -4,7 +4,7 @@ import {
   type CompletedHouseInfo,
   type ImageSetupSteps,
 } from '../types/funnel';
-import { useHousingSelection } from '../api/houseInfoApi';
+import { useHousingSelectionMutation } from '../api/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
 
@@ -16,7 +16,7 @@ interface FormErrors {
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 선택 API 요청
-  const housingSelection = useHousingSelection();
+  const housingSelection = useHousingSelectionMutation();
 
   // Zustand store에서 상태 가져오기
   const {
@@ -34,12 +34,12 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   //   // 한 프레임 뒤에 실행 (persist 복원 후)
   //   setTimeout(() => {
   //     resetFunnel();
-  //     // TODO: hydration 타이밍 알아보기
+  //     // TODO(지성): hydration 타이밍 알아보기
   //     // 컴포넌트 마운트 시 resetFunnel() 실행, 하지만 Zustand persist가 나중에 sessionStorage에서 데이터 복원(Zustand persist의 hydratino 타이밍)
   //     // 결과적으로 이전 데이터가 다시 나타남 -> 지연 초기화 필요(한 프레임 뒤에 실행시키기)
   //   }, 0);
   // }, []);
-  // // TODO: 아래 코드 console.log 찍어보면 둘 다 빈 배열, 하지만 step1 페이지에는 버튼이 선택된 상태로 렌더링됨
+  // // TODO(지성): 아래 코드 console.log 찍어보면 둘 다 빈 배열, 하지만 step1 페이지에는 버튼이 선택된 상태로 렌더링됨
   // // Zustand persist의 hydration 타이밍 관련?
   // console.log(step1);
   // console.log(context);

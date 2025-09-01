@@ -13,6 +13,7 @@ export interface HousingOptionsResponse {
 // 유니온 타입 추출
 export type HouseTypeCode =
   HousingOptionsResponse['houseTypes'][number]['code'];
+// "OFFICETEL" | "VILLA" | "APARTMENT" | "ETC" 유니온 타입
 export type RoomTypeCode = HousingOptionsResponse['roomTypes'][number]['code'];
 export type AreaTypeCode = HousingOptionsResponse['areaTypes'][number]['code'];
 
