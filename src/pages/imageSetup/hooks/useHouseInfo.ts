@@ -7,12 +7,7 @@ import {
 import { useHousingSelectionMutation } from '../api/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
-
-interface FormErrors {
-  houseType?: string;
-  roomType?: string;
-  areaType?: string;
-}
+import type { HouseInfoErrors } from '../types/funnel/houseInfo';
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 선택 API 요청
@@ -51,7 +46,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
     areaType: houseInfo.areaType || context.areaType,
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<HouseInfoErrors>({});
 
   // 컴포넌트 마운트 시 현재 스텝 설정
   useEffect(() => {
@@ -98,7 +93,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   // 제한된 값(아파트, 투룸 등)을 선택했는지 검증
   const validateFormFields = (): boolean => {
-    const newErrors: FormErrors = {};
+    const newErrors: HouseInfoErrors = {};
 
     // 모든 필드가 선택된 경우에만 제한값 검증 실행
     const isAllFieldsSelected = !!(

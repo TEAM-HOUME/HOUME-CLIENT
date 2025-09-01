@@ -28,7 +28,7 @@ const postHousingSelection = async (
 // Query Hooks
 export const useHousingOptionsQuery = () => {
   return useQuery({
-    queryKey: ['housing-options'], // App.tsx에서 호출한 쿼리와 같은 QueryKey값으로 캐시에서 조회
+    queryKey: ['housing-options'], // prefetching한 쿼리와 같은 QueryKey값으로 설정, 캐시에서 데이터 조회
     queryFn: getHousingOptions,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60 * 24,

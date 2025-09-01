@@ -10,7 +10,7 @@ import type {
   HouseTypeCode,
   RoomTypeCode,
   AreaTypeCode,
-} from '../../../types/apis/houseInfo';
+} from '../../../types/funnel/houseInfo';
 import { useHousingOptionsQuery } from '@/pages/imageSetup/api/houseInfoApi';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
