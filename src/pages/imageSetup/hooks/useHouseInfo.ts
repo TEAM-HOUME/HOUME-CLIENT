@@ -13,7 +13,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   const housingSelection = useHousingSelectionMutation();
 
   // 초기값 설정: context에서 가져오기
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<HouseInfoFormData>({
     houseType: context.houseType,
     roomType: context.roomType,
     areaType: context.areaType,
@@ -50,30 +50,28 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   }, [formData.areaType]);
 
   // 제한된 값(아파트, 투룸 등)을 선택했는지 검증
-  const validateFormFields = (): boolean => {
+  const validateFormFields = (data: HouseInfoFormData): boolean => {
     const newErrors: HouseInfoErrors = {};
 
     // 모든 필드가 선택된 경우에만 제한값 검증 실행
     const isAllFieldsSelected = !!(
-      formData.houseType &&
-      formData.roomType &&
-      formData.areaType
+      data.houseType &&
+      data.roomType &&
+      data.areaType
     );
 
     if (isAllFieldsSelected) {
       if (
-        formData.houseType &&
+        data.houseType &&
         HOUSE_INFO_VALIDATION.restrictedValues.houseType.includes(
-          formData.houseType
+          data.houseType
         )
       ) {
         newErrors.houseType = HOUSE_INFO_VALIDATION.messages.houseType;
       }
       if (
-        formData.roomType &&
-        HOUSE_INFO_VALIDATION.restrictedValues.roomType.includes(
-          formData.roomType
-        )
+        data.roomType &&
+        HOUSE_INFO_VALIDATION.restrictedValues.roomType.includes(data.roomType)
       ) {
         newErrors.roomType = HOUSE_INFO_VALIDATION.messages.roomType;
       }
@@ -93,7 +91,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   // isFormCompleted == true일 때 버튼 enable -> handleSubmit 실행 가능
   const handleSubmit = (onNext: (data: CompletedHouseInfo) => void) => {
-    const isValidInput = validateFormFields();
+    const isValidInput = validateFormFields(formData);
 
     // 타입 안전성 강화를 위해 타입 단언(as)을 제거 -> 아래 조건문으로 별도의 타입 검사 필요
     // 필수 필드가 누락되면 '집 구조 선택하기' 버튼이 disabled되어 handleSubmit이 실행될 수 없으므로 아래 조건문은 항상 통과함
