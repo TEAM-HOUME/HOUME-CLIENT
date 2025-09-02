@@ -3,11 +3,12 @@ import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
 import { useHousingSelectionMutation } from '../apis/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { usePrefetchMoodBoard } from '../apis/interiorStyleApi';
+import type { ImageSetupSteps } from '../types/funnel/steps';
 import type {
   CompletedHouseInfo,
-  ImageSetupSteps,
-} from '../types/funnel/steps';
-import type { HouseInfoErrors } from '../types/funnel/houseInfo';
+  HouseInfoErrors,
+  HouseInfoFormData,
+} from '../types/funnel/houseInfo';
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 선택 API 요청
@@ -24,20 +25,6 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   const { prefetchMoodBoard } = usePrefetchMoodBoard();
   prefetchMoodBoard();
   console.log('prefetch 완료');
-
-  // useEffect(() => {
-  //   // 한 프레임 뒤에 실행 (persist 복원 후)
-  //   setTimeout(() => {
-  //     resetFunnel();
-  //     // TODO(지성): hydration 타이밍 알아보기
-  //     // 컴포넌트 마운트 시 resetFunnel() 실행, 하지만 Zustand persist가 나중에 sessionStorage에서 데이터 복원(Zustand persist의 hydratino 타이밍)
-  //     // 결과적으로 이전 데이터가 다시 나타남 -> 지연 초기화 필요(한 프레임 뒤에 실행시키기)
-  //   }, 0);
-  // }, []);
-  // // TODO(지성): 아래 코드 console.log 찍어보면 둘 다 빈 배열, 하지만 step1 페이지에는 버튼이 선택된 상태로 렌더링됨
-  // // Zustand persist의 hydration 타이밍 관련?
-  // console.log(step1);
-  // console.log(context);
 
   // 초기값 설정: funnel의 context보다 zustand store 우선
   const [formData, setFormData] = useState({
@@ -168,9 +155,6 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
             ...selectedHouseInfo,
             houseId: res.houseId,
           });
-
-          // Step1 이후 데이터 초기화 (Step2, 3, 4 데이터 클리어)
-          // clearAfterStep(1);
 
           // funnel의 context에 넣을 데이터(다음 step으로 전달할 데이터)
           const completedHouseInfo = {

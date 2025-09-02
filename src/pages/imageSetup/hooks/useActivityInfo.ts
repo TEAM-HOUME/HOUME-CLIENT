@@ -47,7 +47,7 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // 초기값 설정: funnel의 context보다 zustand store 우선
   const [localFormData, setLocalFormData] = useState({
-    primaryUsage: activityInfo.primaryUsage || context.primaryUsage,
+    primaryUsage: activityInfo.primaryUsage || context.activityTypes,
     bedTypeId: activityInfo.bedTypeId || context.bedTypeId,
     otherFurnitureIds:
       activityInfo.otherFurnitureIds || context.otherFurnitureIds || [],

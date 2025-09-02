@@ -2,15 +2,13 @@
 import * as styles from '../StepCommon.css';
 import OptionGroup from '../optionGroup/OptionGroup';
 import FunnelHeader from '../../header/FunnelHeader';
+import type { ImageSetupSteps } from '../../../types/funnel/steps';
 import type {
   CompletedHouseInfo,
-  ImageSetupSteps,
-} from '../../../types/funnel/steps';
-import type {
   HouseType,
   RoomType,
   AreaType,
-} from '@/pages/imageSetup/types/funnel/houseInfo';
+} from '../../../types/funnel/houseInfo';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
