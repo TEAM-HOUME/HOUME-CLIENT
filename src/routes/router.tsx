@@ -47,7 +47,7 @@ const publicRoutes = [
 // 보호된 라우트 그룹 (인증 필요)
 const protectedRoutes = [
   {
-    path: ROUTES.imageSetup,
+    path: ROUTES.IMAGE_SETUP,
     element: <ImageSetup />,
   },
   {

@@ -17,7 +17,7 @@ export const API_ENDPOINT = {
     FLOOR_PLAN: '/api/v1/house-templates', // GET 도면 템플릿 제공
     ADDRESS_SEARCH: '/api/v1/addresses', // POST 사용자 주소 입력받기
     INTERIOR_STYLE: '/api/v1/moodboard-images', // GET 무드보드 제공
-    ACTIVITY_INFO: '/api/v1/dashboard-info', // GET 주요활동, 가구 리스트 제공
+    ACTIVITY_OPTIONS: '/api/v1/dashboard-info', // GET 주요활동, 가구 리스트 제공
   },
   GENERATE: {
     CAROUSELS: '/api/v1/carousels',

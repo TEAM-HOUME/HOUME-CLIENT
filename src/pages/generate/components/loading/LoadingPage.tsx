@@ -49,7 +49,7 @@ const LoadingPage = () => {
       });
     } else {
       console.log('requestData is null, redirect to /imageSetup');
-      navigate(ROUTES.imageSetup);
+      navigate(ROUTES.IMAGE_SETUP);
     }
   }, [requestData, navigate]); // resetGenerate 의존성 추가
   // ... 이미지 생성 api 코드 끝

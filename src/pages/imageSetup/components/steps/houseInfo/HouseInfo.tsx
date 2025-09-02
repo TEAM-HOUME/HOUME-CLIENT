@@ -25,7 +25,6 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
     useHouseInfo(context);
 
-  // 서버에서 주거 옵션 데이터 가져오기 (캐시에서 즉시 사용)
   const { data: housingOptions } = useHousingOptionsQuery();
 
   const houseTypeOptions = housingOptions?.houseTypes || [];
