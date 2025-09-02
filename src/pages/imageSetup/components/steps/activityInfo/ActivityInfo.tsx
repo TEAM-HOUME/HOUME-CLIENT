@@ -1,18 +1,19 @@
 // Step 4
-import * as common from '../StepCommon.css';
-import FunnelHeader from '../../header/FunnelHeader';
+import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
+import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+
 import {
   MAIN_ACTIVITY_OPTIONS,
   type ImageSetupSteps,
   type PrimaryUsage,
 } from '../../../types/funnel';
-import OptionGroup from '../optionGroup/OptionGroup';
-import MainTitle from '../title/Maintitle';
-import SubOptionGroup from '../optionGroup/SubOptionGroup';
+import FunnelHeader from '../../header/FunnelHeader';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
-import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import OptionGroup from '../optionGroup/OptionGroup';
+import SubOptionGroup from '../optionGroup/SubOptionGroup';
+import * as common from '../StepCommon.css';
+import MainTitle from '../title/Maintitle';
 
 interface ActivityInfoProps {
   context: ImageSetupSteps['ActivityInfo'];

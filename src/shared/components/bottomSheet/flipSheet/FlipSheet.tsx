@@ -1,9 +1,13 @@
 import { useRef } from 'react';
+
 import clsx from 'clsx';
-import DragHandle from '@components/dragHandle/DragHandle';
-import CtaButton from '@components/button/ctaButton/CtaButton';
-import * as styles from './FlipSheet.css';
+
 import FilpButton from '@/shared/components/button/flipButton/FlipButton';
+
+import CtaButton from '@components/button/ctaButton/CtaButton';
+import DragHandle from '@components/dragHandle/DragHandle';
+
+import * as styles from './FlipSheet.css';
 
 interface FlipSheetProps {
   onFlipClick: () => void;

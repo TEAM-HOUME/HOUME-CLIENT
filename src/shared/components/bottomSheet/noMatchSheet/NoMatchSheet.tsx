@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
+
 import clsx from 'clsx';
+
+import { useUserStore } from '@/store/useUserStore';
+
+import CtaButton from '@components/button/ctaButton/CtaButton';
 import DragHandle from '@components/dragHandle/DragHandle';
 import TextField from '@components/textField/TextField';
-import CtaButton from '@components/button/ctaButton/CtaButton';
+
 import * as styles from './NoMatchSheet.css';
-import { useUserStore } from '@/store/useUserStore';
 
 interface NoMatchSheetProps {
   isOpen: boolean;

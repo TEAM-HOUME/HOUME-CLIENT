@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { getHistoryData } from '../apis/landing';
+
 import { QUERY_KEY } from '@/shared/constants/queryKey';
+
+import { getHistoryData } from '../apis/landing';
 
 export const useLandingData = () => {
   return useQuery({

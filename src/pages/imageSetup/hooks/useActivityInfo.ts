@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+
+import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
+import { ROUTES } from '@/routes/paths';
+import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
+
+import { useFunnelStore } from '../stores/useFunnelStore';
 import {
   MAIN_ACTIVITY_OPTIONS,
   MAIN_ACTIVITY_VALIDATION,
   type ImageSetupSteps,
 } from '../types/funnel';
-import { useFunnelStore } from '../stores/useFunnelStore';
-import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
-import { ROUTES } from '@/routes/paths';
-import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
 // 타입 가드 함수(타입 단언 사용 X)
 // 유효한 '주요활동' 카테고리 내의 값인지 체크

@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react';
-import BlurImage from '@assets/icons/recommendBlur.svg?react';
-import LockImage from '@assets/icons/recommendCta.png';
+
 import { overlay } from 'overlay-kit';
 import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
+
+import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
+import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
+import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
+import LikeButton from '@/shared/components/button/likeButton/LikeButton';
+import Modal from '@/shared/components/overlay/modal/Modal';
+import HeadingText from '@/shared/components/text/HeadingText';
+
+import BlurImage from '@assets/icons/recommendBlur.svg?react';
+import LockImage from '@assets/icons/recommendCta.png';
 import Loading from '@components/loading/Loading';
+
 import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
@@ -11,14 +22,8 @@ import {
   useCreditLogMutation,
   useResultData,
 } from '../../hooks/useGenerate';
+
 import type { GenerateImageData } from '../../types/GenerateType';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
-import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
-import HeadingText from '@/shared/components/text/HeadingText';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import Modal from '@/shared/components/overlay/modal/Modal';
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (

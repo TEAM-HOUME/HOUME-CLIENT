@@ -14,9 +14,11 @@
  * URL: /oauth/kakao/callback?code=authorization_code
  */
 import { useEffect } from 'react';
-import { useKakaoLogin } from './hooks/useKakaoLogin';
+
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
+import { useKakaoLogin } from './hooks/useKakaoLogin';
 
 const KakaoCallback = () => {
   // 오류 핸들러

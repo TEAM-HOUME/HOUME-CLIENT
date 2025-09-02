@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import HeadingText from '@/shared/components/text/HeadingText';
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof HeadingText> = {
   title: 'typography/HeadingText',

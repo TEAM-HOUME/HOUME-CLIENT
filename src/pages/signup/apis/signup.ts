@@ -1,6 +1,7 @@
 /* 회원가입 API 함수 */
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import axiosInstance from '@shared/apis/axiosInstance';
+
 import type { SignupRequest, SignupResponse } from '../types/apis/signup';
 
 export const patchSignup = async (

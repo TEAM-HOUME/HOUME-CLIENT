@@ -1,5 +1,6 @@
-import * as styles from './DragHandle.css';
 import DragHandleIcon from '@/shared/assets/icons/dragHandle.svg?react';
+
+import * as styles from './DragHandle.css';
 
 const DragHandle = (props: React.ComponentProps<'div'>) => {
   return (

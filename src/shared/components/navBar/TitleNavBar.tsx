@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import BackIcon from '@shared/assets/icons/backIcon.svg?react';
-import * as styles from './TitleNavBar.css';
-import * as btnStyles from './LoginNavBtn.css';
+
 import { ROUTES } from '@/routes/paths';
+
+import BackIcon from '@shared/assets/icons/backIcon.svg?react';
+
+import * as btnStyles from './LoginNavBtn.css';
+import * as styles from './TitleNavBar.css';
 
 interface TitleNavBarProps extends React.ComponentProps<'nav'> {
   title: string;

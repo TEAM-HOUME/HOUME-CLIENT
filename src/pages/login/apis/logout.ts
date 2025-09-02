@@ -14,6 +14,7 @@
  */
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import axiosInstance from '@shared/apis/axiosInstance';
+
 import type { LogoutResponse } from '../types/auth';
 
 // AxiosInstance를 직접 사용해서 서버에 로그아웃 요청

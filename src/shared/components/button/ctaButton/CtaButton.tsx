@@ -1,4 +1,5 @@
 import KakaoIcon from '@assets/icons/kakaoIcon.svg?react';
+
 import * as styles from './CtaButton.css';
 
 interface CtaButtonProps extends React.ComponentProps<'button'> {

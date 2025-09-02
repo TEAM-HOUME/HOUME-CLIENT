@@ -16,8 +16,9 @@
  */
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import axiosInstance from '@shared/apis/axiosInstance';
-import type { BaseResponse } from '@shared/types/apis';
+
 import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
+import type { BaseResponse } from '@shared/types/apis';
 
 export const getKakaoLogin = async (
   code: string

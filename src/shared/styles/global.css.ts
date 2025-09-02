@@ -1,4 +1,5 @@
 import { globalStyle, createGlobalTheme } from '@vanilla-extract/css';
+
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
 import '@styles/reset.css.ts';

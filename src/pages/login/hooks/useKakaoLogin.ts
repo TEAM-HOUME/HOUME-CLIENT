@@ -16,10 +16,13 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { getKakaoLogin } from '../apis/kakaoLogin';
-import type { LoginApiResponse } from '../types/auth';
+
 import { ROUTES } from '@/routes/paths';
 import { useUserStore } from '@/store/useUserStore';
+
+import { getKakaoLogin } from '../apis/kakaoLogin';
+
+import type { LoginApiResponse } from '../types/auth';
 
 export const useKakaoLogin = () => {
   const navigate = useNavigate();

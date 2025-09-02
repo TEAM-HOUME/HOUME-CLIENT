@@ -9,9 +9,12 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { postLogout } from '../apis/logout';
-import type { LogoutResponse } from '../types/auth';
+
 import { useUserStore } from '@/store/useUserStore';
+
+import { postLogout } from '../apis/logout';
+
+import type { LogoutResponse } from '../types/auth';
 
 export const useLogout = () => {
   const navigate = useNavigate();

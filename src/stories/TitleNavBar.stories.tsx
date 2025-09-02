@@ -1,6 +1,8 @@
 import { MemoryRouter } from 'react-router-dom';
-import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof TitleNavBar> = {
   title: 'navbar/TitleNavBar',

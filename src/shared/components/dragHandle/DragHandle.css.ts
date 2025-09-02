@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+
 import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const wrapper = style({

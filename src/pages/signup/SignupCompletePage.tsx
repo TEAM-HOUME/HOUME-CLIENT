@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import SignupImage from '@assets/icons/loginAfter.png';
-import * as styles from './SignupCompletePage.css';
+
+import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
-import { ROUTES } from '@/routes/paths';
 import { useUserStore } from '@/store/useUserStore';
+
+import SignupImage from '@assets/icons/loginAfter.png';
+
+import * as styles from './SignupCompletePage.css';
 
 const SignupCompletePage = () => {
   // zustand에서 userName 가져오기

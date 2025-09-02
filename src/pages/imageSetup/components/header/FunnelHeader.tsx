@@ -1,6 +1,7 @@
-import * as styles from './FunnelHeader.css';
-import type { ProgressStep } from '@/shared/components/progressBarKey/ProgressBarKey.types';
 import ProgressBarKey from '@/shared/components/progressBarKey/ProgressBarKey';
+import type { ProgressStep } from '@/shared/components/progressBarKey/ProgressBarKey.types';
+
+import * as styles from './FunnelHeader.css';
 
 interface FunnelHeaderProps {
   title: string;

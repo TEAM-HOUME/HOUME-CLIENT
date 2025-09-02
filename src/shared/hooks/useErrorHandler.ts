@@ -1,8 +1,10 @@
 import { useCallback, useRef } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import type { ErrorType, PageContext } from '@/shared/types/error';
-import { useToast } from '@/shared/components/toast/useToast';
+
 import { ROUTES } from '@/routes/paths';
+import { useToast } from '@/shared/components/toast/useToast';
+import type { ErrorType, PageContext } from '@/shared/types/error';
 import { ERROR_MESSAGES } from '@/shared/types/error';
 
 /**

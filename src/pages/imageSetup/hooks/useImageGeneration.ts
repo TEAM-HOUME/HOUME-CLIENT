@@ -1,4 +1,5 @@
 import { useFunnel } from '@use-funnel/react-router';
+
 import type { ImageSetupSteps } from '../types/funnel';
 
 export const useImageSetup = () => {

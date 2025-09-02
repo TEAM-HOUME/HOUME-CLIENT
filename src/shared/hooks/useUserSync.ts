@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useUserStore } from '@/store/useUserStore';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import { useUserStore } from '@/store/useUserStore';
 
 /**
  * 사용자 정보를 전역 상태와 동기화하는 훅

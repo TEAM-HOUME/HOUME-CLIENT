@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
+
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+
+import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
+import { queryClient } from '@/shared/apis/queryClient';
+import { QUERY_KEY } from '@/shared/constants/queryKey';
+
 import {
   checkGenerateImageStatus,
   generateImage,
@@ -13,10 +19,8 @@ import {
   postPreference,
 } from '../apis/generate';
 import { useGenerateStore } from '../stores/useGenerateStore';
+
 import type { GenerateImageRequest } from '../types/GenerateType';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
-import { queryClient } from '@/shared/apis/queryClient';
-import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
 
 export const useStackData = (page: number, options: { enabled: boolean }) => {
   return useQuery({

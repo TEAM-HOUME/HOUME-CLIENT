@@ -1,5 +1,6 @@
-import * as styles from './SettingSection.css';
 import { useLogout } from '@/pages/login/hooks/useLogout';
+
+import * as styles from './SettingSection.css';
 
 type SettingItem = {
   id: string;

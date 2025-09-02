@@ -1,10 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
+
 import axiosInstance from '@shared/apis/axiosInstance';
+
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
 } from '../types/apis/interiorStyle';
-import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
 /**
