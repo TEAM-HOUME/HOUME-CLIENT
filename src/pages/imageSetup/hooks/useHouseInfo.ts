@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
-import { useHousingSelectionMutation } from '../api/houseInfoApi';
+import { useHousingSelectionMutation } from '../apis/houseInfoApi';
 import { useFunnelStore } from '../stores/useFunnelStore';
-import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
+import { usePrefetchMoodBoard } from '../apis/interiorStyleApi';
 import type {
   CompletedHouseInfo,
   ImageSetupSteps,
