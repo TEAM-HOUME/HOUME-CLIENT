@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
 import { useHousingSelectionMutation } from '../apis/houseInfoApi';
-import { useFunnelStore } from '../stores/useFunnelStore';
-import { usePrefetchMoodBoard } from '../apis/interiorStyleApi';
 import type { ImageSetupSteps } from '../types/funnel/steps';
 import type {
   CompletedHouseInfo,
@@ -14,41 +12,14 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 선택 API 요청
   const housingSelection = useHousingSelectionMutation();
 
-  // Zustand store에서 상태 가져오기
-  const {
-    houseInfo: houseInfo,
-    sethouseInfoData: setHouseInfoData,
-    setCurrentStep,
-  } = useFunnelStore();
-
-  // 무드보드 이미지 사전로딩
-  const { prefetchMoodBoard } = usePrefetchMoodBoard();
-  prefetchMoodBoard();
-  console.log('prefetch 완료');
-
-  // 초기값 설정: funnel의 context보다 zustand store 우선
+  // 초기값 설정: context에서 가져오기
   const [formData, setFormData] = useState({
-    houseType: houseInfo.houseType || context.houseType,
-    roomType: houseInfo.roomType || context.roomType,
-    areaType: houseInfo.areaType || context.areaType,
+    houseType: context.houseType,
+    roomType: context.roomType,
+    areaType: context.areaType,
   });
 
   const [errors, setErrors] = useState<HouseInfoErrors>({});
-
-  // 컴포넌트 마운트 시 현재 스텝 설정
-  useEffect(() => {
-    setCurrentStep(1);
-  }, []);
-
-  useEffect(() => {
-    // setStep1Data({ }) 안에 있는 데이터가 setStep1Data의 정의에 의해 spread돼서 zustand의 state에 저장됨
-    // houseType, roomType, areaType 중 하나만 바뀌어도 그냥 셋 다 spread돼서 저장되는 것
-    setHouseInfoData({
-      houseType: formData.houseType,
-      roomType: formData.roomType,
-      areaType: formData.areaType,
-    });
-  }, [formData]);
 
   // 개별 필드 변경 시 해당 필드의 에러 초기화
   useEffect(() => {
@@ -149,12 +120,6 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
         if (res) {
           console.log('유효한 주거정보, House ID:', res.houseId);
           console.log(res);
-
-          // zustand store에 houseId 저장
-          setHouseInfoData({
-            ...selectedHouseInfo,
-            houseId: res.houseId,
-          });
 
           // funnel의 context에 넣을 데이터(다음 step으로 전달할 데이터)
           const completedHouseInfo = {

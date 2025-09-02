@@ -14,20 +14,21 @@ export interface HouseInfoFormData {
   areaType?: AreaType;
 }
 
+// funnel 스텝 컨텍스트 타입
+// ImageSetup.tsx에서 각 최상위 스텝 컴포넌트에 props 타입으로 전달
+export interface HouseInfoContext {
+  houseType?: HouseType;
+  roomType?: RoomType;
+  areaType?: AreaType;
+  houseId?: number;
+}
+
 // 완성된 HouseInfo 데이터 타입(집구조 선택 POST 요청 응답)
 export interface CompletedHouseInfo {
   houseType: HouseType;
   roomType: RoomType;
   areaType: AreaType;
   houseId: number;
-}
-
-// funnel 스텝 컨텍스트 타입
-export interface HouseInfoContext {
-  houseType?: HouseType;
-  roomType?: RoomType;
-  areaType?: AreaType;
-  houseId?: number;
 }
 
 // 에러 타입
