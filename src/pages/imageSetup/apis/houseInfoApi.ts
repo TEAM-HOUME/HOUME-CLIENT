@@ -8,7 +8,7 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
-const getHousingOptions = async (): Promise<HousingOptionsResponse> => {
+export const getHousingOptions = async (): Promise<HousingOptionsResponse> => {
   return await request<HousingOptionsResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.IMAGE_SETUP.HOUSE_OPTIONS,

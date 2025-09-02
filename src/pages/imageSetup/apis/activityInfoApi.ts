@@ -3,12 +3,13 @@ import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
 import { HTTPMethod, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
-const getActivityOptions = async (): Promise<ActivityOptionsResponse> => {
-  return await request<ActivityOptionsResponse>({
-    method: HTTPMethod.GET,
-    url: API_ENDPOINT.IMAGE_SETUP.ACTIVITY_OPTIONS,
-  });
-};
+export const getActivityOptions =
+  async (): Promise<ActivityOptionsResponse> => {
+    return await request<ActivityOptionsResponse>({
+      method: HTTPMethod.GET,
+      url: API_ENDPOINT.IMAGE_SETUP.ACTIVITY_OPTIONS,
+    });
+  };
 
 export const useActivityOptionsQuery = () => {
   return useQuery({

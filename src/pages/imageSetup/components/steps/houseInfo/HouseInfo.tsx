@@ -11,10 +11,10 @@ import type {
   RoomType,
   AreaType,
 } from '@/pages/imageSetup/types/funnel/houseInfo';
-import { useHousingOptionsQuery } from '@/pages/imageSetup/api/houseInfoApi';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfoApi';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];
