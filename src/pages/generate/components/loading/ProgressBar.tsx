@@ -50,7 +50,7 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
           // 100% 완료 시 약간의 지연 후 onComplete 콜백 호출
           setTimeout(
             () => onComplete?.(),
-            PROGRESS_CONFIG.DELAY_BEFORE_COMPLETE
+            PROGRESS_CONFIG.DELAY_BEFORE_COMPLETE_MS
           );
 
           return PROGRESS_CONFIG.FAST_PHASE_END;
