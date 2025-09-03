@@ -6,7 +6,7 @@
  *
  *
  */
-import { useLogout } from '../apis/logout';
+import { useLogoutMutation } from '../apis/logout';
 
 interface LogoutButtonProps {
   children?: React.ReactNode;
@@ -17,8 +17,8 @@ export const LogoutButton = ({
   children = '로그아웃',
   className,
 }: LogoutButtonProps) => {
-  const { mutate: logout, isPending } = useLogout();
-  // Tanstack Query - useLogout 훅 호출
+  const { mutate: logout, isPending } = useLogoutMutation();
+  // Tanstack Query - useLogoutMutation 훅 호출
 
   const handleLogout = () => {
     if (window.confirm('정말 로그아웃하시겠습니까?')) {
