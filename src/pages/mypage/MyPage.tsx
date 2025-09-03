@@ -19,13 +19,6 @@ const MyPage = () => {
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  // 로그인되지 않았으면 로그인 페이지로 리디렉션
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate(ROUTES.LOGIN);
-    }
-  }, [isLoggedIn, navigate]);
-
   const {
     data: userData,
     isLoading: isUserLoading,
@@ -36,10 +29,17 @@ const MyPage = () => {
   });
 
   useEffect(() => {
-    if (isLoggedIn && isUserError && error) {
+    // 로그인되지 않았으면 로그인 페이지로 리디렉션
+    if (!isLoggedIn) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+
+    // 로그인 상태에서 API 에러가 발생한 경우 에러 처리
+    if (isUserError && error) {
       handleError(error, 'api');
     }
-  }, [isLoggedIn, isUserError, userData, isUserLoading, error, handleError]);
+  }, [isLoggedIn, navigate, isUserError, error, handleError]);
 
   // 로그인되지 않았으면 아무것도 렌더링하지 않음 (리디렉션 중)
   if (!isLoggedIn) {
