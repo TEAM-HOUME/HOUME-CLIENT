@@ -67,14 +67,14 @@ export const getKakaoLogin = async (
  *
  * @example
  * ```typescript
- * const { mutate: login, isPending, isError } = useKakaoLogin();
+ * const { mutate: login, isPending, isError } = useKakaoLoginMutation();
  *
  * // 카카오 인가 코드로 로그인
  * login('authorization_code');
  * ```
  */
 
-export const useKakaoLogin = () => {
+export const useKakaoLoginMutation = () => {
   const navigate = useNavigate();
   const setAccessToken = useUserStore((state) => state.setAccessToken);
 
@@ -93,7 +93,7 @@ export const useKakaoLogin = () => {
     },
     onError: (error) => {
       // 오류 처리는 KakaoCallback 컴포넌트에서 useErrorHandler로 처리
-      console.error('[useKakaoLogin] 로그인 실패:', error);
+      console.error('[useKakaoLoginMutation] 로그인 실패:', error);
     },
   });
 };
