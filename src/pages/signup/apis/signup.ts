@@ -18,7 +18,7 @@ export const patchSignup = async (
 };
 
 /* 회원가입 TanStack Query 훅 */
-export const usePatchSignup = () => {
+export const useSignupMutation = () => {
   const navigate = useNavigate();
   const setUserName = useUserStore((state) => state.setUserName);
 
@@ -30,7 +30,7 @@ export const usePatchSignup = () => {
       navigate(ROUTES.SIGNUPCOMPLETE); // 회원가입 완료 페이지 이동
     },
     onError: (error) => {
-      console.error('[usePatchSignup] 회원가입 실패:', error); // 에러는 useErrorHandler에서 처리
+      console.error('[useSignupMutation] 회원가입 실패:', error); // 에러는 useErrorHandler에서 처리
     },
   });
 };
