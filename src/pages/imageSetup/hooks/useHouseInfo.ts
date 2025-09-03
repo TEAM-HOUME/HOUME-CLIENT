@@ -12,7 +12,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 옵션 선택 API
   const housingSelection = useHousingSelectionMutation();
 
-  // 초기값 설정: context에서 가져오기
+  // 초기값 설정: funnel의 context에서 가져오기
   const [formData, setFormData] = useState<HouseInfoFormData>({
     houseType: context.houseType,
     roomType: context.roomType,
@@ -21,7 +21,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   const [errors, setErrors] = useState<HouseInfoErrors>({});
 
-  // 타입 가드: 완전한 HouseInfo 데이터인지 확인
+  // 타입 가드
   const isCompleteHouseInfo = (
     data: HouseInfoFormData
   ): data is Required<HouseInfoFormData> => {

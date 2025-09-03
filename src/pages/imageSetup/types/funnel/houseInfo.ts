@@ -15,7 +15,7 @@ export interface HouseInfoFormData {
 }
 
 // funnel 스텝 컨텍스트 타입
-// ImageSetup.tsx에서 각 최상위 스텝 컴포넌트에 props 타입으로 전달
+// ImageSetup.tsx에서 각 최상위 스텝 컴포넌트에 props의 타입으로 사용
 export interface HouseInfoContext {
   houseType?: HouseType;
   roomType?: RoomType;
