@@ -1,3 +1,13 @@
+import { API_ENDPOINT } from '@constants/apiEndpoints';
+import axiosInstance from '@shared/apis/axiosInstance';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import type { BaseResponse } from '@shared/types/apis';
+import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
+import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
+import { ROUTES } from '@/routes/paths';
+import { useUserStore } from '@/store/useUserStore';
+
 /**
  * 카카오 OAuth 로그인 API 함수
  *
@@ -14,17 +24,11 @@
  * console.log(response.accessToken); // 액세스 토큰
  * ```
  */
-import { API_ENDPOINT } from '@constants/apiEndpoints';
-import axiosInstance from '@shared/apis/axiosInstance';
-import type { BaseResponse } from '@shared/types/apis';
-import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
-import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
 
 export const getKakaoLogin = async (
   code: string
 ): Promise<LoginApiResponse> => {
   // console.log('[kakaoLogin] 인가 코드:', code);
-
   // AxiosInstance를 사용해서 서버에 요청
   const response = await axiosInstance.get<BaseResponse<KakaoLoginResponse>>(
     API_ENDPOINT.AUTH.KAKAO_CALLBACK,
@@ -51,4 +55,45 @@ export const getKakaoLogin = async (
     data: response.data.data,
     accessToken,
   };
+};
+
+/**
+ * 카카오 로그인 React Query 훅
+ *
+ * 카카오 OAuth 로그인을 처리하는 TanStack Query mutation 훅입니다.
+ * 로그인 성공 시 액세스 토큰을 로컬 스토리지에 저장하고 홈페이지로 이동합니다.
+ *
+ * @returns useMutation - 로그인 상태와 함수를 반환
+ *
+ * @example
+ * ```typescript
+ * const { mutate: login, isPending, isError } = useKakaoLogin();
+ *
+ * // 카카오 인가 코드로 로그인
+ * login('authorization_code');
+ * ```
+ */
+
+export const useKakaoLogin = () => {
+  const navigate = useNavigate();
+  const setAccessToken = useUserStore((state) => state.setAccessToken);
+
+  return useMutation<LoginApiResponse, Error, string>({
+    mutationFn: getKakaoLogin,
+    onSuccess: (response) => {
+      const accessToken = response.accessToken;
+      setAccessToken(accessToken); // zustand에 저장 (localStorage 동시 저장)
+
+      // 가입 여부에 따라 리다이렉트 (response.data가 true면 신규회원, false면 기존회원)
+      if (response.data) {
+        navigate(ROUTES.SIGNUP);
+      } else {
+        navigate(ROUTES.HOME);
+      }
+    },
+    onError: (error) => {
+      // 오류 처리는 KakaoCallback 컴포넌트에서 useErrorHandler로 처리
+      console.error('[useKakaoLogin] 로그인 실패:', error);
+    },
+  });
 };
