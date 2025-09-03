@@ -1,4 +1,5 @@
-import type { HouseType, OtherFurnitures, RoomType } from './options';
+import type { HouseType, RoomType } from './houseInfo';
+import type { OtherFurnitures } from './options';
 
 export const HOUSE_INFO_VALIDATION = {
   restrictedValues: {

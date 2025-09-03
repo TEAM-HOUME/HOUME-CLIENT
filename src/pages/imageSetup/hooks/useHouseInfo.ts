@@ -9,7 +9,7 @@ import type {
 } from '../types/funnel/houseInfo';
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
-  // 주거 선택 API 요청
+  // 주거 옵션 선택 API
   const housingSelection = useHousingSelectionMutation();
 
   // 초기값 설정: context에서 가져오기
@@ -21,60 +21,52 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   const [errors, setErrors] = useState<HouseInfoErrors>({});
 
-  // 개별 필드 변경 시 해당 필드의 에러 초기화
+  // 개별 필드 변경 시 해당 필드의 에러만 클리어
   useEffect(() => {
-    if (errors.houseType) {
-      setErrors((prev) => {
+    setErrors((prev) => {
+      if (prev.houseType) {
         const { houseType, ...rest } = prev;
         return rest;
-      });
-    }
+      }
+      return prev;
+    });
   }, [formData.houseType]);
 
   useEffect(() => {
-    if (errors.roomType) {
-      setErrors((prev) => {
+    setErrors((prev) => {
+      if (prev.roomType) {
         const { roomType, ...rest } = prev;
         return rest;
-      });
-    }
+      }
+      return prev;
+    });
   }, [formData.roomType]);
 
   useEffect(() => {
-    if (errors.areaType) {
-      setErrors((prev) => {
+    setErrors((prev) => {
+      if (prev.areaType) {
         const { areaType, ...rest } = prev;
         return rest;
-      });
-    }
+      }
+      return prev;
+    });
   }, [formData.areaType]);
 
   // 제한된 값(아파트, 투룸 등)을 선택했는지 검증
   const validateFormFields = (data: HouseInfoFormData): boolean => {
     const newErrors: HouseInfoErrors = {};
 
-    // 모든 필드가 선택된 경우에만 제한값 검증 실행
-    const isAllFieldsSelected = !!(
+    if (
       data.houseType &&
+      HOUSE_INFO_VALIDATION.restrictedValues.houseType.includes(data.houseType)
+    ) {
+      newErrors.houseType = HOUSE_INFO_VALIDATION.messages.houseType;
+    }
+    if (
       data.roomType &&
-      data.areaType
-    );
-
-    if (isAllFieldsSelected) {
-      if (
-        data.houseType &&
-        HOUSE_INFO_VALIDATION.restrictedValues.houseType.includes(
-          data.houseType
-        )
-      ) {
-        newErrors.houseType = HOUSE_INFO_VALIDATION.messages.houseType;
-      }
-      if (
-        data.roomType &&
-        HOUSE_INFO_VALIDATION.restrictedValues.roomType.includes(data.roomType)
-      ) {
-        newErrors.roomType = HOUSE_INFO_VALIDATION.messages.roomType;
-      }
+      HOUSE_INFO_VALIDATION.restrictedValues.roomType.includes(data.roomType)
+    ) {
+      newErrors.roomType = HOUSE_INFO_VALIDATION.messages.roomType;
     }
 
     setErrors(newErrors);
@@ -89,7 +81,7 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
     Object.values(errors).length === 0
   );
 
-  // isFormCompleted == true일 때 버튼 enable -> handleSubmit 실행 가능
+  // isFormCompleted == true일 때 버튼 enable, handleSubmit 실행
   const handleSubmit = (onNext: (data: CompletedHouseInfo) => void) => {
     const isValidInput = validateFormFields(formData);
 
@@ -106,8 +98,6 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
       areaType: formData.areaType,
     };
 
-    console.log(selectedHouseInfo);
-
     const requestData = {
       ...selectedHouseInfo,
       isValid: isValidInput,
@@ -115,20 +105,13 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
     housingSelection.mutate(requestData, {
       onSuccess: (res) => {
-        if (res) {
-          console.log('유효한 주거정보, House ID:', res.houseId);
-          console.log(res);
+        // funnel의 context에 넣을 데이터(다음 step으로 전달할 데이터)
+        const completedHouseInfo = {
+          ...selectedHouseInfo,
+          houseId: res.houseId,
+        };
 
-          // funnel의 context에 넣을 데이터(다음 step으로 전달할 데이터)
-          const completedHouseInfo = {
-            ...selectedHouseInfo,
-            houseId: res.houseId,
-          };
-
-          onNext(completedHouseInfo);
-        } else {
-          console.log('유효하지 않은 주거정보');
-        }
+        onNext(completedHouseInfo);
       },
     });
   };
