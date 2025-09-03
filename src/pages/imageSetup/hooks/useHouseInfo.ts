@@ -21,6 +21,13 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
   const [errors, setErrors] = useState<HouseInfoErrors>({});
 
+  // 타입 가드: 완전한 HouseInfo 데이터인지 확인
+  const isCompleteHouseInfo = (
+    data: HouseInfoFormData
+  ): data is Required<HouseInfoFormData> => {
+    return !!(data.houseType && data.roomType && data.areaType);
+  };
+
   // 개별 필드 변경 시 해당 필드의 에러만 클리어
   useEffect(() => {
     setErrors((prev) => {
@@ -74,46 +81,33 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   };
 
   // 입력값 3개 입력 여부 확인 및 에러 상태 확인
-  const isFormCompleted = !!(
-    formData.houseType &&
-    formData.roomType &&
-    formData.areaType &&
-    Object.values(errors).length === 0
-  );
+  const isFormCompleted =
+    isCompleteHouseInfo(formData) && Object.values(errors).length === 0;
 
   // isFormCompleted == true일 때 버튼 enable, handleSubmit 실행
   const handleSubmit = (onNext: (data: CompletedHouseInfo) => void) => {
+    if (!isFormCompleted) return;
+
     const isValidInput = validateFormFields(formData);
 
-    // 타입 안전성 강화를 위해 타입 단언(as)을 제거 -> 아래 조건문으로 별도의 타입 검사 필요
-    // 필수 필드가 누락되면 '집 구조 선택하기' 버튼이 disabled되어 handleSubmit이 실행될 수 없으므로 아래 조건문은 항상 통과함
-    if (!formData.houseType || !formData.roomType || !formData.areaType) {
-      console.error('필수 필드가 누락되었습니다');
-      return;
-    }
-
-    const selectedHouseInfo = {
-      houseType: formData.houseType,
-      roomType: formData.roomType,
-      areaType: formData.areaType,
-    };
-
-    const requestData = {
-      ...selectedHouseInfo,
-      isValid: isValidInput,
-    };
-
-    housingSelection.mutate(requestData, {
-      onSuccess: (res) => {
-        // funnel의 context에 넣을 데이터(다음 step으로 전달할 데이터)
-        const completedHouseInfo = {
-          ...selectedHouseInfo,
-          houseId: res.houseId,
-        };
-
-        onNext(completedHouseInfo);
+    housingSelection.mutate(
+      {
+        houseType: formData.houseType,
+        roomType: formData.roomType,
+        areaType: formData.areaType,
+        isValid: isValidInput,
       },
-    });
+      {
+        onSuccess: (res) => {
+          onNext({
+            houseType: formData.houseType,
+            roomType: formData.roomType,
+            areaType: formData.areaType,
+            houseId: res.houseId,
+          });
+        },
+      }
+    );
   };
 
   return {
