@@ -37,7 +37,7 @@ export const postLogout = async (): Promise<LogoutResponse> => {
  *
  */
 
-export const useLogout = () => {
+export const useLogoutMutation = () => {
   const navigate = useNavigate();
 
   return useMutation<LogoutResponse, Error, void>({
