@@ -1,6 +1,6 @@
 import * as styles from './SignupPage.css';
 import useSignupForm from './hooks/useSignupForm';
-import { usePatchSignup } from './hooks/usePatchSignup';
+import { usePatchSignup } from './apis/signup';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
 import TextField from '@/shared/components/textField/TextField.tsx';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton.tsx';
