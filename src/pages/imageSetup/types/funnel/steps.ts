@@ -1,6 +1,6 @@
 import type {
   ActivityTypes,
-  BedIds,
+  BedId,
   SelectiveFurnitureIds,
 } from './activityInfo';
 import type {
@@ -8,7 +8,6 @@ import type {
   RoomType,
   AreaType,
   HouseInfoContext,
-  CompletedHouseInfo,
 } from './houseInfo';
 
 interface FloorPlan {
@@ -18,6 +17,7 @@ interface FloorPlan {
 
 // Funnel Step 정의
 export type ImageSetupSteps = {
+  // TODO(지성): 재사용 가능한 타입들 재사용하기
   HouseInfo: HouseInfoContext;
   FloorPlan: {
     houseType: HouseType;
@@ -42,15 +42,11 @@ export type ImageSetupSteps = {
     floorPlan: FloorPlan;
     moodBoardIds: number[];
     activityTypes?: ActivityTypes;
-    bedTypeId?: number;
-    selectiveFurnitureIds?: number[];
+    bedTypeId?: BedId;
+    selectiveFurnitureIds?: SelectiveFurnitureIds[];
   };
 };
 
-// CompletedHouseInfo는 houseInfo.ts에서 import
+// TODO(지성): FloorPlan, InteriorStyle 리팩토링 후 제거
 export type CompletedFloorPlan = Required<ImageSetupSteps['FloorPlan']>;
 export type CompletedInteriorStyle = Required<ImageSetupSteps['InteriorStyle']>;
-export type CompletedActivityInfo = Required<ImageSetupSteps['ActivityInfo']>;
-
-// re-export for convenience (통합 파일에서 가져온 타입을 다시 export)
-export type { CompletedHouseInfo } from './houseInfo';

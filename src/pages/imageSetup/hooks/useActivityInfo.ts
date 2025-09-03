@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MAIN_ACTIVITY_OPTIONS } from '../types/funnel/options';
 import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
-import { useFunnelStore } from '../stores/useFunnelStore';
 import type { ImageSetupSteps } from '../types/funnel/steps';
+import type {
+  ActivityInfoFormData,
+  ActivityInfoErrors,
+  CompletedActivityInfo,
+} from '../types/funnel/activityInfo';
 import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
@@ -19,76 +23,84 @@ const isValidActivityKey = (
   // usage in _: 객체에 해당 key가 있는지 검사, boolean 반환
 };
 
-// interface FormErrors {
-//   primaryUsage?: string;
-//   bedType?: string;
-//   otherFurnitures?: string;
-// }
-
 export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   const navigate = useNavigate();
 
-  // Zustand store에서 상태 가져오기
-  const {
-    activityInfo: activityInfo,
-    setActivityInfoData: setActivityInfoData,
-    setCurrentStep,
-  } = useFunnelStore();
-
+  // TODO(지성): 크레딧 관련 로직 따로 관리
   // 크레딧 가드 훅 (이미지 생성 시 1크레딧 필요)
   const { checkCredit, isChecking } = useCreditGuard(1);
-
   // 버튼 비활성화 상태 (토스트 표시 후 비활성화)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  useEffect(() => {
-    setCurrentStep(4);
-  }, []);
-
-  // 초기값 설정: funnel의 context보다 zustand store 우선
-  const [localFormData, setLocalFormData] = useState({
-    primaryUsage: activityInfo.primaryUsage || context.activityTypes,
-    bedTypeId: activityInfo.bedTypeId || context.bedTypeId,
-    otherFurnitureIds:
-      activityInfo.otherFurnitureIds || context.otherFurnitureIds || [],
+  // funnel의 context값으로 초기값 설정
+  const [formData, setFormData] = useState<ActivityInfoFormData>({
+    primaryUsage: context.activityTypes,
+    bedId: context.bedTypeId,
+    selectiveIds: context.selectiveFurnitureIds || [],
   });
 
-  // TODO(지성): 코드 확인
-  const updateFormData = useCallback(
-    (updater: any) => {
-      const newData =
-        typeof updater === 'function' ? updater(localFormData) : updater;
+  const [errors, setErrors] = useState<ActivityInfoErrors>({});
 
-      setLocalFormData(newData);
-      setActivityInfoData(newData); // Zustand 동시 업데이트
-    },
-    [localFormData, setActivityInfoData]
-  );
+  // 타입 가드
+  const isCompleteActivityInfo = (
+    data: ActivityInfoFormData
+  ): data is Required<ActivityInfoFormData> => {
+    return !!(
+      data.primaryUsage &&
+      data.bedId &&
+      Array.isArray(data.selectiveIds) &&
+      data.selectiveIds.length > 0
+    );
+  };
 
-  //   const [errors, setErrors] = useState<FormErrors>({});
-
-  // 주요활동(휴식형, 재택근무형 등) 변경 시 useEffect() 실행
-  // 선택한 주요활동에 매칭되는 필수 가구 자동 선택
   useEffect(() => {
-    // 필수 가구 체크
-    const requiredFurnitures = getRequiredFurnitureIds();
-    setLocalFormData((prev) => ({
-      ...prev,
-      otherFurnitureIds: requiredFurnitures,
-    }));
-  }, [localFormData.primaryUsage]);
+    setErrors((prev) => {
+      if (prev.primaryUsage) {
+        const { primaryUsage, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, [formData.primaryUsage]);
+
+  useEffect(() => {
+    setErrors((prev) => {
+      if (prev.bedTypeId) {
+        const { bedTypeId, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, [formData.bedId]);
+
+  useEffect(() => {
+    setErrors((prev) => {
+      if (prev.selectiveIds) {
+        const { selectiveIds: selectiveIds, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, [formData.selectiveIds]);
+
+  // 주요활동 변경 시 필수 가구 자동 선택
+  useEffect(() => {
+    if (formData.primaryUsage) {
+      const requiredFurnitures = getRequiredFurnitureIds();
+      setFormData((prev) => ({
+        ...prev,
+        selectiveIds: requiredFurnitures,
+      }));
+    }
+  }, [formData.primaryUsage]);
 
   // 현재 선택된 활동의 필수 가구 ID 리스트 반환
   const getRequiredFurnitureIds = (): number[] => {
-    if (
-      !localFormData.primaryUsage ||
-      !isValidActivityKey(localFormData.primaryUsage)
-    )
+    if (!formData.primaryUsage || !isValidActivityKey(formData.primaryUsage))
       return [];
 
-    // TODO(지성): 코드 리팩토링
     const requiredCodes =
-      MAIN_ACTIVITY_VALIDATION.combinationRules[localFormData.primaryUsage]
+      MAIN_ACTIVITY_VALIDATION.combinationRules[formData.primaryUsage]
         ?.requiredFurnitures || [];
 
     return requiredCodes
@@ -103,9 +115,9 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // 현재 선택된 활동의 label 가져오기(휴식형, 재택근무형, 영화감상형, 홈카페형)
   const getCurrentActivityLabel = (): string => {
-    if (!localFormData.primaryUsage) return '';
+    if (!formData.primaryUsage) return '';
     const option = Object.values(MAIN_ACTIVITY_OPTIONS.PRIMARY_USAGE).find(
-      (option) => option.code === localFormData.primaryUsage
+      (option) => option.code === formData.primaryUsage
     );
     return option?.label || '';
   };
@@ -125,28 +137,23 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   };
 
   // 특정 가구가 현재 활동의 필수 가구인지 확인
-  const isRequiredFurniture = (furniture: string | number): boolean => {
+  const isRequiredFurniture = (furnitureId: number): boolean => {
     const requiredIds = getRequiredFurnitureIds();
-    // useId={true}인 경우 number로 비교, 아닌 경우 code로 비교
-    return requiredIds.includes(furniture as number);
+    return requiredIds.includes(furnitureId);
   };
 
-  const isFormCompleted = !!(
-    localFormData.primaryUsage &&
-    localFormData.bedTypeId &&
-    Array.isArray(localFormData.otherFurnitureIds) &&
-    localFormData.otherFurnitureIds.length > 0
-  );
+  // 입력값 3개 입력 여부 확인 및 에러 상태 확인
+  const isFormCompleted =
+    isCompleteActivityInfo(formData) && Object.values(errors).length === 0;
 
-  const handleOnClick = async () => {
+  // isFormCompleted == true일 때 버튼 enable, handleSubmit 실행
+  const handleSubmit = async (
+    onNext: (data: CompletedActivityInfo) => void
+  ) => {
+    if (!isFormCompleted) return;
+
     // 중복 클릭 방지 (CreditBox 패턴)
     if (isChecking || isButtonDisabled) return;
-
-    // 타입 단언(as) 대신 사용
-    if (!localFormData.primaryUsage || !localFormData.bedTypeId) {
-      console.error('필수 필드가 누락되었습니다');
-      return;
-    }
 
     // 이미지 생성 전 크레딧 확인
     const hasCredit = await checkCredit();
@@ -156,23 +163,6 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
       return;
     }
 
-    // 디버깅용
-    const payload = {
-      houseType: context.houseType,
-      roomType: context.roomType,
-      areaType: context.areaType,
-      houseId: context.houseId,
-      floorPlan: {
-        floorPlanId: context.floorPlan.floorPlanId,
-        isMirror: context.floorPlan.isMirror,
-      },
-      moodBoardIds: context.moodBoardIds,
-      primaryUsage: localFormData.primaryUsage,
-      bedTypeId: localFormData.bedTypeId,
-      otherFurnitureIds: localFormData.otherFurnitureIds,
-    };
-    console.log('선택된 퍼널 페이로드:', payload);
-
     const generateImageRequest: GenerateImageRequest = {
       houseId: context.houseId,
       equilibrium: context.areaType,
@@ -181,24 +171,34 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
         isMirror: context.floorPlan.isMirror,
       },
       moodBoardIds: context.moodBoardIds,
-      // TODO(지성): 주요활동, 침대, 그 외 가구들 ID값
-      activity: localFormData.primaryUsage,
-      bedId: localFormData.bedTypeId,
-      selectiveIds: localFormData.otherFurnitureIds,
+      activity: formData.primaryUsage!,
+      bedId: formData.bedId!,
+      selectiveIds: formData.selectiveIds!,
     };
+
+    onNext({
+      houseType: context.houseType,
+      roomType: context.roomType,
+      areaType: context.areaType,
+      houseId: context.houseId,
+      floorPlan: context.floorPlan,
+      moodBoardIds: context.moodBoardIds,
+      primaryUsage: formData.primaryUsage!,
+      bedTypeId: formData.bedId!,
+      selectiveIds: formData.selectiveIds!,
+    });
 
     navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
   };
 
   return {
-    localFormData,
-    setFormData: updateFormData,
-    // errors,
+    formData,
+    setFormData,
+    errors,
+    handleSubmit,
     isFormCompleted,
     isRequiredFurniture,
     getCurrentActivityLabel,
     getRequiredFurnitureLabels,
-    handleOnClick,
-    isButtonActive: !isChecking && !isButtonDisabled, // CreditBox 패턴과 동일
   };
 };

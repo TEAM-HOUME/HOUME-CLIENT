@@ -4,11 +4,11 @@ import FloorPlan from './components/steps/floorPlan/FloorPlan';
 import InteriorStyle from './components/steps/interiorStyle/InteriorStyle';
 import ActivityInfo from './components/steps/activityInfo/ActivityInfo';
 import {
-  type CompletedHouseInfo,
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
 } from './types/funnel/steps';
 import FunnelLayout from './components/layout/FunnelLayout';
+import type { CompletedHouseInfo } from './types/funnel/houseInfo';
 
 export const ImageSetup = () => {
   const funnel = useImageSetup();

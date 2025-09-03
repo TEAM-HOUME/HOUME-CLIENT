@@ -73,7 +73,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             onButtonClick={(value) =>
               setFormData((prev: typeof localFormData) => ({
                 ...prev,
-                bedTypeId: value as number,
+                bedId: value as number,
               }))
             }
             useId={true}
@@ -87,7 +87,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             onButtonClick={(value) =>
               setFormData((prev: typeof localFormData) => ({
                 ...prev,
-                otherFurnitureIds: value as number[],
+                selectiveIds: value as number[],
               }))
             }
             maxSelect={4}

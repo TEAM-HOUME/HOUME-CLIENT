@@ -26,7 +26,7 @@ interface InteriorStyleState {
 interface ActivityInfoState {
   primaryUsage?: PrimaryUsage;
   bedTypeId?: number;
-  otherFurnitureIds?: number[];
+  selectiveIds?: number[];
 }
 
 interface FunnelStore {
