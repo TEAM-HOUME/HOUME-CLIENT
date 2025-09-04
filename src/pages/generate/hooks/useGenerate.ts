@@ -11,9 +11,9 @@ import {
   postStackHate,
   postStackLike,
   postResultPreference,
-} from '../apis/generate';
+} from '@pages/generate/apis/generate';
 import { useGenerateStore } from '../stores/useGenerateStore';
-import type { GenerateImageRequest } from '../types/generate';
+import type { GenerateImageRequest } from '@pages/generate/types/generate';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { queryClient } from '@/shared/apis/queryClient';
 import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';

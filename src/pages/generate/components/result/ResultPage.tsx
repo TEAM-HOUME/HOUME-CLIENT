@@ -10,7 +10,7 @@ import {
   useCreditLogMutation,
   useGetResultData,
 } from '@pages/generate/hooks/useGenerate';
-import * as styles from './ResultPage.css';
+import * as styles from './ResultPage.css.ts';
 import type {
   GenerateImageData,
   ResultPageLikeState,
@@ -77,7 +77,7 @@ const ResultPage = () => {
     }
   }
 
-  // result가 있을 때만 mutation hook들 호출 (조건부 렌더링을 위해)
+  // result가 있을 때만 mutation hook들 호출
   const { mutate: sendPreference } = useResultPreferenceMutation();
   const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   const { mutate: sendCreditLogs } = useCreditLogMutation();
