@@ -137,8 +137,11 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   };
 
   // 특정 가구가 현재 활동의 필수 가구인지 확인
-  const isRequiredFurniture = (furnitureId: number): boolean => {
+  const isRequiredFurniture = (furniture: string | number): boolean => {
     const requiredIds = getRequiredFurnitureIds();
+    const furnitureId =
+      typeof furniture === 'string' ? parseInt(furniture, 10) : furniture;
+    // TODO(지성): 디자인팀 공컴 디자인 완료되면 타입 수정 예정(현재 공컴 props때문에 임시로 string | number로 구현)
     return requiredIds.includes(furnitureId);
   };
 
