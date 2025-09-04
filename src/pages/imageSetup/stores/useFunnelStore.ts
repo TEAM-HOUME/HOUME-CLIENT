@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { AreaType, HouseType, RoomType } from '../types/funnel/options';
 import type {
-  AreaType,
-  HouseType,
-  PrimaryUsage,
-  RoomType,
-} from '../types/funnel/options';
+  ActivityTypes,
+  BedId,
+  SelectiveFurnitureIds,
+} from '../types/funnel/activityInfo';
 
 interface HouseInfoState {
   houseType?: HouseType;
@@ -24,9 +24,9 @@ interface InteriorStyleState {
 }
 
 interface ActivityInfoState {
-  primaryUsage?: PrimaryUsage;
-  bedTypeId?: number;
-  selectiveIds?: number[];
+  primaryUsage?: ActivityTypes;
+  bedId?: BedId;
+  selectiveIds?: SelectiveFurnitureIds[];
 }
 
 interface FunnelStore {

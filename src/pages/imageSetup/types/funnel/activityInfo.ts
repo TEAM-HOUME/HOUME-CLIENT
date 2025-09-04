@@ -12,8 +12,8 @@ export type SelectiveFurnitureIds =
 // 폼 데이터 타입 (사용자 입력값)
 export interface ActivityInfoFormData {
   primaryUsage?: ActivityTypes;
-  bedId?: BedId;
-  selectiveIds?: SelectiveFurnitureIds[];
+  bedId?: number;
+  selectiveIds?: number[];
 }
 
 // funnel 스텝 컨텍스트 타입
@@ -28,8 +28,8 @@ export interface ActivityInfoContext {
   };
   moodBoardIds: number[];
   activityTypes?: ActivityTypes;
-  bedTypeId?: BedId;
-  selectiveIds?: SelectiveFurnitureIds[];
+  bedTypeId?: number;
+  selectiveIds?: number[];
 }
 
 // 완성된 ActivityInfo 데이터 타입
@@ -44,8 +44,8 @@ export interface CompletedActivityInfo {
   };
   moodBoardIds: number[];
   primaryUsage: ActivityTypes;
-  bedTypeId: BedId;
-  selectiveIds: SelectiveFurnitureIds[];
+  bedTypeId: number;
+  selectiveIds: number[];
 }
 
 // 에러 타입

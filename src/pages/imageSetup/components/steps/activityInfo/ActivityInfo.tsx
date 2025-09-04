@@ -1,15 +1,13 @@
 // Step 4
 import * as common from '../StepCommon.css';
 import FunnelHeader from '../../header/FunnelHeader';
-import {
-  type ImageSetupSteps,
-  type PrimaryUsage,
-} from '../../../types/funnel/steps';
 import { MAIN_ACTIVITY_OPTIONS } from '../../../types/funnel/options';
 import OptionGroup from '../optionGroup/OptionGroup';
 import MainTitle from '../title/Maintitle';
 import SubOptionGroup from '../optionGroup/SubOptionGroup';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
+import type { ActivityTypes } from '../../../types/funnel/activityInfo';
+import type { ImageSetupSteps } from '../../../types/funnel/steps';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
@@ -20,15 +18,14 @@ interface ActivityInfoProps {
 
 const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
-    localFormData,
+    formData,
     setFormData,
-    // errors,
+    errors,
+    handleSubmit,
     isFormCompleted,
     isRequiredFurniture,
     getCurrentActivityLabel,
     getRequiredFurnitureLabels,
-    handleOnClick,
-    isButtonActive,
   } = useActivityInfo(context);
 
   const primaryUsageOptions = Object.values(
@@ -49,18 +46,18 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
       />
 
       <div className={common.wrapper}>
-        <OptionGroup<PrimaryUsage>
+        <OptionGroup<ActivityTypes>
           title="주요 활동"
           body="선택한 활동에 최적화된 동선을 알려드려요."
           options={primaryUsageOptions}
-          selected={localFormData.primaryUsage}
+          selected={formData.primaryUsage}
           onButtonClick={(value) =>
-            setFormData((prev: typeof localFormData) => ({
+            setFormData((prev) => ({
               ...prev,
               primaryUsage: value,
             }))
           }
-          // error={errors.primaryUsage}
+          error={errors.primaryUsage}
         />
 
         <div className={common.subWrapper}>
@@ -69,30 +66,30 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
           <SubOptionGroup<string>
             subtitle="침대"
             options={bedTypeOptions}
-            selected={localFormData.bedTypeId}
+            selected={formData.bedId}
             onButtonClick={(value) =>
-              setFormData((prev: typeof localFormData) => ({
+              setFormData((prev) => ({
                 ...prev,
                 bedId: value as number,
               }))
             }
             useId={true}
-            // error={errors.bedType}
+            error={errors.bedTypeId}
           />
 
           <MultiOptionGroup<string>
             options={otherFurnituresOptions}
-            selected={localFormData.otherFurnitureIds}
-            selectedCount={localFormData.otherFurnitureIds.length}
+            selected={formData.selectiveIds}
+            selectedCount={formData.selectiveIds?.length || 0}
             onButtonClick={(value) =>
-              setFormData((prev: typeof localFormData) => ({
+              setFormData((prev) => ({
                 ...prev,
                 selectiveIds: value as number[],
               }))
             }
             maxSelect={4}
             isAlertPresented={true}
-            // error={errors.otherFurnitures}
+            error={errors.selectiveIds}
             isRequiredFurniture={isRequiredFurniture}
             currentActivityLabel={getCurrentActivityLabel()}
             requiredFurnitureLabels={getRequiredFurnitureLabels()}
@@ -102,8 +99,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
 
         <div>
           <CtaButton
-            isActive={isFormCompleted && isButtonActive}
-            onClick={handleOnClick}
+            isActive={isFormCompleted}
+            onClick={() => handleSubmit(() => {})}
           >
             이미지 생성하기
           </CtaButton>
