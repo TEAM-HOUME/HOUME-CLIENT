@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageResponse,
-} from '../types/apis/interiorStyle';
+} from '@/pages/imageSetup/types/apis/interiorStyle';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 import { HTTPMethod, request } from '@/shared/apis/request';
 
@@ -21,7 +21,7 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 const getMoodBoardImage = async (
   limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT
 ): Promise<MoodBoardImageResponse> => {
-  return request({
+  return request<MoodBoardImageResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.IMAGE_SETUP.INTERIOR_STYLE,
     query: { limit },

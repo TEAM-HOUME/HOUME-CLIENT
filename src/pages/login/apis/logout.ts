@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import type { LogoutResponse } from '../types/auth';
+import type { LogoutResponse } from '@pages/login/types/auth';
+import { ROUTES } from '@/routes/paths';
 import { useUserStore } from '@/store/useUserStore';
 import { HTTPMethod, request } from '@/shared/apis/request';
 
@@ -15,13 +16,13 @@ import { HTTPMethod, request } from '@/shared/apis/request';
  *
  * @example
  * ```typescript
- * const result = await logout();
+ * const result = await posLogout();
  * console.log(result.message); // "로그아웃되었습니다"
  * ```
  */
 
 export const postLogout = async (): Promise<LogoutResponse> => {
-  return request({
+  return request<LogoutResponse>({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.AUTH.LOGOUT,
   });
@@ -42,14 +43,10 @@ export const useLogoutMutation = () => {
 
   return useMutation<LogoutResponse, Error, void>({
     mutationFn: postLogout, // 로그아웃 API 호출 함수
-    onSuccess: () => {
-      useUserStore.getState().clearUser();
-      navigate('/');
-    },
-    onError: () => {
+    onSettled: () => {
       // 에러가 발생해도 로컬 토큰은 제거하고 로그인 페이지로 이동
       useUserStore.getState().clearUser();
-      navigate('/');
+      navigate(ROUTES.HOME);
     },
   });
 };
