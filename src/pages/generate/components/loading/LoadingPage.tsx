@@ -10,7 +10,7 @@ import {
   useGenerateImageStatusCheck,
 } from '../../hooks/useGenerate';
 import { useGenerateStore } from '../../stores/useGenerateStore';
-import type { GenerateImageRequest } from '../../types/GenerateType';
+import type { GenerateImageRequest } from '../../types/generate';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import { ROUTES } from '@/routes/paths';

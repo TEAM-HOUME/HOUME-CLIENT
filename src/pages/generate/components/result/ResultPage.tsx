@@ -11,7 +11,7 @@ import {
   useCreditLogMutation,
   useResultData,
 } from '../../hooks/useGenerate';
-import type { GenerateImageData } from '../../types/GenerateType';
+import type { GenerateImageData } from '../../types/generate';
 import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';

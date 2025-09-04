@@ -13,7 +13,7 @@ import {
   postPreference,
 } from '../apis/generate';
 import { useGenerateStore } from '../stores/useGenerateStore';
-import type { GenerateImageRequest } from '../types/GenerateType';
+import type { GenerateImageRequest } from '../types/generate';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { queryClient } from '@/shared/apis/queryClient';
 import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';

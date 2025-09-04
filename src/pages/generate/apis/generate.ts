@@ -1,9 +1,9 @@
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import type { CarouselItem, ImageStackResponse } from '../types/GenerateType';
+import type { CarouselItem, ImageStackResponse } from '../types/generate';
 import type {
   GenerateImageRequest,
   GenerateImageResponse,
-} from '../types/GenerateType';
+} from '../types/generate';
 import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 
 // 스택 UI
