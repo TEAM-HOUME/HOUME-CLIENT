@@ -4,17 +4,17 @@ import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
 import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
 import Loading from '@components/loading/Loading';
-import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
   useResultPreferenceMutation,
   useCreditLogMutation,
   useGetResultData,
-} from '../../hooks/useGenerate';
+} from '@pages/generate/hooks/useGenerate';
+import * as styles from './ResultPage.css';
 import type {
   GenerateImageData,
   ResultPageLikeState,
-} from '../../types/generate';
+} from '@pages/generate/types/generate';
 import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
