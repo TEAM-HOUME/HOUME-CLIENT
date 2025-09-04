@@ -18,7 +18,7 @@ export const getStackData = async (page: number): Promise<CarouselItem[]> => {
 };
 
 // 캐러셀 이미지 좋아요 / 별로예요
-export const postLikeStack = async (carouselId: number) => {
+export const postStackLike = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.CAROUSELS_LIKE,
@@ -28,7 +28,7 @@ export const postLikeStack = async (carouselId: number) => {
   });
 };
 
-export const postHateStack = async (carouselId: number) => {
+export const postStackHate = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.CAROUSELS_HATE,

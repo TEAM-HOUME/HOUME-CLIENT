@@ -8,8 +8,8 @@ import {
   getStackData,
   postCreditLog,
   postFurnitureLog,
-  postHateStack,
-  postLikeStack,
+  postStackHate,
+  postStackLike,
   postPreference,
 } from '../apis/generate';
 import { useGenerateStore } from '../stores/useGenerateStore';
@@ -28,7 +28,7 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useResultData = (
+export const useGetResultData = (
   imageId: number,
   options?: { enabled?: boolean }
 ) => {
@@ -40,20 +40,20 @@ export const useResultData = (
 };
 
 // 캐러셀 이미지 좋아요/별로예요
-export const useLikeStackMutation = () => {
+export const useStackLikeMutation = () => {
   return useMutation({
-    mutationFn: postLikeStack,
+    mutationFn: postStackLike,
   });
 };
 
-export const useHateStackMutation = () => {
+export const useStackHateMutation = () => {
   return useMutation({
-    mutationFn: postHateStack,
+    mutationFn: postStackHate,
   });
 };
 
 // 결과 이미지 선호도 전송용 (POST)
-export const usePreferenceMutation = () => {
+export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postPreference(imageId, isLike),
