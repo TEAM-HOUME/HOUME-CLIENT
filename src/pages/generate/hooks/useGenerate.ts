@@ -2,15 +2,15 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
-  checkGenerateImageStatus,
-  generateImage,
+  getCheckGenerateImageStatus,
+  postGenerateImage,
   getResultData,
   getStackData,
   postCreditLog,
   postFurnitureLog,
   postStackHate,
   postStackLike,
-  postPreference,
+  postResultPreference,
 } from '../apis/generate';
 import { useGenerateStore } from '../stores/useGenerateStore';
 import type { GenerateImageRequest } from '../types/generate';
@@ -56,7 +56,7 @@ export const useStackHateMutation = () => {
 export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
-      postPreference(imageId, isLike),
+      postResultPreference(imageId, isLike),
   });
 };
 
@@ -84,7 +84,7 @@ export const useGenerateImageApi = () => {
   const generateImageRequest = useMutation({
     mutationFn: (userInfo: GenerateImageRequest) => {
       console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
-      return generateImage(userInfo);
+      return postGenerateImage(userInfo);
     },
     onSuccess: (data) => {
       console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
@@ -117,7 +117,7 @@ export const useGenerateImageStatusCheck = (
 
   const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
-    queryFn: () => checkGenerateImageStatus(houseId),
+    queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
     refetchInterval: 7000, // 5초
     refetchIntervalInBackground: true,
