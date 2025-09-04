@@ -4,8 +4,8 @@ import * as styles from './LoadingPage.css';
 import ProgressBar from './ProgressBar';
 import {
   useStackData,
-  useLikeStackMutation,
-  useHateStackMutation,
+  useStackLikeMutation,
+  useStackHateMutation,
   useGenerateImageApi,
   useGenerateImageStatusCheck,
 } from '../../hooks/useGenerate';
@@ -70,8 +70,8 @@ const LoadingPage = () => {
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
   const ANIMATION_DURATION = 600;
 
-  const likeMutation = useLikeStackMutation();
-  const hateMutation = useHateStackMutation();
+  const likeMutation = useStackLikeMutation();
+  const hateMutation = useStackHateMutation();
 
   useEffect(() => {
     setCurrentIndex(0);
