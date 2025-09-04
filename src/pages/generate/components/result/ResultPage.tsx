@@ -11,7 +11,10 @@ import {
   useCreditLogMutation,
   useResultData,
 } from '../../hooks/useGenerate';
-import type { GenerateImageData } from '../../types/generate';
+import type {
+  GenerateImageData,
+  ResultPageLikeState,
+} from '../../types/generate';
 import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
@@ -41,7 +44,7 @@ const ResultPage = () => {
   const [searchParams] = useSearchParams();
 
   // Hook들을 최상단에 배치
-  const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
+  const [selected, setSelected] = useState<ResultPageLikeState>(null);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (location.state as { result?: GenerateImageData })?.result;

@@ -1,8 +1,11 @@
-export interface GenerateTypes {
+export interface GenerateType {
   sqft: string;
   style: string[];
   user: string;
 }
+
+// 결과 페이지 좋아요/별로예요 상태
+export type ResultPageLikeState = 'like' | 'dislike' | null;
 
 // 스택 UI
 export interface CarouselItem {
