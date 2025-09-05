@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AreaType, HouseType, RoomType } from '../types/funnel/options';
 import type {
   ActivityTypes,
   BedId,
   SelectiveFurnitureIds,
 } from '../types/funnel/activityInfo';
+import type { AreaType, HouseType, RoomType } from '../types/funnel/houseInfo';
 
 interface HouseInfoState {
   houseType?: HouseType;
