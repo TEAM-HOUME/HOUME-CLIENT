@@ -43,7 +43,8 @@ const HomePage = () => {
    */
   const handleCtaButtonClick = () => {
     if (!isLoggedIn) {
-      navigate(ROUTES.LOGIN);
+      // navigate(ROUTES.LOGIN);
+      navigate(ROUTES.IMAGE_SETUP);
       return;
     }
 
