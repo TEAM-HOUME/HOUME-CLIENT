@@ -9,7 +9,7 @@ export const backdrop = style({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backgroundColor: colorVars.color.gray999_50,
   zIndex: zIndex.backdrop,
   opacity: 0,
   visibility: 'hidden',
@@ -39,6 +39,7 @@ export const sheetWrapper = style({
   zIndex: zIndex.sheet,
   overflow: 'hidden',
   userSelect: 'none', // 텍스트 선택 방지
+  touchAction: 'none', // 모바일에서 화면 스크롤 방지
 
   // 드래그 중일 때만 transition 비활성화
   selectors: {
@@ -73,7 +74,16 @@ export const dragHandleContainer = style({
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '2rem',
-  pointerEvents: 'auto', // 드래그 핸들은 클릭 가능하게
+  cursor: 'grab',
+  userSelect: 'none',
+  touchAction: 'none',
+
+  // 드래그 중일 때 커서 변경
+  selectors: {
+    '&:active': {
+      cursor: 'grabbing',
+    },
+  },
 });
 
 export const infoTextContainer = style({

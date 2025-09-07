@@ -1,12 +1,12 @@
 import * as styles from './DragHandle.css';
 import DragHandleIcon from '@/shared/assets/icons/dragHandle.svg?react';
 
-const DragHandle = (props: React.ComponentProps<'div'>) => {
+export const DragHandle = () => {
   return (
-    <div className={styles.wrapper} {...props}>
-      <DragHandleIcon />
+    <div className={styles.wrapper}>
+      <div className={styles.dragHandle}>
+        <DragHandleIcon />
+      </div>
     </div>
   );
 };
-
-export default DragHandle;
