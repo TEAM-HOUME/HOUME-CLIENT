@@ -1,8 +1,6 @@
-import { useRef } from 'react';
-import clsx from 'clsx';
-import DragHandle from '@components/dragHandle/DragHandle';
 import CtaButton from '@components/button/ctaButton/CtaButton';
 import * as styles from './FlipSheet.css';
+import { BottomSheetWrapper } from '../BottomSheetWrapper';
 import FilpButton from '@/shared/components/button/flipButton/FlipButton';
 
 interface FlipSheetProps {
@@ -15,7 +13,7 @@ interface FlipSheetProps {
   isFlipped: boolean;
 }
 
-const FlipSheet = ({
+export const FlipSheet = ({
   onFlipClick,
   onChooseClick,
   isOpen,
@@ -24,54 +22,28 @@ const FlipSheet = ({
   src,
   isFlipped,
 }: FlipSheetProps) => {
-  const sheetRef = useRef<HTMLDivElement | null>(null); // bottom sheet DOM 참조
-
-  // CSS transition이 끝났을 때 호출
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
-    if (!isOpen && e.propertyName === 'transform') {
-      onExited?.();
-    }
-  };
-
   return (
-    <>
-      <div
-        className={clsx(styles.backdrop, isOpen && styles.backdropVisible)}
-        onClick={onClose}
-      />
-      <div
-        ref={sheetRef}
-        className={clsx(
-          styles.sheetWrapper,
-          isOpen ? styles.sheetWrapperExpanded : styles.sheetWrapperCollapsed
-        )}
-        onTransitionEnd={handleTransitionEnd}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={styles.imageArea}>
-          <div className={styles.dragHandleContainer}>
-            <DragHandle onClick={onClose} />
-          </div>
-          <p className={styles.infoText}>이미지를 좌우반전 할 수 있어요</p>
-          <div className={styles.imageContainer}>
-            <img
-              src={src}
-              alt="선택된 구조 이미지"
-              className={
-                isFlipped
-                  ? styles.imageVariants.flipped
-                  : styles.imageVariants.normal
-              }
-            />
-          </div>
-        </div>
-
-        <div className={styles.buttonGroup}>
-          <FilpButton onClick={onFlipClick} isFlipped={false} />
-          <CtaButton onClick={onChooseClick}>선택하기</CtaButton>
+    <BottomSheetWrapper isOpen={isOpen} onClose={onClose} onExited={onExited}>
+      <div className={styles.imageArea}>
+        <p className={styles.infoText}>이미지를 좌우반전 할 수 있어요</p>
+        <div className={styles.imageContainer}>
+          <img
+            src={src}
+            alt="선택된 구조 이미지"
+            className={
+              isFlipped
+                ? styles.imageVariants.flipped
+                : styles.imageVariants.normal
+            }
+          />
         </div>
       </div>
-    </>
+
+      <div className={styles.buttonGroup}>
+        <FilpButton onClick={onFlipClick} isFlipped={false} />
+        <CtaButton onClick={onChooseClick}>선택하기</CtaButton>
+      </div>
+    </BottomSheetWrapper>
   );
 };
 
