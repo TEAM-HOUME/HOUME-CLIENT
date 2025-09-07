@@ -207,7 +207,6 @@ src/
 
 ![image](https://github.com/user-attachments/assets/d0e499ac-8938-46d9-9c44-6ad18ba5a772)
 
-
 **메인 브랜치**
 
 - **`main`** - 배포 가능한 상태만을 관리합니다
