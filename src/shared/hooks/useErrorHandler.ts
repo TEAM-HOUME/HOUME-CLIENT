@@ -57,6 +57,7 @@ export const useErrorHandler = (context: PageContext) => {
           loading: ROUTES.HOME,
           api: ROUTES.HOME,
           network: ROUTES.HOME,
+          auth: ROUTES.LOGIN,
         },
       };
 

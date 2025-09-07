@@ -15,7 +15,7 @@ import type {
   GenerateImageData,
   ResultPageLikeState,
 } from '@pages/generate/types/generate';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPageType';
+import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
