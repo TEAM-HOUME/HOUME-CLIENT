@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { ERROR_CODES } from '../constants/apiErrorCode';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '../constants/response';
 
+import type { BaseResponse } from '../types/apis';
 import type { AxiosRequestConfig } from 'axios';
 
 const axiosInstance = axios.create({

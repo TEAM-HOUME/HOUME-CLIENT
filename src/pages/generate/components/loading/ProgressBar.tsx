@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import * as styles from './LoadingPage.css';
 import { PROGRESS_CONFIG } from '../../constants/progressConfig';

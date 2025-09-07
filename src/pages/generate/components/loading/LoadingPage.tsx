@@ -19,7 +19,7 @@ import {
 } from '../../hooks/useGenerate';
 import { useGenerateStore } from '../../stores/useGenerateStore';
 
-import type { GenerateImageRequest } from '../../types/GenerateType';
+import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
 const LoadingPage = () => {
   // 이미지 생성 api 코드 ...
