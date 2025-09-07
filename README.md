@@ -238,7 +238,8 @@ src/
 
 ### Git Flow
 
-![image](https://github.com/user-attachments/assets/36fc37c5-02e2-4931-b3c9-24d7d55cdb06)
+![image](https://github.com/user-attachments/assets/d0e499ac-8938-46d9-9c44-6ad18ba5a772)
+
 
 **메인 브랜치**
 

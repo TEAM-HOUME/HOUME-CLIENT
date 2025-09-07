@@ -1,5 +1,5 @@
 import * as styles from './SettingSection.css';
-import { useLogout } from '@/pages/login/hooks/useLogout';
+import { useLogoutMutation } from '@/pages/login/apis/logout';
 
 type SettingItem = {
   id: string;
@@ -8,7 +8,7 @@ type SettingItem = {
 };
 
 const SettingSection = () => {
-  const { mutate: logout } = useLogout();
+  const { mutate: logout } = useLogoutMutation();
 
   const handleTerms = () => console.log('약관 클릭');
   const handleLogout = () => {
