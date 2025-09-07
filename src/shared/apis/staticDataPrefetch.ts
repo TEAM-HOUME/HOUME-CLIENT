@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfoApi';
+import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfo';
 import { getActivityOptions } from '@/pages/imageSetup/apis/activityInfoApi';
 
 /**

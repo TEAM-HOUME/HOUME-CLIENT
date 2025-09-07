@@ -12,7 +12,7 @@ import type {
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
-import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfoApi';
+import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];

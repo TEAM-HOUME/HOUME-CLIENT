@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
-import { useHousingSelectionMutation } from '../apis/houseInfoApi';
+import { useHousingSelectionMutation } from '../apis/houseInfo';
 import type { ImageSetupSteps } from '../types/funnel/steps';
 import type {
   CompletedHouseInfo,

@@ -1,6 +1,6 @@
 // useFloorPlan.hooks.ts (로직 담당)
 import { useCallback, useState } from 'react';
-import { useFloorPlanApi } from '../apis/floorPlanApi';
+import { useFloorPlanApi } from '../apis/floorPlan';
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
