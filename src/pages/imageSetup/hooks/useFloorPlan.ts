@@ -1,6 +1,6 @@
 // useFloorPlan.hooks.ts (로직 담당)
 import { useCallback, useState } from 'react';
-import { useFloorPlanApi } from '../apis/floorPlan';
+import { useFloorPlanQuery } from '../apis/floorPlan';
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
@@ -18,7 +18,7 @@ export const useFloorPlan = (
 ) => {
   // FloorPlan 컴포넌트 렌더링 -> useFloorPlan 훅 실행
   // -> useFloorPlanQuery 실행 -> 데이터 fetching
-  const { data, isLoading, error, isError } = useFloorPlanApi();
+  const { data, isLoading, error, isError } = useFloorPlanQuery();
   console.log('도면 데이터: ', data);
 
   // funnel의 context에서 초기값 설정

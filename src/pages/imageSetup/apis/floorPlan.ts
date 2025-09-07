@@ -25,7 +25,7 @@ export const postAddress = async (body: UserAddressRequest) => {
 };
 
 // Query Hooks
-export const useFloorPlanApi = () => {
+export const useFloorPlanQuery = () => {
   const query = useQuery({
     queryKey: ['floorPlan'],
     queryFn: getFloorPlan,
