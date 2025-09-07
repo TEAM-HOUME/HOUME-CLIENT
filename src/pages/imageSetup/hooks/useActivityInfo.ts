@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MAIN_ACTIVITY_OPTIONS } from '../types/funnel/options';
 import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
 import type { ImageSetupSteps } from '../types/funnel/steps';
 import type {
@@ -8,11 +7,15 @@ import type {
   ActivityInfoErrors,
   CompletedActivityInfo,
 } from '../types/funnel/activityInfo';
+import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
 import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
-export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
+export const useActivityInfo = (
+  context: ImageSetupSteps['ActivityInfo'],
+  activityOptionsData?: ActivityOptionsResponse
+) => {
   const navigate = useNavigate();
 
   // TODO(지성): 크레딧 관련 로직 따로 관리
@@ -24,8 +27,8 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
     primaryUsage: context.activityTypes,
-    bedId: context.bedTypeId,
-    selectiveIds: context.selectiveFurnitureIds || [],
+    bedId: context.bedId,
+    selectiveIds: context.selectiveIds || [],
   });
 
   const [errors, setErrors] = useState<ActivityInfoErrors>({});
@@ -96,7 +99,11 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // 현재 선택된 활동의 필수 가구 ID 리스트 반환
   const getRequiredFurnitureIds = (): number[] => {
-    if (!formData.primaryUsage || !isValidActivityKey(formData.primaryUsage))
+    if (
+      !formData.primaryUsage ||
+      !isValidActivityKey(formData.primaryUsage) ||
+      !activityOptionsData
+    )
       return [];
 
     const requiredCodes =
@@ -105,9 +112,9 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
     return requiredCodes
       .map((code) => {
-        const option = Object.values(
-          MAIN_ACTIVITY_OPTIONS.OTHER_FURNITURES
-        ).find((option) => option.code === code);
+        const option = activityOptionsData.selectives.items.find(
+          (option) => option.code === code
+        );
         return option?.id;
       })
       .filter((id): id is number => id !== undefined);
@@ -115,8 +122,8 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
 
   // 현재 선택된 활동의 label 가져오기(휴식형, 재택근무형, 영화감상형, 홈카페형)
   const getCurrentActivityLabel = (): string => {
-    if (!formData.primaryUsage) return '';
-    const option = Object.values(MAIN_ACTIVITY_OPTIONS.PRIMARY_USAGE).find(
+    if (!formData.primaryUsage || !activityOptionsData) return '';
+    const option = activityOptionsData.activities.find(
       (option) => option.code === formData.primaryUsage
     );
     return option?.label || '';
@@ -125,12 +132,13 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   // 현재 선택된 활동의 필수 가구들의 label 가져오기(책상, 옷장, 식탁/의자, 소파 등)
   // 필수 가구가 여러 개인 경우도 처리 가능
   const getRequiredFurnitureLabels = (): string[] => {
+    if (!activityOptionsData) return [];
     const requiredIds = getRequiredFurnitureIds();
     return requiredIds
       .map((id) => {
-        const option = Object.values(
-          MAIN_ACTIVITY_OPTIONS.OTHER_FURNITURES
-        ).find((option) => option.id === id);
+        const option = activityOptionsData.selectives.items.find(
+          (option) => option.id === id
+        );
         return option?.label || '';
       })
       .filter((label) => label !== '');

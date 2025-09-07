@@ -1,5 +1,12 @@
 import type { HouseType, RoomType } from './houseInfo';
-import type { OtherFurnitures } from './options';
+
+export type OtherFurnitures =
+  | 'DESK'
+  | 'CLOSET'
+  | 'TABLE_CHAIRS'
+  | 'SOFA'
+  | 'DRAWER'
+  | 'MOVABLE_TV';
 
 export const HOUSE_INFO_VALIDATION = {
   restrictedValues: {

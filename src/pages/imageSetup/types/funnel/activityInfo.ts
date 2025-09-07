@@ -3,15 +3,15 @@ import type { ActivityOptionsResponse } from '../apis/activityInfo';
 import type { AreaType, HouseType, RoomType } from './houseInfo';
 
 // API 기반 Union 타입 추출
-export type ActivityTypes =
+export type ActivityType =
   ActivityOptionsResponse['activities'][number]['code'];
-export type BedId = ActivityOptionsResponse['beds']['items'][number]['id'];
-export type SelectiveFurnitureIds =
-  ActivityOptionsResponse['selectives']['items'][number]['id'];
+// export type BedId = ActivityOptionsResponse['beds']['items'][number]['id'];
+// export type SelectiveIds =
+//   ActivityOptionsResponse['selectives']['items'][number]['id'];
 
 // 폼 데이터 타입 (사용자 입력값)
 export interface ActivityInfoFormData {
-  primaryUsage?: ActivityTypes;
+  primaryUsage?: ActivityType;
   bedId?: number;
   selectiveIds?: number[];
 }
@@ -27,7 +27,7 @@ export interface ActivityInfoContext {
     isMirror: boolean;
   };
   moodBoardIds: number[];
-  activityTypes?: ActivityTypes;
+  activityTypes?: ActivityType;
   bedTypeId?: number;
   selectiveIds?: number[];
 }
@@ -43,7 +43,7 @@ export interface CompletedActivityInfo {
     isMirror: boolean;
   };
   moodBoardIds: number[];
-  primaryUsage: ActivityTypes;
+  primaryUsage: ActivityType;
   bedTypeId: number;
   selectiveIds: number[];
 }

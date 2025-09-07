@@ -1,22 +1,29 @@
 // Step 4
 import * as common from '../StepCommon.css';
 import FunnelHeader from '../../header/FunnelHeader';
-import { MAIN_ACTIVITY_OPTIONS } from '../../../types/funnel/options';
 import OptionGroup from '../optionGroup/OptionGroup';
 import MainTitle from '../title/Maintitle';
 import SubOptionGroup from '../optionGroup/SubOptionGroup';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
-import type { ActivityTypes } from '../../../types/funnel/activityInfo';
+import type { ActivityType } from '../../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../../types/funnel/steps';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
+import Loading from '@/shared/components/loading/Loading';
 
 interface ActivityInfoProps {
   context: ImageSetupSteps['ActivityInfo'];
 }
 
 const ActivityInfo = ({ context }: ActivityInfoProps) => {
+  const {
+    data: activityOptionsData,
+    isLoading,
+    error,
+  } = useActivityOptionsQuery();
+
   const {
     formData,
     setFormData,
@@ -26,15 +33,21 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     isRequiredFurniture,
     getCurrentActivityLabel,
     getRequiredFurnitureLabels,
-  } = useActivityInfo(context);
+  } = useActivityInfo(context, activityOptionsData);
 
-  const primaryUsageOptions = Object.values(
-    MAIN_ACTIVITY_OPTIONS.PRIMARY_USAGE
-  );
-  const bedTypeOptions = Object.values(MAIN_ACTIVITY_OPTIONS.BED_TYPE);
-  const otherFurnituresOptions = Object.values(
-    MAIN_ACTIVITY_OPTIONS.OTHER_FURNITURES
-  );
+  // 로딩 중이거나 데이터가 없는 경우
+  if (isLoading || !activityOptionsData) {
+    return <Loading />;
+  }
+
+  // 에러 처리
+  if (error) {
+    return <div>데이터를 불러올 수 없습니다.</div>;
+  }
+
+  const primaryUsageOptions = activityOptionsData.activities;
+  const bedTypeOptions = activityOptionsData.beds.items;
+  const otherFurnituresOptions = activityOptionsData.selectives.items;
 
   return (
     <div className={common.container}>
@@ -46,7 +59,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
       />
 
       <div className={common.wrapper}>
-        <OptionGroup<ActivityTypes>
+        <OptionGroup<ActivityType>
           title="주요 활동"
           body="선택한 활동에 최적화된 동선을 알려드려요."
           options={primaryUsageOptions}

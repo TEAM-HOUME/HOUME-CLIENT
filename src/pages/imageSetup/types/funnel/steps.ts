@@ -1,8 +1,4 @@
-import type {
-  ActivityTypes,
-  BedId,
-  SelectiveFurnitureIds,
-} from './activityInfo';
+import type { ActivityType } from './activityInfo';
 import type {
   HouseType,
   RoomType,
@@ -41,9 +37,9 @@ export type ImageSetupSteps = {
     houseId: number;
     floorPlan: FloorPlan;
     moodBoardIds: number[];
-    activityTypes?: ActivityTypes;
-    bedTypeId?: BedId;
-    selectiveFurnitureIds?: SelectiveFurnitureIds[];
+    activityTypes?: ActivityType;
+    bedId?: number;
+    selectiveIds?: number[];
   };
 };
 
