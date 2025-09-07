@@ -271,16 +271,19 @@ fix/button-style/#25
 
 ### 네이밍 규칙
 
-| 유형              | 규칙             | 예시                              |
-| ----------------- | ---------------- | --------------------------------- |
-| 컴포넌트 / Class  | `PascalCase`     | `RankTable`, `UserProfile`        |
-| 폴더명            | `camelCase`      | `userProfile`, `sharedComponents` |
-| 파일명 (컴포넌트) | `PascalCase.tsx` | `UserProfile.tsx`, `Button.tsx`   |
-| 파일명 (일반)     | `camelCase`      | `userService.ts`, `apiConfig.ts`  |
-| Custom Hook       | `use*.ts`        | `useUserList.ts`, `useModal.ts`   |
-| API 함수 파일     | `{resource}Api`  | `userApi.ts`, `postApi.ts`        |
-| 변수 / 함수       | `camelCase`      | `userName`, `getUserData`         |
-| 상수              | `BIG_SNAKE_CASE` | `MAX_LENGTH`, `API_KEY`           |
+| 유형              | 규칙               | 예시                              |
+| ----------------- | ------------------ | --------------------------------- |
+| 컴포넌트 / Class  | `PascalCase`       | `RankTable`, `UserProfile`        |
+| 폴더명            | `camelCase`        | `userProfile`, `sharedComponents` |
+| 파일명 (컴포넌트) | `PascalCase.tsx`   | `UserProfile.tsx`, `Button.tsx`   |
+| 파일명 (일반)     | `camelCase`        | `userService.ts`, `apiConfig.ts`  |
+| Custom Hook       | `use*.ts`          | `useUserList.ts`, `useModal.ts`   |
+| API 함수 파일     | `{resource}Api.ts` | `userApi.ts`, `postApi.ts`        |
+| 타입 정의 파일    | `*.ts`             | `user.ts`, `common.ts`            |
+| 스타일 파일       | `*.css.ts`         | `Button.css.ts`, `Layout.css.ts`  |
+| 테스트 파일       | `*.test.ts`        | `utils.test.ts`, `api.test.ts`    |
+| 변수 / 함수       | `camelCase`        | `userName`, `getUserData`         |
+| 상수              | `BIG_SNAKE_CASE`   | `MAX_LENGTH`, `API_KEY`           |
 
 ### 변수 규칙
 
