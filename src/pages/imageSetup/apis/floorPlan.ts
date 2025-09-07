@@ -6,7 +6,7 @@ import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
 // 도면 이미지
-const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
+export const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
     url: API_ENDPOINT.IMAGE_SETUP.FLOOR_PLAN,

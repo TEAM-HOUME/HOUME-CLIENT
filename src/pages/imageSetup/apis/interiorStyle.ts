@@ -18,7 +18,7 @@ import { HTTPMethod, request } from '@/shared/apis/request';
  * console.log(result.data); // 무드보드 이미지 데이터
  * ```
  */
-const getMoodBoardImage = async (
+export const getMoodBoardImage = async (
   limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT
 ): Promise<MoodBoardImageResponse> => {
   return request({
