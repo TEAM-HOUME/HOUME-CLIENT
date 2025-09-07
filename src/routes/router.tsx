@@ -72,35 +72,35 @@ const publicRoutes = [
   },
 ];
 
-// // 보호된 라우트 그룹 (인증 필요)
-// const protectedRoutes = [
-//   {
-//     path: ROUTES.IMAGE_SETUP,
-//     element: <ImageSetup />,
-//   },
-//   {
-//     path: ROUTES.GENERATE,
-//     element: <GeneratePage />,
-//     children: [
-//       {
-//         index: true,
-//         element: <LoadingPage />,
-//       },
-//       {
-//         path: 'result',
-//         element: <ResultPage />,
-//       },
-//     ],
-//   },
-//   {
-//     path: ROUTES.MYPAGE,
-//     element: <MyPage />,
-//   },
-//   {
-//     path: ROUTES.SIGNUPCOMPLETE,
-//     element: <SignupCompletePage />,
-//   },
-// ];
+// 보호된 라우트 그룹 (인증 필요)
+const protectedRoutes = [
+  {
+    path: ROUTES.IMAGE_SETUP,
+    element: <ImageSetup />,
+  },
+  {
+    path: ROUTES.GENERATE,
+    element: <GeneratePage />,
+    children: [
+      {
+        index: true,
+        element: <LoadingPage />,
+      },
+      {
+        path: 'result',
+        element: <ResultPage />,
+      },
+    ],
+  },
+  {
+    path: ROUTES.MYPAGE,
+    element: <MyPage />,
+  },
+  {
+    path: ROUTES.SIGNUPCOMPLETE,
+    element: <SignupCompletePage />,
+  },
+];
 
 export const router = createBrowserRouter([
   {
@@ -110,10 +110,10 @@ export const router = createBrowserRouter([
       // 공개 라우트들
       ...publicRoutes,
       // 보호된 라우트들 (ProtectedRoute로 감싸서 인증 체크)
-      // {
-      //   element: <ProtectedRoute />,
-      //   children: protectedRoutes,
-      // },
+      {
+        element: <ProtectedRoute />,
+        children: protectedRoutes,
+      },
     ],
   },
 ]);
