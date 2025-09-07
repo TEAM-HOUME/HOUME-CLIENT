@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfo';
-import { getActivityOptions } from '@/pages/imageSetup/apis/activityInfoApi';
+import { getActivityOptions } from '@/pages/imageSetup/apis/activityInfo';
 
 /**
  * 앱 시작 시점에 미리 로딩할 데이터들을 prefetch하는 함수
