@@ -1,9 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { type FloorPlanResponse } from '../types/apis/floorPlan';
+import type { UserAddressRequest } from '../types/apis/bottomSheetAddress.types';
 import { HTTPMethod, type RequestConfig, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
+// 도면 이미지
 const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
@@ -13,15 +15,16 @@ const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
   return await request<FloorPlanResponse['data']>(config);
 };
 
+// 사용자 주소 등록
+export const postAddress = async (body: UserAddressRequest) => {
+  return request({
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.IMAGE_SETUP.ADDRESS_SEARCH,
+    body,
+  });
+};
+
 // Query Hooks
-/**
- * 도면 정보를 가져오는 커스텀 훅
- *
- * @returns useQuery 결과 객체
- *
- * @example
- * const { data, isLoading } = useFloorPlanApi();
- */
 export const useFloorPlanApi = () => {
   const query = useQuery({
     queryKey: ['floorPlan'],
@@ -29,4 +32,16 @@ export const useFloorPlanApi = () => {
   });
 
   return query;
+};
+
+export const useUserAddressMutation = () => {
+  return useMutation({
+    mutationFn: (body: UserAddressRequest) => postAddress(body),
+    onSuccess: () => {
+      console.log('주소 등록 성공!');
+    },
+    onError: (error) => {
+      console.error('주소 등록 실패', error);
+    },
+  });
 };

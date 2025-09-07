@@ -8,7 +8,7 @@ import NoMatchButton from '@/shared/components/button/noMatchButton/NoMatchButto
 import NoMatchSheet from '@/shared/components/bottomSheet/noMatchSheet/NoMatchSheet';
 import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
 import { useToast } from '@/shared/components/toast/useToast';
-import { useBottomSheetAddress } from '@/pages/imageSetup/hooks/useBottomSheetAddress';
+import { useUserAddressMutation } from '@/pages/imageSetup/apis/floorPlan';
 
 interface FloorPlanListProps {
   floorPlanList: FloorPlanData[];
@@ -32,7 +32,7 @@ const FloorPlanList = ({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [openSheet, setOpenSheet] = useState<OpenSheetKey>(null);
   const { notify } = useToast();
-  const { mutate: postAddress } = useBottomSheetAddress();
+  const { mutate: postAddress } = useUserAddressMutation();
 
   // toast를 NoMatchSheet의 상위 컴포넌트인 FloorPlan에서 호출해야
   // toast의 option에 준 autoClose가 정상적으로 적용됨
