@@ -12,17 +12,6 @@ import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
-// 타입 가드 함수(타입 단언 사용 X)
-// 유효한 '주요활동' 카테고리 내의 값인지 체크
-const isValidActivityKey = (
-  usage: string
-): usage is keyof typeof MAIN_ACTIVITY_VALIDATION.combinationRules => {
-  // usage is SomeType
-  // 이 함수가 true를 반환할 때는 호출부에서 usage를 SomeType으로 간주해도 된다는 것을 TS에게 알려줌
-  return usage in MAIN_ACTIVITY_VALIDATION.combinationRules;
-  // usage in _: 객체에 해당 key가 있는지 검사, boolean 반환
-};
-
 export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   const navigate = useNavigate();
 
@@ -40,6 +29,17 @@ export const useActivityInfo = (context: ImageSetupSteps['ActivityInfo']) => {
   });
 
   const [errors, setErrors] = useState<ActivityInfoErrors>({});
+
+  // 타입 가드
+  // 유효한 '주요활동' 카테고리 내의 값인지 체크
+  const isValidActivityKey = (
+    usage: string
+  ): usage is keyof typeof MAIN_ACTIVITY_VALIDATION.combinationRules => {
+    // usage is SomeType
+    // 이 함수가 true를 반환할 때는 호출부에서 usage를 SomeType으로 간주해도 된다는 것을 TS에게 알려줌
+    return usage in MAIN_ACTIVITY_VALIDATION.combinationRules;
+    // usage in _: 객체에 해당 key가 있는지 검사, boolean 반환
+  };
 
   // 타입 가드
   const isCompleteActivityInfo = (
