@@ -120,22 +120,18 @@ HOUME는 사용자가 자신만의 개성 있는 공간을 디자인하고 꾸�
    부드러운 어조를 사용하여 서로를 배려하는 소통하기
 2. 🤝 **공감과 이해**  
    상대방의 입장에서 생각하고 다양한 관점을 존중하기
-3. 🏡 **공용 공간 관리**  
-   함께 사용하는 숙소 공간을 깨끗하고 정돈된 상태로 유지하기
-4. ⚖️ **워라밸 준수**  
-   업무에 집중할 때와 휴식 시간을 명확히 구분하여 효율적으로 일하기
-5. 💝 **상호 지원**  
+3. 💝 **상호 지원**  
    팀원들의 성장과 성공을 위해 따뜻한 마음으로 서로 돕기
-6. 📲 **신속한 커뮤니케이션**  
+4. 📲 **신속한 커뮤니케이션**  
    메시지와 요청사항에 최대한 빠르게 응답하여 업무 흐름 유지하기
-7. 💬 **명확한 의사 전달**  
+5. 💬 **명확한 의사 전달**  
    상대방을 배려하면서도 본인의 의견을 명확하고 구체적으로 표현하기
-8. 🙋 **적극적인 질문 문화**  
+6. 🙋 **적극적인 질문 문화**  
    모르는 것이 있을 때 주저하지 않고 편하게 질문하는 환경 조성하기
-9. 💪 **책임감 있는 업무 수행**  
+7. 💪 **책임감 있는 업무 수행**  
    맡은 업무는 끝까지 책임지고 완수하는 프로페셔널한 자세 유지하기
-10. 🎉 **즐거운 프로젝트 경험**  
-    프로젝트를 통해 최대한의 배움과 성장을 추구하며 즐겁게 참여하기
+8. 🎉 **즐거운 프로젝트 경험**  
+   프로젝트를 통해 최대한의 배움과 성장을 추구하며 즐겁게 참여하기
 
 ### 협업 도구 및 프로세스
 
@@ -159,35 +155,6 @@ HOUME는 사용자가 자신만의 개성 있는 공간을 디자인하고 꾸�
 
 매일 진행되며, 전날과 당일 수행한 업무를 공유하고 다음날 수행할 계획을 논의합니다.  
 또한, 프로젝트 진행 중 발생한 이슈들을 함께 해결합니다.
-
-#### 일정 관리
-
-##### Notion 데이터베이스 활용
-
-회의록과 작업 보드 DB를 Notion에서 관리하여 팀원들이 쉽게 접근하고 업데이트할 수 있도록 합니다.
-
-| 회의록 DB                                                                                          | 작업 보드 DB                                                                                       |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| ![20250704170642](https://github.com/user-attachments/assets/71d30839-39cf-4c94-adff-5aafd175716f) | ![20250704170627](https://github.com/user-attachments/assets/1cb5f6cf-31f1-4e46-a1e7-811acbe262fb) |
-
-##### 진행 상황 관리
-
-칸반 보드와 간트 차트를 통해 프로젝트 진행 상황을 시각적으로 관리합니다.
-
-| 칸반 보드                                                                                          | 간트 차트                                                                                          |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| ![20250704165759](https://github.com/user-attachments/assets/d4c56aba-3a98-41ba-90c8-c2e14cde1563) | ![20250704170043](https://github.com/user-attachments/assets/be632ea2-b08a-428a-8c0b-4a7f99bdcfa2) |
-
-개인 일정을 캘린더를 통해 공유합니다. 서로의 일정을 배려하면서 전체적인 프로젝트 진행 상황을 관리합니다.  
-개발하면서 기록한 아티클들은 아티클 DB에 체계적으로 관리하여 팀원들과 공유합니다.
-
-| 아티클 DB                                                                                          | 개인 일정 캘린더                                                                                   |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| ![20250704170217](https://github.com/user-attachments/assets/16377c5a-5381-4f1d-8d7f-90cb27db768d) | ![20250704170108](https://github.com/user-attachments/assets/ea72457b-979a-4010-8c25-278db0bef809) |
-
-##### 정기 회의
-
-모든 정기 회의 일정은 사전에 공지하여 팀원들이 일정을 조율할 수 있도록 합니다.
 
 #### 브랜치 보호 룰셋
 
@@ -239,7 +206,6 @@ src/
 ### Git Flow
 
 ![image](https://github.com/user-attachments/assets/d0e499ac-8938-46d9-9c44-6ad18ba5a772)
-
 
 **메인 브랜치**
 
@@ -305,13 +271,19 @@ fix/button-style/#25
 
 ### 네이밍 규칙
 
-| 유형                   | 규칙             | 예시                              |
-| ---------------------- | ---------------- | --------------------------------- |
-| 컴포넌트 / Class       | `PascalCase`     | `RankTable`, `UserProfile`        |
-| 폴더명                 | `camelCase`      | `userProfile`, `sharedComponents` |
-| 파일명 (컴포넌트 제외) | `camelCase`      | `userService.ts`, `apiConfig.js`  |
-| 변수 / 함수            | `camelCase`      | `userName`, `getUserData`         |
-| 상수                   | `BIG_SNAKE_CASE` | `MAX_LENGTH`, `API_KEY`           |
+| 유형              | 규칙               | 예시                              |
+| ----------------- | ------------------ | --------------------------------- |
+| 컴포넌트 / Class  | `PascalCase`       | `RankTable`, `UserProfile`        |
+| 폴더명            | `camelCase`        | `userProfile`, `sharedComponents` |
+| 파일명 (컴포넌트) | `PascalCase.tsx`   | `UserProfile.tsx`, `Button.tsx`   |
+| 파일명 (일반)     | `camelCase`        | `userService.ts`, `apiConfig.ts`  |
+| Custom Hook       | `use*.ts`          | `useUserList.ts`, `useModal.ts`   |
+| API 함수 파일     | `{resource}Api.ts` | `userApi.ts`, `postApi.ts`        |
+| 타입 정의 파일    | `*.ts`             | `user.ts`, `common.ts`            |
+| 스타일 파일       | `*.css.ts`         | `Button.css.ts`, `Layout.css.ts`  |
+| 테스트 파일       | `*.test.ts`        | `utils.test.ts`, `api.test.ts`    |
+| 변수 / 함수       | `camelCase`        | `userName`, `getUserData`         |
+| 상수              | `BIG_SNAKE_CASE`   | `MAX_LENGTH`, `API_KEY`           |
 
 ### 변수 규칙
 
@@ -354,6 +326,23 @@ const message = `안녕하세요, ${name}님!`;
 const getUserList = () => {};
 const postComment = () => {};
 const deleteArticle = () => {};
+const putUserProfile = () => {};
+const patchUserStatus = () => {};
+```
+
+### Hook 네이밍 규칙
+
+**TanStack Query Hooks**: `use + 행위 + 대상 + Query/Mutation` (접미사 필수)
+
+```tsx
+// Query (GET 요청)
+const useGetUserListQuery = () => {};
+const useGetUserDetailQuery = (id: string) => {};
+
+// Mutation (POST/PUT/DELETE 요청)
+const useCreateUserMutation = () => {};
+const useUpdateUserMutation = () => {};
+const useDeleteUserMutation = () => {};
 ```
 
 ### 파일 Export
@@ -370,54 +359,131 @@ import Component from '@components/Component';
 
 **기본 원칙**
 
-- 모든 타입명에 `-Types` 접미사 (Props 제외)
+- PascalCase 사용 (모든 타입/인터페이스)
+- Type, I, T 접두사/접미사 사용 금지 (제네릭 T 제외)
 - Props 타입은 `컴포넌트명 + Props`
-- 객체는 `interface`, 단일 타입은 `type` 사용
-- API response는 `XXXResponse` 네이밍
+- State 타입은 `컴포넌트명 + State`
+- API 타입은 `{Resource}Request/Response` 네이밍
 
 ```tsx
-// Props 타입 예시
+// ✅ Good - 올바른 네이밍
 interface ButtonProps {
   text: string;
   onClick: () => void;
 }
 
-// API Response 타입 예시
-interface UserListResponse {
-  users: UserTypes[];
-  total: number;
+interface UserResponse {
+  id: string;
+  name: string;
 }
 
-// 일반 타입 예시
-type StatusTypes = 'pending' | 'completed' | 'failed';
+type Status = 'pending' | 'completed' | 'failed';
+
+// ❌ Bad - 잘못된 네이밍
+interface IButton {} // I 접두사 사용 금지
+type TStatus = 'active'; // T 접두사 사용 금지
+interface ButtonType {} // Type 접미사 사용 금지
 ```
 
 ### Interface vs Type 가이드
 
 **Interface 사용 케이스**
 
-- React 컴포넌트 Props
-- 확장 가능한 객체 타입
-- API Response 타입
+- Component Props & State
+- API Request/Response
+- 객체 타입 정의
+- 확장이 필요한 타입
 
 **Type 사용 케이스**
 
-- Union 타입
-- 단순 타입 별칭
-- 복잡한 타입 조합
+- Union Types (Status, Variant 등)
+- Intersection Types
+- 함수 시그니처
+- Tuple 타입
 
 ```tsx
-// Interface - 확장 가능
-interface BaseButtonProps {
+// Interface - 객체 구조, Props, API
+interface ButtonProps {
   text: string;
+  variant?: ButtonVariant;
 }
 
-interface PrimaryButtonProps extends BaseButtonProps {
-  variant: 'primary';
+interface UserRequest {
+  name: string;
+  email: string;
 }
 
-// Type - Union 타입
+// Type - Union, 함수, 유틸리티
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
+type ClickHandler = (event: MouseEvent) => void;
+type Nullable<T> = T | null;
+```
+
+### Import/Export 규칙
+
+**Barrel Export 사용 금지** (성능 이슈)
+
+```tsx
+// ❌ Bad - index.ts를 통한 re-export
+export { Button } from './Button';
+export { Input } from './Input';
+
+// ✅ Good - 직접 import
+import Button from '@components/Button/Button';
+import Input from '@components/Input/Input';
+```
+
+**Path Alias 활용**
+
+```tsx
+// ✅ Good - Path alias 사용
+import { getUserList } from '@apis/user';
+import Button from '@components/Button';
+
+// ❌ Bad - 상대 경로 사용
+import { getUserList } from '../../../shared/apis/user';
+```
+
+### 데이터 페칭 규칙
+
+**QueryKey Factory Pattern**
+
+```tsx
+// shared/constants/queryKey.ts
+export const QUERY_KEYS = {
+  USER: {
+    ALL: ['user'] as const,
+    LIST: () => [...QUERY_KEYS.USER.ALL, 'list'] as const,
+    DETAIL: (id: string) => [...QUERY_KEYS.USER.ALL, 'detail', id] as const,
+  },
+} as const;
+
+// ✅ Good - QueryKey Factory 사용
+const { data } = useQuery(QUERY_KEYS.USER.LIST(), getUserList);
+
+// ❌ Bad - 하드코딩된 쿼리 키
+const { data } = useQuery(['user', 'list'], getUserList);
+```
+
+### API 레이어 규칙
+
+**Request 래퍼 사용**
+
+```tsx
+// ✅ Good - request 래퍼 사용
+import { request } from '@apis/axiosInstance';
+
+const getUserList = async () => {
+  return request<UserListResponse>({
+    method: 'GET',
+    url: '/users',
+  });
+};
+
+// ❌ Bad - axiosInstance 직접 사용
+const getUserList = async () => {
+  return axiosInstance.get('/users');
+};
 ```
 
 <br />
