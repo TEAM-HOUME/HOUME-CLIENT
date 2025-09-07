@@ -6,7 +6,7 @@ import type {
   MyPageUserResponse,
   MyPageImagesResponse,
   MyPageImageDetailResponse,
-} from '../types/apis/MyPageType';
+} from '../types/apis/MyPage';
 
 /**
  * 마이페이지 기본 정보 조회 API

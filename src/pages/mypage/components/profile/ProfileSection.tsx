@@ -10,7 +10,7 @@ interface ProfileSectionProps {
 }
 
 const ProfileSection = ({
-  userName = '사용자 이름',
+  userName,
   credit,
   isChargeDisabled,
 }: ProfileSectionProps) => {

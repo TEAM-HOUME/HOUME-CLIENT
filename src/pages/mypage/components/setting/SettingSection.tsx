@@ -1,4 +1,4 @@
-import { useLogout } from '@/pages/login/hooks/useLogout';
+import { useLogoutMutation } from '@/pages/login/apis/logout';
 
 import * as styles from './SettingSection.css';
 
@@ -9,7 +9,7 @@ type SettingItem = {
 };
 
 const SettingSection = () => {
-  const { mutate: logout } = useLogout();
+  const { mutate: logout } = useLogoutMutation();
 
   const handleTerms = () => console.log('약관 클릭');
   const handleLogout = () => {

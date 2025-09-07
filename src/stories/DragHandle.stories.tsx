@@ -1,4 +1,4 @@
-import DragHandle from '@/shared/components/dragHandle/DragHandle';
+import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 

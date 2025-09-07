@@ -5,7 +5,7 @@ import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
 import TextField from '@/shared/components/textField/TextField.tsx';
 import { ERROR_MESSAGES } from '@/shared/constants/clientErrorMessage.ts';
 
-import { usePatchSignup } from './hooks/usePatchSignup';
+import { useSignupMutation } from './apis/signup';
 import useSignupForm from './hooks/useSignupForm';
 import * as styles from './SignupPage.css';
 
@@ -30,7 +30,7 @@ const SignupPage = () => {
     isFormValid,
   } = useSignupForm();
 
-  const { mutate: patchSignup } = usePatchSignup();
+  const { mutate: patchSignup } = useSignupMutation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
