@@ -444,7 +444,7 @@ import Button from '@components/Button';
 import { getUserList } from '../../../shared/apis/user';
 ```
 
-### 상태 관리 규칙
+### 데이터 페칭 규칙
 
 **QueryKey Factory Pattern**
 
