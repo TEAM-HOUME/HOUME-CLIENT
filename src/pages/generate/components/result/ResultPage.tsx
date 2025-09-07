@@ -8,7 +8,7 @@ import {
   useFurnitureLogMutation,
   useResultPreferenceMutation,
   useCreditLogMutation,
-  useGetResultData,
+  useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 import * as styles from './ResultPage.css.ts';
 import type {
@@ -56,7 +56,7 @@ const ResultPage = () => {
   const shouldFetchFromAPI = !result && !!imageId;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
-  const { data: apiResult, isLoading } = useGetResultData(
+  const { data: apiResult, isLoading } = useGetResultDataQuery(
     Number(imageId || 0),
     {
       enabled: shouldFetchFromAPI && !isFromMypage,
