@@ -28,7 +28,7 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useGetResultData = (
+export const useGetResultDataQuery = (
   imageId: number,
   options?: { enabled?: boolean }
 ) => {
@@ -40,13 +40,13 @@ export const useGetResultData = (
 };
 
 // 캐러셀 이미지 좋아요/별로예요
-export const useStackLikeMutation = () => {
+export const usePostCarouselLikeMutation = () => {
   return useMutation({
     mutationFn: postStackLike,
   });
 };
 
-export const useStackHateMutation = () => {
+export const usePostCarouselHateMutation = () => {
   return useMutation({
     mutationFn: postStackHate,
   });
