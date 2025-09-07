@@ -332,7 +332,7 @@ const patchUserStatus = () => {};
 
 ### Hook 네이밍 규칙
 
-**TanStack Query Hooks**: `use + 행위 + 대상 + Query/Mutation`
+**TanStack Query Hooks**: `use + 행위 + 대상 + Query/Mutation` (접미사 필수)
 
 ```tsx
 // Query (GET 요청)
@@ -360,8 +360,9 @@ import Component from '@components/Component';
 **기본 원칙**
 
 - PascalCase 사용 (모든 타입/인터페이스)
-- Type, I, T 접두사/접미사 사용 금지
+- Type, I, T 접두사/접미사 사용 금지 (제네릭 T 제외)
 - Props 타입은 `컴포넌트명 + Props`
+- State 타입은 `컴포넌트명 + State`
 - API 타입은 `{Resource}Request/Response` 네이밍
 
 ```tsx
@@ -441,6 +442,48 @@ import Button from '@components/Button';
 
 // ❌ Bad - 상대 경로 사용
 import { getUserList } from '../../../shared/apis/user';
+```
+
+### 상태 관리 규칙
+
+**QueryKey Factory Pattern**
+
+```tsx
+// shared/constants/queryKey.ts
+export const QUERY_KEYS = {
+  USER: {
+    ALL: ['user'] as const,
+    LIST: () => [...QUERY_KEYS.USER.ALL, 'list'] as const,
+    DETAIL: (id: string) => [...QUERY_KEYS.USER.ALL, 'detail', id] as const,
+  },
+} as const;
+
+// ✅ Good - QueryKey Factory 사용
+const { data } = useQuery(QUERY_KEYS.USER.LIST(), getUserList);
+
+// ❌ Bad - 하드코딩된 쿼리 키
+const { data } = useQuery(['user', 'list'], getUserList);
+```
+
+### API 레이어 규칙
+
+**Request 래퍼 사용**
+
+```tsx
+// ✅ Good - request 래퍼 사용
+import { request } from '@apis/axiosInstance';
+
+const getUserList = async () => {
+  return request<UserListResponse>({
+    method: 'GET',
+    url: '/users',
+  });
+};
+
+// ❌ Bad - axiosInstance 직접 사용
+const getUserList = async () => {
+  return axiosInstance.get('/users');
+};
 ```
 
 <br />
