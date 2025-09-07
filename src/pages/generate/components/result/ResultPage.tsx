@@ -4,14 +4,17 @@ import LockImage from '@assets/icons/recommendCta.png';
 import { overlay } from 'overlay-kit';
 import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
 import Loading from '@components/loading/Loading';
-import * as styles from './ResultPage.css';
 import {
   useFurnitureLogMutation,
-  usePreferenceMutation,
+  useResultPreferenceMutation,
   useCreditLogMutation,
-  useResultData,
-} from '../../hooks/useGenerate';
-import type { GenerateImageData } from '../../types/GenerateType';
+  useGetResultDataQuery,
+} from '@pages/generate/hooks/useGenerate';
+import * as styles from './ResultPage.css.ts';
+import type {
+  GenerateImageData,
+  ResultPageLikeState,
+} from '@pages/generate/types/generate';
 import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
@@ -41,7 +44,7 @@ const ResultPage = () => {
   const [searchParams] = useSearchParams();
 
   // Hook들을 최상단에 배치
-  const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
+  const [selected, setSelected] = useState<ResultPageLikeState>(null);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (location.state as { result?: GenerateImageData })?.result;
@@ -53,9 +56,12 @@ const ResultPage = () => {
   const shouldFetchFromAPI = !result && !!imageId;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
-  const { data: apiResult, isLoading } = useResultData(Number(imageId || 0), {
-    enabled: shouldFetchFromAPI && !isFromMypage,
-  });
+  const { data: apiResult, isLoading } = useGetResultDataQuery(
+    Number(imageId || 0),
+    {
+      enabled: shouldFetchFromAPI && !isFromMypage,
+    }
+  );
 
   const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
     Number(imageId || 0),
@@ -71,8 +77,8 @@ const ResultPage = () => {
     }
   }
 
-  // result가 있을 때만 mutation hook들 호출 (조건부 렌더링을 위해)
-  const { mutate: sendPreference } = usePreferenceMutation();
+  // result가 있을 때만 mutation hook들 호출
+  const { mutate: sendPreference } = useResultPreferenceMutation();
   const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   const { mutate: sendCreditLogs } = useCreditLogMutation();
 

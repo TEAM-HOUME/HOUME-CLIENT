@@ -6,7 +6,7 @@ import {
   type ImageSetupSteps,
 } from '../types/funnel';
 import { useFunnelStore } from '../stores/useFunnelStore';
-import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
+import type { GenerateImageRequest } from '@/pages/generate/types/generate';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
