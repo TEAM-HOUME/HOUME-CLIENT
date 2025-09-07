@@ -1,7 +1,9 @@
-import { colorVars } from '@styles/tokens/color.css';
 import { style } from '@vanilla-extract/css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { animationTokens } from '@/shared/styles/tokens/animation.css';
+
+import { colorVars } from '@styles/tokens/color.css';
 
 export const wrapper = style({
   display: 'flex',

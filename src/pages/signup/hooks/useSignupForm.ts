@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+
 import {
   VALIDATION_RULES,
   isKoreanOnly,
@@ -10,6 +11,7 @@ import {
   isMinimumAge,
   isValidDate,
 } from '../utils/validation';
+
 import type { GenderOption } from '../types/formOptions';
 
 const useSignupForm = () => {

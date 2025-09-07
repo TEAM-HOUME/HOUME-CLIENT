@@ -1,4 +1,5 @@
 import { Slide } from 'react-toastify';
+
 import type { ToastContainerProps } from 'react-toastify';
 
 export const TOAST_TYPE = {

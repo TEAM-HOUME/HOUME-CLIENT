@@ -1,10 +1,13 @@
+import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import type { CarouselItem, ImageStackResponse } from '../types/generate';
+
 import type {
   GenerateImageRequest,
   GenerateImageResponse,
-} from '../types/generate';
-import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+  CarouselItem,
+  ImageStackResponse,
+} from '@pages/generate/types/generate';
 
 // 스택 UI
 // 캐러셀 가구 이미지 제공

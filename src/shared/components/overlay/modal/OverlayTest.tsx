@@ -1,4 +1,5 @@
 import { overlay } from 'overlay-kit';
+
 import Modal from './Modal';
 
 const OverlayTest = () => {

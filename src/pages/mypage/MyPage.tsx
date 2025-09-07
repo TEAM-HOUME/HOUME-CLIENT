@@ -1,15 +1,18 @@
 import { useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import ProfileSection from './components/profile/ProfileSection';
-import HistorySection from './components/history/HistorySection';
-import SettingSection from './components/setting/SettingSection';
-import * as styles from './MyPage.css';
-import { useMyPageUser } from './hooks/useMypage';
-import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+
+import { ROUTES } from '@/routes/paths';
 import Loading from '@/shared/components/loading/Loading';
+import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 import { useUserStore } from '@/store/useUserStore';
-import { ROUTES } from '@/routes/paths';
+
+import HistorySection from './components/history/HistorySection';
+import ProfileSection from './components/profile/ProfileSection';
+import SettingSection from './components/setting/SettingSection';
+import { useMyPageUser } from './hooks/useMypage';
+import * as styles from './MyPage.css';
 
 const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');

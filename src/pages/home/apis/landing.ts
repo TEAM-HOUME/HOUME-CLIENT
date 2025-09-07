@@ -1,5 +1,6 @@
-import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { HTTPMethod, request } from '@/shared/apis/request';
+
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 
 export const getHistoryData = async () => {
   return request({

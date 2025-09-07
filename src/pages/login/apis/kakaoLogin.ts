@@ -1,12 +1,15 @@
-import { API_ENDPOINT } from '@constants/apiEndpoints';
-import axiosInstance from '@shared/apis/axiosInstance';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import type { BaseResponse } from '@shared/types/apis';
-import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
-import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
+
 import { ROUTES } from '@/routes/paths';
+import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
 import { useUserStore } from '@/store/useUserStore';
+
+import { API_ENDPOINT } from '@constants/apiEndpoints';
+import axiosInstance from '@shared/apis/axiosInstance';
+
+import type { KakaoLoginResponse, LoginApiResponse } from '../types/auth';
+import type { BaseResponse } from '@shared/types/apis';
 
 /**
  * 카카오 OAuth 로그인 API 함수

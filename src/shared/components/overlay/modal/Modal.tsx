@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import CreditIcon from '@assets/icons/modalCoin.png';
-import CtaButton from '../../button/ctaButton/CtaButton';
-import { useToast } from '../../toast/useToast';
-import * as styles from './Modal.css';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { useUserStore } from '@/store/useUserStore';
+
+import CreditIcon from '@assets/icons/modalCoin.png';
+
+import * as styles from './Modal.css';
+import CtaButton from '../../button/ctaButton/CtaButton';
+import { useToast } from '../../toast/useToast';
 
 export interface ModalProps {
   onClose: () => void;

@@ -1,8 +1,10 @@
-import LoginBeforeImage from '@assets/icons/loginBefore.png';
-import * as styles from './loginPage.css';
-import { KAKAO_AUTH_URL } from './constants/kakaoLoginPath';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+
+import LoginBeforeImage from '@assets/icons/loginBefore.png';
+
+import { KAKAO_AUTH_URL } from './constants/kakaoLoginPath';
+import * as styles from './loginPage.css';
 
 const LoginPage = () => {
   const handleKakaoLogin = () => {

@@ -1,4 +1,5 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
+
 import { API_ENDPOINT, type ApiEndpoint } from './apiEndpoints';
 
 // 런타임에서 중첩 객체의 모든 leaf 값 추출하는 헬퍼 함수

@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
+
 import { SHEET_DURATION_MS } from '../constants/bottomSheet';
 
 interface UseBottomSheetDragProps {

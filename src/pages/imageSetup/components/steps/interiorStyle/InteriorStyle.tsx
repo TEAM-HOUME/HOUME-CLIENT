@@ -1,14 +1,16 @@
 // Step 3
-import MoodBoard from './MoodBoard';
+import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useInteriorStyle } from '@/pages/imageSetup/hooks/useInteriorStyle';
+import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+
 import * as styles from './InteriorStyle.css';
+import MoodBoard from './MoodBoard';
 import FunnelHeader from '../../header/FunnelHeader';
+
 import type {
   CompletedInteriorStyle,
   ImageSetupSteps,
 } from '../../../types/funnel';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { useInteriorStyle } from '@/pages/imageSetup/hooks/useInteriorStyle';
-import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 
 interface InteriorStyleProps {
   context: ImageSetupSteps['InteriorStyle'];

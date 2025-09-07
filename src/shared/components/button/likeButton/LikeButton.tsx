@@ -1,5 +1,6 @@
-import LikeIconGray from '@assets/icons/likeGray.svg?react';
 import LikeIconColor from '@assets/icons/likeColor.svg?react';
+import LikeIconGray from '@assets/icons/likeGray.svg?react';
+
 import * as styles from './LikeButton.css';
 interface LikeButtonProps extends React.ComponentProps<'button'> {
   children: React.ReactNode;

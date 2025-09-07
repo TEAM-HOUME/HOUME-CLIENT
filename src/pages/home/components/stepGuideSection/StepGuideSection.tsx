@@ -1,12 +1,14 @@
+import TitleStep from '@/shared/components/titleStep/TitleStep';
+
 import AiLandingImage from '@assets/images/landingAIImage.png';
-import InfoLandingImage from '@assets/images/landingInfoImage.png';
 import LandingImage3_1 from '@assets/images/landingImage3-1.png';
 import LandingImage3_2 from '@assets/images/landingImage3-2.png';
 import LandingImage3_3 from '@assets/images/landingImage3-3.png';
 import LandingImage4 from '@assets/images/landingImage4.png';
+import InfoLandingImage from '@assets/images/landingInfoImage.png';
+
 import * as styles from './StepGuideSection.css.ts';
 import { AnimatedSection } from '../AnimatedSection.tsx';
-import TitleStep from '@/shared/components/titleStep/TitleStep';
 
 const StepGuideSection = () => {
   return (

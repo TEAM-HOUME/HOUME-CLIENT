@@ -1,10 +1,12 @@
+import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+
 import { API_ENDPOINT } from '@constants/apiEndpoints';
+
 import type {
   MyPageUserResponse,
   MyPageImagesResponse,
   MyPageImageDetailResponse,
 } from '../types/apis/MyPage';
-import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
 
 /**
  * 마이페이지 기본 정보 조회 API

@@ -5,6 +5,7 @@ import {
   useSearchParams,
   useMatch,
 } from 'react-router-dom';
+
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
 const GeneratePage = () => {

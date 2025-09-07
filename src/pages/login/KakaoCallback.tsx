@@ -14,10 +14,12 @@
  * URL: /oauth/kakao/callback?code=authorization_code
  */
 import { useEffect } from 'react';
-import { useKakaoLoginMutation } from './apis/kakaoLogin';
+
 import Loading from '@/shared/components/loading/Loading';
-import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@/shared/constants/response';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
+import { useKakaoLoginMutation } from './apis/kakaoLogin';
 
 const KakaoCallback = () => {
   // 오류 핸들러

@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+
+import { QUERY_KEY } from '@/shared/constants/queryKey';
+
 import {
   getMyPageUser,
   getMyPageImages,
   getMyPageImageDetail,
 } from '../apis/mypage';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
 
 /**
  * 마이페이지 사용자 정보 조회 훅

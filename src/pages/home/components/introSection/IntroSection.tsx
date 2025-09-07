@@ -1,11 +1,13 @@
 import { useState, type ChangeEvent } from 'react';
+
+import SmallFilledButton from '@/shared/components/button/smallFilledButton/SmallFilledButton';
+
 import * as styles from './IntroSection.css';
 import {
   INTERIOR_IMAGES,
   INTERIOR_OPTIONS,
   type InteriorOption,
 } from '../../types/options';
-import SmallFilledButton from '@/shared/components/button/smallFilledButton/SmallFilledButton';
 
 const IntroSection = () => {
   const [selected, setSelected] = useState<InteriorOption>('휴식형');

@@ -1,12 +1,15 @@
 import type { ReactNode } from 'react';
 import { useRef, useCallback, useEffect } from 'react';
+
 import clsx from 'clsx';
-import * as styles from './BottomSheetWrapper.css.ts';
+
 import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 import {
   SHEET_DURATION_MS,
   SHEET_BASIC_THRESHOLD,
 } from '@/shared/constants/bottomSheet';
+
+import * as styles from './BottomSheetWrapper.css.ts';
 
 interface BottomSheetWrapperProps {
   isOpen: boolean;

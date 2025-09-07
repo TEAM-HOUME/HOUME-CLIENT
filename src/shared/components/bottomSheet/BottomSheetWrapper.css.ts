@@ -1,6 +1,7 @@
 import { style, styleVariants } from '@vanilla-extract/css';
-import { zIndex } from '@/shared/styles/tokens/zIndex';
+
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 export const backdrop = style({
   position: 'fixed',

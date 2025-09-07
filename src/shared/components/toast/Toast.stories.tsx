@@ -1,6 +1,8 @@
-import Toast from './Toast';
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TOAST_TYPE } from '@/shared/types/toast';
+
+import Toast from './Toast';
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
   title: 'shared/components/toast/Toast',

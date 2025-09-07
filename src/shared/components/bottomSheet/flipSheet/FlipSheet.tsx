@@ -1,7 +1,9 @@
+import FilpButton from '@/shared/components/button/flipButton/FlipButton';
+
 import CtaButton from '@components/button/ctaButton/CtaButton';
+
 import * as styles from './FlipSheet.css';
 import { BottomSheetWrapper } from '../BottomSheetWrapper';
-import FilpButton from '@/shared/components/button/flipButton/FlipButton';
 
 interface FlipSheetProps {
   onFlipClick: () => void;

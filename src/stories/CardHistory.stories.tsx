@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import CardHistory from '@/shared/components/card/cardHistory/CardHistory';
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof CardHistory> = {
   title: 'Components/CardHistory',
