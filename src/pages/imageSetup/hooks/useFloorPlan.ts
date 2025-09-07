@@ -6,12 +6,6 @@ import type {
   ImageSetupSteps,
 } from '../types/funnel/steps';
 
-// interface SelectedFloorPlanTypes {
-//   id: number;
-//   src: string;
-//   flipped: boolean;
-// }
-
 export const useFloorPlan = (
   context: ImageSetupSteps['FloorPlan'],
   onNext: (data: CompletedFloorPlan) => void
@@ -21,7 +15,6 @@ export const useFloorPlan = (
   const { data, isLoading, error, isError } = useFloorPlanQuery();
   console.log('도면 데이터: ', data);
 
-  // funnel의 context에서 초기값 설정
   const [selectedId, setSelectedId] = useState<number | null>(
     context.floorPlan?.floorPlanId || null
   );
