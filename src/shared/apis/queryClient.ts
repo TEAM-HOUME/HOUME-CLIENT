@@ -1,4 +1,5 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
+import { prefetchStaticData } from './staticDataPrefetch';
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -14,3 +15,5 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+prefetchStaticData(queryClient);
