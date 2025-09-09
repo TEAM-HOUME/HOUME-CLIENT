@@ -1,4 +1,5 @@
 import CtaButton from '@components/button/ctaButton/CtaButton';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof CtaButton> = {

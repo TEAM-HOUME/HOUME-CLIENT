@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
+
 import { useHousingSelectionMutation } from '../apis/houseInfo';
-import type { ImageSetupSteps } from '../types/funnel/steps';
+import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
+
 import type {
   CompletedHouseInfo,
   HouseInfoErrors,
   HouseInfoFormData,
 } from '../types/funnel/houseInfo';
+import type { ImageSetupSteps } from '../types/funnel/steps';
 
 export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 옵션 선택 API

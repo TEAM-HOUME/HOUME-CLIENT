@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
 import ProgressBarKey from '@/shared/components/progressBarKey/ProgressBarKey';
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof ProgressBarKey> = {
   title: '공통/ProgressBarKey',

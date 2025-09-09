@@ -1,8 +1,10 @@
 import { styleVariants } from '@vanilla-extract/css';
 import { style } from '@vanilla-extract/css';
-import { colorVars } from '@styles/tokens/color.css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
+
+import { colorVars } from '@styles/tokens/color.css';
 
 export const backdrop = style({
   position: 'fixed',
@@ -38,7 +40,11 @@ export const sheetWrapper = style({
   zIndex: zIndex.sheet,
   overflow: 'hidden',
   userSelect: 'none',
-  cursor: 'grab',
+  touchAction: 'none', // Pull-to-refresh 방지
+  overscrollBehavior: 'none', // 추가: overscroll 방지
+  WebkitOverflowScrolling: 'touch', // iOS에서 부드러운 스크롤
+  WebkitUserSelect: 'none', // Safari에서 텍스트 선택 방지
+  WebkitTouchCallout: 'none', // iOS에서 터치 콜아웃 방지
 
   // 드래그 중일 때만 transition 비활성화
   selectors: {
@@ -58,6 +64,12 @@ export const sheetWrapperCollapsed = style({
   transition: 'transform 0.6s ease-in-out',
 });
 
+export const contentWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+});
+
 export const imageArea = style({
   display: 'flex',
   flexDirection: 'column',
@@ -72,7 +84,23 @@ export const dragHandleContainer = style({
   height: '2.8rem',
   alignItems: 'center',
   justifyContent: 'center',
-  pointerEvents: 'auto', // 드래그 핸들은 클릭 가능하게
+  cursor: 'grab',
+  userSelect: 'none',
+  touchAction: 'none',
+  overscrollBehavior: 'none',
+
+  WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
+  WebkitTapHighlightColor: 'transparent',
+
+  selectors: {
+    '&:active': {
+      cursor: 'grabbing',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+  },
 });
 
 export const infoText = style({

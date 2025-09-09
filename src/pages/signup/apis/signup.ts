@@ -1,10 +1,13 @@
-import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import type { SignupRequest, SignupResponse } from '../types/apis/signup';
-import { HTTPMethod, request } from '@/shared/apis/request';
+
 import { ROUTES } from '@/routes/paths';
+import { HTTPMethod, request } from '@/shared/apis/request';
 import { useUserStore } from '@/store/useUserStore';
+
+import { API_ENDPOINT } from '@constants/apiEndpoints';
+
+import type { SignupRequest, SignupResponse } from '../types/apis/signup';
 
 /* 회원가입 API 함수 */
 export const patchSignup = async (

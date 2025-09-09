@@ -1,18 +1,19 @@
 // Step 1
-import * as styles from '../StepCommon.css';
-import OptionGroup from '../optionGroup/OptionGroup';
-import FunnelHeader from '../../header/FunnelHeader';
-import type { ImageSetupSteps } from '../../../types/funnel/steps';
+import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
+import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
 import type {
+  AreaType,
   CompletedHouseInfo,
   HouseType,
   RoomType,
-  AreaType,
-} from '../../../types/funnel/houseInfo';
-import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
+} from '@/pages/imageSetup/types/funnel/houseInfo';
+import type { ImageSetupSteps } from '@/pages/imageSetup/types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
-import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
+
+import FunnelHeader from '../../header/FunnelHeader';
+import OptionGroup from '../optionGroup/OptionGroup';
+import * as styles from '../StepCommon.css';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];

@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react';
+
 import { MAX_MOOD_BOARD_SELECTION } from '../constants/interiorStyle';
+
 import type {
   CompletedInteriorStyle,
   ImageSetupSteps,

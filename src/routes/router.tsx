@@ -10,19 +10,20 @@
 
 // TODO(지성): 컴포넌트 lazy load 적용하기
 import { createBrowserRouter } from 'react-router-dom';
-import { ROUTES } from '@/routes/paths';
+
 import RootLayout from '@/layout/RootLayout';
-import ProtectedRoute from '@/routes/ProtectedRoute';
-import HomePage from '@/pages/home/HomePage';
-import LoginPage from '@/pages/login/LoginPage';
-import SignupPage from '@/pages/signup/SignupPage';
-import GeneratePage from '@/pages/generate/GeneratePage';
-import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
-import MyPage from '@/pages/mypage/MyPage';
-import KakaoCallback from '@/pages/login/KakaoCallback';
-import SignupCompletePage from '@/pages/signup/SignupCompletePage';
 import LoadingPage from '@/pages/generate/components/loading/LoadingPage';
 import ResultPage from '@/pages/generate/components/result/ResultPage';
+import GeneratePage from '@/pages/generate/GeneratePage';
+import HomePage from '@/pages/home/HomePage';
+import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
+import KakaoCallback from '@/pages/login/KakaoCallback';
+import LoginPage from '@/pages/login/LoginPage';
+import MyPage from '@/pages/mypage/MyPage';
+import SignupCompletePage from '@/pages/signup/SignupCompletePage';
+import SignupPage from '@/pages/signup/SignupPage';
+import { ROUTES } from '@/routes/paths';
+import ProtectedRoute from '@/routes/ProtectedRoute';
 
 // 공개 라우트 그룹 (인증 불필요)
 const publicRoutes = [

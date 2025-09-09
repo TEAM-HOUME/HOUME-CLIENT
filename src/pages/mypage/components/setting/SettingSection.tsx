@@ -1,5 +1,6 @@
-import * as styles from './SettingSection.css';
 import { useLogoutMutation } from '@/pages/login/apis/logout';
+
+import * as styles from './SettingSection.css';
 
 type SettingItem = {
   id: string;

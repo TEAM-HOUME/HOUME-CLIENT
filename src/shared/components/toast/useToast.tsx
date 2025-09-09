@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
+
 import { type Id, toast, type ToastOptions } from 'react-toastify';
-import { toastStyle, type ToastType } from '@/shared/types/toast';
+
 import Toast from '@/shared/components/toast/Toast';
+import { toastStyle, type ToastType } from '@/shared/types/toast';
 
 interface UseToastParams {
   text: string;

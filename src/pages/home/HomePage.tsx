@@ -1,14 +1,17 @@
-import LogoNavBar from '@shared/components/navBar/LogoNavBar';
 import { useNavigate } from 'react-router-dom';
-import IntroSection from './components/introSection/IntroSection';
-import StepGuideSection from './components/stepGuideSection/StepGuideSection';
-import ReviewSection from './components/reviewSection/ReviewSection';
-import { AnimatedSection } from './components/AnimatedSection';
-import * as styles from './HomePage.css';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { useUserStore } from '@/store/useUserStore';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { ROUTES } from '@/routes/paths';
+import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+import { useUserStore } from '@/store/useUserStore';
+
+import LogoNavBar from '@shared/components/navBar/LogoNavBar';
+
+import { AnimatedSection } from './components/AnimatedSection';
+import IntroSection from './components/introSection/IntroSection';
+import ReviewSection from './components/reviewSection/ReviewSection';
+import StepGuideSection from './components/stepGuideSection/StepGuideSection';
+import * as styles from './HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();

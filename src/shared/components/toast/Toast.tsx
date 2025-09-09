@@ -1,7 +1,10 @@
 import type { JSX } from 'react';
-import WarningIcon from '@assets/icn_warning_toast.svg?react';
-import * as styles from './Toast.css';
+
 import { TOAST_TYPE, type ToastType } from '@/shared/types/toast';
+
+import WarningIcon from '@assets/icn_warning_toast.svg?react';
+
+import * as styles from './Toast.css';
 
 interface ToastProps {
   text: string;

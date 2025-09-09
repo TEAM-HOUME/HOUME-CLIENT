@@ -1,5 +1,7 @@
 import { MemoryRouter } from 'react-router-dom';
+
 import LogoNavBar from '@shared/components/navBar/LogoNavBar';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof LogoNavBar> = {

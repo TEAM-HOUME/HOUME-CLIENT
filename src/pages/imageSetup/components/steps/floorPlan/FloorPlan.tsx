@@ -1,16 +1,19 @@
 // Step2FloorPlan.tsx (UI만 담당)
 import { useEffect } from 'react';
-import FloorPlanList from './FloorPlanList';
+
+import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
+import { useFloorPlan } from '@/pages/imageSetup/hooks/useFloorPlan';
+import Loading from '@/shared/components/loading/Loading';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
 import * as styles from './FloorPlan.css';
+import FloorPlanList from './FloorPlanList';
 import FunnelHeader from '../../header/FunnelHeader';
+
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
 } from '../../../types/funnel/steps';
-import { useFloorPlan } from '@/pages/imageSetup/hooks/useFloorPlan';
-import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
-import Loading from '@/shared/components/loading/Loading';
-import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
 interface FloorPlanProps {
   context: ImageSetupSteps['FloorPlan'];

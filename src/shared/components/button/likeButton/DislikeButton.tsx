@@ -1,6 +1,8 @@
 import React from 'react';
-import DislikeIconGray from '@assets/icons/dislikeGray.svg?react';
+
 import DislikeIconColor from '@assets/icons/dislikeColor.svg?react';
+import DislikeIconGray from '@assets/icons/dislikeGray.svg?react';
+
 import * as styles from './LikeButton.css';
 
 interface DislikeButtonProps extends React.ComponentProps<'button'> {

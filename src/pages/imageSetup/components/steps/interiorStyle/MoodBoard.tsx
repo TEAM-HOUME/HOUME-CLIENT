@@ -11,15 +11,17 @@
  */
 
 import { useEffect } from 'react';
-import * as styles from './MoodBoard.css';
+
+import { useMoodBoardQuery } from '@/pages/imageSetup/apis/interiorStyle';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageItem,
 } from '@/pages/imageSetup/types/apis/interiorStyle';
-import { useMoodBoardQuery } from '@/pages/imageSetup/apis/interiorStyle';
 import CardImage from '@/shared/components/card/cardImage/CardImage';
 import SkeletonCardImage from '@/shared/components/card/cardImage/SkeletonCardImage';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
+import * as styles from './MoodBoard.css';
 
 interface MoodBoardProps {
   selectedImages: number[];

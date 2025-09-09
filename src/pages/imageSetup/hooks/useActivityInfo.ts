@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
-import type { ImageSetupSteps } from '../types/funnel/steps';
-import type {
-  ActivityInfoFormData,
-  ActivityInfoErrors,
-  CompletedActivityInfo,
-} from '../types/funnel/activityInfo';
-import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
-import type { GenerateImageRequest } from '@/pages/generate/types/GenerateType';
+
+import type { GenerateImageRequest } from '@/pages/generate/types/generate';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
+
+import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
+
+import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
+import type {
+  ActivityInfoErrors,
+  ActivityInfoFormData,
+  CompletedActivityInfo,
+} from '../types/funnel/activityInfo';
+import type { ImageSetupSteps } from '../types/funnel/steps';
 
 export const useActivityInfo = (
   context: ImageSetupSteps['ActivityInfo'],

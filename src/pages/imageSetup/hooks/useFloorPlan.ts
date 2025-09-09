@@ -1,10 +1,18 @@
 // useFloorPlan.hooks.ts (로직 담당)
 import { useCallback, useState } from 'react';
+
 import { useFloorPlanQuery } from '../apis/floorPlan';
+
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
 } from '../types/funnel/steps';
+
+// interface SelectedFloorPlanTypes {
+//   id: number;
+//   src: string;
+//   flipped: boolean;
+// }
 
 export const useFloorPlan = (
   context: ImageSetupSteps['FloorPlan'],

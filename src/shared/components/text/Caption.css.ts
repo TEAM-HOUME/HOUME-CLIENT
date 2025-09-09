@@ -1,7 +1,8 @@
 // Caption.css.ts
 import { style, styleVariants } from '@vanilla-extract/css';
-import { colorVars } from '@/shared/styles/tokens/color.css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
+import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const captionBox = style({
   display: 'flex',
