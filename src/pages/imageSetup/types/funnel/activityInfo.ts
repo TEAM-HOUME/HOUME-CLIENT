@@ -1,6 +1,6 @@
 // ActivityInfo 도메인 관련 모든 타입 통합 관리
-import type { ActivityOptionsResponse } from '../apis/activityInfo';
 import type { AreaType, HouseType, RoomType } from './houseInfo';
+import type { ActivityOptionsResponse } from '../apis/activityInfo';
 
 // API 기반 Union 타입 추출
 export type ActivityType =

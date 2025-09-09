@@ -26,6 +26,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     error,
   } = useActivityOptionsQuery();
 
+  console.log(activityOptionsData);
+
   const {
     formData,
     setFormData,

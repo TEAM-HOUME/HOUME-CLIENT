@@ -39,16 +39,3 @@ export const useMoodBoardQuery = (
     gcTime: 10 * 60 * 1000,
   });
 };
-
-export const usePrefetchMoodBoard = () => {
-  const queryClient = useQueryClient();
-
-  const prefetchMoodBoard = (limit = MOOD_BOARD_CONSTANTS.DEFAULT_LIMIT) => {
-    queryClient.prefetchQuery({
-      queryKey: ['moodBoardImages', limit],
-      queryFn: () => getMoodBoardImage(limit),
-      staleTime: 3 * 60 * 1000,
-    });
-  };
-  return { prefetchMoodBoard };
-};

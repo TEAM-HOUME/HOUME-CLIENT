@@ -5,11 +5,7 @@ export interface MoodBoardImageItem {
 }
 
 export interface MoodBoardImageResponse {
-  code: number;
-  msg: string;
-  data: {
-    moodBoardResponseList: MoodBoardImageItem[];
-  };
+  moodBoardResponseList: MoodBoardImageItem[];
 }
 
 export const MOOD_BOARD_CONSTANTS = {
