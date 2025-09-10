@@ -3,7 +3,6 @@ import { isAxiosError } from 'axios';
 import axiosInstance from './axiosInstance';
 import { RESPONSE_MESSAGE } from '../constants/response';
 
-import type { ApiEndpoint } from '../constants/apiEndpoints';
 import type { BaseResponse } from '@shared/types/apis';
 
 export const HTTPMethod = {
@@ -17,7 +16,7 @@ export const HTTPMethod = {
 export type HTTPMethodType = (typeof HTTPMethod)[keyof typeof HTTPMethod];
 export interface RequestConfig {
   method: HTTPMethodType;
-  url: ApiEndpoint;
+  url: string;
   query?: Record<string, string | number | boolean>;
   body?: Record<string, unknown>;
 }
