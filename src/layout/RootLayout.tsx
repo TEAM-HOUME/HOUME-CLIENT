@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router-dom';
-import ScrollToTop from '@/shared/components/ScrollToTop';
+import useScrollToTop from '@/shared/hooks/useScrollToTop';
 
 function RootLayout() {
+  useScrollToTop({ includeHash: false, includeKey: false });
   return (
     <div>
-      <ScrollToTop />
       <Outlet />
     </div>
   );
