@@ -45,32 +45,6 @@ const publicRoutes = [
     path: ROUTES.OAUTH,
     element: <KakaoCallback />,
   },
-  {
-    path: ROUTES.IMAGE_SETUP,
-    element: <ImageSetup />,
-  },
-  {
-    path: ROUTES.GENERATE,
-    element: <GeneratePage />,
-    children: [
-      {
-        index: true,
-        element: <LoadingPage />,
-      },
-      {
-        path: 'result',
-        element: <ResultPage />,
-      },
-    ],
-  },
-  {
-    path: ROUTES.MYPAGE,
-    element: <MyPage />,
-  },
-  {
-    path: ROUTES.SIGNUPCOMPLETE,
-    element: <SignupCompletePage />,
-  },
 ];
 
 // 보호된 라우트 그룹 (인증 필요)

@@ -35,7 +35,5 @@ export const useMoodBoardQuery = (
   return useQuery({
     queryKey: ['moodBoardImages', limit],
     queryFn: () => getMoodBoardImage(limit),
-    staleTime: 3 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
   });
 };

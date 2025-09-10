@@ -1,9 +1,10 @@
-import type { QueryClient } from '@tanstack/react-query';
-import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfo';
 import { getActivityOptions } from '@/pages/imageSetup/apis/activityInfo';
 import { getFloorPlan } from '@/pages/imageSetup/apis/floorPlan';
+import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfo';
 import { getMoodBoardImage } from '@/pages/imageSetup/apis/interiorStyle';
 import { MOOD_BOARD_CONSTANTS } from '@/pages/imageSetup/types/apis/interiorStyle';
+
+import type { QueryClient } from '@tanstack/react-query';
 
 /**
  * 앱 시작 시점에 미리 로딩할 데이터들을 prefetch하는 함수
