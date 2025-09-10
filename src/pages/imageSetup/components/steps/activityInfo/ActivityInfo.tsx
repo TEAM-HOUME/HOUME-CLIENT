@@ -50,8 +50,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   }
 
   const primaryUsageOptions = activityOptionsData.activities;
-  const bedTypeOptions = activityOptionsData.beds.items;
-  const otherFurnituresOptions = activityOptionsData.selectives.items;
+  const bedOptions = activityOptionsData.beds.items;
+  const selectiveOptions = activityOptionsData.selectives.items;
 
   return (
     <div className={common.container}>
@@ -82,7 +82,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
 
           <SubOptionGroup<string>
             subtitle="침대"
-            options={bedTypeOptions}
+            options={bedOptions}
             selected={formData.bedId}
             onButtonClick={(value) =>
               setFormData((prev) => ({
@@ -95,7 +95,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
           />
 
           <MultiOptionGroup<string>
-            options={otherFurnituresOptions}
+            options={selectiveOptions}
             selected={formData.selectiveIds}
             selectedCount={formData.selectiveIds?.length || 0}
             onButtonClick={(value) =>
