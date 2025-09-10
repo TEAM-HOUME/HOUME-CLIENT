@@ -30,7 +30,7 @@ export const useActivityInfo = (
 
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
-    primaryUsage: context.activityTypes,
+    primaryUsage: context.primaryUsage,
     bedId: context.bedId,
     selectiveIds: context.selectiveIds || [],
   });

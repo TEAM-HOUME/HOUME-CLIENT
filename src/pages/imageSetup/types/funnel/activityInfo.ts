@@ -27,7 +27,7 @@ export interface ActivityInfoContext {
     isMirror: boolean;
   };
   moodBoardIds: number[];
-  activityTypes?: ActivityType;
+  primaryUsage?: ActivityType;
   bedId?: number;
   selectiveIds?: number[];
 }
