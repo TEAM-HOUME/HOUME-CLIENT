@@ -1,24 +1,24 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+
+import { HTTPMethod, request } from '@/shared/apis/request';
+import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
+
 import type {
   HousingOptionsResponse,
   HousingSelectionRequest,
   HousingSelectionResponse,
 } from '../types/apis/houseInfo';
-import { HTTPMethod, request } from '@/shared/apis/request';
-import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
 
 // API Functions
-export const getHousingOptions = async (): Promise<HousingOptionsResponse> => {
-  return await request<HousingOptionsResponse>({
+export const getHousingOptions = async () => {
+  return request<HousingOptionsResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.IMAGE_SETUP.HOUSE_OPTIONS,
   });
 };
 
-const postHousingSelection = async (
-  requestData: HousingSelectionRequest
-): Promise<HousingSelectionResponse> => {
-  return await request<HousingSelectionResponse>({
+const postHousingSelection = async (requestData: HousingSelectionRequest) => {
+  return request<HousingSelectionResponse>({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.IMAGE_SETUP.HOUSE_INFO,
     body: requestData,

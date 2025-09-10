@@ -1,8 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { type FloorPlanResponse } from '../types/apis/floorPlan';
-import type { UserAddressRequest } from '../types/apis/bottomSheetAddress.types';
+
 import { HTTPMethod, type RequestConfig, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
+
+import { type FloorPlanResponse } from '../types/apis/floorPlan';
+
+import type { UserAddressRequest } from '../types/apis/bottomSheetAddress.types';
 
 // API Functions
 // 도면 이미지
@@ -12,7 +15,7 @@ export const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
     url: API_ENDPOINT.IMAGE_SETUP.FLOOR_PLAN,
   };
 
-  return await request<FloorPlanResponse['data']>(config);
+  return request<FloorPlanResponse['data']>(config);
 };
 
 // 사용자 주소 등록
@@ -26,12 +29,10 @@ export const postAddress = async (body: UserAddressRequest) => {
 
 // Query Hooks
 export const useFloorPlanQuery = () => {
-  const query = useQuery({
+  return useQuery({
     queryKey: ['floorPlan'],
     queryFn: getFloorPlan,
   });
-
-  return query;
 };
 
 export const useUserAddressMutation = () => {
