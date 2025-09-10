@@ -22,7 +22,7 @@ export const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {
 export const postAddress = async (body: UserAddressRequest) => {
   return request({
     method: HTTPMethod.POST,
-    url: API_ENDPOINT.IMAGE_SETUP.ADDRESS_SEARCH,
+    url: API_ENDPOINT.IMAGE_SETUP.POST_ADDRESS,
     body,
   });
 };

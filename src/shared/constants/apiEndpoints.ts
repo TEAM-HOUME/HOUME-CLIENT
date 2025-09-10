@@ -15,7 +15,7 @@ export const API_ENDPOINT = {
     HOUSE_OPTIONS: '/api/v1/housing-options', // GET 집구조 제공(OFFICETEL, VILLA 등)
     HOUSE_INFO: '/api/v1/housing-selections', // POST 집구조 선택
     FLOOR_PLAN: '/api/v1/house-templates', // GET 도면 템플릿 제공
-    ADDRESS_SEARCH: '/api/v1/addresses', // POST 사용자 주소 입력받기
+    POST_ADDRESS: '/api/v1/addresses', // POST 사용자 주소 입력받기
     INTERIOR_STYLE: '/api/v1/moodboard-images', // GET 무드보드 제공
     ACTIVITY_OPTIONS: '/api/v1/dashboard-info', // GET 주요활동, 가구 리스트 제공
   },
