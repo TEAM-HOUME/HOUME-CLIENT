@@ -1,4 +1,3 @@
-// useFloorPlan.hooks.ts (로직 담당)
 import { useCallback, useState } from 'react';
 
 import { useFloorPlanQuery } from '../apis/floorPlan';

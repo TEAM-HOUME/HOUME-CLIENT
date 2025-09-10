@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import type { ActivityType } from '../types/funnel/activityInfo';
 import type { AreaType, HouseType, RoomType } from '../types/funnel/houseInfo';
 
@@ -20,7 +21,7 @@ interface InteriorStyleState {
 }
 
 interface ActivityInfoState {
-  primaryUsage?: ActivityType;
+  activityType?: ActivityType;
   bedId?: number;
   selectiveIds?: number[];
 }

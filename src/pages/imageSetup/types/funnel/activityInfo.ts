@@ -11,7 +11,7 @@ export type ActivityType =
 
 // 폼 데이터 타입 (사용자 입력값)
 export interface ActivityInfoFormData {
-  primaryUsage?: ActivityType;
+  activityType?: ActivityType;
   bedId?: number;
   selectiveIds?: number[];
 }
@@ -27,7 +27,7 @@ export interface ActivityInfoContext {
     isMirror: boolean;
   };
   moodBoardIds: number[];
-  primaryUsage?: ActivityType;
+  activityType?: ActivityType;
   bedId?: number;
   selectiveIds?: number[];
 }
@@ -43,14 +43,14 @@ export interface CompletedActivityInfo {
     isMirror: boolean;
   };
   moodBoardIds: number[];
-  primaryUsage: ActivityType;
+  activityType: ActivityType;
   bedId: number;
   selectiveIds: number[];
 }
 
 // 에러 타입
 export interface ActivityInfoErrors {
-  primaryUsage?: string;
+  activityType?: string;
   bedId?: string;
   selectiveIds?: string;
 }

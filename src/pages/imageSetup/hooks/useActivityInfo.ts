@@ -30,7 +30,7 @@ export const useActivityInfo = (
 
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
-    primaryUsage: context.primaryUsage,
+    activityType: context.activityType,
     bedId: context.bedId,
     selectiveIds: context.selectiveIds || [],
   });
@@ -53,7 +53,7 @@ export const useActivityInfo = (
     data: ActivityInfoFormData
   ): data is Required<ActivityInfoFormData> => {
     return !!(
-      data.primaryUsage &&
+      data.activityType &&
       data.bedId &&
       Array.isArray(data.selectiveIds) &&
       data.selectiveIds.length > 0
@@ -62,13 +62,13 @@ export const useActivityInfo = (
 
   useEffect(() => {
     setErrors((prev) => {
-      if (prev.primaryUsage) {
-        const { primaryUsage, ...rest } = prev;
+      if (prev.activityType) {
+        const { activityType: activityType, ...rest } = prev;
         return rest;
       }
       return prev;
     });
-  }, [formData.primaryUsage]);
+  }, [formData.activityType]);
 
   useEffect(() => {
     setErrors((prev) => {
@@ -92,26 +92,26 @@ export const useActivityInfo = (
 
   // 주요활동 변경 시 필수 가구 자동 선택
   useEffect(() => {
-    if (formData.primaryUsage) {
+    if (formData.activityType) {
       const requiredFurnitures = getRequiredFurnitureIds();
       setFormData((prev) => ({
         ...prev,
         selectiveIds: requiredFurnitures,
       }));
     }
-  }, [formData.primaryUsage]);
+  }, [formData.activityType]);
 
   // 현재 선택된 활동의 필수 가구 ID 리스트 반환
   const getRequiredFurnitureIds = (): number[] => {
     if (
-      !formData.primaryUsage ||
-      !isValidActivityKey(formData.primaryUsage) ||
+      !formData.activityType ||
+      !isValidActivityKey(formData.activityType) ||
       !activityOptionsData
     )
       return [];
 
     const requiredCodes =
-      MAIN_ACTIVITY_VALIDATION.combinationRules[formData.primaryUsage]
+      MAIN_ACTIVITY_VALIDATION.combinationRules[formData.activityType]
         ?.requiredFurnitures || [];
 
     return requiredCodes
@@ -126,9 +126,9 @@ export const useActivityInfo = (
 
   // 현재 선택된 활동의 label 가져오기(휴식형, 재택근무형, 영화감상형, 홈카페형)
   const getCurrentActivityLabel = (): string => {
-    if (!formData.primaryUsage || !activityOptionsData) return '';
+    if (!formData.activityType || !activityOptionsData) return '';
     const option = activityOptionsData.activities.find(
-      (option) => option.code === formData.primaryUsage
+      (option) => option.code === formData.activityType
     );
     return option?.label || '';
   };
@@ -186,7 +186,7 @@ export const useActivityInfo = (
         isMirror: context.floorPlan.isMirror,
       },
       moodBoardIds: context.moodBoardIds,
-      activity: formData.primaryUsage!,
+      activity: formData.activityType!,
       bedId: formData.bedId!,
       selectiveIds: formData.selectiveIds!,
     };
@@ -198,7 +198,7 @@ export const useActivityInfo = (
       houseId: context.houseId,
       floorPlan: context.floorPlan,
       moodBoardIds: context.moodBoardIds,
-      primaryUsage: formData.primaryUsage!,
+      activityType: formData.activityType!,
       bedId: formData.bedId!,
       selectiveIds: formData.selectiveIds!,
     });

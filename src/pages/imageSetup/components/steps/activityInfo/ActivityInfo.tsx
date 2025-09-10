@@ -49,7 +49,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     return <Loading />;
   }
 
-  const primaryUsageOptions = activityOptionsData.activities;
+  const activityTypeOptions = activityOptionsData.activities;
   const bedOptions = activityOptionsData.beds.items;
   const selectiveOptions = activityOptionsData.selectives.items;
 
@@ -66,15 +66,15 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         <OptionGroup<ActivityType>
           title="주요 활동"
           body="선택한 활동에 최적화된 동선을 알려드려요."
-          options={primaryUsageOptions}
-          selected={formData.primaryUsage}
+          options={activityTypeOptions}
+          selected={formData.activityType}
           onButtonClick={(value) =>
             setFormData((prev) => ({
               ...prev,
-              primaryUsage: value,
+              activityType: value,
             }))
           }
-          error={errors.primaryUsage}
+          error={errors.activityType}
         />
 
         <div className={common.subWrapper}>

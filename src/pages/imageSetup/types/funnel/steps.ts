@@ -37,7 +37,7 @@ export type ImageSetupSteps = {
     houseId: number;
     floorPlan: FloorPlan;
     moodBoardIds: number[];
-    primaryUsage?: ActivityType;
+    activityType?: ActivityType;
     bedId?: number;
     selectiveIds?: number[];
   };
