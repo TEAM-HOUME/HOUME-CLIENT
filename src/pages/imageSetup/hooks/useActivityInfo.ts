@@ -72,8 +72,8 @@ export const useActivityInfo = (
 
   useEffect(() => {
     setErrors((prev) => {
-      if (prev.bedTypeId) {
-        const { bedTypeId, ...rest } = prev;
+      if (prev.bedId) {
+        const { bedId: bedId, ...rest } = prev;
         return rest;
       }
       return prev;
@@ -199,7 +199,7 @@ export const useActivityInfo = (
       floorPlan: context.floorPlan,
       moodBoardIds: context.moodBoardIds,
       primaryUsage: formData.primaryUsage!,
-      bedTypeId: formData.bedId!,
+      bedId: formData.bedId!,
       selectiveIds: formData.selectiveIds!,
     });
 

@@ -28,7 +28,7 @@ export interface ActivityInfoContext {
   };
   moodBoardIds: number[];
   activityTypes?: ActivityType;
-  bedTypeId?: number;
+  bedId?: number;
   selectiveIds?: number[];
 }
 
@@ -44,13 +44,13 @@ export interface CompletedActivityInfo {
   };
   moodBoardIds: number[];
   primaryUsage: ActivityType;
-  bedTypeId: number;
+  bedId: number;
   selectiveIds: number[];
 }
 
 // 에러 타입
 export interface ActivityInfoErrors {
   primaryUsage?: string;
-  bedTypeId?: string;
+  bedId?: string;
   selectiveIds?: string;
 }

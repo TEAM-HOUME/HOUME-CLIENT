@@ -39,14 +39,14 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     getRequiredFurnitureLabels,
   } = useActivityInfo(context, activityOptionsData);
 
-  // 로딩 중이거나 데이터가 없는 경우
-  if (isLoading || !activityOptionsData) {
-    return <Loading />;
-  }
-
   // 에러 처리
   if (error) {
     return <div>데이터를 불러올 수 없습니다.</div>;
+  }
+
+  // 로딩 중이거나 데이터가 없는 경우
+  if (isLoading || !activityOptionsData) {
+    return <Loading />;
   }
 
   const primaryUsageOptions = activityOptionsData.activities;
@@ -91,7 +91,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
               }))
             }
             useId={true}
-            error={errors.bedTypeId}
+            error={errors.bedId}
           />
 
           <MultiOptionGroup<string>
