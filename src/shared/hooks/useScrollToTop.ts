@@ -6,8 +6,10 @@ interface Options {
   includeKey?: boolean; // 기본값 false: location.key 변화에는 반응하지 않음
 }
 
-export const useScrollToTop = (options: Options = {}) => {
-  const { includeHash = false, includeKey = false } = options;
+export const useScrollToTop = ({
+  includeHash = false,
+  includeKey = false,
+}: Options = {}) => {
   const location = useLocation();
 
   // 브라우저의 기본 스크롤 복원 기능을 1회 비활성화

@@ -2,7 +2,8 @@ import { Outlet } from 'react-router-dom';
 import { useScrollToTop } from '@/shared/hooks/useScrollToTop';
 
 function RootLayout() {
-  useScrollToTop({ includeHash: false, includeKey: false });
+  // 기본값 사용: 해시/키 변화에는 반응하지 않음
+  useScrollToTop();
   return (
     <div>
       <Outlet />
