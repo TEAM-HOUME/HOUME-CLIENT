@@ -1,15 +1,9 @@
 import { useEffect } from 'react';
+
 import { useLocation } from 'react-router-dom';
 
-interface Options {
-  includeHash?: boolean; // 기본값 false: 앵커(해시) 내비게이션은 브라우저 기본 동작 유지
-  includeKey?: boolean; // 기본값 false: location.key 변화에는 반응하지 않음
-}
-
-export const useScrollToTop = ({
-  includeHash = false,
-  includeKey = false,
-}: Options = {}) => {
+// 모든 상황(초기 로드, 라우트/쿼리/해시/키 변화)에서 스크롤을 최상단으로 초기화
+export const useScrollToTop = () => {
   const location = useLocation();
 
   // 브라우저의 기본 스크롤 복원 기능을 1회 비활성화
@@ -27,10 +21,5 @@ export const useScrollToTop = ({
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
-  }, [
-    location.pathname,
-    location.search,
-    includeHash ? location.hash : undefined,
-    includeKey ? location.key : undefined,
-  ]);
+  }, [location.key, location.pathname, location.search, location.hash]);
 };
