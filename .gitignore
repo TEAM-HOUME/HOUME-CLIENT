@@ -40,6 +40,7 @@ storybook-static
 CLAUDE.md
 .taskmaster
 .cursor
+docs/
 
 dev-debug.log
 # Dependency directories
