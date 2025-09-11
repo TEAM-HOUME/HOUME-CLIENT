@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
 
 export const container = style({

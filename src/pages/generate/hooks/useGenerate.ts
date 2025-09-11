@@ -1,22 +1,27 @@
 import { useEffect } from 'react';
+
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+
+import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
+import { queryClient } from '@/shared/apis/queryClient';
+import { QUERY_KEY } from '@/shared/constants/queryKey';
+
 import {
-  checkGenerateImageStatus,
-  generateImage,
+  getCheckGenerateImageStatus,
+  postGenerateImage,
   getResultData,
   getStackData,
   postCreditLog,
   postFurnitureLog,
-  postHateStack,
-  postLikeStack,
-  postPreference,
-} from '../apis/generate';
+  postStackHate,
+  postStackLike,
+  postResultPreference,
+} from '@pages/generate/apis/generate';
+
 import { useGenerateStore } from '../stores/useGenerateStore';
-import type { GenerateImageRequest } from '../types/GenerateType';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
-import { queryClient } from '@/shared/apis/queryClient';
-import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
+
+import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
 export const useStackData = (page: number, options: { enabled: boolean }) => {
   return useQuery({
@@ -28,7 +33,7 @@ export const useStackData = (page: number, options: { enabled: boolean }) => {
   });
 };
 
-export const useResultData = (
+export const useGetResultDataQuery = (
   imageId: number,
   options?: { enabled?: boolean }
 ) => {
@@ -40,23 +45,23 @@ export const useResultData = (
 };
 
 // 캐러셀 이미지 좋아요/별로예요
-export const useLikeStackMutation = () => {
+export const usePostCarouselLikeMutation = () => {
   return useMutation({
-    mutationFn: postLikeStack,
+    mutationFn: postStackLike,
   });
 };
 
-export const useHateStackMutation = () => {
+export const usePostCarouselHateMutation = () => {
   return useMutation({
-    mutationFn: postHateStack,
+    mutationFn: postStackHate,
   });
 };
 
 // 결과 이미지 선호도 전송용 (POST)
-export const usePreferenceMutation = () => {
+export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
-      postPreference(imageId, isLike),
+      postResultPreference(imageId, isLike),
   });
 };
 
@@ -84,7 +89,7 @@ export const useGenerateImageApi = () => {
   const generateImageRequest = useMutation({
     mutationFn: (userInfo: GenerateImageRequest) => {
       console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
-      return generateImage(userInfo);
+      return postGenerateImage(userInfo);
     },
     onSuccess: (data) => {
       console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
@@ -117,7 +122,7 @@ export const useGenerateImageStatusCheck = (
 
   const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
-    queryFn: () => checkGenerateImageStatus(houseId),
+    queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
     refetchInterval: 7000, // 5초
     refetchIntervalInBackground: true,

@@ -1,12 +1,13 @@
-import * as styles from './SignupPage.css';
-import useSignupForm from './hooks/useSignupForm';
-import { usePatchSignup } from './hooks/usePatchSignup';
-import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
-import TextField from '@/shared/components/textField/TextField.tsx';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton.tsx';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton.tsx';
 import ShowErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton.tsx';
+import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
+import TextField from '@/shared/components/textField/TextField.tsx';
 import { ERROR_MESSAGES } from '@/shared/constants/clientErrorMessage.ts';
+
+import { useSignupMutation } from './apis/signup';
+import useSignupForm from './hooks/useSignupForm';
+import * as styles from './SignupPage.css';
 
 const SignupPage = () => {
   const {
@@ -29,7 +30,7 @@ const SignupPage = () => {
     isFormValid,
   } = useSignupForm();
 
-  const { mutate: patchSignup } = usePatchSignup();
+  const { mutate: patchSignup } = useSignupMutation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

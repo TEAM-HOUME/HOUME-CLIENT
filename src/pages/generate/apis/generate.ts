@@ -1,10 +1,13 @@
+import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import type { CarouselItem, ImageStackResponse } from '../types/GenerateType';
+
 import type {
   GenerateImageRequest,
   GenerateImageResponse,
-} from '../types/GenerateType';
-import { HTTPMethod, request, type RequestConfig } from '@/shared/apis/request';
+  CarouselItem,
+  ImageStackResponse,
+} from '@pages/generate/types/generate';
 
 // 스택 UI
 // 캐러셀 가구 이미지 제공
@@ -18,7 +21,7 @@ export const getStackData = async (page: number): Promise<CarouselItem[]> => {
 };
 
 // 캐러셀 이미지 좋아요 / 별로예요
-export const postLikeStack = async (carouselId: number) => {
+export const postStackLike = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.CAROUSELS_LIKE,
@@ -28,7 +31,7 @@ export const postLikeStack = async (carouselId: number) => {
   });
 };
 
-export const postHateStack = async (carouselId: number) => {
+export const postStackHate = async (carouselId: number) => {
   return request({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.CAROUSELS_HATE,
@@ -48,7 +51,10 @@ export const getResultData = async (imageId: number) => {
 };
 
 // 생성된 이미지 선호 여부
-export const postPreference = async (imageId: number, isLike: boolean) => {
+export const postResultPreference = async (
+  imageId: number,
+  isLike: boolean
+) => {
   return request({
     method: HTTPMethod.POST,
     url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
@@ -75,7 +81,7 @@ export const postCreditLog = async () => {
 };
 
 // 이미지 생성 api
-export const generateImage = async (
+export const postGenerateImage = async (
   requestData: GenerateImageRequest
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {
@@ -88,7 +94,7 @@ export const generateImage = async (
 };
 
 // 이미지 생성 폴백 api
-export const checkGenerateImageStatus = async (
+export const getCheckGenerateImageStatus = async (
   houseId: number
 ): Promise<GenerateImageResponse['data']> => {
   const config: RequestConfig = {

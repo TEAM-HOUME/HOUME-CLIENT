@@ -2,10 +2,13 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { patchSignup } from '../apis/signup';
-import type { SignupRequest, SignupResponse } from '../types/apis/signup';
+
 import { ROUTES } from '@/routes/paths';
 import { useUserStore } from '@/store/useUserStore';
+
+import { patchSignup } from '../apis/signup';
+
+import type { SignupRequest, SignupResponse } from '../types/apis/signup';
 
 export const usePatchSignup = () => {
   const navigate = useNavigate();

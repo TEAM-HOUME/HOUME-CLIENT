@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+
+import { useHouseInfoApi } from '../api/houseInfoApi';
+import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
+import { useFunnelStore } from '../stores/useFunnelStore';
 import {
   HOUSE_INFO_VALIDATION,
   type CompletedHouseInfo,
   type ImageSetupSteps,
 } from '../types/funnel';
-import { useHouseInfoApi } from '../api/houseInfoApi';
-import { useFunnelStore } from '../stores/useFunnelStore';
-import { usePrefetchMoodBoard } from '../api/interiorStyleApi';
 
 interface FormErrors {
   houseType?: string;

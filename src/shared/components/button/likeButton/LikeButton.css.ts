@@ -1,6 +1,8 @@
 import { recipe } from '@vanilla-extract/recipes';
-import { colorVars } from '@styles/tokens/color.css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
+
+import { colorVars } from '@styles/tokens/color.css';
 
 export const likeButton = recipe({
   base: {

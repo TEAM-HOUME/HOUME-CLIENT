@@ -1,14 +1,14 @@
-import { useImageSetup } from './hooks/useImageGeneration';
-import HouseInfo from './components/steps/houseInfo/HouseInfo';
-import FloorPlan from './components/steps/floorPlan/FloorPlan';
-import InteriorStyle from './components/steps/interiorStyle/InteriorStyle';
+import FunnelLayout from './components/layout/FunnelLayout';
 import ActivityInfo from './components/steps/activityInfo/ActivityInfo';
+import FloorPlan from './components/steps/floorPlan/FloorPlan';
+import HouseInfo from './components/steps/houseInfo/HouseInfo';
+import InteriorStyle from './components/steps/interiorStyle/InteriorStyle';
+import { useImageSetup } from './hooks/useImageGeneration';
 import {
   type CompletedHouseInfo,
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
 } from './types/funnel';
-import FunnelLayout from './components/layout/FunnelLayout';
 
 export const ImageSetup = () => {
   const funnel = useImageSetup();

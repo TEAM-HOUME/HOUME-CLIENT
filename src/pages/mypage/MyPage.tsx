@@ -1,15 +1,18 @@
 import { useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import ProfileSection from './components/profile/ProfileSection';
-import HistorySection from './components/history/HistorySection';
-import SettingSection from './components/setting/SettingSection';
-import * as styles from './MyPage.css';
-import { useMyPageUser } from './hooks/useMypage';
-import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+
+import { ROUTES } from '@/routes/paths';
 import Loading from '@/shared/components/loading/Loading';
+import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 import { useUserStore } from '@/store/useUserStore';
-import { ROUTES } from '@/routes/paths';
+
+import HistorySection from './components/history/HistorySection';
+import ProfileSection from './components/profile/ProfileSection';
+import SettingSection from './components/setting/SettingSection';
+import { useMyPageUser } from './hooks/useMypage';
+import * as styles from './MyPage.css';
 
 const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');
@@ -18,13 +21,6 @@ const MyPage = () => {
   // 로그인 상태 확인
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
-
-  // 로그인되지 않았으면 로그인 페이지로 리디렉션
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate(ROUTES.LOGIN);
-    }
-  }, [isLoggedIn, navigate]);
 
   const {
     data: userData,
@@ -36,10 +32,17 @@ const MyPage = () => {
   });
 
   useEffect(() => {
-    if (isLoggedIn && (isUserError || (!userData && !isUserLoading))) {
-      handleError(error || new Error('User data load failed'), 'api');
+    // 로그인되지 않았으면 로그인 페이지로 리디렉션
+    if (!isLoggedIn) {
+      navigate(ROUTES.LOGIN);
+      return;
     }
-  }, [isLoggedIn, isUserError, userData, isUserLoading, error, handleError]);
+
+    // 로그인 상태에서 API 에러가 발생한 경우 에러 처리
+    if (isUserError && error) {
+      handleError(error, 'api');
+    }
+  }, [isLoggedIn, navigate, isUserError, error, handleError]);
 
   // 로그인되지 않았으면 아무것도 렌더링하지 않음 (리디렉션 중)
   if (!isLoggedIn) {

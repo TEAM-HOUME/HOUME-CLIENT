@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+
 import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 export const wrapper = style({

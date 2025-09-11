@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { MAX_MOOD_BOARD_SELECTION } from '../constants/interiorStyle';
 import { useFunnelStore } from '../stores/useFunnelStore';
+
 import type { CompletedInteriorStyle, ImageSetupSteps } from '../types/funnel';
 
 export const useInteriorStyle = (

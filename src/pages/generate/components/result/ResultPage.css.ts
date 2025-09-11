@@ -1,9 +1,11 @@
-import { colorVars } from '@styles/tokens/color.css';
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
-import { zIndex } from '@/shared/styles/tokens/zIndex';
 import { animationTokens } from '@/shared/styles/tokens/animation.css';
+import { zIndex } from '@/shared/styles/tokens/zIndex';
+
+import { colorVars } from '@styles/tokens/color.css';
 
 export const wrapper = style({
   display: 'flex',

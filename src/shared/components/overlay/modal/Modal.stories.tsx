@@ -1,4 +1,5 @@
 import Modal from './Modal';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {

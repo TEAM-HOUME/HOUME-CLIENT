@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react';
+
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { ROUTES } from '@/routes/paths';
+import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
+import LikeButton from '@/shared/components/button/likeButton/LikeButton';
+import Loading from '@/shared/components/loading/Loading';
+import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
 import * as styles from './LoadingPage.css';
 import ProgressBar from './ProgressBar';
 import {
   useStackData,
-  useLikeStackMutation,
-  useHateStackMutation,
+  usePostCarouselLikeMutation,
+  usePostCarouselHateMutation,
   useGenerateImageApi,
   useGenerateImageStatusCheck,
 } from '../../hooks/useGenerate';
 import { useGenerateStore } from '../../stores/useGenerateStore';
-import type { GenerateImageRequest } from '../../types/GenerateType';
-import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
-import { ROUTES } from '@/routes/paths';
-import Loading from '@/shared/components/loading/Loading';
-import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
+
+import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
 const LoadingPage = () => {
   // 이미지 생성 api 코드 ...
@@ -70,8 +74,8 @@ const LoadingPage = () => {
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
   const ANIMATION_DURATION = 600;
 
-  const likeMutation = useLikeStackMutation();
-  const hateMutation = useHateStackMutation();
+  const likeMutation = usePostCarouselLikeMutation();
+  const hateMutation = usePostCarouselHateMutation();
 
   useEffect(() => {
     setCurrentIndex(0);

@@ -1,16 +1,18 @@
 // 엑세스 토큰 만료 및 리프레시 토큰 재발급 테스트용 컴포넌트
 
-import axiosInstance from '@shared/apis/axiosInstance';
+import { HTTPMethod, request } from '@/shared/apis/request';
 
 const TokenRefreshTest = () => {
   const getTokenTest = async () => {
     try {
-      const res = await axiosInstance.get('/access-test');
+      const res = await request({
+        method: HTTPMethod.GET,
+        url: '/access-test',
+      });
 
       console.log('API 응답:', res);
     } catch (err: any) {
-      const message = err?.response?.data?.message || err.message;
-      console.error('API 요청 에러:', err, message);
+      console.error('API 요청 에러:', err);
     }
   };
 

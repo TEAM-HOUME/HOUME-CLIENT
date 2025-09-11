@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import * as styles from './LoadingPage.css';
 import { PROGRESS_CONFIG } from '../../constants/progressConfig';
 import { useGenerateStore } from '../../stores/useGenerateStore';
@@ -28,6 +29,9 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
     return () => clearInterval(interval);
   }, [isDone]);
 
+  const doneRef = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // 90%→100% 빠르게 증가
   useEffect(() => {
     if (!isDone) return;
@@ -35,15 +39,20 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= PROGRESS_CONFIG.FAST_PHASE_END) {
+          if (!doneRef.current) {
+            doneRef.current = true; // 렌더 간에도 유지되어 중복 방지
+            clearInterval(interval);
+
+            // 100% 완료 시 약간의 지연 후 onComplete 콜백 호출
+            timeoutRef.current = setTimeout(() => {
+              onComplete?.();
+            }, PROGRESS_CONFIG.DELAY_BEFORE_COMPLETE_MS);
+          }
+
           console.log(
             '📊 프로그레스 바 100% 완료:',
             new Date().toLocaleTimeString()
           );
-
-          // 100% 완료 시 onComplete 콜백 호출
-          if (onComplete) {
-            setTimeout(() => onComplete(), 100); // 약간의 지연 후 호출
-          }
 
           return PROGRESS_CONFIG.FAST_PHASE_END;
         }
@@ -51,8 +60,14 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
       });
     }, PROGRESS_CONFIG.FAST_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [isDone]);
+    return () => {
+      clearInterval(interval);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [isDone, onComplete]);
 
   // API 완료 시 isDone = true
   useEffect(() => {

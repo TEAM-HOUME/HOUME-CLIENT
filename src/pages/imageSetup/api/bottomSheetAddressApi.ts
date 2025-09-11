@@ -1,6 +1,8 @@
-import { API_ENDPOINT } from '@constants/apiEndpoints';
-import type { BottomSheetAddressRequest } from '../types/apis/bottomSheetAddress.types';
 import { HTTPMethod, request } from '@/shared/apis/request';
+
+import { API_ENDPOINT } from '@constants/apiEndpoints';
+
+import type { BottomSheetAddressRequest } from '../types/apis/bottomSheetAddress.types';
 
 // API Functions
 export const postAddress = async (body: BottomSheetAddressRequest) => {

@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { type FloorPlanResponse } from '../types/apis/floorPlan';
+
 import { HTTPMethod, type RequestConfig, request } from '@/shared/apis/request';
 import { API_ENDPOINT } from '@/shared/constants/apiEndpoints';
+
+import { type FloorPlanResponse } from '../types/apis/floorPlan';
 
 // API Functions
 const getFloorPlan = async (): Promise<FloorPlanResponse['data']> => {

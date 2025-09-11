@@ -1,7 +1,10 @@
 import axios, { AxiosError } from 'axios';
+
 import { ERROR_CODES } from '../constants/apiErrorCode';
-import type { AxiosRequestConfig } from 'axios';
+import { RESPONSE_MESSAGE, HTTP_STATUS } from '../constants/response';
+
 import type { BaseResponse } from '../types/apis';
+import type { AxiosRequestConfig } from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -57,7 +60,12 @@ axiosInstance.interceptors.response.use(
         );
 
         const newAccessToken = res.headers['access-token'];
-        if (!newAccessToken) throw new Error('새 액세스 토큰이 없습니다.');
+        if (!newAccessToken) {
+          throw new Error(
+            RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] ||
+              '새 액세스 토큰이 없습니다.'
+          );
+        }
 
         localStorage.setItem('accessToken', newAccessToken);
 

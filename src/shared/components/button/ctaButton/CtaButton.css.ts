@@ -1,7 +1,9 @@
-import { recipe } from '@vanilla-extract/recipes';
-import { colorVars } from '@styles/tokens/color.css';
 import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
+
+import { colorVars } from '@styles/tokens/color.css';
 
 export const buttonWrapper = style({
   display: 'flex',
