@@ -35,7 +35,7 @@ const LoadingPage = () => {
   } | null;
   const requestData: GenerateImageRequest | null =
     state?.generateImageRequest ?? null;
-  const generateImageRequest = useGenerateImageApi();
+  const { mutate: mutateGenerateImage } = useGenerateImageApi();
 
   // 상태 폴링은 requestData가 있을 때만 시작
   useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
@@ -44,7 +44,7 @@ const LoadingPage = () => {
     if (!requestData) return;
 
     console.log('이미지 생성 요청 시작:', requestData);
-    generateImageRequest.mutate(requestData, {
+    mutateGenerateImage(requestData, {
       onError: (error: any) => {
         // 재요청 코드 42900 확인
         if (error?.response?.data?.code === 42900) {
@@ -55,7 +55,7 @@ const LoadingPage = () => {
         }
       },
     });
-  }, [generateImageRequest, requestData]);
+  }, [mutateGenerateImage, requestData]);
   // ... 이미지 생성 api 코드 끝
 
   const [currentPage, setCurrentPage] = useState(0);
