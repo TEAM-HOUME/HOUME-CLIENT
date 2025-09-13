@@ -23,13 +23,22 @@ import { useGenerateStore } from '../stores/useGenerateStore';
 
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
-export const useStackData = (page: number, options: { enabled: boolean }) => {
+export const useStackData = (
+  page: number,
+  options: {
+    enabled: boolean;
+    onSuccess?: (data: Awaited<ReturnType<typeof getStackData>>) => void;
+    onError?: (err: unknown) => void;
+  }
+) => {
   return useQuery({
     queryKey: [QUERY_KEY.GENERATE_LOADING, page],
     queryFn: () => getStackData(page),
     staleTime: 2 * 60 * 1000,
     retry: 2,
-    ...options,
+    onSuccess: options.onSuccess,
+    onError: options.onError,
+    enabled: options.enabled,
   });
 };
 
