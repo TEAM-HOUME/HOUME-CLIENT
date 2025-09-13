@@ -12,7 +12,7 @@
 
 import { useEffect } from 'react';
 
-import { useMoodBoardQuery } from '@/pages/imageSetup/api/interiorStyleApi';
+import { useMoodBoardQuery } from '@/pages/imageSetup/apis/interiorStyle';
 import {
   MOOD_BOARD_CONSTANTS,
   type MoodBoardImageItem,
@@ -49,7 +49,7 @@ const MoodBoard = ({ selectedImages, onImageSelect }: MoodBoardProps) => {
     error,
     isError,
   } = useMoodBoardQuery();
-  const images = moodBoardData?.data?.moodBoardResponseList || [];
+  const images = moodBoardData?.moodBoardResponseList || [];
   console.log('이미지: ', images);
 
   // 3초간만 스켈레톤 보여주기

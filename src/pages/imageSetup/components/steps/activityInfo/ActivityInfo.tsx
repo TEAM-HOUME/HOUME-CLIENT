@@ -1,13 +1,10 @@
 // Step 4
+import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+import Loading from '@/shared/components/loading/Loading';
 
-import {
-  MAIN_ACTIVITY_OPTIONS,
-  type ImageSetupSteps,
-  type PrimaryUsage,
-} from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
 import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
 import OptionGroup from '../optionGroup/OptionGroup';
@@ -15,30 +12,46 @@ import SubOptionGroup from '../optionGroup/SubOptionGroup';
 import * as common from '../StepCommon.css';
 import MainTitle from '../title/Maintitle';
 
+import type { ActivityType } from '../../../types/funnel/activityInfo';
+import type { ImageSetupSteps } from '../../../types/funnel/steps';
+
 interface ActivityInfoProps {
   context: ImageSetupSteps['ActivityInfo'];
 }
 
 const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
-    localFormData,
+    data: activityOptionsData,
+    isLoading,
+    error,
+  } = useActivityOptionsQuery();
+
+  console.log(activityOptionsData);
+
+  const {
+    formData,
     setFormData,
-    // errors,
+    errors,
+    handleSubmit,
     isFormCompleted,
     isRequiredFurniture,
     getCurrentActivityLabel,
     getRequiredFurnitureLabels,
-    handleOnClick,
-    isButtonActive,
-  } = useActivityInfo(context);
+  } = useActivityInfo(context, activityOptionsData);
 
-  const primaryUsageOptions = Object.values(
-    MAIN_ACTIVITY_OPTIONS.PRIMARY_USAGE
-  );
-  const bedTypeOptions = Object.values(MAIN_ACTIVITY_OPTIONS.BED_TYPE);
-  const otherFurnituresOptions = Object.values(
-    MAIN_ACTIVITY_OPTIONS.OTHER_FURNITURES
-  );
+  // 에러 처리
+  if (error) {
+    return <div>데이터를 불러올 수 없습니다.</div>;
+  }
+
+  // 로딩 중이거나 데이터가 없는 경우
+  if (isLoading || !activityOptionsData) {
+    return <Loading />;
+  }
+
+  const activityTypeOptions = activityOptionsData.activities;
+  const bedOptions = activityOptionsData.beds.items;
+  const selectiveOptions = activityOptionsData.selectives.items;
 
   return (
     <div className={common.container}>
@@ -50,18 +63,18 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
       />
 
       <div className={common.wrapper}>
-        <OptionGroup<PrimaryUsage>
+        <OptionGroup<ActivityType>
           title="주요 활동"
           body="선택한 활동에 최적화된 동선을 알려드려요."
-          options={primaryUsageOptions}
-          selected={localFormData.primaryUsage}
+          options={activityTypeOptions}
+          selected={formData.activityType}
           onButtonClick={(value) =>
-            setFormData((prev: typeof localFormData) => ({
+            setFormData((prev) => ({
               ...prev,
-              primaryUsage: value,
+              activityType: value,
             }))
           }
-          // error={errors.primaryUsage}
+          error={errors.activityType}
         />
 
         <div className={common.subWrapper}>
@@ -69,31 +82,31 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
 
           <SubOptionGroup<string>
             subtitle="침대"
-            options={bedTypeOptions}
-            selected={localFormData.bedTypeId}
+            options={bedOptions}
+            selected={formData.bedId}
             onButtonClick={(value) =>
-              setFormData((prev: typeof localFormData) => ({
+              setFormData((prev) => ({
                 ...prev,
-                bedTypeId: value as number,
+                bedId: value as number,
               }))
             }
             useId={true}
-            // error={errors.bedType}
+            error={errors.bedId}
           />
 
           <MultiOptionGroup<string>
-            options={otherFurnituresOptions}
-            selected={localFormData.otherFurnitureIds}
-            selectedCount={localFormData.otherFurnitureIds.length}
+            options={selectiveOptions}
+            selected={formData.selectiveIds}
+            selectedCount={formData.selectiveIds?.length || 0}
             onButtonClick={(value) =>
-              setFormData((prev: typeof localFormData) => ({
+              setFormData((prev) => ({
                 ...prev,
-                otherFurnitureIds: value as number[],
+                selectiveIds: value as number[],
               }))
             }
             maxSelect={4}
             isAlertPresented={true}
-            // error={errors.otherFurnitures}
+            error={errors.selectiveIds}
             isRequiredFurniture={isRequiredFurniture}
             currentActivityLabel={getCurrentActivityLabel()}
             requiredFurnitureLabels={getRequiredFurnitureLabels()}
@@ -103,8 +116,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
 
         <div>
           <CtaButton
-            isActive={isFormCompleted && isButtonActive}
-            onClick={handleOnClick}
+            isActive={isFormCompleted}
+            onClick={() => handleSubmit(() => {})}
           >
             이미지 생성하기
           </CtaButton>

@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { useFunnelStore } from '@/pages/imageSetup/stores/useFunnelStore';
 import { queryClient } from '@/shared/apis/queryClient';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 
@@ -81,8 +80,6 @@ export const useCreditLogMutation = () => {
 
 // 이미지 생성 api
 export const useGenerateImageApi = () => {
-  // const queryClient = useQueryClient();
-  const { resetFunnel } = useFunnelStore();
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
 
@@ -102,7 +99,6 @@ export const useGenerateImageApi = () => {
       // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
       console.log('🔄 프로그래스 바 완료 대기 중...');
 
-      resetFunnel(); // 성공 시에도 초기화
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });
@@ -116,7 +112,6 @@ export const useGenerateImageStatusCheck = (
   shouldStart: boolean
 ) => {
   const navigate = useNavigate();
-  const { resetFunnel } = useFunnelStore();
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
 
@@ -150,10 +145,9 @@ export const useGenerateImageStatusCheck = (
       console.log('🔄 프로그래스 바 완료 대기 중...');
 
       // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
-      resetFunnel();
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     }
-  }, [query.isSuccess, query.data, resetFunnel]);
+  }, [query.isSuccess, query.data]);
 
   // 에러 시 처리
   useEffect(() => {

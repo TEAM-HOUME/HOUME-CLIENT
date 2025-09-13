@@ -12,11 +12,12 @@ export const API_ENDPOINT = {
       `/api/v1/mypage/images/${imageId}`,
   },
   IMAGE_SETUP: {
-    HOUSE_INFO: '/api/v1/housing-selections',
-    FLOOR_PLAN: '/api/v1/house-templates',
-    INTERIOR_STYLE: '/api/v1/moodboard-images',
-    ACTIVITY_INFO: '/api/v1/activity-selections',
-    ADDRESS_SEARCH: '/api/v1/addresses',
+    HOUSE_OPTIONS: '/api/v1/housing-options', // GET 집구조 제공(OFFICETEL, VILLA 등)
+    HOUSE_INFO: '/api/v1/housing-selections', // POST 집구조 선택
+    FLOOR_PLAN: '/api/v1/house-templates', // GET 도면 템플릿 제공
+    POST_ADDRESS: '/api/v1/addresses', // POST 사용자 주소 입력받기
+    INTERIOR_STYLE: '/api/v1/moodboard-images', // GET 무드보드 제공
+    ACTIVITY_OPTIONS: '/api/v1/dashboard-info', // GET 주요활동, 가구 리스트 제공
   },
   GENERATE: {
     CAROUSELS: '/api/v1/carousels',

@@ -7,6 +7,8 @@
 // 3) ProtectedRoute   : 인증이 필요한 하위 라우트 묶음
 //    - 인증 실패 시 ROUTES.LOGIN 으로 리다이렉트
 // ------------------------------
+
+// TODO(지성): 컴포넌트 lazy load 적용하기
 import { createBrowserRouter } from 'react-router-dom';
 
 import RootLayout from '@/layout/RootLayout';
@@ -48,7 +50,7 @@ const publicRoutes = [
 // 보호된 라우트 그룹 (인증 필요)
 const protectedRoutes = [
   {
-    path: ROUTES.imageSetup,
+    path: ROUTES.IMAGE_SETUP,
     element: <ImageSetup />,
   },
   {

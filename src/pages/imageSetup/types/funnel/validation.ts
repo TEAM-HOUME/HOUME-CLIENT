@@ -1,4 +1,12 @@
-import type { HouseType, OtherFurnitures, RoomType } from './options';
+import type { HouseType, RoomType } from './houseInfo';
+
+export type Selectives =
+  | 'DESK'
+  | 'CLOSET'
+  | 'TABLE_CHAIRS'
+  | 'SOFA'
+  | 'DRAWER'
+  | 'MOVABLE_TV';
 
 export const HOUSE_INFO_VALIDATION = {
   restrictedValues: {
@@ -20,16 +28,16 @@ export const HOUSE_INFO_VALIDATION = {
 export const MAIN_ACTIVITY_VALIDATION = {
   combinationRules: {
     RELAXING: {
-      requiredFurnitures: ['SOFA'] as OtherFurnitures[],
+      requiredFurnitures: ['SOFA'] as Selectives[],
     },
     REMOTE_WORK: {
-      requiredFurnitures: ['DESK'] as OtherFurnitures[],
+      requiredFurnitures: ['DESK'] as Selectives[],
     },
     HOME_CAFE: {
-      requiredFurnitures: ['TABLE_CHAIRS'] as OtherFurnitures[],
+      requiredFurnitures: ['TABLE_CHAIRS'] as Selectives[],
     },
     HOME_THEATER: {
-      requiredFurnitures: ['MOVABLE_TV'] as OtherFurnitures[],
+      requiredFurnitures: ['MOVABLE_TV'] as Selectives[],
     },
   },
 };

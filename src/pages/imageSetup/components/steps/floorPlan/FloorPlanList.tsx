@@ -1,7 +1,7 @@
 // FloorPlan.tsx
 import { useEffect, useState } from 'react';
 
-import { useBottomSheetAddress } from '@/pages/imageSetup/hooks/useBottomSheetAddress';
+import { useUserAddressMutation } from '@/pages/imageSetup/apis/floorPlan';
 import { type FloorPlanData } from '@/pages/imageSetup/types/apis/floorPlan';
 import type { OpenSheetKey } from '@/pages/imageSetup/types/OpenSheet';
 import FlipSheet from '@/shared/components/bottomSheet/flipSheet/FlipSheet';
@@ -34,7 +34,7 @@ const FloorPlanList = ({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [openSheet, setOpenSheet] = useState<OpenSheetKey>(null);
   const { notify } = useToast();
-  const { mutate: postAddress } = useBottomSheetAddress();
+  const { mutate: postAddress } = useUserAddressMutation();
 
   // toast를 NoMatchSheet의 상위 컴포넌트인 FloorPlan에서 호출해야
   // toast의 option에 준 autoClose가 정상적으로 적용됨

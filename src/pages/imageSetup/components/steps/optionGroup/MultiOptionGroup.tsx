@@ -79,7 +79,7 @@ const MultiOptionGroup = <T = string,>({
 
       <div className={styles.buttonBox}>
         {options.map((option) => {
-          // TODO: option.id와 option.code는 현재 types/funnel/options에 명시된 local값
+          // TODO((지성): option.id와 option.code는 현재 types/funnel/options에 명시된 local값
           // 따라서 optionValue에 ! 를 사용해도 문제는 X
           const optionValue = useId ? option.id : option.code;
           const isRequired = isRequiredFurniture

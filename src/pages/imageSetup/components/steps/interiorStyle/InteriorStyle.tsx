@@ -10,7 +10,7 @@ import FunnelHeader from '../../header/FunnelHeader';
 import type {
   CompletedInteriorStyle,
   ImageSetupSteps,
-} from '../../../types/funnel';
+} from '../../../types/funnel/steps';
 
 interface InteriorStyleProps {
   context: ImageSetupSteps['InteriorStyle'];

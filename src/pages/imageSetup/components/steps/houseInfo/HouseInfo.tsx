@@ -1,16 +1,16 @@
 // Step 1
+import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
+import type {
+  AreaType,
+  CompletedHouseInfo,
+  HouseType,
+  RoomType,
+} from '@/pages/imageSetup/types/funnel/houseInfo';
+import type { ImageSetupSteps } from '@/pages/imageSetup/types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
-import {
-  type CompletedHouseInfo,
-  type HouseType,
-  type ImageSetupSteps,
-  type AreaType,
-  type RoomType,
-  HOUSE_INFO_OPTIONS,
-} from '../../../types/funnel';
 import FunnelHeader from '../../header/FunnelHeader';
 import OptionGroup from '../optionGroup/OptionGroup';
 import * as styles from '../StepCommon.css';
@@ -24,9 +24,11 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
     useHouseInfo(context);
 
-  const houseTypeOptions = Object.values(HOUSE_INFO_OPTIONS.HOUSING_TYPES);
-  const roomTypeOptions = Object.values(HOUSE_INFO_OPTIONS.ROOM_TYPES);
-  const areaTypeOptions = Object.values(HOUSE_INFO_OPTIONS.AREA_TYPES);
+  const { data: housingOptions } = useHousingOptionsQuery();
+
+  const houseTypeOptions = housingOptions?.houseTypes || [];
+  const roomTypeOptions = housingOptions?.roomTypes || [];
+  const areaTypeOptions = housingOptions?.areaTypes || [];
 
   return (
     <div className={styles.container}>

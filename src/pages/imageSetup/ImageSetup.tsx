@@ -5,10 +5,11 @@ import HouseInfo from './components/steps/houseInfo/HouseInfo';
 import InteriorStyle from './components/steps/interiorStyle/InteriorStyle';
 import { useImageSetup } from './hooks/useImageGeneration';
 import {
-  type CompletedHouseInfo,
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
-} from './types/funnel';
+} from './types/funnel/steps';
+
+import type { CompletedHouseInfo } from './types/funnel/houseInfo';
 
 export const ImageSetup = () => {
   const funnel = useImageSetup();
