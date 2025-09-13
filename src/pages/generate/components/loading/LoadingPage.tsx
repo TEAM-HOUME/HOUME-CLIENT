@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -30,32 +30,32 @@ const LoadingPage = () => {
   // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
   // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
+  const state = location.state as {
+    generateImageRequest?: GenerateImageRequest;
+  } | null;
   const requestData: GenerateImageRequest | null =
-    (location.state as { generateImageRequest?: GenerateImageRequest })
-      ?.generateImageRequest || null;
+    state?.generateImageRequest ?? null;
   const generateImageRequest = useGenerateImageApi();
 
-  useGenerateImageStatusCheck(requestData?.houseId || 0, true);
+  // 상태 폴링은 requestData가 있을 때만 시작
+  useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
 
   useEffect(() => {
-    if (requestData) {
-      console.log('이미지 생성 요청 시작:', requestData);
-      generateImageRequest.mutate(requestData, {
-        onError: (error: any) => {
-          // 재요청 코드 42900 확인
-          if (error?.response?.data?.code === 42900) {
-            console.log('재요청 필요, 상태 체크 시작');
-            // setShouldCheckStatus(true);
-          } else {
-            console.error('이미지 생성 실패:', error);
-          }
-        },
-      });
-    } else {
-      console.log('requestData is null, redirect to /imageSetup');
-      navigate(ROUTES.imageSetup);
-    }
-  }, [requestData, navigate]); // resetGenerate 의존성 추가
+    if (!requestData) return;
+
+    console.log('이미지 생성 요청 시작:', requestData);
+    generateImageRequest.mutate(requestData, {
+      onError: (error: any) => {
+        // 재요청 코드 42900 확인
+        if (error?.response?.data?.code === 42900) {
+          console.log('재요청 필요, 상태 체크 시작');
+          // setShouldCheckStatus(true);
+        } else {
+          console.error('이미지 생성 실패:', error);
+        }
+      },
+    });
+  }, [generateImageRequest, requestData]);
   // ... 이미지 생성 api 코드 끝
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -63,8 +63,11 @@ const LoadingPage = () => {
     data: currentImages,
     isLoading,
     isError,
-    error,
-  } = useStackData(currentPage, { enabled: true });
+  } = useStackData(currentPage, {
+    enabled: true,
+    onSuccess: () => setCurrentIndex(0),
+    onError: (err) => handleError(err, 'loading'),
+  });
   const { data: nextImages } = useStackData(currentPage + 1, {
     enabled: !!currentImages, // next prefetch
   });
@@ -77,17 +80,10 @@ const LoadingPage = () => {
   const likeMutation = usePostCarouselLikeMutation();
   const hateMutation = usePostCarouselHateMutation();
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [currentImages]);
+  // currentImages 변화에 따른 인덱스 초기화와 에러 처리는
+  // useStackData의 onSuccess/onError 콜백으로 이관
 
-  useEffect(() => {
-    // 실제 에러가 발생했거나, 로딩이 완료되었는데 데이터가 없는 경우에만 에러 처리
-    if (isError || (!isLoading && !currentImages)) {
-      handleError(error || new Error('Stack data load failed'), 'loading');
-    }
-  }, [isError, isLoading, currentImages, error, handleError]);
-
+  if (!requestData) return <Navigate to={ROUTES.imageSetup} replace />;
   if (isLoading) return <Loading />;
 
   // 에러 상황 체크
