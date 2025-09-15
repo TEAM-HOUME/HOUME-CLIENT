@@ -11,9 +11,9 @@ import type {
 import type { ImageSetupSteps } from '@/pages/imageSetup/types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
-import FunnelHeader from '../../header/FunnelHeader';
-import OptionGroup from '../optionGroup/OptionGroup';
-import * as styles from '../StepCommon.css';
+import FunnelHeader from '../../components/header/FunnelHeader';
+import OptionGroup from '../../components/optionGroup/OptionGroup';
+import * as styles from '../../components/StepCommon.css';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];

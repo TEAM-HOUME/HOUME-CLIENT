@@ -5,15 +5,15 @@ import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Loading from '@/shared/components/loading/Loading';
 
-import FunnelHeader from '../../header/FunnelHeader';
-import MultiOptionGroup from '../optionGroup/MultiOptionGroup';
-import OptionGroup from '../optionGroup/OptionGroup';
-import SubOptionGroup from '../optionGroup/SubOptionGroup';
-import * as common from '../StepCommon.css';
-import MainTitle from '../title/Maintitle';
+import FunnelHeader from '../../components/header/FunnelHeader';
+import MultiOptionGroup from '../../components/optionGroup/MultiOptionGroup';
+import OptionGroup from '../../components/optionGroup/OptionGroup';
+import SubOptionGroup from '../../components/optionGroup/SubOptionGroup';
+import * as common from '../../components/StepCommon.css';
+import MainTitle from '../../components/title/Maintitle';
 
-import type { ActivityType } from '../../../types/funnel/activityInfo';
-import type { ImageSetupSteps } from '../../../types/funnel/steps';
+import type { ActivityType } from '../../types/funnel/activityInfo';
+import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 interface ActivityInfoProps {
   context: ImageSetupSteps['ActivityInfo'];

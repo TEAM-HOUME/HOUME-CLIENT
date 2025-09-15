@@ -5,12 +5,12 @@ import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
 import * as styles from './InteriorStyle.css';
 import MoodBoard from './MoodBoard';
-import FunnelHeader from '../../header/FunnelHeader';
+import FunnelHeader from '../../components/header/FunnelHeader';
 
 import type {
   CompletedInteriorStyle,
   ImageSetupSteps,
-} from '../../../types/funnel/steps';
+} from '../../types/funnel/steps';
 
 interface InteriorStyleProps {
   context: ImageSetupSteps['InteriorStyle'];
