@@ -4,7 +4,7 @@ import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
 import Img404Error from '@assets/images/img404Error.png';
-import * as styles from '@pages/Error404Page/Error404Page.css';
+import * as styles from '@pages/Error404Page/Error404Page.css.ts';
 
 const Error404Page = () => {
   const navigate = useNavigate();
