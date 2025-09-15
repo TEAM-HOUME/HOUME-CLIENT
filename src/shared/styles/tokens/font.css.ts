@@ -56,6 +56,12 @@ export const fontVars = createGlobalTheme(':root', {
     lineHeight: '150%',
     letterSpacing: '-0.01em',
   },
+  body_r_13: {
+    size: '1.3rem',
+    weight: '400',
+    lineHeight: '140%',
+    letterSpacing: '-0.01em',
+  },
 
   // Caption
   caption_sb_12: {
@@ -64,7 +70,6 @@ export const fontVars = createGlobalTheme(':root', {
     lineHeight: '150%',
     letterSpacing: '-0.01em',
   },
-
   caption_m_12: {
     size: '1.2rem',
     weight: '500',
@@ -75,6 +80,12 @@ export const fontVars = createGlobalTheme(':root', {
     size: '1.2rem',
     weight: '400',
     lineHeight: '150%',
+    letterSpacing: '-0.01em',
+  },
+  caption_r_11: {
+    size: '1.1rem',
+    weight: '400',
+    lineHeight: '100%',
     letterSpacing: '-0.01em',
   },
 });
