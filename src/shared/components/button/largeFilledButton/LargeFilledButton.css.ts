@@ -6,8 +6,8 @@ import { colorVars } from '@styles/tokens/color.css';
 
 export const largeFilled = recipe({
   base: {
-    width: '100%',
-    minWidth: '16.4rem',
+    // width: '100%',
+    minWidth: '7.4rem',
     height: '4.8rem',
     padding: '1rem 2rem',
     alignItems: 'center',
@@ -38,6 +38,12 @@ export const largeFilled = recipe({
       },
     },
     buttonSize: {
+      small: {
+        height: '3.2rem',
+        padding: '0.7rem 0',
+        borderRadius: '6px',
+        ...fontStyle('caption_r_12'),
+      },
       medium: {
         minWidth: '10.7rem',
         textAlign: 'center',
