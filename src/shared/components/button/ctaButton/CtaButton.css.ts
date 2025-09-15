@@ -58,6 +58,11 @@ export const CtaButton = recipe({
       },
       notFound: {
         backgroundColor: colorVars.color.gray200,
+        color: colorVars.color.gray900,
+
+        ':active': {
+          backgroundColor: colorVars.color.gray300,
+        },
       },
     },
     buttonSize: {
