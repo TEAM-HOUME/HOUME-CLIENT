@@ -53,3 +53,17 @@ export const ButtonSizeSmall: Story = {
     buttonSize: 'small',
   },
 };
+
+export const ButtonSizeMedium: Story = {
+  args: {
+    children: '버튼 이름',
+    buttonSize: 'medium',
+  },
+};
+
+export const ButtonLarge: Story = {
+  args: {
+    children: '버튼 이름',
+    buttonSize: 'large',
+  },
+};
