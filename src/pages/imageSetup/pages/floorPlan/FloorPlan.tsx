@@ -8,12 +8,12 @@ import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
 import * as styles from './FloorPlan.css';
 import FloorPlanList from './FloorPlanList';
-import FunnelHeader from '../../header/FunnelHeader';
+import FunnelHeader from '../../components/header/FunnelHeader';
 
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
-} from '../../../types/funnel/steps';
+} from '../../types/funnel/steps';
 
 interface FloorPlanProps {
   context: ImageSetupSteps['FloorPlan'];
