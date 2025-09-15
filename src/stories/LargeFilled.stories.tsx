@@ -33,9 +33,23 @@ export const Disabled: Story = {
   },
 };
 
+export const Selected: Story = {
+  args: {
+    children: '버튼 이름',
+    isSelected: true,
+  },
+};
+
 export const Error: Story = {
   args: {
     children: '버튼 이름',
     isError: true,
+  },
+};
+
+export const ButtonSizeSmall: Story = {
+  args: {
+    children: '슈퍼싱글',
+    buttonSize: 'small',
   },
 };
