@@ -12,6 +12,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import RootLayout from '@/layout/RootLayout';
+import Error404Page from '@/pages/Error404Page/Error404Page';
 import LoadingPage from '@/pages/generate/components/loading/LoadingPage';
 import ResultPage from '@/pages/generate/components/result/ResultPage';
 import GeneratePage from '@/pages/generate/GeneratePage';
@@ -89,6 +90,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: protectedRoutes,
       },
+      { path: '*', element: <Error404Page /> },
     ],
   },
 ]);
