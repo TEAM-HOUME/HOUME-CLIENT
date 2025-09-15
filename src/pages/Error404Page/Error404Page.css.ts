@@ -1,9 +1,6 @@
 import { style } from '@vanilla-extract/css';
-import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
-import { animationTokens } from '@/shared/styles/tokens/animation.css';
-import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 import { colorVars } from '@styles/tokens/color.css';
 
