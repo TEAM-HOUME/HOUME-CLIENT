@@ -65,12 +65,12 @@ export const largeFilled = recipe({
     // small + selected
     {
       variants: { buttonSize: 'small', selected: true },
-      style: fontStyle('caption_m_12'),
+      style: { ...fontStyle('caption_m_12') },
     },
     // small + error
     {
       variants: { buttonSize: 'small', state: 'error' },
-      style: fontStyle('caption_m_12'),
+      style: { ...fontStyle('caption_m_12') },
     },
   ],
   defaultVariants: {
