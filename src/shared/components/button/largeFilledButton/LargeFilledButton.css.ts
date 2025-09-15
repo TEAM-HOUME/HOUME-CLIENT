@@ -6,7 +6,7 @@ import { colorVars } from '@styles/tokens/color.css';
 
 export const largeFilled = recipe({
   base: {
-    // width: '100%',
+    width: '100%',
     minWidth: '7.4rem',
     height: '4.8rem',
     padding: '1rem 2rem',
