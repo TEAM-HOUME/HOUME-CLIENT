@@ -1,9 +1,18 @@
+import { useNavigate } from 'react-router-dom';
+
+import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
-import Img404Error from '@assets/images/img404Error.svg?react';
+import Img404Error from '@assets/images/img404Error.png';
 import * as styles from '@pages/Error404Page/Error404Page.css';
 
 const Error404Page = () => {
+  const navigate = useNavigate();
+
+  const goToHome = () => {
+    navigate(ROUTES.HOME);
+  };
+
   return (
     <main className={styles.contentWrapper}>
       <section className={styles.textSection}>
@@ -14,10 +23,12 @@ const Error404Page = () => {
         </p>
       </section>
       <section className={styles.imgSection}>
-        <Img404Error />
+        <img src={Img404Error} alt="404에러 이미지" />
       </section>
       <section className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound">홈으로 돌아가기</CtaButton>
+        <CtaButton typeVariant="notFound" onClick={goToHome}>
+          홈으로 돌아가기
+        </CtaButton>
       </section>
     </main>
   );
