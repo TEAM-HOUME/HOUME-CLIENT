@@ -7,23 +7,16 @@ import * as styles from './ErrorImageGroup.css.ts';
 export default function ErrorImageGroup() {
   return (
     <div className={styles.wrapper}>
-      <img
-        src={HouseImg}
-        className={styles.houseLayer}
-        alt=""
-        aria-hidden="true"
-      />
+      <img src={HouseImg} className={styles.houseLayer} alt="" />
       <img
         src={Ghost1Img}
         className={`${styles.layer} ${styles.floatLoop}`}
         alt=""
-        aria-hidden="true"
       />
       <img
         src={Ghost2Img}
         className={`${styles.layer} ${styles.floatLoop}`}
         alt=""
-        aria-hidden="true"
       />
     </div>
   );
