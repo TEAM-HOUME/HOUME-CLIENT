@@ -50,7 +50,7 @@ const TitleNavBar = ({
         {isSettingBtn && (
           <button
             type="button"
-            onClick={() => navigate(ROUTES.LOGIN)}
+            onClick={() => navigate(ROUTES.SETTING)}
             className={btnStyles.settingNav}
           >
             설정
