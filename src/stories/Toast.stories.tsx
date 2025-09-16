@@ -22,7 +22,7 @@ const meta = {
       description: {
         component:
           'react-toastify로 구현한 토스트 컴포넌트입니다.\n' +
-          'toast type(success, warning)을 설정해 상황에 적절한 토스트 컴포넌트를 렌더링합니다.',
+          'toast type을 설정해 상황에 적절한 토스트 컴포넌트를 렌더링합니다.',
       },
     },
   },

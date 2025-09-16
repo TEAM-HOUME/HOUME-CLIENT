@@ -11,8 +11,8 @@ const ToastTest = () => {
         type="button"
         onClick={() =>
           notify({
-            text: '상품을 찜했어요! 위시리스트롤 이동할까요?',
-            type: TOAST_TYPE.NAVIGATE,
+            text: '상품을 찜했어요! 위시리스트로 이동할까요?',
+            type: TOAST_TYPE.WARNING,
             onClick: () => {
               console.log('토스트 클릭');
             },
