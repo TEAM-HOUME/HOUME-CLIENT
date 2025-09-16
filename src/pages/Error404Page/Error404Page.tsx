@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
+import ErrorImageGroup from '@pages/Error404Page/components/ErrorImageGroup';
 import * as styles from '@pages/Error404Page/Error404Page.css.ts';
-
-import ErrorImageGroup from './components/ErrorImageGroup';
 
 const Error404Page = () => {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ const Error404Page = () => {
   return (
     <main className={styles.contentWrapper}>
       <Helmet>
-        <title>404 - 페이지를 찾을 수 없습니다</title>
+        <title>404</title>
         <meta name="robots" content="noindex" />
       </Helmet>
 
