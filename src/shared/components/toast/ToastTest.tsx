@@ -1,3 +1,5 @@
+import { TOAST_TYPE } from '@/shared/types/toast';
+
 import { useToast } from './useToast';
 
 const ToastTest = () => {
@@ -9,8 +11,11 @@ const ToastTest = () => {
         type="button"
         onClick={() =>
           notify({
-            text: '결제는 아직 준비 중인 기능이에요',
-            type: 'success',
+            text: '상품을 찜했어요! 위시리스트롤 이동할까요?',
+            type: TOAST_TYPE.NAVIGATE,
+            onClick: () => {
+              console.log('토스트 클릭');
+            },
             options: {
               style: {
                 marginBottom: '5rem',

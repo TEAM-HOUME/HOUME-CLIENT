@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 export const Success: Story = {
   args: {
     text: '작업이 성공적으로 완료되었습니다!',
-    type: TOAST_TYPE.SUCCESS,
+    type: TOAST_TYPE.INFO,
   },
 };
 
