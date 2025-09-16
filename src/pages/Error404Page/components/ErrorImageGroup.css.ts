@@ -17,7 +17,7 @@ export const layer = style({
   pointerEvents: 'none', // 클릭 차단
 });
 
-export const houseLayer = style([layer, { zIndex: zIndex.house }]); // layer + zIndex 값
+export const houseLayer = style([layer, { zIndex: zIndex.illustration }]); // layer + zIndex 값
 
 const float = keyframes({
   '0%': { transform: 'translateY(0)' }, // 시작 시점
