@@ -1,5 +1,6 @@
 export const zIndex = {
   base: 1,
+  house: 2,
   text: 10,
   blurButton: 40,
   button: 50,

@@ -1,5 +1,7 @@
 import { style, keyframes } from '@vanilla-extract/css';
 
+import { zIndex } from '@/shared/styles/tokens/zIndex';
+
 export const wrapper = style({
   position: 'relative',
   width: '100%',
@@ -16,7 +18,7 @@ export const layer = style({
   willChange: 'transform',
 });
 
-export const houseLayer = style([layer, { zIndex: 2 }]); // layer + zIndex 값
+export const houseLayer = style([layer, { zIndex: zIndex.house }]); // layer + zIndex 값
 
 const float = keyframes({
   '0%': { transform: 'translateY(0)' }, // 시작 시점
