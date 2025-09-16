@@ -5,8 +5,8 @@ import { ROUTES } from '@/routes/paths';
 import LogoIcon from '@shared/assets/icons/logoIcon.svg?react';
 import ProfileIcon from '@shared/assets/icons/profileIcon.svg?react';
 
-import * as btnStyles from './LoginNavBtn.css';
 import * as styles from './LogoNavBar.css';
+import * as btnStyles from './NavBtn.css';
 
 type ButtonType = 'login' | 'profile' | null;
 
