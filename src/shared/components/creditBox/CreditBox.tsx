@@ -1,3 +1,5 @@
+// 스프린트 PhaseA에서 사라진 컴포넌트, 더이상 사용 X
+
 import { useState } from 'react';
 
 import ChargeButton from '@components/button/chargeButton/ChargeButton';
