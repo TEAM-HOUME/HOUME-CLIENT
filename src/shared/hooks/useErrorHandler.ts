@@ -7,6 +7,8 @@ import { useToast } from '@/shared/components/toast/useToast';
 import type { ErrorType, PageContext } from '@/shared/types/error';
 import { ERROR_MESSAGES } from '@/shared/types/error';
 
+import { TOAST_TYPE } from '../types/toast';
+
 /**
  * 중앙화된 에러 핸들러 훅
  *
@@ -97,7 +99,7 @@ export const useErrorHandler = (context: PageContext) => {
 
         notify({
           text: message,
-          type: 'warning',
+          type: TOAST_TYPE.WARNING,
         });
 
         setTimeout(() => {
@@ -126,7 +128,7 @@ export const useErrorHandler = (context: PageContext) => {
 
       notify({
         text: message,
-        type: 'warning',
+        type: TOAST_TYPE.WARNING,
       });
 
       // 리다이렉트

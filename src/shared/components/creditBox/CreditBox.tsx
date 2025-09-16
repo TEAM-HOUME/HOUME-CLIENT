@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { TOAST_TYPE } from '@/shared/types/toast';
+
 import ChargeButton from '@components/button/chargeButton/ChargeButton';
 
 import * as styles from './CreditBox.css';
@@ -20,7 +22,7 @@ const CreditBox = ({ credit, disabled = false }: CreditBoxProps) => {
 
     notify({
       text: '결제는 아직 준비 중인 기능이에요',
-      type: 'warning',
+      type: TOAST_TYPE.WARNING,
       options: {
         style: { marginBottom: '2rem' },
       },
