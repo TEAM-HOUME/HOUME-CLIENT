@@ -8,7 +8,7 @@ import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-import Modal from '@/shared/components/overlay/modal/Modal';
+import CreditModal from '@/shared/components/overlay/modal/CreditModal';
 import HeadingText from '@/shared/components/text/HeadingText';
 
 import BlurImage from '@assets/icons/recommendBlur.svg?react';
@@ -112,7 +112,7 @@ const ResultPage = () => {
 
   const handleOpenModal = () => {
     overlay.open(({ unmount }) => (
-      <Modal
+      <CreditModal
         onClose={unmount}
         title={`스타일링 이미지대로 가구를\n추천 받으려면 크레딧이 필요해요`}
         onCreditAction={sendCreditLogs} // 크레딧 액션 콜백 전달
