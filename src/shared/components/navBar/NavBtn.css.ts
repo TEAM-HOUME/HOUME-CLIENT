@@ -9,6 +9,7 @@ export const loginNav = style({
   color: colorVars.color.gray900,
   textDecoration: 'underline',
   textUnderlineOffset: '3px',
+  cursor: 'pointer',
 });
 
 export const settingNav = style({
@@ -16,4 +17,5 @@ export const settingNav = style({
   height: '4.8rem',
   textAlign: 'center',
   color: colorVars.color.gray700,
+  cursor: 'pointer',
 });
