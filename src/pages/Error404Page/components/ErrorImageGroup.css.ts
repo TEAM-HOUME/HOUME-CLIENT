@@ -15,7 +15,6 @@ export const layer = style({
   height: '100%',
   objectFit: 'contain',
   pointerEvents: 'none', // 클릭 차단
-  willChange: 'transform',
 });
 
 export const houseLayer = style([layer, { zIndex: zIndex.house }]); // layer + zIndex 값
@@ -29,4 +28,5 @@ const float = keyframes({
 // 왕복 애니메이션
 export const floatLoop = style({
   animation: `${float} 3s ease-in-out infinite`,
+  willChange: 'transform',
 });
