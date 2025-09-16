@@ -10,7 +10,7 @@ import ErrorImageGroup from './components/ErrorImageGroup';
 const Error404Page = () => {
   const navigate = useNavigate();
 
-  const goToHome = () => {
+  const handleGoToHome = () => {
     navigate(ROUTES.HOME);
   };
 
@@ -27,7 +27,7 @@ const Error404Page = () => {
         <ErrorImageGroup />
       </section>
       <section className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound" onClick={goToHome}>
+        <CtaButton typeVariant="notFound" onClick={handleGoToHome}>
           홈으로 돌아가기
         </CtaButton>
       </section>
