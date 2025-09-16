@@ -6,7 +6,7 @@ interface CaptionChipProps {
 }
 
 const CaptionChip = ({ text, stroke = false }: CaptionChipProps) => {
-  return <div className={styles.captionChip({ stroke })}>{text}</div>;
+  return <span className={styles.captionChip({ stroke })}>{text}</span>;
 };
 
 export default CaptionChip;

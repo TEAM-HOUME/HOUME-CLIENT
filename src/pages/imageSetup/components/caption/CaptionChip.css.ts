@@ -5,6 +5,8 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const captionChip = recipe({
   base: {
+    display: 'inline-flex',
+    alignItems: 'center',
     backgroundColor: colorVars.color.primary_light2,
     borderRadius: '3px',
     ...fontStyle('caption_m_12'),

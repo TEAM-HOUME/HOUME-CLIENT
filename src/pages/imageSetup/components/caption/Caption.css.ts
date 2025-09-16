@@ -6,7 +6,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 export const container = style({
   display: 'flex',
   padding: '0.8rem 1rem',
-  borderRadius: '0.8rem',
+  borderRadius: '8px',
   backgroundColor: colorVars.color.gray000,
   outline: `1px solid ${colorVars.color.gray300}`,
   outlineOffset: '-1px',
