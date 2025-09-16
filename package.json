@@ -36,6 +36,7 @@
     "overlay-kit": "^1.8.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.6.3",
     "react-toastify": "^11.0.5",
     "zustand": "^5.0.6"

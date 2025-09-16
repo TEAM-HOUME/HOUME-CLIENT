@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
@@ -16,6 +17,11 @@ const Error404Page = () => {
 
   return (
     <main className={styles.contentWrapper}>
+      <Helmet>
+        <title>404 - 페이지를 찾을 수 없습니다</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+
       <section className={styles.textSection}>
         <h1 className={styles.headerText}>유효하지 않은 링크예요!</h1>
         <p className={styles.bodyText}>
