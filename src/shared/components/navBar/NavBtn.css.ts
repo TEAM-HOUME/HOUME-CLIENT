@@ -15,5 +15,5 @@ export const settingNav = style({
   width: '3.2rem',
   height: '4.8rem',
   textAlign: 'center',
-  color: colorVars.color.gray900,
+  color: colorVars.color.gray700,
 });
