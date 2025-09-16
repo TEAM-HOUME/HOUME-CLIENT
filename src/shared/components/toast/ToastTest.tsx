@@ -10,7 +10,7 @@ const ToastTest = () => {
         onClick={() =>
           notify({
             text: '결제는 아직 준비 중인 기능이에요',
-            type: 'warning',
+            type: 'success',
             options: {
               style: {
                 marginBottom: '5rem',

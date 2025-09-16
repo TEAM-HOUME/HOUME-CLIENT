@@ -1,4 +1,4 @@
-import Popup from './Popup';
+import Popup from '../shared/components/overlay/popup/Popup';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
