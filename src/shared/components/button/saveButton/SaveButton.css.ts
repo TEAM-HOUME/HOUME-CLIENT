@@ -5,4 +5,5 @@ export const buttonWrapper = style({
   background: 'none',
   border: 'none',
   padding: 0,
+  margin: 0,
 });
