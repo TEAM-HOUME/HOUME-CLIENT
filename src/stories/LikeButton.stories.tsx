@@ -9,7 +9,17 @@ const meta: Meta<typeof LikeButton> = {
   parameters: {
     docs: {
       description: {
-        component: '좋아요 버튼 컴포넌트. 선택 전/후 상태를 보여줍니다.',
+        component:
+          '좋아요 버튼 컴포넌트. 텍스트+아이콘(withText) / 아이콘-only(onlyIcon) 타입을 지원합니다.',
+      },
+    },
+    argTypes: {
+      type: {
+        control: 'radio',
+        options: ['withText', 'onlyIcon'],
+      },
+      isSelected: {
+        control: 'boolean',
       },
     },
   },
@@ -18,8 +28,42 @@ const meta: Meta<typeof LikeButton> = {
 export default meta;
 type Story = StoryObj<typeof LikeButton>;
 
-export const Active: Story = {
+const GrayBg = (Story: any) => (
+  <div style={{ background: '#F3F4F7', padding: 16 }}>
+    <Story />
+  </div>
+);
+
+// 텍스트+아이콘
+export const WithText: Story = {
   args: {
-    children: '이름',
+    typeVariant: 'withText',
+    isSelected: false,
+    children: '좋아요',
   },
+};
+
+export const WithTextSelected: Story = {
+  args: {
+    typeVariant: 'withText',
+    isSelected: true,
+    children: '좋아요',
+  },
+};
+
+// 아이콘-only 버튼
+export const OnlyIcon: Story = {
+  args: {
+    typeVariant: 'onlyIcon',
+    isSelected: false,
+  },
+  decorators: [GrayBg],
+};
+
+export const OnlyIconSelected: Story = {
+  args: {
+    typeVariant: 'onlyIcon',
+    isSelected: true,
+  },
+  decorators: [GrayBg],
 };
