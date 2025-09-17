@@ -13,14 +13,14 @@ const meta: Meta<typeof LikeButton> = {
           '좋아요 버튼 컴포넌트. 텍스트+아이콘(withText) / 아이콘-only(onlyIcon) 타입을 지원합니다.',
       },
     },
-    argTypes: {
-      type: {
-        control: 'radio',
-        options: ['withText', 'onlyIcon'],
-      },
-      isSelected: {
-        control: 'boolean',
-      },
+  },
+  argTypes: {
+    typeVariant: {
+      control: 'radio',
+      options: ['withText', 'onlyIcon'],
+    },
+    isSelected: {
+      control: 'boolean',
     },
   },
 };
@@ -56,6 +56,7 @@ export const OnlyIcon: Story = {
   args: {
     typeVariant: 'onlyIcon',
     isSelected: false,
+    'aria-label': '좋아요',
   },
   decorators: [GrayBg],
 };
@@ -64,6 +65,7 @@ export const OnlyIconSelected: Story = {
   args: {
     typeVariant: 'onlyIcon',
     isSelected: true,
+    'aria-label': '좋아요',
   },
   decorators: [GrayBg],
 };
