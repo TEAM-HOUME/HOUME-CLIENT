@@ -14,7 +14,7 @@ const LinkButton = ({
   return (
     <a
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener noreferrer" // 새 탭으로 열기
       className={styles.linkButton({
         type: typeVariant,
       })}
