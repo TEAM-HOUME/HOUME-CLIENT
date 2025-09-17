@@ -36,14 +36,14 @@ const CardProduct = ({
             typeVariant={isLarge ? 'withText' : 'onlyIcon'}
             aria-label="공식 사이트로 이동"
           >
-            {size === 'large' ? linkLabel : null}
+            {isLarge && linkLabel}
           </LinkButton>
         </div>
       </section>
       <section className={styles.bottomSection}>
         <div className={styles.textContainer}>
           <p className={styles.productText}>{title}</p>
-          {size === 'large' && <p className={styles.brandText}>{brand}</p>}
+          {isLarge && <p className={styles.brandText}>{brand}</p>}
         </div>
         <div className={styles.saveBtnContainer}>
           <SaveButton isSelected={isSaved} onClick={onToggleSave} />
