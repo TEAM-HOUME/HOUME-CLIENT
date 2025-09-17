@@ -33,13 +33,15 @@ const CardProduct = ({
       <section className={styles.imgSection({ size })}>
         <CardImage />
         <div className={styles.linkBtnContainer}>
-          <LinkButton
-            href={linkHref}
-            typeVariant={isLarge ? 'withText' : 'onlyIcon'}
-            aria-label="공식 사이트로 이동"
-          >
-            {isLarge && linkLabel}
-          </LinkButton>
+          {linkHref && (
+            <LinkButton
+              href={linkHref}
+              typeVariant={isLarge ? 'withText' : 'onlyIcon'}
+              aria-label={isLarge ? undefined : '공식 사이트로 이동'}
+            >
+              {isLarge && linkLabel}
+            </LinkButton>
+          )}
         </div>
       </section>
       <section className={styles.bottomSection}>

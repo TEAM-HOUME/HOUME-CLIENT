@@ -13,12 +13,12 @@ const LinkButton = ({
 }: LinkButtonProps) => {
   return (
     <a
+      {...props}
       target="_blank"
       rel="noopener noreferrer" // 새 탭으로 열기
       className={styles.linkButton({
         type: typeVariant,
       })}
-      {...props}
     >
       <LinkIcon />
       {children}
