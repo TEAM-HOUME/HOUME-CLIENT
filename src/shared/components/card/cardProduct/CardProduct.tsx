@@ -13,7 +13,7 @@ interface CardProductProps {
   // image: string;
   isSaved: boolean;
   onToggleSave: () => void;
-  // linkHref?: string;
+  linkHref?: string;
   linkLabel?: string;
 }
 
@@ -23,6 +23,7 @@ const CardProduct = ({
   brand,
   isSaved,
   onToggleSave,
+  linkHref,
   linkLabel = '사이트',
 }: CardProductProps) => {
   const isLarge = size === 'large';
@@ -33,6 +34,7 @@ const CardProduct = ({
         <CardImage />
         <div className={styles.linkBtnContainer}>
           <LinkButton
+            href={linkHref}
             typeVariant={isLarge ? 'withText' : 'onlyIcon'}
             aria-label="공식 사이트로 이동"
           >

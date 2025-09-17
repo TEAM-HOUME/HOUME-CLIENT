@@ -1,7 +1,7 @@
 import LinkIcon from '@assets/icons/icnLink.svg?react';
 
 import * as styles from './LinkButton.css';
-interface LinkButtonProps extends React.ComponentProps<'button'> {
+interface LinkButtonProps extends React.ComponentProps<'a'> {
   children?: React.ReactNode;
   typeVariant?: 'withText' | 'onlyIcon';
 }
@@ -12,8 +12,9 @@ const LinkButton = ({
   ...props
 }: LinkButtonProps) => {
   return (
-    <button
-      type="button"
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
       className={styles.linkButton({
         type: typeVariant,
       })}
@@ -21,7 +22,7 @@ const LinkButton = ({
     >
       <LinkIcon />
       {children}
-    </button>
+    </a>
   );
 };
 
