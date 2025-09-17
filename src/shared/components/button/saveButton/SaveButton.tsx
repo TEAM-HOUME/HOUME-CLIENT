@@ -10,18 +10,20 @@ interface SaveButtonProps extends React.ComponentProps<'button'> {
   onClick: () => void;
 }
 
-const SaveButton = ({ isSelected, onClick, ...props }: SaveButtonProps) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={isSelected}
-      className={styles.buttonWrapper}
-      {...props}
-    >
-      {isSelected ? <SaveOnIcon /> : <SaveOffIcon />}
-    </button>
-  );
-};
+const SaveButton = React.memo(
+  ({ isSelected, onClick, ...props }: SaveButtonProps) => {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-pressed={isSelected}
+        className={styles.buttonWrapper}
+        {...props}
+      >
+        {isSelected ? <SaveOnIcon /> : <SaveOffIcon />}
+      </button>
+    );
+  }
+);
 
 export default SaveButton;
