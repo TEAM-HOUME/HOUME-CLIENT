@@ -3,6 +3,7 @@ import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
+import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 export const wrapper = recipe({
   base: {
@@ -37,7 +38,7 @@ export const imgSection = recipe({
 
 export const linkBtnContainer = style({
   position: 'absolute',
-  zIndex: 1,
+  zIndex: zIndex.button,
   left: '0.8rem',
   bottom: '0.8rem',
 });
