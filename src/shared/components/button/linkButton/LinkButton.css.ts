@@ -11,6 +11,7 @@ export const linkButton = recipe({
     padding: '0.6rem',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: '999px',
 
     transition: 'all 0.2s ease-in-out',
