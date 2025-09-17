@@ -6,14 +6,14 @@ import DislikeIconGray from '@assets/icons/dislikeGray.svg?react';
 import * as styles from './LikeButton.css';
 
 interface DislikeButtonProps extends React.ComponentProps<'button'> {
-  children: React.ReactNode;
-  size?: 'small' | 'large';
+  children?: React.ReactNode;
+  typeVariant?: 'withText' | 'onlyIcon';
   isSelected?: boolean;
 }
 
 const DislikeButton = ({
   children,
-  size = 'large',
+  typeVariant = 'withText',
   isSelected = false,
   ...props
 }: DislikeButtonProps) => {
@@ -23,7 +23,7 @@ const DislikeButton = ({
       aria-pressed={isSelected}
       className={styles.likeButton({
         selected: isSelected,
-        size,
+        type: typeVariant,
       })}
       {...props}
     >
