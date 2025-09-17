@@ -13,7 +13,7 @@ interface DislikeButtonProps extends React.ComponentProps<'button'> {
 
 const DislikeButton = ({
   children,
-  size = 'small',
+  size = 'large',
   isSelected = false,
   ...props
 }: DislikeButtonProps) => {
