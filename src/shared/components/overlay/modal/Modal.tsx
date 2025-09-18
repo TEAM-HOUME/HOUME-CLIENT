@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import { TOAST_TYPE } from '@/shared/types/toast';
 import { useUserStore } from '@/store/useUserStore';
 
 import CreditIcon from '@assets/icons/modalCoin.png';
@@ -34,7 +35,7 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
 
     notify({
       text: '결제는 아직 준비 중인 기능이에요',
-      type: 'warning',
+      type: TOAST_TYPE.WARNING,
     });
     setIsButtonActive(false);
   };
