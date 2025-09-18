@@ -9,6 +9,7 @@ import NoMatchSheet from '@/shared/components/bottomSheet/noMatchSheet/NoMatchSh
 import NoMatchButton from '@/shared/components/button/noMatchButton/NoMatchButton';
 import FloorPlanItem from '@/shared/components/card/floorCard/FloorCard';
 import { useToast } from '@/shared/components/toast/useToast';
+import { TOAST_TYPE } from '@/shared/types/toast';
 
 import * as styles from './FloorPlanList.css';
 
@@ -43,7 +44,7 @@ const FloorPlanList = ({
     handleCloseSheet();
     notify({
       text: '주소가 성공적으로 제출되었어요',
-      type: 'success',
+      type: TOAST_TYPE.INFO,
       options: {
         autoClose: 3000,
       },

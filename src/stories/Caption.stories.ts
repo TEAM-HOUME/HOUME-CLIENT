@@ -1,4 +1,4 @@
-import Caption from '@/shared/components/text/Caption';
+import Caption from '@/pages/imageSetup/components/caption/Caption';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 

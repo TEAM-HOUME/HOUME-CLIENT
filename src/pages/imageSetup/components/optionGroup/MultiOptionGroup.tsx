@@ -1,7 +1,7 @@
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton';
 import ShowErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton';
-import Caption from '@/shared/components/text/Caption';
 
+import Caption from '../caption/Caption';
 import * as styles from '../StepCommon.css';
 import Subtitle from '../subtitle/Subtitle';
 
