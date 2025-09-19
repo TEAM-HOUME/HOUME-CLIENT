@@ -5,11 +5,7 @@ export const filterMockData = [
   { id: 3, furniture: '러그' },
   { id: 4, furniture: '스탠드' },
   { id: 5, furniture: '가구' },
-  { id: 5, furniture: '가구' },
-  { id: 5, furniture: '가구' },
-  { id: 5, furniture: '가구' },
-  { id: 5, furniture: '가구' },
-  { id: 5, furniture: '가구' },
+  { id: 6, furniture: '가구' },
 ];
 
 // product
