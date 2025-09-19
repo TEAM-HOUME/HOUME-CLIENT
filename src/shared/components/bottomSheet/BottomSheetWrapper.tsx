@@ -154,6 +154,18 @@ export const BottomSheetWrapper = ({
     [threshold, onClose]
   );
 
+  // bottom sheet 열렸을 때 body의 스크롤 막기
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 컴포넌트가 언마운트되거나 isOpen 상태가 false로 바뀔 때의 클린업(cleanup) 함수
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
     <>
       <div
