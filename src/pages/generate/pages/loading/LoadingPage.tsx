@@ -214,14 +214,12 @@ const LoadingPage = () => {
         {!hasError && (
           <div className={styles.buttonGroup}>
             <LikeButton
-              size={'large'}
               onClick={() => handleVote(true)}
               isSelected={selected === 'like'}
             >
               좋아요
             </LikeButton>
             <DislikeButton
-              size={'large'}
               onClick={() => handleVote(false)}
               isSelected={selected === 'dislike'}
             >

@@ -3,14 +3,14 @@ import LikeIconGray from '@assets/icons/likeGray.svg?react';
 
 import * as styles from './LikeButton.css';
 interface LikeButtonProps extends React.ComponentProps<'button'> {
-  children: React.ReactNode;
-  size?: 'small' | 'large';
+  children?: React.ReactNode;
+  typeVariant?: 'withText' | 'onlyIcon';
   isSelected?: boolean;
 }
 
 const LikeButton = ({
   children,
-  size = 'small',
+  typeVariant = 'withText',
   isSelected = false,
   ...props
 }: LikeButtonProps) => {
@@ -19,8 +19,8 @@ const LikeButton = ({
       type="button"
       aria-pressed={isSelected}
       className={styles.likeButton({
+        type: typeVariant,
         selected: isSelected,
-        size,
       })}
       {...props}
     >
