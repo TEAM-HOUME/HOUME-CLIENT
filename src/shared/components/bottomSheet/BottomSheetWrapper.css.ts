@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
 import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
@@ -42,18 +43,40 @@ export const sheetState = styleVariants({
   collapsed: { transform: 'translate(-50%, 100%)' }, // 접힌 상태
 });
 
-export const contentWrapper = style({
-  padding: '0 2rem 2rem 2rem',
-  minHeight: '30rem',
+export const contentWrapper = recipe({
+  base: {
+    minHeight: '30rem',
+  },
+  variants: {
+    type: {
+      basic: {
+        padding: '0 2rem 2rem 2rem',
+      },
+      curation: {
+        padding: '0 1.6rem',
+      },
+    },
+  },
 });
 
-export const dragHandleContainer = style({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  height: '2.4rem',
-  marginBottom: '2rem',
-  touchAction: 'none',
-  userSelect: 'none',
+export const dragHandleContainer = recipe({
+  base: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '2.8rem',
+    touchAction: 'none',
+    userSelect: 'none',
+  },
+  variants: {
+    type: {
+      basic: {
+        marginBottom: '2rem',
+      },
+      curation: {
+        marginBottom: '0',
+      },
+    },
+  },
 });

@@ -17,6 +17,7 @@ interface BottomSheetWrapperProps {
   onExited?: () => void;
   children: ReactNode;
   threshold?: number;
+  typeVariant?: 'basic' | 'curation';
 }
 
 export const BottomSheetWrapper = ({
@@ -25,6 +26,7 @@ export const BottomSheetWrapper = ({
   onExited,
   children,
   threshold = SHEET_BASIC_THRESHOLD,
+  typeVariant = 'basic',
 }: BottomSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
@@ -179,11 +181,15 @@ export const BottomSheetWrapper = ({
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div
-          className={styles.contentWrapper}
+          className={styles.contentWrapper({
+            type: typeVariant,
+          })}
           onTouchStart={(e) => e.stopPropagation()}
         >
           <div
-            className={styles.dragHandleContainer}
+            className={styles.dragHandleContainer({
+              type: typeVariant,
+            })}
             onPointerDown={handlePointerDown}
           >
             <DragHandle />
