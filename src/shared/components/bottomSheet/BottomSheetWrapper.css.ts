@@ -43,7 +43,7 @@ export const sheetState = styleVariants({
 });
 
 export const contentWrapper = style({
-  padding: '2rem',
+  padding: '0 2rem 2rem 2rem',
   minHeight: '30rem',
 });
 
