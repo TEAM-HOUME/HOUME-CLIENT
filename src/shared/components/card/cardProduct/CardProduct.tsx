@@ -1,4 +1,4 @@
-import CardImage from '@assets/images/cardExImg.svg?react';
+import CardImage from '@assets/images/cardExImg.svg';
 import LinkButton from '@components/button/linkButton/LinkButton';
 import SaveButton from '@components/button/saveButton/SaveButton';
 
@@ -31,7 +31,7 @@ const CardProduct = ({
   return (
     <div className={styles.wrapper({ size })}>
       <section className={styles.imgSection({ size })}>
-        <CardImage />
+        <img src={CardImage} alt="카드 이미지" />
         <div className={styles.linkBtnContainer}>
           {linkHref && (
             <LinkButton
