@@ -13,9 +13,9 @@ import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 
 import Loading from '@components/loading/Loading';
 import {
-  useFurnitureLogMutation,
+  // useFurnitureLogMutation,
   useResultPreferenceMutation,
-  useCreditLogMutation,
+  // useCreditLogMutation,
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 
@@ -137,15 +137,15 @@ const ResultPage = () => {
               <LikeButton
                 onClick={() => handleVote(true)}
                 isSelected={selected === 'like'}
-              >
-                만족스러워요
-              </LikeButton>
+                typeVariant={'onlyIcon'}
+                aria-label="이미지 좋아요 버튼"
+              />
               <DislikeButton
                 onClick={() => handleVote(false)}
                 isSelected={selected === 'dislike'}
-              >
-                아쉬워요
-              </DislikeButton>
+                typeVariant={'onlyIcon'}
+                aria-label="이미지 싫어요 버튼"
+              />
             </div>
           </div>
         </div>
