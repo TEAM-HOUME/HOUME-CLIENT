@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 
-import { overlay } from 'overlay-kit';
+// import { overlay } from 'overlay-kit';
 import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+// import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-import Modal from '@/shared/components/overlay/modal/Modal';
+// import Modal from '@/shared/components/overlay/modal/Modal';
 // import HeadingText from '@/shared/components/text/HeadingText';
 
 import Loading from '@components/loading/Loading';
@@ -82,8 +82,8 @@ const ResultPage = () => {
 
   // result가 있을 때만 mutation hook들 호출
   const { mutate: sendPreference } = useResultPreferenceMutation();
-  const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
-  const { mutate: sendCreditLogs } = useCreditLogMutation();
+  // const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
+  // const { mutate: sendCreditLogs } = useCreditLogMutation();
 
   // 마이페이지에서 온 경우 기존 isLike 상태를 버튼에 반영
   useEffect(() => {
@@ -135,14 +135,12 @@ const ResultPage = () => {
             <p className={styles.boxText}>이미지가 마음에 드셨나요?</p>
             <div className={styles.buttonGroup}>
               <LikeButton
-                size={'large'}
                 onClick={() => handleVote(true)}
                 isSelected={selected === 'like'}
               >
                 만족스러워요
               </LikeButton>
               <DislikeButton
-                size={'large'}
                 onClick={() => handleVote(false)}
                 isSelected={selected === 'dislike'}
               >

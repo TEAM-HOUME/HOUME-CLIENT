@@ -3,8 +3,9 @@ import { Slide } from 'react-toastify';
 import type { ToastContainerProps } from 'react-toastify';
 
 export const TOAST_TYPE = {
-  SUCCESS: 'success',
+  INFO: 'info',
   WARNING: 'warning',
+  NAVIGATE: 'navigate',
 } as const;
 
 // 1) 키 타입: 'SUCCESS' | 'WARNING'
