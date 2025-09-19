@@ -7,12 +7,13 @@ import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 export const wrapper = recipe({
   base: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
   variants: {
     size: {
-      large: { width: '16.6rem' },
+      large: { minWidth: '16.6rem', maxWidth: '19.4rem' },
       small: { width: '10.8rem' },
     },
   },
