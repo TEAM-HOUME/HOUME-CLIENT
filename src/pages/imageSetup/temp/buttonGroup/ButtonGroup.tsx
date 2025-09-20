@@ -3,7 +3,8 @@ import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFille
 import * as styles from './ButtonGroup.css';
 
 export interface ButtonOption {
-  id: string;
+  id?: number;
+  code: string;
   label: string;
   disabled?: boolean;
 }
@@ -12,8 +13,8 @@ export interface ButtonGroupProps {
   title?: string;
   titleSize?: 'small' | 'large';
   options: ButtonOption[];
-  selectedIds: string[];
-  onSelectionChange: (selectedIds: string[]) => void;
+  selectedCodes: string[];
+  onSelectionChange: (selectedCodes: string[]) => void;
   selectionMode: 'single' | 'multiple';
   maxSelection?: number;
   buttonSize: 'xsmall' | 'small' | 'medium' | 'large';
@@ -26,7 +27,7 @@ const ButtonGroup = ({
   title,
   titleSize,
   options,
-  selectedIds,
+  selectedCodes,
   onSelectionChange,
   selectionMode,
   maxSelection,
@@ -34,19 +35,19 @@ const ButtonGroup = ({
   layout,
   hasBorder = false,
 }: ButtonGroupProps) => {
-  const handleButtonClick = (buttonId: string) => {
+  const handleButtonClick = (buttonCode: string) => {
     if (selectionMode == 'single') {
-      onSelectionChange([buttonId]);
+      onSelectionChange([buttonCode]);
     } else {
-      const isSelected = selectedIds.includes(buttonId);
+      const isSelected = selectedCodes.includes(buttonCode);
 
       if (isSelected) {
         // 선택 해제
-        onSelectionChange(selectedIds.filter((id) => id !== buttonId));
+        onSelectionChange(selectedCodes.filter((code) => code !== buttonCode));
       } else {
         // 선택 추가
-        if (maxSelection && selectedIds.length >= maxSelection) return;
-        onSelectionChange([...selectedIds, buttonId]);
+        if (maxSelection && selectedCodes.length >= maxSelection) return;
+        onSelectionChange([...selectedCodes, buttonCode]);
       }
     }
   };
@@ -57,11 +58,11 @@ const ButtonGroup = ({
       <div className={`${styles.buttonGroupStyles({ layout })}`}>
         {options.map((option) => (
           <LargeFilled
-            key={option.id}
+            key={option.code}
             buttonSize={buttonSize}
-            isSelected={selectedIds.includes(option.id)}
+            isSelected={selectedCodes.includes(option.code)}
             isActive={!option.disabled}
-            onClick={() => handleButtonClick(option.id)}
+            onClick={() => handleButtonClick(option.code)}
           >
             {option.label}
           </LargeFilled>
