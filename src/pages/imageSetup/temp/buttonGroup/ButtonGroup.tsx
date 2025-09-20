@@ -9,6 +9,8 @@ export interface ButtonOption {
 }
 
 export interface ButtonGroupProps {
+  title?: string;
+  titleSize?: 'small' | 'large';
   options: ButtonOption[];
   selectedIds: string[];
   onSelectionChange: (selectedIds: string[]) => void;
@@ -17,9 +19,12 @@ export interface ButtonGroupProps {
   buttonSize: 'xsmall' | 'small' | 'medium' | 'large';
   layout: 'grid-2' | 'grid-3' | 'grid-4';
   className?: string;
+  hasBorder?: boolean;
 }
 
 const ButtonGroup = ({
+  title,
+  titleSize,
   options,
   selectedIds,
   onSelectionChange,
@@ -27,6 +32,7 @@ const ButtonGroup = ({
   maxSelection,
   buttonSize,
   layout,
+  hasBorder = false,
 }: ButtonGroupProps) => {
   const handleButtonClick = (buttonId: string) => {
     if (selectionMode == 'single') {
@@ -46,18 +52,21 @@ const ButtonGroup = ({
   };
 
   return (
-    <div className={`${styles.buttonGroupStyles({ layout })}`}>
-      {options.map((option) => (
-        <LargeFilled
-          key={option.id}
-          buttonSize={buttonSize}
-          isSelected={selectedIds.includes(option.id)}
-          isActive={!option.disabled}
-          onClick={() => handleButtonClick(option.id)}
-        >
-          {option.label}
-        </LargeFilled>
-      ))}
+    <div className={styles.container({ hasBorder })}>
+      {title && <p className={styles.title({ titleSize })}>{title}</p>}
+      <div className={`${styles.buttonGroupStyles({ layout })}`}>
+        {options.map((option) => (
+          <LargeFilled
+            key={option.id}
+            buttonSize={buttonSize}
+            isSelected={selectedIds.includes(option.id)}
+            isActive={!option.disabled}
+            onClick={() => handleButtonClick(option.id)}
+          >
+            {option.label}
+          </LargeFilled>
+        ))}
+      </div>
     </div>
   );
 };
