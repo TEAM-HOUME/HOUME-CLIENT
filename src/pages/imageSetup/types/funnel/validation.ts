@@ -1,5 +1,3 @@
-import type { HouseType, RoomType } from './houseInfo';
-
 export type Selectives =
   | 'DESK'
   | 'CLOSET'
@@ -10,12 +8,8 @@ export type Selectives =
 
 export const HOUSE_INFO_VALIDATION = {
   restrictedValues: {
-    houseType: ['APARTMENT', 'ETC'] as HouseType[],
-    roomType: [
-      'TWO_ROOM',
-      'THREE_ROOM_OVER',
-      'SEPARATED_ONE_ROOM',
-    ] as RoomType[],
+    houseType: ['APARTMENT', 'ETC'],
+    roomType: ['TWO_ROOM', 'THREE_ROOM_OVER', 'SEPARATED_ONE_ROOM'],
   },
   messages: {
     houseType:
