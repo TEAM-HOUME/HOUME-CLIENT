@@ -45,32 +45,4 @@ export const productMockData = [
     linkHref: 'https://houme.kr',
     imageUrl: '',
   },
-  {
-    id: 6,
-    title: '러그',
-    brand: 'SoftHome',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
-  },
-  {
-    id: 7,
-    title: '미니멀 포스터(액자 포함)',
-    brand: 'Artify',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
-  },
-  {
-    id: 8,
-    title: '벽걸이 선반',
-    brand: 'WallUp',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
-  },
-  {
-    id: 9,
-    title: '쿠션',
-    brand: 'Cushy',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
-  },
 ];
