@@ -23,3 +23,9 @@ export const activityButton = style({
 export const caption = style({
   marginTop: '1.4rem',
 });
+
+export const furnitures = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2.4rem',
+});

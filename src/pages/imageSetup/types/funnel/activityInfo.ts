@@ -5,9 +5,12 @@ import type { ActivityOptionsResponse } from '../apis/activityInfo';
 // API 기반 Union 타입 추출
 export type ActivityType =
   ActivityOptionsResponse['activities'][number]['code'];
-// export type BedId = ActivityOptionsResponse['beds']['items'][number]['id'];
-// export type SelectiveIds =
-//   ActivityOptionsResponse['selectives']['items'][number]['id'];
+export type BedType = ActivityOptionsResponse['beds']['items'][number]['code'];
+export type BedId = ActivityOptionsResponse['beds']['items'][number]['id'];
+export type SelectiveType =
+  ActivityOptionsResponse['selectives']['items'][number]['code'];
+export type SelectiveId =
+  ActivityOptionsResponse['selectives']['items'][number]['id'];
 
 // 폼 데이터 타입 (사용자 입력값)
 export interface ActivityInfoFormData {

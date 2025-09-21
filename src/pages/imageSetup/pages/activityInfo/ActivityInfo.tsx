@@ -11,7 +11,11 @@ import Caption from '../../components/caption/Caption';
 import FunnelHeader from '../../components/header/FunnelHeader';
 import HeadingText from '../../components/headingText/HeadingText';
 
-import type { ActivityType } from '../../types/funnel/activityInfo';
+import type {
+  ActivityType,
+  BedId,
+  BedType,
+} from '../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 interface ActivityInfoProps {
@@ -90,10 +94,28 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
           </div>
         </div>
 
-        <div>
+        <div className={styles.furnitures}>
           <HeadingText
             title="가구"
             subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
+          />
+
+          <ButtonGroup<BedId>
+            title="침대"
+            titleSize="small"
+            hasBorder={true}
+            options={bedOptions}
+            selectedValues={formData.bedId ? [formData.bedId] : []}
+            onSelectionChange={(values) =>
+              setFormData((prev) => ({
+                ...prev,
+                bedId: values[0] || undefined,
+              }))
+            }
+            selectionMode="single"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.bedId}
           />
         </div>
 
