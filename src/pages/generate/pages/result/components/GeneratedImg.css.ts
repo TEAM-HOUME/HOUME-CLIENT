@@ -6,7 +6,6 @@ export const container = style({
   width: '100%',
   aspectRatio: '3 / 2',
   overflow: 'hidden',
-  border: '1px solid grey',
 });
 
 export const imgArea = recipe({
