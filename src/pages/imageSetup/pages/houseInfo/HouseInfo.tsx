@@ -11,9 +11,9 @@ import type {
 import type { ImageSetupSteps } from '@/pages/imageSetup/types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
+import * as styles from './HouseInfo.css';
 import FunnelHeader from '../../components/header/FunnelHeader';
-import OptionGroup from '../../components/optionGroup/OptionGroup';
-import * as styles from '../../components/StepCommon.css';
+import ButtonGroup from '../../temp/buttonGroup/ButtonGroup';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];
@@ -39,35 +39,53 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
         image={FUNNELHEADER_IMAGES[1]}
       />
 
-      <div className={styles.wrapper}>
-        <OptionGroup<HouseType>
+      <div className={styles.contents}>
+        <ButtonGroup<HouseType>
           title="주거 형태"
+          titleSize="large"
           options={houseTypeOptions}
-          selected={formData.houseType}
-          onButtonClick={(value) =>
-            setFormData((prev) => ({ ...prev, houseType: value }))
+          selectedValues={formData.houseType ? [formData.houseType] : []}
+          onSelectionChange={(values) =>
+            setFormData((prev) => ({
+              ...prev,
+              houseType: values[0] || undefined,
+            }))
           }
-          error={errors.houseType}
+          selectionMode="single"
+          buttonSize="large"
+          layout="grid-2"
         />
 
-        <OptionGroup<RoomType>
+        <ButtonGroup<RoomType>
           title="구조"
+          titleSize="large"
           options={roomTypeOptions}
-          selected={formData.roomType}
-          onButtonClick={(value) =>
-            setFormData((prev) => ({ ...prev, roomType: value }))
+          selectedValues={formData.roomType ? [formData.roomType] : []}
+          onSelectionChange={(values) =>
+            setFormData((prev) => ({
+              ...prev,
+              roomType: values[0] || undefined,
+            }))
           }
-          error={errors.roomType}
+          selectionMode="single"
+          buttonSize="large"
+          layout="grid-2"
         />
 
-        <OptionGroup<AreaType>
+        <ButtonGroup<AreaType>
           title="평형"
+          titleSize="large"
           options={areaTypeOptions}
-          selected={formData.areaType}
-          onButtonClick={(value) =>
-            setFormData((prev) => ({ ...prev, areaType: value }))
+          selectedValues={formData.areaType ? [formData.areaType] : []}
+          onSelectionChange={(values) =>
+            setFormData((prev) => ({
+              ...prev,
+              areaType: values[0] || undefined,
+            }))
           }
-          error={errors.areaType}
+          selectionMode="single"
+          buttonSize="large"
+          layout="grid-2"
         />
 
         <div>

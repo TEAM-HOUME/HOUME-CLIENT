@@ -5,8 +5,7 @@ import { router } from '@/routes/router';
 import Test from './pages/imageSetup/temp/Test';
 
 function App() {
-  // return <RouterProvider router={router} />;
-  return <Test />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;
