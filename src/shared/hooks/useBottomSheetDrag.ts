@@ -65,9 +65,7 @@ export const useBottomSheetDrag = ({
         const deltaY = ev.clientY - startY;
 
         if (deltaY > 0 && sheetRef.current) {
-          // 드래그 거리를 threshold 내에서 제한하여 자연스러운 움직임 구현
-          const translateY = Math.min(deltaY, threshold);
-          sheetRef.current.style.transform = `translate(-50%, ${translateY}px)`;
+          sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
           // 드래그 중에는 transition을 비활성화
           sheetRef.current.style.transition = 'none';
         }
