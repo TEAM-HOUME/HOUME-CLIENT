@@ -2,12 +2,7 @@
 import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
-import type {
-  AreaType,
-  CompletedHouseInfo,
-  HouseType,
-  RoomType,
-} from '@/pages/imageSetup/types/funnel/houseInfo';
+import type { CompletedHouseInfo } from '@/pages/imageSetup/types/funnel/houseInfo';
 import type { ImageSetupSteps } from '@/pages/imageSetup/types/funnel/steps';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
@@ -40,7 +35,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
       />
 
       <div className={styles.contents}>
-        <ButtonGroup<HouseType>
+        <ButtonGroup
           title="주거 형태"
           titleSize="large"
           options={houseTypeOptions}
@@ -57,7 +52,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           errors={errors.houseType}
         />
 
-        <ButtonGroup<RoomType>
+        <ButtonGroup
           title="구조"
           titleSize="large"
           options={roomTypeOptions}
@@ -74,7 +69,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           errors={errors.roomType}
         />
 
-        <ButtonGroup<AreaType>
+        <ButtonGroup
           title="평형"
           titleSize="large"
           options={areaTypeOptions}

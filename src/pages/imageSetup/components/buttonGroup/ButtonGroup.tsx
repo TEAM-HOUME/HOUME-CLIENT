@@ -11,12 +11,12 @@ export interface ButtonOption {
 }
 
 // 항상 code값을 반환함, id값이 필요한 경우 커스텀 훅에서 별도 로직으로 처리
-export interface ButtonGroupProps<T = string> {
+export interface ButtonGroupProps {
   title?: string;
   titleSize?: 'small' | 'large';
   options: ButtonOption[];
-  selectedValues: T[];
-  onSelectionChange: (selectedValues: T[]) => void;
+  selectedValues: string[];
+  onSelectionChange: (selectedValues: string[]) => void;
   selectionMode: 'single' | 'multiple';
   maxSelection?: number;
   buttonSize: 'xsmall' | 'small' | 'medium' | 'large';
@@ -26,7 +26,7 @@ export interface ButtonGroupProps<T = string> {
   errors?: string;
 }
 
-const ButtonGroup = <T = string,>({
+const ButtonGroup = ({
   title,
   titleSize,
   options,
@@ -38,8 +38,8 @@ const ButtonGroup = <T = string,>({
   layout,
   hasBorder = false,
   errors,
-}: ButtonGroupProps<T>) => {
-  const handleButtonClick = (buttonCode: T) => {
+}: ButtonGroupProps) => {
+  const handleButtonClick = (buttonCode: string) => {
     if (selectionMode === 'single') {
       onSelectionChange([buttonCode]);
     } else {
