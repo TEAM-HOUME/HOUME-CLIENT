@@ -13,7 +13,7 @@ export const wrapper = recipe({
   },
   variants: {
     size: {
-      large: { minWidth: '16.6rem', maxWidth: '19.4rem' },
+      large: { minWidth: '16.6rem' },
       small: { width: '10.8rem' },
     },
   },
