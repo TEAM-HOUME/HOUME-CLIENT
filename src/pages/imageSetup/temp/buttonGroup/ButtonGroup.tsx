@@ -22,7 +22,7 @@ export interface ButtonGroupProps<T = string> {
   layout: 'grid-2' | 'grid-3' | 'grid-4';
   className?: string;
   hasBorder?: boolean;
-  error?: string;
+  errors?: string;
 }
 
 const ButtonGroup = <T = string,>({
@@ -36,7 +36,7 @@ const ButtonGroup = <T = string,>({
   buttonSize,
   layout,
   hasBorder = false,
-  error,
+  errors,
 }: ButtonGroupProps<T>) => {
   const handleButtonClick = (buttonCode: T) => {
     if (selectionMode === 'single') {
@@ -70,8 +70,12 @@ const ButtonGroup = <T = string,>({
             {option.label}
           </LargeFilled>
         ))}
-        {error && <ErrorMessage message={error} />}
       </div>
+      {errors && (
+        <div className={styles.errorContainer}>
+          <ErrorMessage message={errors} />
+        </div>
+      )}
     </div>
   );
 };

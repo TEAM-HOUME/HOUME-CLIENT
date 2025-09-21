@@ -1,5 +1,5 @@
+import ErrorMessage from '@/shared/components/button/ErrorButton/ErrorMessage';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton';
-import ErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton';
 
 import Caption from '../caption/Caption';
 import * as styles from '../StepCommon.css';

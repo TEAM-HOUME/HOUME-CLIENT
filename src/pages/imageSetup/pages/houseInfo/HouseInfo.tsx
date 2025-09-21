@@ -54,6 +54,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           selectionMode="single"
           buttonSize="large"
           layout="grid-2"
+          errors={errors.houseType}
         />
 
         <ButtonGroup<RoomType>
@@ -70,6 +71,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           selectionMode="single"
           buttonSize="large"
           layout="grid-2"
+          errors={errors.roomType}
         />
 
         <ButtonGroup<AreaType>
@@ -86,6 +88,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
           selectionMode="single"
           buttonSize="large"
           layout="grid-2"
+          errors={errors.areaType}
         />
 
         <div>

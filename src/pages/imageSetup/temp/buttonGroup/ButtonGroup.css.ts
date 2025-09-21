@@ -1,3 +1,4 @@
+import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
@@ -60,4 +61,8 @@ export const buttonGroupStyles = recipe({
   defaultVariants: {
     layout: 'grid-2',
   },
+});
+
+export const errorContainer = style({
+  marginTop: '4px',
 });

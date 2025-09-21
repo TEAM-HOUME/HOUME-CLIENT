@@ -1,6 +1,6 @@
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton.tsx';
+import ErrorMessage from '@/shared/components/button/ErrorButton/ErrorMessage';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton.tsx';
-import ErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton.tsx';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
 import TextField from '@/shared/components/textField/TextField.tsx';
 import { ERROR_MESSAGES } from '@/shared/constants/clientErrorMessage.ts';
