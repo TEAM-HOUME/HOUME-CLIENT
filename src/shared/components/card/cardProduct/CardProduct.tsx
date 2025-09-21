@@ -32,7 +32,11 @@ const CardProduct = ({
   return (
     <div className={styles.wrapper({ size })}>
       <section className={styles.imgSection({ size })}>
-        <img src={imageUrl || CardImage} alt="카드 이미지" />
+        <img
+          className={styles.cardImage}
+          src={imageUrl || CardImage}
+          alt="카드 이미지"
+        />
         <div className={styles.linkBtnContainer}>
           {linkHref && (
             <LinkButton

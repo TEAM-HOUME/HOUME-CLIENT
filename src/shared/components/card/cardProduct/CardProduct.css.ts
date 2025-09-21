@@ -37,6 +37,15 @@ export const imgSection = recipe({
   },
 });
 
+export const cardImage = style({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+  display: 'block',
+  boxSizing: 'border-box',
+});
+
 export const linkBtnContainer = style({
   position: 'absolute',
   zIndex: zIndex.button,
