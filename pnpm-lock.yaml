@@ -52,6 +52,9 @@ importers:
       react-toastify:
         specifier: ^11.0.5
         version: 11.0.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      swiper:
+        specifier: ^12.0.2
+        version: 12.0.2
       zustand:
         specifier: ^5.0.6
         version: 5.0.6(@types/react@19.1.8)(react@19.1.0)
@@ -4857,6 +4860,13 @@ packages:
     engines: { node: '>=14.0.0' }
     hasBin: true
 
+  swiper@12.0.2:
+    resolution:
+      {
+        integrity: sha512-y8F6fDGXmTVVgwqJj6I00l4FdGuhpFJn0U/9Ucn1MwWOw3NdLV8aH88pZOjyhBgU/6PyBlUx+JuAQ5KMWz906Q==,
+      }
+    engines: { node: '>= 4.7.0' }
+
   synckit@0.11.8:
     resolution:
       {
@@ -8379,6 +8389,8 @@ snapshots:
       css-what: 6.2.2
       csso: 5.0.5
       picocolors: 1.1.1
+
+  swiper@12.0.2: {}
 
   synckit@0.11.8:
     dependencies:
