@@ -6,11 +6,11 @@ import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Loading from '@/shared/components/loading/Loading';
 
 import FunnelHeader from '../../components/header/FunnelHeader';
+import MainTitle from '../../components/headingText/Maintitle';
 import MultiOptionGroup from '../../components/optionGroup/MultiOptionGroup';
 import OptionGroup from '../../components/optionGroup/OptionGroup';
 import SubOptionGroup from '../../components/optionGroup/SubOptionGroup';
 import * as common from '../../components/StepCommon.css';
-import MainTitle from '../../components/title/Maintitle';
 
 import type { ActivityType } from '../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../types/funnel/steps';
