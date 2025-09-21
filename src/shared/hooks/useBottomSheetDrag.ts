@@ -1,16 +1,14 @@
 import { useCallback, useRef, type RefObject } from 'react';
-
-import { SHEET_DURATION_MS } from '@/shared/constants/bottomSheet';
-
 interface UseBottomSheetDragProps {
   sheetRef: RefObject<HTMLDivElement | null>;
   threshold: number;
-  onClose: () => void;
+  onDragUp: () => void;
+  onDragDown: () => void;
+  onDragCancel: () => void;
 }
 
 interface UseBottomSheetDragReturn {
   onHandlePointerDown: (e: React.PointerEvent) => void;
-  animateClose: () => void;
 }
 
 /**
@@ -21,25 +19,11 @@ interface UseBottomSheetDragReturn {
 export const useBottomSheetDrag = ({
   sheetRef,
   threshold,
-  onClose,
+  onDragUp,
+  onDragDown,
+  onDragCancel,
 }: UseBottomSheetDragProps): UseBottomSheetDragReturn => {
   const isDraggingRef = useRef(false);
-
-  // 드래그로 닫을 때
-  const animateClose = useCallback(() => {
-    if (!sheetRef.current) {
-      onClose();
-      return;
-    }
-    const sheet = sheetRef.current;
-    // 하단으로 이동 후 onClose 호출
-    sheet.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
-    sheet.style.transform = 'translate(-50%, 100%)';
-
-    setTimeout(() => {
-      onClose();
-    }, SHEET_DURATION_MS);
-  }, [onClose, sheetRef]);
 
   const onHandlePointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -67,10 +51,7 @@ export const useBottomSheetDrag = ({
       const handlePointerCancel = () => {
         isDraggingRef.current = false;
         // 원위치로 복귀
-        if (sheetRef.current) {
-          sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
-          sheetRef.current.style.transform = 'translate(-50%, 0)';
-        }
+        onDragCancel();
         cleanup();
       };
 
@@ -99,12 +80,14 @@ export const useBottomSheetDrag = ({
 
         if (sheetRef.current) {
           if (deltaY > threshold) {
-            // threshold를 넘으면 닫기
-            animateClose();
+            // 아래로 임계값 이상 드래그
+            onDragDown();
+          } else if (deltaY < -threshold) {
+            // 아래로 임계값 이상 드래그
+            onDragUp();
           } else {
-            // threshold 미만이면 원위치로 복귀
-            sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
-            sheetRef.current.style.transform = 'translate(-50%, 0)';
+            // 임계값 미만 -> 원위치
+            onDragCancel();
           }
         }
 
@@ -125,8 +108,8 @@ export const useBottomSheetDrag = ({
         passive: false,
       });
     },
-    [sheetRef, threshold, animateClose]
+    [onDragCancel, onDragDown, onDragUp, sheetRef, threshold]
   );
 
-  return { onHandlePointerDown, animateClose };
+  return { onHandlePointerDown };
 };

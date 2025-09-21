@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 import clsx from 'clsx';
 
@@ -31,10 +31,35 @@ export const BottomSheetWrapper = ({
 }: BottomSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
-  const { onHandlePointerDown, animateClose } = useBottomSheetDrag({
+  // 드래그로 닫을 때
+  const animateClose = useCallback(() => {
+    if (!sheetRef.current) {
+      onClose();
+      return;
+    }
+    const sheet = sheetRef.current;
+    sheet.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
+    sheet.style.transform = 'translate(-50%, 100%)';
+
+    setTimeout(() => {
+      onClose();
+    }, SHEET_DURATION_MS);
+  }, [onClose]);
+
+  // 드래그 취소 시 원위치
+  const turnToOrigin = useCallback(() => {
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
+      sheetRef.current.style.transform = 'translate(-50%, 0)';
+    }
+  }, []);
+
+  const { onHandlePointerDown } = useBottomSheetDrag({
     sheetRef,
     threshold,
-    onClose,
+    onDragUp: turnToOrigin, // 위로 드래그하면 원위치
+    onDragDown: animateClose, // 아래로 드래그하면 닫기
+    onDragCancel: turnToOrigin, // 살짝만 드래그해도 원위치
   });
 
   // 바텀시트 열기/닫기 시 초기 위치 설정
