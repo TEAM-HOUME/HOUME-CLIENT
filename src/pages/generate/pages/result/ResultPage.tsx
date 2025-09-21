@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 
 // import { overlay } from 'overlay-kit';
-import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
 // import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
@@ -19,28 +18,14 @@ import {
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 
+// import GeneratedImgA from './components/GeneratedImgA.tsx';
+import GeneratedImgB from './components/GeneratedImgB.tsx';
 import * as styles from './ResultPage.css.ts';
 
 import type {
   GenerateImageData,
   ResultPageLikeState,
 } from '@pages/generate/types/generate';
-
-// 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
-const convertMypageDataToGenerateData = (
-  mypageData: MyPageImageDetailData,
-  imageId: number
-): GenerateImageData => {
-  return {
-    imageId,
-    imageUrl: mypageData.generatedImageUrl,
-    isMirror: false, // 마이페이지에서는 미러 정보를 제공하지 않음
-    equilibrium: mypageData.equilibrium,
-    houseForm: mypageData.houseForm,
-    tagName: mypageData.tasteTag,
-    name: mypageData.name,
-  };
-};
 
 const ResultPage = () => {
   const location = useLocation();
@@ -74,7 +59,15 @@ const ResultPage = () => {
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
     if (isFromMypage && mypageResult) {
-      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+      result = {
+        imageId: Number(imageId),
+        imageUrl: mypageResult.generatedImageUrl,
+        isMirror: false,
+        equilibrium: mypageResult.equilibrium,
+        houseForm: mypageResult.houseForm,
+        tagName: mypageResult.tasteTag,
+        name: mypageResult.name,
+      };
     } else if (!isFromMypage && apiResult) {
       result = apiResult as GenerateImageData;
     }
@@ -125,11 +118,8 @@ const ResultPage = () => {
   return (
     <div className={styles.wrapper}>
       <section className={styles.resultSection}>
-        <img
-          src={result.imageUrl}
-          alt={`${result.name}님을 위한 맞춤 인테리어 스타일링`}
-          className={styles.imgArea({ mirrored: result.isMirror })}
-        />
+        {/* <GeneratedImgA result={result} /> */}
+        <GeneratedImgB result={result} />
         <div className={styles.buttonSection}>
           <div className={styles.buttonBox}>
             <p className={styles.boxText}>이미지가 마음에 드셨나요?</p>
