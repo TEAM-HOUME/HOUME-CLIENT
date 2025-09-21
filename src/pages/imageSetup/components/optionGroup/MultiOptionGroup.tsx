@@ -1,5 +1,5 @@
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton';
-import ShowErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton';
+import ErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton';
 
 import Caption from '../caption/Caption';
 import * as styles from '../StepCommon.css';
@@ -101,7 +101,7 @@ const MultiOptionGroup = <T = string,>({
           );
         })}
       </div>
-      {error && <ShowErrorMessage message={error} />}
+      {error && <ErrorMessage message={error} />}
     </div>
   );
 };

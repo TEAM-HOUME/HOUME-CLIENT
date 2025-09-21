@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
+import ErrorMessage from '@/shared/components/button/ErrorButton/ErrorMessage';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton';
-import ShowErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton';
 
 import * as styles from '../StepCommon.css';
 import MainTitle from '../title/Maintitle';
@@ -48,7 +48,7 @@ const OptionGroup = <T = string,>({
           </LargeFilled>
         ))}
       </div>
-      {error && <ShowErrorMessage message={error} />}
+      {error && <ErrorMessage message={error} />}
     </div>
   );
 };
