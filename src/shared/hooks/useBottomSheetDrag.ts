@@ -64,7 +64,7 @@ export const useBottomSheetDrag = ({
 
         const deltaY = ev.clientY - startY;
 
-        if (deltaY > 0 && sheetRef.current) {
+        if (sheetRef.current) {
           sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
           // 드래그 중에는 transition을 비활성화
           sheetRef.current.style.transition = 'none';
