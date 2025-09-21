@@ -51,26 +51,11 @@ export const curationSection = style({
   marginTop: '1.6rem',
 });
 
-export const wrapper = style({
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-});
-
-export const container = style({
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
 export const gridbox = style({
   width: '100%',
   height: 'fit-content',
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(16.6rem, 1fr))',
   columnGap: '1.1rem',
-  justifyContent: 'center',
+  justifyItems: 'center',
 });

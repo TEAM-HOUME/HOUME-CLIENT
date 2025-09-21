@@ -8,22 +8,11 @@ import {
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { useUserStore } from '@/store/useUserStore';
 
-import { BottomSheetWrapper } from '@components/bottomSheet/BottomSheetWrapper';
-
 import * as styles from './CurationSheet.css';
+import { CurationSheetWrapper } from './CurationSheetWrapper';
 
-interface CurationSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onExited?: () => void;
-}
-
-export const CurationSheet = ({
-  isOpen,
-  onClose,
-  onExited,
-}: CurationSheetProps) => {
-  const userName = useUserStore((state) => state.userName);
+export const CurationSheet = () => {
+  const userName = useUserStore((state) => state.userName); // 전역상태 사용
   const [isSaved, setIsSaved] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(1);
 
@@ -31,12 +20,7 @@ export const CurationSheet = ({
     setIsSaved((prev) => !prev);
   };
   return (
-    <BottomSheetWrapper
-      isOpen={isOpen}
-      onClose={onClose}
-      onExited={onExited}
-      typeVariant="curation"
-    >
+    <CurationSheetWrapper>
       <div className={styles.filterSection}>
         {filterMockData.map((filter) => (
           <FilterChip
@@ -52,27 +36,24 @@ export const CurationSheet = ({
         <p className={styles.headerText}>
           {userName}님의 취향에 딱 맞는 가구 추천
         </p>
+        {/* 그리드 영역 */}
         <div className={styles.curationSection}>
-          <div className={styles.wrapper}>
-            <div className={styles.container}>
-              <div className={styles.gridbox}>
-                {productMockData.map((p) => (
-                  <CardProduct
-                    key={p.id}
-                    size="large"
-                    title={p.title}
-                    brand={p.brand}
-                    imageUrl={p.imageUrl}
-                    linkHref={p.linkHref}
-                    isSaved={isSaved}
-                    onToggleSave={handleSave}
-                  />
-                ))}
-              </div>
-            </div>
+          <div className={styles.gridbox}>
+            {productMockData.map((p) => (
+              <CardProduct
+                key={p.id}
+                size="large"
+                title={p.title}
+                brand={p.brand}
+                imageUrl={p.imageUrl}
+                linkHref={p.linkHref}
+                isSaved={isSaved}
+                onToggleSave={handleSave}
+              />
+            ))}
           </div>
         </div>
       </div>
-    </BottomSheetWrapper>
+    </CurationSheetWrapper>
   );
 };
