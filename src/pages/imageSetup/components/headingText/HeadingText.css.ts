@@ -7,6 +7,7 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '0.6rem',
+  textAlign: 'left',
 });
 
 export const title = style({

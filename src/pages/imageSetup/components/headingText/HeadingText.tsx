@@ -2,14 +2,14 @@ import * as styles from './HeadingText.css';
 
 interface HeadingTextProps {
   title: string;
-  body: string;
+  subtitle: string;
 }
 
-const HeadingText = ({ title, body }: HeadingTextProps) => {
+const HeadingText = ({ title, subtitle }: HeadingTextProps) => {
   return (
-    <div>
+    <div className={styles.container}>
       <p className={styles.title}>{title}</p>
-      <p className={styles.subtitle}>{body}</p>
+      <p className={styles.subtitle}>{subtitle}</p>
     </div>
   );
 };

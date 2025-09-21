@@ -5,12 +5,11 @@ import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Loading from '@/shared/components/loading/Loading';
 
+import * as styles from './ActivityInfo.css';
+import ButtonGroup from '../../components/buttonGroup/ButtonGroup';
+import Caption from '../../components/caption/Caption';
 import FunnelHeader from '../../components/header/FunnelHeader';
-import MainTitle from '../../components/headingText/Maintitle';
-import MultiOptionGroup from '../../components/optionGroup/MultiOptionGroup';
-import OptionGroup from '../../components/optionGroup/OptionGroup';
-import SubOptionGroup from '../../components/optionGroup/SubOptionGroup';
-import * as common from '../../components/StepCommon.css';
+import HeadingText from '../../components/headingText/HeadingText';
 
 import type { ActivityType } from '../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../types/funnel/steps';
@@ -54,7 +53,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const selectiveOptions = activityOptionsData.selectives.items;
 
   return (
-    <div className={common.container}>
+    <div className={styles.container}>
       <FunnelHeader
         title={`마지막 단계예요!`}
         detail={`집에서 주로 하는 활동과\n배치가 필요한 가구에 대해 알려주세요.`}
@@ -62,55 +61,39 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         image={FUNNELHEADER_IMAGES[4]}
       />
 
-      <div className={common.wrapper}>
-        <OptionGroup<ActivityType>
-          title="주요 활동"
-          body="선택한 활동에 최적화된 동선을 알려드려요."
-          options={activityTypeOptions}
-          selected={formData.activityType}
-          onButtonClick={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              activityType: value,
-            }))
-          }
-          error={errors.activityType}
-        />
-
-        <div className={common.subWrapper}>
-          <MainTitle title="가구" body="선택한 가구가 이미지에 반영돼요." />
-
-          <SubOptionGroup<string>
-            subtitle="침대"
-            options={bedOptions}
-            selected={formData.bedId}
-            onButtonClick={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                bedId: value as number,
-              }))
-            }
-            useId={true}
-            error={errors.bedId}
+      <div className={styles.contents}>
+        <div>
+          <HeadingText
+            title="주요 활동"
+            subtitle="선택한 활동에 최적화된 동선을 알려드려요."
           />
+          <div className={styles.activityButton}>
+            <ButtonGroup<ActivityType>
+              options={activityTypeOptions}
+              selectedValues={
+                formData.activityType ? [formData.activityType] : []
+              }
+              onSelectionChange={(values) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  activityType: values[0] || undefined,
+                }))
+              }
+              selectionMode="single"
+              buttonSize="large"
+              layout="grid-2"
+              errors={errors.activityType}
+            />
+          </div>
+          <div className={styles.caption}>
+            {/* <Caption code={} option={} /> */}
+          </div>
+        </div>
 
-          <MultiOptionGroup<string>
-            options={selectiveOptions}
-            selected={formData.selectiveIds}
-            selectedCount={formData.selectiveIds?.length || 0}
-            onButtonClick={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                selectiveIds: value as number[],
-              }))
-            }
-            maxSelect={4}
-            isAlertPresented={true}
-            error={errors.selectiveIds}
-            isRequiredFurniture={isRequiredFurniture}
-            currentActivityLabel={getCurrentActivityLabel()}
-            requiredFurnitureLabels={getRequiredFurnitureLabels()}
-            useId={true}
+        <div>
+          <HeadingText
+            title="가구"
+            subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
           />
         </div>
 
