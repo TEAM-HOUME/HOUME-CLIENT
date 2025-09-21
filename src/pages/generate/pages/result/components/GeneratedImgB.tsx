@@ -6,7 +6,7 @@ import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
 
-import * as styles from './GenerateImage.css.ts';
+import * as styles from './GeneratedImg.css.ts';
 
 import type { GenerateImageData } from '@pages/generate/types/generate';
 
