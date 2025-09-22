@@ -52,6 +52,12 @@ export const useBottomSheetDrag = ({
         target.removeEventListener('pointerup', handlePointerUp);
         target.removeEventListener('pointercancel', handlePointerCancel);
         target.removeEventListener('lostpointercapture', handlePointerCancel);
+
+        // 드래그가 종료되면 --drag-y 변수를 초기화
+        if (sheetRef.current) {
+          sheetRef.current.style.setProperty('--drag-y', '0px');
+          sheetRef.current.style.transition = ''; // 인라인 transition도 제거
+        }
       };
 
       // 포인터 취소/캡처 해제 시 정리
@@ -75,7 +81,7 @@ export const useBottomSheetDrag = ({
           return;
         }
 
-        sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
+        sheetRef.current.style.setProperty('--drag-y', `${deltaY}px`);
         // 드래그 중에는 transition을 비활성화
         sheetRef.current.style.transition = 'none';
       };
@@ -85,11 +91,7 @@ export const useBottomSheetDrag = ({
         if (!isDraggingRef.current) return;
         setIsDragging(false);
         isDraggingRef.current = false;
-        const deltaY = ev.clientY - startY;
-
-        if (sheetRef.current) {
-          sheetRef.current.style.transition = 'transform 0.3s ease';
-        }
+        const deltaY = ev.clientY - startY; // 드래그를 시작한 지점으로부터의 변화량
 
         if (mode === 'close-only') {
           if (deltaY > threshold) {
