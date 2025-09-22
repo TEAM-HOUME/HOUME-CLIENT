@@ -30,6 +30,7 @@
     "@vanilla-extract/recipes": "^0.5.7",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
+    "firebase": "^12.3.0",
     "framer-motion": "^12.23.0",
     "lint-staged": "^16.1.2",
     "lottie-react": "^2.4.1",
