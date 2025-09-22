@@ -57,7 +57,7 @@ export const BottomSheetWrapper = ({
   const { onHandlePointerDown } = useBottomSheetDrag({
     sheetRef,
     threshold,
-    onDragUp: turnToOrigin, // 위로 드래그하면 원위치
+    onDragUp: () => {}, // 필요 없음
     onDragDown: animateClose, // 아래로 드래그하면 닫기
     onDragCancel: turnToOrigin, // 살짝만 드래그해도 원위치
   });

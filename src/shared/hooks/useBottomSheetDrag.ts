@@ -1,20 +1,21 @@
-import { useCallback, useRef, type RefObject } from 'react';
+import { useCallback, useRef, useState, type RefObject } from 'react';
 interface UseBottomSheetDragProps {
   sheetRef: RefObject<HTMLDivElement | null>;
   threshold: number;
   onDragUp: () => void;
   onDragDown: () => void;
   onDragCancel: () => void;
+  mode?: 'close-only' | 'open-close';
 }
 
 interface UseBottomSheetDragReturn {
+  isDragging: boolean;
   onHandlePointerDown: (e: React.PointerEvent) => void;
 }
 
 /**
  * Pointer Event 기반 드래그 (마우스, 터치, 펜 지원)
  * 바텀시트 드래그/닫기 동작을 담당
- * backdrop 닫기에도 동일 애니메이션을 재사용할 수 있도록 animateClose 제공
  */
 export const useBottomSheetDrag = ({
   sheetRef,
@@ -22,19 +23,25 @@ export const useBottomSheetDrag = ({
   onDragUp,
   onDragDown,
   onDragCancel,
+  mode = 'close-only',
 }: UseBottomSheetDragProps): UseBottomSheetDragReturn => {
+  const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
 
   const onHandlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      if (!sheetRef.current) return;
+
       e.preventDefault();
       e.stopPropagation();
 
       // 드래그 시작 상태 설정 (useRef로 즉시 반영)
+      setIsDragging(true);
       isDraggingRef.current = true;
-      const startY = e.clientY;
-      const target = e.currentTarget as HTMLElement;
 
+      const startY = e.clientY;
+
+      const target = e.currentTarget as HTMLElement;
       // 포인터 캡처 설정 (윈도우 밖 이동 시에도 이벤트 수신)
       target.setPointerCapture?.(e.pointerId);
 
@@ -57,34 +64,42 @@ export const useBottomSheetDrag = ({
 
       // 드래그 중 실시간 움직임 처리
       const handlePointerMove = (ev: PointerEvent) => {
-        if (!isDraggingRef.current) return;
+        if (!isDraggingRef.current || !sheetRef.current) return;
 
         ev.preventDefault();
         ev.stopPropagation();
 
         const deltaY = ev.clientY - startY;
 
-        if (sheetRef.current) {
-          sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
-          // 드래그 중에는 transition을 비활성화
-          sheetRef.current.style.transition = 'none';
-        }
+        sheetRef.current.style.setProperty('--drag-y', `${deltaY}px`);
+        // 드래그 중에는 transition을 비활성화
+        sheetRef.current.style.transition = 'none';
       };
 
       // 드래그 종료 시 동작 결정 (닫기 또는 원위치 복귀)
       const handlePointerUp = (ev: PointerEvent) => {
+        if (!isDraggingRef.current) return;
+        setIsDragging(false);
         isDraggingRef.current = false;
         const deltaY = ev.clientY - startY;
 
         if (sheetRef.current) {
+          sheetRef.current.style.transition = 'transform 0.3s ease';
+        }
+
+        if (mode === 'close-only') {
           if (deltaY > threshold) {
-            // 아래로 임계값 이상 드래그
+            onDragDown();
+          } else {
+            onDragCancel();
+          }
+        } else {
+          // 열기/닫기
+          if (deltaY > threshold) {
             onDragDown();
           } else if (deltaY < -threshold) {
-            // 아래로 임계값 이상 드래그
             onDragUp();
           } else {
-            // 임계값 미만 -> 원위치
             onDragCancel();
           }
         }
@@ -109,5 +124,5 @@ export const useBottomSheetDrag = ({
     [onDragCancel, onDragDown, onDragUp, sheetRef, threshold]
   );
 
-  return { onHandlePointerDown };
+  return { isDragging, onHandlePointerDown };
 };
