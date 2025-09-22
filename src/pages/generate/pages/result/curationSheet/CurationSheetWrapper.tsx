@@ -15,8 +15,8 @@ import * as commonStyles from '@components/bottomSheet/BottomSheetWrapper.css';
 
 import * as styles from './CurationSheetWrapper.css';
 
-const PEEK_HEIGHT = '8.8rem';
-const THRESHOLD = 150; // 드래그해야 상태 변경 임계값
+export const CURATION_PEEK_HEIGHT = '8.8rem';
+const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 
 interface CurationSheetWrapperProps {
   children: ReactNode;
@@ -26,63 +26,64 @@ export const CurationSheetWrapper = ({
   children,
 }: CurationSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  // 3단계(collapsed, mid, expanded) 상태 관리
+  const [snapState, setSnapState] = useState<'collapsed' | 'mid' | 'expanded'>(
+    'collapsed'
+  );
 
   const handleDragUp = useCallback(() => {
-    setIsExpanded(true);
-  }, []);
+    if (snapState === 'collapsed') setSnapState('mid');
+    else if (snapState === 'mid') setSnapState('expanded');
+  }, [snapState]);
 
   const handleDragDown = useCallback(() => {
-    // 확장된 상태에서만 축소되도록 처리
-    if (isExpanded) {
-      setIsExpanded(false);
-    }
-  }, [isExpanded]);
-
-  const handleDragCancel = useCallback(() => {
-    // 드래그가 취소되면 아무것도 하지 않음
-  }, []);
+    if (snapState === 'expanded') setSnapState('mid');
+    else if (snapState === 'mid') setSnapState('collapsed');
+  }, [snapState]);
 
   const { isDragging, onHandlePointerDown } = useBottomSheetDrag({
     sheetRef,
     threshold: THRESHOLD,
     onDragUp: handleDragUp,
     onDragDown: handleDragDown,
-    onDragCancel: handleDragCancel,
+    onDragCancel: () => {},
     mode: 'open-close',
   });
 
   // backdrop 활성화시 body의 스크롤 막기
   useEffect(() => {
-    if (isExpanded) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow =
+      snapState === 'expanded' ? 'hidden' : 'unset';
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isExpanded]);
+  }, [snapState]);
 
   return (
     <>
       <div
         className={clsx(
           commonStyles.backdrop,
-          (isExpanded || isDragging) && commonStyles.backdropVisible
+          (isDragging || snapState === 'expanded') &&
+            commonStyles.backdropVisible
         )}
-        onClick={() => setIsExpanded(false)}
+        onClick={() => setSnapState('mid')}
       />
 
       <div
         ref={sheetRef}
-        className={styles.sheetWrapper}
-        style={{ maxHeight: isExpanded ? '100vh' : PEEK_HEIGHT }}
+        className={clsx(styles.sheetWrapper, styles.snapStyles[snapState])}
       >
-        <div className={commonStyles.contentWrapper({ type: 'curation' })}>
+        <div
+          className={commonStyles.contentWrapper({ type: 'curation' })}
+          onClick={() => {
+            if (snapState === 'collapsed') setSnapState('mid');
+          }}
+        >
           <div
             className={commonStyles.dragHandleContainer({ type: 'curation' })}
             onPointerDown={onHandlePointerDown}
+            onClick={(e) => e.stopPropagation()}
           >
             <DragHandle />
           </div>
