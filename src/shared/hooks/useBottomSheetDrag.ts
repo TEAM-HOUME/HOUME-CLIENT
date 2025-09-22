@@ -71,7 +71,11 @@ export const useBottomSheetDrag = ({
 
         const deltaY = ev.clientY - startY;
 
-        sheetRef.current.style.setProperty('--drag-y', `${deltaY}px`);
+        if (mode === 'close-only' && deltaY < 0) {
+          return;
+        }
+
+        sheetRef.current.style.transform = `translate(-50%, ${deltaY}px)`;
         // 드래그 중에는 transition을 비활성화
         sheetRef.current.style.transition = 'none';
       };
@@ -121,7 +125,7 @@ export const useBottomSheetDrag = ({
         passive: false,
       });
     },
-    [onDragCancel, onDragDown, onDragUp, sheetRef, threshold]
+    [mode, onDragCancel, onDragDown, onDragUp, sheetRef, threshold]
   );
 
   return { isDragging, onHandlePointerDown };
