@@ -8,7 +8,10 @@ import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
 import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
 
-import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
+import type {
+  ActivityOptionsResponse,
+  FurnitureOptionItem,
+} from '../types/apis/activityInfo';
 import type {
   ActivityInfoErrors,
   ActivityInfoFormData,
@@ -27,6 +30,21 @@ export const useActivityInfo = (
   const { checkCredit, isChecking } = useCreditGuard(1);
   // 버튼 비활성화 상태 (토스트 표시 후 비활성화)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  // id 또는 id배열 -> code배열 변환 (ButtonGroup selectedValues용)
+  const getSelectedCodes = (
+    options: FurnitureOptionItem[],
+    ids?: number | number[]
+  ): string[] => {
+    if (!ids) return [];
+
+    // 단일 id인 경우 배열로 변환
+    const idArray = Array.isArray(ids) ? ids : [ids];
+
+    return idArray
+      .map((id) => options.find((option) => option.id === id)?.code)
+      .filter((code): code is string => code !== undefined);
+  };
 
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
@@ -124,30 +142,6 @@ export const useActivityInfo = (
       .filter((id): id is number => id !== undefined);
   };
 
-  // 현재 선택된 활동의 label 가져오기(휴식형, 재택근무형, 영화감상형, 홈카페형)
-  const getCurrentActivityLabel = (): string => {
-    if (!formData.activityType || !activityOptionsData) return '';
-    const option = activityOptionsData.activities.find(
-      (option) => option.code === formData.activityType
-    );
-    return option?.label || '';
-  };
-
-  // 현재 선택된 활동의 필수 가구들의 label 가져오기(책상, 옷장, 식탁/의자, 소파 등)
-  // 필수 가구가 여러 개인 경우도 처리 가능
-  const getRequiredFurnitureLabels = (): string[] => {
-    if (!activityOptionsData) return [];
-    const requiredIds = getRequiredFurnitureIds();
-    return requiredIds
-      .map((id) => {
-        const option = activityOptionsData.selectives.items.find(
-          (option) => option.id === id
-        );
-        return option?.label || '';
-      })
-      .filter((label) => label !== '');
-  };
-
   // 특정 가구가 현재 활동의 필수 가구인지 확인
   const isRequiredFurniture = (furniture: string | number): boolean => {
     const requiredIds = getRequiredFurnitureIds();
@@ -213,7 +207,6 @@ export const useActivityInfo = (
     handleSubmit,
     isFormCompleted,
     isRequiredFurniture,
-    getCurrentActivityLabel,
-    getRequiredFurnitureLabels,
+    getSelectedCodes,
   };
 };

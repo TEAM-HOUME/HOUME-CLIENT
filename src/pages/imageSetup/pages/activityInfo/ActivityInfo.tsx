@@ -1,4 +1,3 @@
-// Step 4
 import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/useActivityInfo';
@@ -11,11 +10,6 @@ import Caption from '../../components/caption/Caption';
 import FunnelHeader from '../../components/header/FunnelHeader';
 import HeadingText from '../../components/headingText/HeadingText';
 
-import type {
-  ActivityType,
-  BedId,
-  BedType,
-} from '../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 interface ActivityInfoProps {
@@ -38,8 +32,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     handleSubmit,
     isFormCompleted,
     isRequiredFurniture,
-    getCurrentActivityLabel,
-    getRequiredFurnitureLabels,
+    getSelectedCodes,
   } = useActivityInfo(context, activityOptionsData);
 
   // 에러 처리
@@ -72,7 +65,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             subtitle="선택한 활동에 최적화된 동선을 알려드려요."
           />
           <div className={styles.activityButton}>
-            <ButtonGroup<ActivityType>
+            <ButtonGroup
               options={activityTypeOptions}
               selectedValues={
                 formData.activityType ? [formData.activityType] : []
@@ -100,22 +93,53 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
           />
 
-          <ButtonGroup<BedId>
+          <ButtonGroup
             title="침대"
             titleSize="small"
             hasBorder={true}
             options={bedOptions}
-            selectedValues={formData.bedId ? [formData.bedId] : []}
-            onSelectionChange={(values) =>
+            selectedValues={getSelectedCodes(bedOptions, formData.bedId)}
+            onSelectionChange={(values) => {
+              const selectedBed = bedOptions.find(
+                (bed) => bed.code === values[0]
+              );
               setFormData((prev) => ({
                 ...prev,
-                bedId: values[0] || undefined,
-              }))
-            }
+                bedId: selectedBed?.id,
+              }));
+            }}
             selectionMode="single"
             buttonSize="xsmall"
             layout="grid-4"
             errors={errors.bedId}
+          />
+
+          <ButtonGroup
+            title="주요가구"
+            titleSize="small"
+            options={selectiveOptions}
+            selectedValues={getSelectedCodes(
+              selectiveOptions,
+              formData.selectiveIds
+            )}
+            onSelectionChange={(values) => {
+              const selectedIds = values
+                .map(
+                  (code) =>
+                    selectiveOptions.find((option) => option.code === code)?.id
+                )
+                .filter((id): id is number => id !== undefined);
+
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: selectedIds,
+              }));
+            }}
+            selectionMode="multiple"
+            maxSelection={4}
+            buttonSize="large"
+            layout="grid-2"
+            errors={errors.selectiveIds}
           />
         </div>
 
