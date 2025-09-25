@@ -71,15 +71,14 @@ export const BottomSheetWrapper = ({
     <>
       <div
         className={clsx(styles.backdrop, isOpen && styles.backdropVisible)}
-        onClick={handleClose}
-        onTouchStart={(e) => {
+        onPointerDown={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           handleClose();
         }}
       />
       <div
         ref={sheetRef}
-        data-sheet="true"
         role="dialog"
         aria-modal="true"
         className={clsx(
@@ -97,7 +96,6 @@ export const BottomSheetWrapper = ({
           className={styles.contentWrapper({
             type: typeVariant,
           })}
-          onTouchStart={(e) => e.stopPropagation()}
         >
           <div
             className={styles.dragHandleContainer({
