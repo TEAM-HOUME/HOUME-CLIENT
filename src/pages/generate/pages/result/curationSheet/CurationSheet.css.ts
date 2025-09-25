@@ -31,7 +31,7 @@ export const filterSection = style({
 
 export const scrollContentArea = style({
   overflowY: 'auto',
-  maxHeight: '48.7rem',
+  maxHeight: '52rem',
 
   '::-webkit-scrollbar': {
     display: 'none',
