@@ -208,5 +208,6 @@ export const useActivityInfo = (
     isFormCompleted,
     isRequiredFurniture,
     getSelectedCodes,
+    getRequiredFurnitureIds,
   };
 };

@@ -7,7 +7,6 @@ export interface ButtonOption {
   code: string;
   label: string;
   id?: number;
-  disabled?: boolean;
 }
 
 // 항상 code값을 반환함, id값이 필요한 경우 커스텀 훅에서 별도 로직으로 처리
@@ -24,6 +23,7 @@ export interface ButtonGroupProps {
   className?: string;
   hasBorder?: boolean;
   errors?: string;
+  disabled?: boolean;
 }
 
 const ButtonGroup = ({

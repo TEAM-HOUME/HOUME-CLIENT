@@ -33,6 +33,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     isFormCompleted,
     isRequiredFurniture,
     getSelectedCodes,
+    getRequiredFurnitureIds,
   } = useActivityInfo(context, activityOptionsData);
 
   // 에러 처리
@@ -130,15 +131,16 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
                 )
                 .filter((id): id is number => id !== undefined);
 
-              setFormData((prev) => ({
-                ...prev,
-                selectiveIds: selectedIds,
-              }));
+              // 필수 가구는 항상 포함되도록 보장
+              const requiredIds = getRequiredFurnitureIds();
+              const finalIds = [...new Set([...requiredIds, ...selectedIds])]; // Set(): 주요 활동 변경 시 기존 선택과 새 필수 가구 중복 방지
+
+              setFormData((prev) => ({ ...prev, selectiveIds: finalIds }));
             }}
             selectionMode="multiple"
             maxSelection={4}
-            buttonSize="large"
-            layout="grid-2"
+            buttonSize="small"
+            layout="grid-3"
             errors={errors.selectiveIds}
           />
         </div>
