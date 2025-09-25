@@ -14,7 +14,7 @@ import { CurationSheetWrapper } from './CurationSheetWrapper';
 export const CurationSheet = () => {
   const userName = useUserStore((state) => state.userName); // 전역상태 사용
   const [isSaved, setIsSaved] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState(1);
+  const [selectedFilter, setSelectedFilter] = useState<number | null>(null);
 
   const handleSave = () => {
     setIsSaved((prev) => !prev);

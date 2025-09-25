@@ -13,6 +13,7 @@ export const filterSection = style({
   width: '100%',
   minWidth: '34.3rem',
   backgroundColor: colorVars.color.gray000,
+  overflow: 'hidden',
 
   position: 'sticky',
   top: 0,
