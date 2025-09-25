@@ -15,7 +15,7 @@ const SignupCompletePage = () => {
   const navigate = useNavigate();
 
   const handleGoToImageSetup = () => {
-    navigate(ROUTES.imageSetup);
+    navigate(ROUTES.IMAGE_SETUP);
   };
 
   return (

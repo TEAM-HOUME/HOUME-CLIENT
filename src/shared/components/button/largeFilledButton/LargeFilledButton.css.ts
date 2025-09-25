@@ -7,7 +7,6 @@ import { colorVars } from '@styles/tokens/color.css';
 export const largeFilled = recipe({
   base: {
     width: '100%',
-    minWidth: '16.4rem',
     height: '4.8rem',
     padding: '1rem 2rem',
     alignItems: 'center',
@@ -38,11 +37,20 @@ export const largeFilled = recipe({
       },
     },
     buttonSize: {
+      small: {
+        minWidth: '7.4rem',
+        height: '3.2rem',
+        padding: '0.7rem 0',
+        borderRadius: '6px',
+        ...fontStyle('caption_r_12'),
+      },
       medium: {
         minWidth: '10.7rem',
         textAlign: 'center',
       },
-      large: {},
+      large: {
+        minWidth: '16.4rem',
+      },
     },
     selected: {
       true: {
@@ -53,6 +61,18 @@ export const largeFilled = recipe({
       false: {},
     },
   },
+  compoundVariants: [
+    // small + selected
+    {
+      variants: { buttonSize: 'small', selected: true },
+      style: { ...fontStyle('caption_m_12') },
+    },
+    // small + error
+    {
+      variants: { buttonSize: 'small', state: 'error' },
+      style: { ...fontStyle('caption_m_12') },
+    },
+  ],
   defaultVariants: {
     state: 'active',
     buttonSize: 'large',

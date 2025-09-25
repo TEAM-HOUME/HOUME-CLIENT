@@ -54,7 +54,7 @@ const HomePage = () => {
 
     // 크레딧이 있으면 imageSetup 이동
     if (userData?.CreditCount && userData.CreditCount > 0) {
-      navigate(ROUTES.imageSetup);
+      navigate(ROUTES.IMAGE_SETUP);
     }
     // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
   };

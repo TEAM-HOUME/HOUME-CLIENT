@@ -1,35 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { MAX_MOOD_BOARD_SELECTION } from '../constants/interiorStyle';
-import { useFunnelStore } from '../stores/useFunnelStore';
 
-import type { CompletedInteriorStyle, ImageSetupSteps } from '../types/funnel';
+import type {
+  CompletedInteriorStyle,
+  ImageSetupSteps,
+} from '../types/funnel/steps';
 
 export const useInteriorStyle = (
   context: ImageSetupSteps['InteriorStyle'],
   onNext: (data: CompletedInteriorStyle) => void
 ) => {
-  // Zustand store에서 상태 가져오기
-  const {
-    interiorStyle: interiorStyle,
-    setInteriorStyleData: setinteriorStyleData,
-    setCurrentStep,
-  } = useFunnelStore();
-
   const [selectedImages, setSelectedImages] = useState<number[]>(
-    interiorStyle.moodBoardIds || []
+    context.moodBoardIds || []
   );
-
-  // 컴포넌트 마운트 시 현재 스텝 설정
-  useEffect(() => {
-    setCurrentStep(3);
-  }, []);
-
-  useEffect(() => {
-    setinteriorStyleData({
-      moodBoardIds: selectedImages,
-    });
-  }, [selectedImages]);
 
   // 이미지 선택/해제를 처리하는 함수
   const handleImageSelect = useCallback(
@@ -65,8 +49,6 @@ export const useInteriorStyle = (
     };
 
     console.log('선택된 퍼널 페이로드:', payload);
-
-    // clearAfterStep(3);
 
     onNext({
       houseType: context.houseType,
