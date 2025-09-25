@@ -6,19 +6,20 @@ import {
   productMockData,
 } from '@/pages/generate/constants/curationMockdata';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
+import { useSavedItemsStore } from '@/store/useSavedItems';
 import { useUserStore } from '@/store/useUserStore';
 
 import * as styles from './CurationSheet.css';
 import { CurationSheetWrapper } from './CurationSheetWrapper';
 
 export const CurationSheet = () => {
-  const userName = useUserStore((state) => state.userName); // 전역상태 사용
-  const [isSaved, setIsSaved] = useState(false);
+  // 전역상태 사용
+  const userName = useUserStore((state) => state.userName);
+  const { savedProductIds, toggleSaveProduct } = useSavedItemsStore();
+
+  // 필터
   const [selectedFilter, setSelectedFilter] = useState<number | null>(null);
 
-  const handleSave = () => {
-    setIsSaved((prev) => !prev);
-  };
   return (
     <CurationSheetWrapper>
       <div className={styles.filterSection}>
@@ -47,8 +48,8 @@ export const CurationSheet = () => {
                 brand={p.brand}
                 imageUrl={p.imageUrl}
                 linkHref={p.linkHref}
-                isSaved={isSaved}
-                onToggleSave={handleSave}
+                isSaved={savedProductIds.has(p.id)}
+                onToggleSave={() => toggleSaveProduct(p.id)}
               />
             ))}
           </div>
