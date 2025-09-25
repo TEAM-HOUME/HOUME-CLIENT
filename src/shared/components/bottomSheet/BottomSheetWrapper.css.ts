@@ -31,17 +31,29 @@ export const sheetWrapper = style({
   left: '50%',
   width: '100%',
   maxWidth: '50rem',
-  backgroundColor: colorVars.color.gray000,
-  borderTopLeftRadius: '20px',
-  borderTopRightRadius: '20px',
   zIndex: zIndex.sheet,
 
+  willChange: 'transform',
   transform: 'translate(-50%, calc(var(--base-y) + var(--drag-y)))',
   transition: 'transform 0.3s ease-in-out',
 
   vars: {
     '--base-y': '100%',
     '--drag-y': '0px',
+  },
+
+  userSelect: 'none',
+  touchAction: 'none', // Pull-to-refresh 방지
+  overscrollBehavior: 'none', // overscroll 방지
+  WebkitOverflowScrolling: 'touch', // iOS에서 부드러운 스크롤
+  WebkitUserSelect: 'none', // Safari에서 텍스트 선택 방지
+  WebkitTouchCallout: 'none', // iOS에서 터치 콜아웃 방지
+
+  // 드래그 중일 때만 transition 비활성화
+  selectors: {
+    '&:active': {
+      cursor: 'grabbing',
+    },
   },
 });
 
