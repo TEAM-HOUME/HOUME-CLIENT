@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
@@ -21,6 +21,39 @@ import { useGenerateStore } from '../../stores/useGenerateStore';
 
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
+const ANIMATION_DURATION = 600;
+
+type GenerateLocationState = {
+  generateImageRequest: GenerateImageRequest;
+};
+
+const isGenerateLocationState = (
+  value: unknown
+): value is GenerateLocationState => {
+  if (!value || typeof value !== 'object') return false;
+
+  const { generateImageRequest } = value as Record<string, unknown>;
+  if (!generateImageRequest || typeof generateImageRequest !== 'object') {
+    return false;
+  }
+
+  const request = generateImageRequest as Record<string, unknown>;
+  const floorPlan = request.floorPlan as Record<string, unknown> | undefined;
+
+  return (
+    typeof request.houseId === 'number' &&
+    typeof request.equilibrium === 'string' &&
+    typeof request.activity === 'string' &&
+    typeof request.bedId === 'number' &&
+    Array.isArray(request.moodBoardIds) &&
+    Array.isArray(request.selectiveIds) &&
+    floorPlan !== undefined &&
+    typeof floorPlan === 'object' &&
+    typeof floorPlan.floorPlanId === 'number' &&
+    typeof floorPlan.isMirror === 'boolean'
+  );
+};
+
 const LoadingPage = () => {
   // 이미지 생성 api 코드 ...
   const location = useLocation();
@@ -29,16 +62,27 @@ const LoadingPage = () => {
   const { isApiCompleted, navigationData } = useGenerateStore();
   // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
-  // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
-  const state = location.state as {
-    generateImageRequest?: GenerateImageRequest;
-  } | null;
-  const requestData: GenerateImageRequest | null =
-    state?.generateImageRequest ?? null;
+  const rawState = location.state;
+  const hasInvalidState =
+    rawState != null && !isGenerateLocationState(rawState);
+  const requestData: GenerateImageRequest | null = isGenerateLocationState(
+    rawState
+  )
+    ? rawState.generateImageRequest
+    : null;
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   // 상태 폴링은 requestData가 있을 때만 시작
   useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
+
+  useEffect(() => {
+    if (hasInvalidState) {
+      console.warn('잘못된 generate 페이지 진입 - requestData 누락');
+    }
+  }, [hasInvalidState]);
 
   useEffect(() => {
     if (!requestData) return;
@@ -58,6 +102,14 @@ const LoadingPage = () => {
   }, [mutateGenerateImage, requestData]);
   // ... 이미지 생성 api 코드 끝
 
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const [currentPage, setCurrentPage] = useState(0);
   const {
     data: currentImages,
@@ -75,7 +127,6 @@ const LoadingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
-  const ANIMATION_DURATION = 600;
 
   const likeMutation = usePostCarouselLikeMutation();
   const hateMutation = usePostCarouselHateMutation();
@@ -83,7 +134,7 @@ const LoadingPage = () => {
   // currentImages 변화에 따른 인덱스 초기화와 에러 처리는
   // useStackData의 onSuccess/onError 콜백으로 이관
 
-  if (!requestData) return <Navigate to={ROUTES.imageSetup} replace />;
+  if (!requestData) return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
   if (isLoading) return <Loading />;
 
   // 에러 상황 체크
@@ -111,7 +162,7 @@ const LoadingPage = () => {
         '🎯 프로그래스 바 완료 후 페이지 이동:',
         new Date().toLocaleTimeString()
       );
-      navigate('/generate/result', {
+      navigate(ROUTES.GENERATE_RESULT, {
         state: {
           result: navigationData,
         },
@@ -140,7 +191,11 @@ const LoadingPage = () => {
       });
     }
 
-    setTimeout(() => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
       if (!isLast) {
         setSelected(null);
         setCurrentIndex((prev) => prev + 1);
@@ -154,6 +209,7 @@ const LoadingPage = () => {
         }
       }
       setAnimating(false);
+      transitionTimeoutRef.current = null;
     }, ANIMATION_DURATION);
   };
 
