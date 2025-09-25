@@ -1,11 +1,16 @@
 import { useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import FilterChip from '@/pages/generate/components/filterChip/FilterChip';
 import {
   filterMockData,
   productMockData,
 } from '@/pages/generate/constants/curationMockdata';
+import { ROUTES } from '@/routes/paths';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
+import { useToast } from '@/shared/components/toast/useToast';
+import { TOAST_TYPE } from '@/shared/types/toast';
 import { useSavedItemsStore } from '@/store/useSavedItems';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -17,8 +22,36 @@ export const CurationSheet = () => {
   const userName = useUserStore((state) => state.userName);
   const { savedProductIds, toggleSaveProduct } = useSavedItemsStore();
 
+  const navigate = useNavigate();
+
   // 필터
   const [selectedFilter, setSelectedFilter] = useState<number | null>(null);
+
+  // 찜하기
+  const { notify } = useToast();
+
+  const handleSaveClick = (productId: number) => {
+    // 현재 저장상태 확인
+    const isCurrentlySaved = savedProductIds.has(productId);
+
+    // 상태 변경
+    toggleSaveProduct(productId);
+
+    if (!isCurrentlySaved) {
+      notify({
+        text: '상품을 찜했어요! 위시리스트로 이동할까요?',
+        type: TOAST_TYPE.NAVIGATE,
+        onClick: handleGotoMypage,
+        options: {
+          style: { marginBottom: '2rem' },
+        },
+      });
+    }
+  };
+
+  const handleGotoMypage = () => {
+    navigate(ROUTES.MYPAGE);
+  };
 
   return (
     <CurationSheetWrapper>
@@ -49,7 +82,7 @@ export const CurationSheet = () => {
                 imageUrl={p.imageUrl}
                 linkHref={p.linkHref}
                 isSaved={savedProductIds.has(p.id)}
-                onToggleSave={() => toggleSaveProduct(p.id)}
+                onToggleSave={() => handleSaveClick(p.id)}
               />
             ))}
           </div>
