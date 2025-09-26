@@ -93,15 +93,11 @@ export const useActivityInfo = (
     });
   }, [formData.selectiveIds]);
 
-  // 주요활동 변경 시 필수 가구 자동 선택
+  // 주요활동 변경 시 기존 가구 초기화 후 필수 가구 자동 선택
   useEffect(() => {
     if (formData.activityType) {
       const requiredIds = activitySelection.getRequiredFurnitureIds();
-      const currentIds = formData.selectiveIds || [];
-      const updatedIds = globalConstraints.applyConstraints([
-        ...currentIds,
-        ...requiredIds,
-      ]);
+      const updatedIds = globalConstraints.applyConstraints([...requiredIds]);
       setFormData((prev) => ({
         ...prev,
         selectiveIds: updatedIds,
