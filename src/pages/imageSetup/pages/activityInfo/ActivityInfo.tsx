@@ -103,74 +103,21 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={bedOptions.furnitures}
             selectedValues={getSelectedCodes(
               bedOptions.furnitures,
-              formData.bedId
-            )}
-            onSelectionChange={(values) => {
-              const selectedBed = bedOptions.furnitures.find(
-                (bed) => bed.code === values[0]
-              );
-              setFormData((prev) => ({
-                ...prev,
-                bedId: selectedBed?.id,
-              }));
-            }}
-            selectionMode="single"
-            buttonSize="xsmall"
-            layout="grid-4"
-            errors={errors.bedId}
-          />
-          <ButtonGroup
-            title={sofaOptions.nameKr}
-            titleSize="small"
-            hasBorder={true}
-            options={sofaOptions.furnitures}
-            selectedValues={getSelectedCodes(
-              sofaOptions.furnitures,
-              formData.bedId
-            )}
-            onSelectionChange={(values) => {
-              const selectedBed = bedOptions.furnitures.find(
-                (bed) => bed.code === values[0]
-              );
-              setFormData((prev) => ({
-                ...prev,
-                bedId: selectedBed?.id,
-              }));
-            }}
-            selectionMode="single"
-            buttonSize="xsmall"
-            layout="grid-4"
-            errors={errors.bedId}
-          />
-          a
-          <ButtonGroup
-            title="주요가구"
-            titleSize="small"
-            options={selectiveOptions}
-            selectedValues={getSelectedCodes(
-              selectiveOptions,
               formData.selectiveIds
             )}
             onSelectionChange={(values) => {
-              // code -> id 변환
-              const selectedIds = values
-                .map(
-                  (code) =>
-                    selectiveOptions.find((option) => option.code === code)?.id
-                )
-                .filter((id): id is number => id !== undefined);
-
-              // 필수 가구는 항상 포함되도록 보장
-              const requiredIds = getRequiredFurnitureIds();
-              const finalIds = [...new Set([...requiredIds, ...selectedIds])]; // Set(): 주요 활동 변경 시 기존 선택과 새 필수 가구 중복 방지
-
-              setFormData((prev) => ({ ...prev, selectiveIds: finalIds }));
+              const selectedBed = bedOptions.furnitures.find(
+                (bed) => bed.code === values[0]
+              );
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: selectedBed?.id,
+              }));
             }}
-            selectionMode="multiple"
-            maxSelection={4}
-            buttonSize="small"
-            layout="grid-3"
-            errors={errors.selectiveIds}
+            selectionMode="single"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.bedId}
           />
         </div>
 
