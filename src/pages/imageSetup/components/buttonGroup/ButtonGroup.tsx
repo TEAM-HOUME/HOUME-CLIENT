@@ -65,7 +65,7 @@ const ButtonGroup = ({
             key={String(option.code)}
             buttonSize={buttonSize}
             isSelected={selectedValues.includes(option.code)}
-            isActive={!option.disabled}
+            // isActive={!option.disabled}
             onClick={() => handleButtonClick(option.code)}
           >
             {option.label}
