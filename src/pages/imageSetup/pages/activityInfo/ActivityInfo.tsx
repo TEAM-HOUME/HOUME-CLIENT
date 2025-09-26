@@ -47,8 +47,11 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   }
 
   const activityTypeOptions = activityOptionsData.activities;
-  const bedOptions = activityOptionsData.beds.items;
-  const selectiveOptions = activityOptionsData.selectives.items;
+  const bedOptions = activityOptionsData.categories[0];
+  const sofaOptions = activityOptionsData.categories[1];
+  const storageOptions = activityOptionsData.categories[2];
+  const tableOptions = activityOptionsData.categories[3];
+  const selectiveOptions = activityOptionsData.categories[4];
 
   return (
     <div className={styles.container}>
@@ -93,15 +96,17 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             title="가구"
             subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
           />
-
           <ButtonGroup
-            title="침대"
+            title={bedOptions.nameKr}
             titleSize="small"
             hasBorder={true}
-            options={bedOptions}
-            selectedValues={getSelectedCodes(bedOptions, formData.bedId)}
+            options={bedOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              bedOptions.furnitures,
+              formData.bedId
+            )}
             onSelectionChange={(values) => {
-              const selectedBed = bedOptions.find(
+              const selectedBed = bedOptions.furnitures.find(
                 (bed) => bed.code === values[0]
               );
               setFormData((prev) => ({
@@ -114,7 +119,30 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             layout="grid-4"
             errors={errors.bedId}
           />
-
+          <ButtonGroup
+            title={sofaOptions.nameKr}
+            titleSize="small"
+            hasBorder={true}
+            options={sofaOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              sofaOptions.furnitures,
+              formData.bedId
+            )}
+            onSelectionChange={(values) => {
+              const selectedBed = bedOptions.furnitures.find(
+                (bed) => bed.code === values[0]
+              );
+              setFormData((prev) => ({
+                ...prev,
+                bedId: selectedBed?.id,
+              }));
+            }}
+            selectionMode="single"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.bedId}
+          />
+          a
           <ButtonGroup
             title="주요가구"
             titleSize="small"

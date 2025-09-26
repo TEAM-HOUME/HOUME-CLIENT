@@ -49,7 +49,6 @@ export const useActivityInfo = (
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
     activityType: context.activityType,
-    bedId: context.bedId,
     selectiveIds: context.selectiveIds || [],
   });
 
@@ -72,7 +71,6 @@ export const useActivityInfo = (
   ): data is Required<ActivityInfoFormData> => {
     return !!(
       data.activityType &&
-      data.bedId &&
       Array.isArray(data.selectiveIds) &&
       data.selectiveIds.length > 0
     );
@@ -87,16 +85,6 @@ export const useActivityInfo = (
       return prev;
     });
   }, [formData.activityType]);
-
-  useEffect(() => {
-    setErrors((prev) => {
-      if (prev.bedId) {
-        const { bedId: bedId, ...rest } = prev;
-        return rest;
-      }
-      return prev;
-    });
-  }, [formData.bedId]);
 
   useEffect(() => {
     setErrors((prev) => {
@@ -134,8 +122,8 @@ export const useActivityInfo = (
 
     return requiredCodes
       .map((code) => {
-        const option = activityOptionsData.selectives.items.find(
-          (option) => option.code === code
+        const option = activityOptionsData.categories.find(
+          (option) => option.furnitures.code === code
         );
         return option?.id;
       })
@@ -181,7 +169,6 @@ export const useActivityInfo = (
       },
       moodBoardIds: context.moodBoardIds,
       activity: formData.activityType!,
-      bedId: formData.bedId!,
       selectiveIds: formData.selectiveIds!,
     };
 
@@ -193,7 +180,6 @@ export const useActivityInfo = (
       floorPlan: context.floorPlan,
       moodBoardIds: context.moodBoardIds,
       activityType: formData.activityType!,
-      bedId: formData.bedId!,
       selectiveIds: formData.selectiveIds!,
     });
 

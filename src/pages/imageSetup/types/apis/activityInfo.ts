@@ -19,5 +19,5 @@ export interface FurnitureCategory {
 
 export interface ActivityOptionsResponse {
   activities: ActivityOptionItem[];
-  categories: FurnitureCategory;
+  categories: FurnitureCategory[];
 }

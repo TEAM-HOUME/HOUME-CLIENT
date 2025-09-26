@@ -3,7 +3,6 @@
 // 폼 데이터 타입 (사용자 입력값)
 export type ActivityInfoFormData = {
   activityType?: string;
-  bedId?: number;
   selectiveIds?: number[];
 };
 
@@ -19,7 +18,6 @@ export type ActivityInfoContext = {
   };
   moodBoardIds: number[];
   activityType?: string;
-  bedId?: number;
   selectiveIds?: number[];
 };
 
