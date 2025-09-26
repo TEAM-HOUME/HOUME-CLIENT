@@ -124,6 +124,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
               formData.selectiveIds
             )}
             onSelectionChange={(values) => {
+              // code -> id 변환
               const selectedIds = values
                 .map(
                   (code) =>
