@@ -31,9 +31,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     errors,
     handleSubmit,
     isFormCompleted,
-    isRequiredFurniture,
     getSelectedCodes,
-    getRequiredFurnitureIds,
   } = useActivityInfo(context, activityOptionsData);
 
   // 에러 처리
@@ -109,15 +107,164 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
               const selectedBed = bedOptions.furnitures.find(
                 (bed) => bed.code === values[0]
               );
+              if (!selectedBed) return;
+
+              // 기존 selectiveIds에서 침대 카테고리 제거 후 새 침대 추가
+              const currentIds = formData.selectiveIds || [];
+              const nonBedIds = currentIds.filter(
+                (id) => !bedOptions.furnitures.some((bed) => bed.id === id)
+              );
+
               setFormData((prev) => ({
                 ...prev,
-                selectiveIds: selectedBed?.id,
+                selectiveIds: [...nonBedIds, selectedBed.id],
               }));
             }}
             selectionMode="single"
             buttonSize="xsmall"
             layout="grid-4"
-            errors={errors.bedId}
+            errors={errors.selectiveIds}
+          />
+
+          <ButtonGroup
+            title={sofaOptions.nameKr}
+            titleSize="small"
+            hasBorder={true}
+            options={sofaOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              sofaOptions.furnitures,
+              formData.selectiveIds
+            )}
+            onSelectionChange={(values) => {
+              const selectedSofa = sofaOptions.furnitures.find(
+                (sofa) => sofa.code === values[0]
+              );
+              if (!selectedSofa) return;
+
+              const currentIds = formData.selectiveIds || [];
+              const nonSofaIds = currentIds.filter(
+                (id) => !sofaOptions.furnitures.some((sofa) => sofa.id === id)
+              );
+
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: [...nonSofaIds, selectedSofa.id],
+              }));
+            }}
+            selectionMode="single"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.selectiveIds}
+          />
+
+          <ButtonGroup
+            title={storageOptions.nameKr}
+            titleSize="small"
+            hasBorder={true}
+            options={storageOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              storageOptions.furnitures,
+              formData.selectiveIds
+            )}
+            onSelectionChange={(values) => {
+              const selectedIds = values
+                .map(
+                  (code) =>
+                    storageOptions.furnitures.find((item) => item.code === code)
+                      ?.id
+                )
+                .filter((id): id is number => id !== undefined);
+
+              const currentIds = formData.selectiveIds || [];
+              const nonStorageIds = currentIds.filter(
+                (id) =>
+                  !storageOptions.furnitures.some(
+                    (storage) => storage.id === id
+                  )
+              );
+
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: [...nonStorageIds, ...selectedIds],
+              }));
+            }}
+            selectionMode="multiple"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.selectiveIds}
+          />
+
+          <ButtonGroup
+            title={tableOptions.nameKr}
+            titleSize="small"
+            hasBorder={true}
+            options={tableOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              tableOptions.furnitures,
+              formData.selectiveIds
+            )}
+            onSelectionChange={(values) => {
+              const selectedIds = values
+                .map(
+                  (code) =>
+                    tableOptions.furnitures.find((item) => item.code === code)
+                      ?.id
+                )
+                .filter((id): id is number => id !== undefined);
+
+              const currentIds = formData.selectiveIds || [];
+              const nonTableIds = currentIds.filter(
+                (id) =>
+                  !tableOptions.furnitures.some((table) => table.id === id)
+              );
+
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: [...nonTableIds, ...selectedIds],
+              }));
+            }}
+            selectionMode="multiple"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.selectiveIds}
+          />
+
+          <ButtonGroup
+            title={selectiveOptions.nameKr}
+            titleSize="small"
+            hasBorder={true}
+            options={selectiveOptions.furnitures}
+            selectedValues={getSelectedCodes(
+              selectiveOptions.furnitures,
+              formData.selectiveIds
+            )}
+            onSelectionChange={(values) => {
+              const selectedIds = values
+                .map(
+                  (code) =>
+                    selectiveOptions.furnitures.find(
+                      (item) => item.code === code
+                    )?.id
+                )
+                .filter((id): id is number => id !== undefined);
+
+              const currentIds = formData.selectiveIds || [];
+              const nonSelectiveIds = currentIds.filter(
+                (id) =>
+                  !selectiveOptions.furnitures.some(
+                    (selective) => selective.id === id
+                  )
+              );
+
+              setFormData((prev) => ({
+                ...prev,
+                selectiveIds: [...nonSelectiveIds, ...selectedIds],
+              }));
+            }}
+            selectionMode="multiple"
+            buttonSize="xsmall"
+            layout="grid-4"
+            errors={errors.selectiveIds}
           />
         </div>
 

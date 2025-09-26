@@ -17,7 +17,7 @@ export const MAIN_ACTIVITY_VALIDATION = {
       requiredFurnitures: ['DESK'],
     },
     READING: {
-      requiredFurnitures: ['ONE_SEATER_SOFA'],
+      requiredFurnitures: ['BOOK_SHELF'],
     },
     FLOOR_LIVING: {
       requiredFurnitures: ['SITTING_TABLE'],

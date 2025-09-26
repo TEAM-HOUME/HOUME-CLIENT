@@ -6,12 +6,11 @@ import type { GenerateImageRequest } from '@/pages/generate/types/generate';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
-import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
+import { useActivitySelection } from './useActivitySelection';
+import { useFurnitureSelection } from './useFurnitureSelection';
+import { useGlobalConstraints } from './useGlobalConstraints';
 
-import type {
-  ActivityOptionsResponse,
-  FurnitureOptionItem,
-} from '../types/apis/activityInfo';
+import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
 import type {
   ActivityInfoErrors,
   ActivityInfoFormData,
@@ -25,26 +24,10 @@ export const useActivityInfo = (
 ) => {
   const navigate = useNavigate();
 
-  // TODO(지성): 크레딧 관련 로직 따로 관리
   // 크레딧 가드 훅 (이미지 생성 시 1크레딧 필요)
   const { checkCredit, isChecking } = useCreditGuard(1);
   // 버튼 비활성화 상태 (토스트 표시 후 비활성화)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-
-  // id 또는 id배열 -> code배열 변환 (ButtonGroup selectedValues용)
-  const getSelectedCodes = (
-    options: FurnitureOptionItem[],
-    ids?: number | number[]
-  ): string[] => {
-    if (!ids) return [];
-
-    // 단일 id인 경우 배열로 변환
-    const idArray = Array.isArray(ids) ? ids : [ids];
-
-    return idArray
-      .map((id) => options.find((option) => option.id === id)?.code)
-      .filter((code): code is string => code !== undefined);
-  };
 
   // funnel의 context값으로 초기값 설정
   const [formData, setFormData] = useState<ActivityInfoFormData>({
@@ -54,18 +37,31 @@ export const useActivityInfo = (
 
   const [errors, setErrors] = useState<ActivityInfoErrors>({});
 
-  // 타입 가드
-  // 유효한 '주요활동' 카테고리 내의 값인지 체크
-  const isValidActivityKey = (
-    usage: string
-  ): usage is keyof typeof MAIN_ACTIVITY_VALIDATION.combinationRules => {
-    // usage is SomeType
-    // 이 함수가 true를 반환할 때는 호출부에서 usage를 SomeType으로 간주해도 된다는 것을 TS에게 알려줌
-    return usage in MAIN_ACTIVITY_VALIDATION.combinationRules;
-    // usage in _: 객체에 해당 key가 있는지 검사, boolean 반환
-  };
+  // 주요활동 선택 훅
+  const activitySelection = useActivitySelection(
+    activityOptionsData,
+    formData.activityType,
+    (activityType) => {
+      setFormData((prev) => ({ ...prev, activityType: activityType }));
+    }
+  );
 
-  // 타입 가드
+  // 전역 제약조건 훅
+  const globalConstraints = useGlobalConstraints(
+    formData.selectiveIds,
+    activitySelection.getRequiredFurnitureIds()
+  );
+
+  // 가구 선택 훅
+  const furnitureSelection = useFurnitureSelection(
+    formData.selectiveIds,
+    (selectiveIds) => {
+      setFormData((prev) => ({ ...prev, selectiveIds }));
+    },
+    globalConstraints
+  );
+
+  // 타입 가드: 완료된 데이터인지 확인
   const isCompleteActivityInfo = (
     data: ActivityInfoFormData
   ): data is Required<ActivityInfoFormData> => {
@@ -76,10 +72,11 @@ export const useActivityInfo = (
     );
   };
 
+  // 에러 상태 관리
   useEffect(() => {
     setErrors((prev) => {
       if (prev.activityType) {
-        const { activityType: activityType, ...rest } = prev;
+        const { activityType, ...rest } = prev;
         return rest;
       }
       return prev;
@@ -89,7 +86,7 @@ export const useActivityInfo = (
   useEffect(() => {
     setErrors((prev) => {
       if (prev.selectiveIds) {
-        const { selectiveIds: selectiveIds, ...rest } = prev;
+        const { selectiveIds, ...rest } = prev;
         return rest;
       }
       return prev;
@@ -99,51 +96,20 @@ export const useActivityInfo = (
   // 주요활동 변경 시 필수 가구 자동 선택
   useEffect(() => {
     if (formData.activityType) {
-      const requiredFurnitures = getRequiredFurnitureIds();
+      const requiredIds = activitySelection.getRequiredFurnitureIds();
+      const updatedIds = globalConstraints.applyConstraints([...requiredIds]);
       setFormData((prev) => ({
         ...prev,
-        selectiveIds: requiredFurnitures,
+        selectiveIds: updatedIds,
       }));
     }
-  }, [formData.activityType]);
+  }, [formData.activityType, activitySelection, globalConstraints]);
 
-  // 현재 선택된 활동의 필수 가구 ID 리스트 반환
-  const getRequiredFurnitureIds = (): number[] => {
-    if (
-      !formData.activityType ||
-      !isValidActivityKey(formData.activityType) ||
-      !activityOptionsData
-    )
-      return [];
-
-    const requiredCodes =
-      MAIN_ACTIVITY_VALIDATION.combinationRules[formData.activityType]
-        ?.requiredFurnitures || [];
-
-    return requiredCodes
-      .map((code) => {
-        const option = activityOptionsData.categories.find(
-          (option) => option.furnitures.code === code
-        );
-        return option?.id;
-      })
-      .filter((id): id is number => id !== undefined);
-  };
-
-  // 특정 가구가 현재 활동의 필수 가구인지 확인
-  const isRequiredFurniture = (furniture: string | number): boolean => {
-    const requiredIds = getRequiredFurnitureIds();
-    const furnitureId =
-      typeof furniture === 'string' ? parseInt(furniture, 10) : furniture;
-    // TODO(지성): 디자인팀 공컴 디자인 완료되면 타입 수정 예정(현재 공컴 props때문에 임시로 string | number로 구현)
-    return requiredIds.includes(furnitureId);
-  };
-
-  // 입력값 3개 입력 여부 확인 및 에러 상태 확인
+  // 입력값 완료 여부 확인
   const isFormCompleted =
     isCompleteActivityInfo(formData) && Object.values(errors).length === 0;
 
-  // isFormCompleted == true일 때 버튼 enable, handleSubmit 실행
+  // 제출 핸들러
   const handleSubmit = async (
     onNext: (data: CompletedActivityInfo) => void
   ) => {
@@ -187,13 +153,22 @@ export const useActivityInfo = (
   };
 
   return {
+    // 상태
     formData,
     setFormData,
     errors,
-    handleSubmit,
     isFormCompleted,
-    isRequiredFurniture,
-    getSelectedCodes,
-    getRequiredFurnitureIds,
+
+    // 주요활동 관련
+    activitySelection,
+
+    // 가구 선택 관련
+    furnitureSelection,
+
+    // 전역 제약조건
+    globalConstraints,
+
+    // 액션
+    handleSubmit,
   };
 };

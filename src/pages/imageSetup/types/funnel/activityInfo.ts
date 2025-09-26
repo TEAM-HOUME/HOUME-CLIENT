@@ -27,6 +27,16 @@ export type CompletedActivityInfo = Required<ActivityInfoContext>;
 // 에러 타입
 export type ActivityInfoErrors = {
   activityType?: string;
-  bedId?: string;
   selectiveIds?: string;
 };
+
+// 카테고리별 선택 설정
+export type CategorySelectionMode = 'single' | 'multiple';
+
+export const CATEGORY_SELECTION_CONFIG = {
+  BED: 'single' as CategorySelectionMode, // 침대
+  SOFA: 'single' as CategorySelectionMode, // 소파
+  STORAGE: 'multiple' as CategorySelectionMode, // 수납
+  TABLE: 'multiple' as CategorySelectionMode, // 테이블
+  ETC: 'multiple' as CategorySelectionMode, // 그외
+} as const;
