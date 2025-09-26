@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 
-import { CATEGORY_SELECTION_CONFIG } from '../types/funnel/activityInfo';
+import { CATEGORY_SELECTION_CONFIG } from '../../types/funnel/activityInfo';
 
-import type { FurnitureCategory } from '../types/apis/activityInfo';
+import type { FurnitureCategory } from '../../types/apis/activityInfo';
 
 /**
  * 가구 선택 전체를 관리하는 훅

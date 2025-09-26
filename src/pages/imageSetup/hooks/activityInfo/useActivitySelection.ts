@@ -1,6 +1,6 @@
-import { MAIN_ACTIVITY_VALIDATION } from '../types/funnel/validation';
+import { MAIN_ACTIVITY_VALIDATION } from '../../types/funnel/validation';
 
-import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
+import type { ActivityOptionsResponse } from '../../types/apis/activityInfo';
 
 /**
  * 주요활동 선택 로직을 담당하는 훅

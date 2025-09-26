@@ -10,13 +10,13 @@ import { useActivitySelection } from './useActivitySelection';
 import { useFurnitureSelection } from './useFurnitureSelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
 
-import type { ActivityOptionsResponse } from '../types/apis/activityInfo';
+import type { ActivityOptionsResponse } from '../../types/apis/activityInfo';
 import type {
   ActivityInfoErrors,
   ActivityInfoFormData,
   CompletedActivityInfo,
-} from '../types/funnel/activityInfo';
-import type { ImageSetupSteps } from '../types/funnel/steps';
+} from '../../types/funnel/activityInfo';
+import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 export const useActivityInfo = (
   context: ImageSetupSteps['ActivityInfo'],
@@ -76,7 +76,7 @@ export const useActivityInfo = (
   useEffect(() => {
     setErrors((prev) => {
       if (prev.activityType) {
-        const { activityType, ...rest } = prev;
+        const { activityType: _, ...rest } = prev;
         return rest;
       }
       return prev;
@@ -86,7 +86,7 @@ export const useActivityInfo = (
   useEffect(() => {
     setErrors((prev) => {
       if (prev.selectiveIds) {
-        const { selectiveIds, ...rest } = prev;
+        const { selectiveIds: _, ...rest } = prev;
         return rest;
       }
       return prev;
@@ -97,13 +97,17 @@ export const useActivityInfo = (
   useEffect(() => {
     if (formData.activityType) {
       const requiredIds = activitySelection.getRequiredFurnitureIds();
-      const updatedIds = globalConstraints.applyConstraints([...requiredIds]);
+      const currentIds = formData.selectiveIds || [];
+      const updatedIds = globalConstraints.applyConstraints([
+        ...currentIds,
+        ...requiredIds,
+      ]);
       setFormData((prev) => ({
         ...prev,
         selectiveIds: updatedIds,
       }));
     }
-  }, [formData.activityType, activitySelection, globalConstraints]);
+  }, [formData.activityType]);
 
   // 입력값 완료 여부 확인
   const isFormCompleted =

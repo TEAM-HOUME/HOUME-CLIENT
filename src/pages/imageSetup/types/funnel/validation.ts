@@ -9,7 +9,7 @@ export const HOUSE_INFO_VALIDATION = {
     roomType:
       '현재 분리형 원룸, 투룸, 쓰리룸 이상 유형은 지원하지 않아요.\n점차 확대될 예정이에요.',
   },
-} as const;
+};
 
 export const MAIN_ACTIVITY_VALIDATION = {
   combinationRules: {
@@ -17,13 +17,13 @@ export const MAIN_ACTIVITY_VALIDATION = {
       requiredFurnitures: ['DESK'],
     },
     READING: {
-      requiredFurnitures: ['BOOK_SHELF'],
+      requiredFurnitures: ['book_shelf'],
     },
     FLOOR_LIVING: {
-      requiredFurnitures: ['SITTING_TABLE'],
+      requiredFurnitures: ['sitting_table'],
     },
     HOME_CAFE: {
-      requiredFurnitures: ['TABLE_CHAIRS'],
+      requiredFurnitures: ['table_chairs'],
     },
   },
 } as const;
