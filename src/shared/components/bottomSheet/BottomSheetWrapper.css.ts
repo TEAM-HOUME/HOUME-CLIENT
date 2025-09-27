@@ -86,7 +86,6 @@ export const contentWrapper = recipe({
         padding: '0 1.6rem',
         borderRadius: '12px 12px 0 0',
         boxShadow: '0 -10px 14px 0 rgba(209, 213, 219, 0.10)',
-        height: '60rem',
       },
     },
   },
