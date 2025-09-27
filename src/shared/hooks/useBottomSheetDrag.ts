@@ -3,7 +3,7 @@ interface UseBottomSheetDragProps {
   sheetRef: RefObject<HTMLDivElement | null>;
   threshold: number;
   onDragUp: () => void;
-  onDragDown: () => void;
+  onDragDown: (delta?: number) => void;
   onDragCancel: () => void;
   mode?: 'close-only' | 'open-close';
 }
@@ -102,7 +102,7 @@ export const useBottomSheetDrag = ({
         } else {
           // 열기/닫기
           if (deltaY > threshold) {
-            onDragDown();
+            onDragDown(deltaY);
           } else if (deltaY < -threshold) {
             onDragUp();
           } else {

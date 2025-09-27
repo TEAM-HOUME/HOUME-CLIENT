@@ -17,6 +17,7 @@ import * as styles from './CurationSheetWrapper.css';
 
 export const CURATION_PEEK_HEIGHT = '8.8rem';
 const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
+const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
 interface CurationSheetWrapperProps {
   children: ReactNode;
@@ -36,10 +37,23 @@ export const CurationSheetWrapper = ({
     else if (snapState === 'mid') setSnapState('expanded');
   }, [snapState]);
 
-  const handleDragDown = useCallback(() => {
-    if (snapState === 'expanded') setSnapState('mid');
-    else if (snapState === 'mid') setSnapState('collapsed');
-  }, [snapState]);
+  const handleDragDown = useCallback(
+    (delta?: number) => {
+      const move = delta ?? THRESHOLD;
+
+      if (snapState === 'expanded') {
+        // 2단계 한 번에 (바로 닫힘)
+        if (move >= THRESHOLD_JUMP) {
+          setSnapState('collapsed');
+        } else {
+          setSnapState('mid');
+        }
+      } else if (snapState === 'mid') {
+        setSnapState('collapsed');
+      }
+    },
+    [snapState]
+  );
 
   const { isDragging, onHandlePointerDown } = useBottomSheetDrag({
     sheetRef,
