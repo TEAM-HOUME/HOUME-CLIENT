@@ -46,7 +46,9 @@ const isGenerateLocationState = (
     typeof request.activity === 'string' &&
     typeof request.bedId === 'number' &&
     Array.isArray(request.moodBoardIds) &&
+    (request.moodBoardIds as unknown[]).every((n) => typeof n === 'number') &&
     Array.isArray(request.selectiveIds) &&
+    (request.selectiveIds as unknown[]).every((n) => typeof n === 'number') &&
     floorPlan !== undefined &&
     typeof floorPlan === 'object' &&
     typeof floorPlan.floorPlanId === 'number' &&
@@ -115,12 +117,12 @@ const LoadingPage = () => {
     isLoading,
     isError,
   } = useStackData(currentPage, {
-    enabled: true,
+    enabled: !!requestData,
     onSuccess: () => setCurrentIndex(0),
     onError: (err) => handleError(err, 'loading'),
   });
   const { data: nextImages } = useStackData(currentPage + 1, {
-    enabled: !!currentImages, // next prefetch
+    enabled: !!currentImages && !!requestData, // next prefetch
   });
 
   const [currentIndex, setCurrentIndex] = useState(0);
