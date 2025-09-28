@@ -97,12 +97,7 @@ const ButtonGroup = <T = string,>({
           const isSelected = selectedValues.some(
             (selected) => String(selected) === String(value)
           );
-
-          // 버튼 활성화 상태 확인 (id 기반)
-          const buttonStatus = buttonStatuses?.find(
-            (status) => status.id === option.id
-          );
-          const isActive = buttonStatus?.isActive ?? true;
+          const isActive = isButtonActive(option); // 버튼 활성화 상태 확인 (id 기반)
 
           return (
             <LargeFilled

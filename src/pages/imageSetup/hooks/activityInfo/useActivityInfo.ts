@@ -11,10 +11,7 @@ import { useCategorySelection } from './useCategorySelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
 
 import type { ActivityOptionsResponse } from '../../types/apis/activityInfo';
-import type {
-  ActivityInfoFormData,
-  CompletedActivityInfo,
-} from '../../types/funnel/activityInfo';
+import type { ActivityInfoFormData } from '../../types/funnel/activityInfo';
 import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 export const useActivityInfo = (
@@ -87,6 +84,27 @@ export const useActivityInfo = (
     ? { bed, sofa, storage, table, selective }
     : null;
 
+  const selectedActivityLabel = activityOptionsData?.activities.find(
+    (activity) => activity.code === formData.activityType
+  )?.label;
+  // 선택된 활동의 필수 가구 라벨들을 반환하는 메서드
+  const getRequiredFurnitureLabels = (): string[] => {
+    if (!formData.activityType || !activityOptionsData) return [];
+
+    const requiredIds = activitySelection.getRequiredFurnitureIds();
+    const labels: string[] = [];
+
+    for (const category of activityOptionsData.categories) {
+      for (const furniture of category.furnitures) {
+        if (requiredIds.includes(furniture.id)) {
+          labels.push(furniture.label);
+        }
+      }
+    }
+
+    return labels;
+  };
+
   // 타입 가드: 완료된 데이터인지 확인
   const isCompleteActivityInfo = (
     data: ActivityInfoFormData
@@ -156,6 +174,8 @@ export const useActivityInfo = (
 
     // 주요활동 관련
     activitySelection,
+    selectedActivityLabel,
+    getRequiredFurnitureLabels,
 
     // 가구 카테고리 선택 관련
     categorySelections,

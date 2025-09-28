@@ -2,10 +2,12 @@ import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/activityInfo/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+import { selected } from '@/shared/components/card/floorCard/FloorCard.css';
 import Loading from '@/shared/components/loading/Loading';
 
 import * as styles from './ActivityInfo.css';
 import ButtonGroup from '../../components/buttonGroup/ButtonGroup';
+import Caption from '../../components/caption/Caption';
 import FunnelHeader from '../../components/header/FunnelHeader';
 import HeadingText from '../../components/headingText/HeadingText';
 
@@ -27,6 +29,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
     handleSubmit,
     isFormCompleted,
+    selectedActivityLabel,
+    getRequiredFurnitureLabels,
     activitySelection,
     categorySelections,
   } = useActivityInfo(context, activityOptionsData);
@@ -74,9 +78,14 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
               layout="grid-2"
             />
           </div>
-          <div className={styles.caption}>
-            {/* <Caption code={} option={} /> */}
-          </div>
+          {selectedActivityLabel && (
+            <div className={styles.caption}>
+              <Caption
+                code={selectedActivityLabel}
+                option={getRequiredFurnitureLabels()}
+              />
+            </div>
+          )}
         </div>
 
         <div className={styles.furnitures}>

@@ -1,7 +1,7 @@
 import * as styles from './CaptionChip.css';
 
 interface CaptionChipProps {
-  text: string;
+  text: string | string[];
   stroke?: boolean;
 }
 
