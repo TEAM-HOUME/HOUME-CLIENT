@@ -46,7 +46,8 @@ export const useActivityInfo = (
   // 전역 제약조건 훅
   const globalConstraints = useGlobalConstraints(
     formData.selectiveIds,
-    activitySelection.getRequiredFurnitureIds()
+    activitySelection.getRequiredFurnitureIds(),
+    !!formData.activityType
   );
 
   // 각 카테고리별 가구 선택 훅(for문 안에서는 훅 호출 불가)
@@ -104,6 +105,12 @@ export const useActivityInfo = (
       setFormData((prev) => ({
         ...prev,
         selectiveIds: requiredIds,
+      }));
+    } else {
+      // 주요활동이 해제된 경우 모든 가구 선택 해제
+      setFormData((prev) => ({
+        ...prev,
+        selectiveIds: [],
       }));
     }
   }, [formData.activityType]);

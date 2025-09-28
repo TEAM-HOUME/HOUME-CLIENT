@@ -7,7 +7,8 @@ import { FURNITURE_SELECTION } from '../../constants/furnitureSelection';
  */
 export const useGlobalConstraints = (
   currentSelections: number[] = [],
-  requiredFurnitureIds: number[] = []
+  requiredFurnitureIds: number[] = [],
+  hasSelectedActivity: boolean = true
 ) => {
   const { MAX_SELECTION_COUNT } = FURNITURE_SELECTION;
 
@@ -37,6 +38,11 @@ export const useGlobalConstraints = (
 
   // 개별 가구 선택 가능 여부 확인
   const canSelectFurniture = (furnitureId: number): boolean => {
+    // 주요 활동이 선택되지 않은 경우 모든 가구 비활성화
+    if (!hasSelectedActivity) {
+      return false;
+    }
+
     const isSelected = currentSelections.includes(furnitureId);
 
     // 이미 선택된 경우는 선택 해제 가능 여부만 확인

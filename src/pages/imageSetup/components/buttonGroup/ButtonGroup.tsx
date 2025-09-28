@@ -65,7 +65,13 @@ const ButtonGroup = <T = string,>({
     );
 
     if (selectionMode === 'single') {
-      onSelectionChange([value]);
+      if (isSelected) {
+        // 선택 해제
+        onSelectionChange([]);
+      } else {
+        // 새로운 선택
+        onSelectionChange([value]);
+      }
     } else {
       if (isSelected) {
         // 선택 해제
