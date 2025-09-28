@@ -71,9 +71,9 @@ const LoadingPage = () => {
     ? rawState.generateImageRequest
     : null;
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
-  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
+  const transitionTimeoutRef = useRef<ReturnType<
+    typeof window.setTimeout
+  > | null>(null);
 
   // 상태 폴링은 requestData가 있을 때만 시작
   useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
@@ -105,7 +105,7 @@ const LoadingPage = () => {
   useEffect(() => {
     return () => {
       if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
+        window.clearTimeout(transitionTimeoutRef.current);
       }
     };
   }, []);
@@ -192,7 +192,7 @@ const LoadingPage = () => {
     }
 
     if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
+      window.clearTimeout(transitionTimeoutRef.current);
     }
 
     transitionTimeoutRef.current = window.setTimeout(() => {
