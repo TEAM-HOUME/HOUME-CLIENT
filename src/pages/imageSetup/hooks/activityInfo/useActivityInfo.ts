@@ -119,9 +119,7 @@ export const useActivityInfo = (
   const isFormCompleted = isCompleteActivityInfo(formData);
 
   // 제출 핸들러
-  const handleSubmit = async (
-    onNext: (data: CompletedActivityInfo) => void
-  ) => {
+  const handleSubmit = async () => {
     if (!isFormCompleted) return;
 
     // 중복 클릭 방지 (CreditBox 패턴)
@@ -146,17 +144,6 @@ export const useActivityInfo = (
       activity: formData.activityType!,
       selectiveIds: formData.selectiveIds!,
     };
-
-    onNext({
-      houseType: context.houseType,
-      roomType: context.roomType,
-      areaType: context.areaType,
-      houseId: context.houseId,
-      floorPlan: context.floorPlan,
-      moodBoardIds: context.moodBoardIds,
-      activityType: formData.activityType!,
-      selectiveIds: formData.selectiveIds!,
-    });
 
     navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
   };

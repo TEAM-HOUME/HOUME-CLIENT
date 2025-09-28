@@ -153,10 +153,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         </div>
 
         <div>
-          <CtaButton
-            isActive={isFormCompleted}
-            onClick={() => handleSubmit(() => {})}
-          >
+          <CtaButton isActive={isFormCompleted} onClick={() => handleSubmit()}>
             이미지 생성하기
           </CtaButton>
         </div>
