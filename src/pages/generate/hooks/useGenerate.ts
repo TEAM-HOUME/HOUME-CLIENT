@@ -20,25 +20,42 @@ import {
 
 import { useGenerateStore } from '../stores/useGenerateStore';
 
-import type { GenerateImageRequest } from '@pages/generate/types/generate';
+import type {
+  GenerateImageRequest,
+  CarouselItem,
+  GenerateImageResponse,
+} from '@pages/generate/types/generate';
+import type { UseMutationResult } from '@tanstack/react-query';
 
 export const useStackData = (
   page: number,
   options: {
     enabled: boolean;
-    onSuccess?: (data: Awaited<ReturnType<typeof getStackData>>) => void;
+    onSuccess?: (data: CarouselItem[]) => void;
     onError?: (err: unknown) => void;
   }
 ) => {
-  return useQuery({
+  const query = useQuery<CarouselItem[], unknown>({
     queryKey: [QUERY_KEY.GENERATE_LOADING, page],
     queryFn: () => getStackData(page),
     staleTime: 2 * 60 * 1000,
     retry: 2,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
     enabled: options.enabled,
   });
+  // v5에서는 onSuccess/onError가 제거됨: effect로 래핑
+  useEffect(() => {
+    if (query.isSuccess && query.data) {
+      options.onSuccess?.(query.data);
+    }
+  }, [query.isSuccess, query.data]);
+
+  useEffect(() => {
+    if (query.isError) {
+      options.onError?.(query.error);
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };
 
 export const useGetResultDataQuery = (
@@ -88,11 +105,19 @@ export const useCreditLogMutation = () => {
 };
 
 // 이미지 생성 api
-export const useGenerateImageApi = () => {
+export const useGenerateImageApi = (): UseMutationResult<
+  GenerateImageResponse['data'],
+  unknown,
+  GenerateImageRequest
+> => {
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
 
-  const generateImageRequest = useMutation({
+  const generateImageRequest = useMutation<
+    GenerateImageResponse['data'],
+    unknown,
+    GenerateImageRequest
+  >({
     mutationFn: (userInfo: GenerateImageRequest) => {
       console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
       return postGenerateImage(userInfo);
@@ -124,7 +149,7 @@ export const useGenerateImageStatusCheck = (
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
 
-  const query = useQuery({
+  const query = useQuery<GenerateImageResponse['data'], unknown>({
     queryKey: ['generateImageStatus', houseId],
     queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
