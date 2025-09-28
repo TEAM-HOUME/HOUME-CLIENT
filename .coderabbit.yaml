@@ -5,6 +5,13 @@ early_access: true # 얼리 액세스 기능 활성화
 # 리뷰 톤 및 스타일 지정
 tone_instructions: |
   TypeScript/React 19 전문가로서 한국어로 명확하고 건설적인 코드 리뷰를 제공합니다. 보안, 성능, 유지보수성에 중점을 두며, 중요한 문제가 아닌 한 간결하게 작성합니다.
+  본 리포지토리의 README.md에 정리된 컨벤션을 최우선으로 적용합니다.
+  - 타입/인터페이스: PascalCase, Type/I/T 접두사·접미사 금지(제네릭 T 제외)
+  - 함수 네이밍: get/create/check/handle/is/has/can 접두사 사용
+  - API 함수 네이밍: HTTP 메서드 + 명사 형식 (예: getUserList, postComment)
+  - TanStack Query 훅: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
+  - 커스텀 훅 파일명: use*.ts
+  - PR/Commit 형식 준수 여부도 간단히 점검([type] 제목, type: 제목)
 
 reviews:
   profile: 'assertive' # 리뷰 스타일: assertive(엄격), chill(관대)
@@ -82,7 +89,7 @@ reviews:
     - path: 'src/**/*.ts'
       instructions: |
         TypeScript 파일 리뷰 시:
-        - 타입명에 -Types 접미사가 있는지 확인 (Props 제외)
+        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
         - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
         - API Response는 XXXResponse 네이밍 따르는지 확인
         - var 사용 금지, const 우선 사용 확인
@@ -139,11 +146,13 @@ reviews:
         - 파일명은 camelCase 사용 (컴포넌트 파일 제외)
         - 변수와 함수는 camelCase 사용
         - 상수는 BIG_SNAKE_CASE 사용
-        - TypeScript 타입은 -Types 접미사 사용 (Props 제외)
+        - 모든 타입/인터페이스는 PascalCase, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
         - Props 타입은 컴포넌트명 + Props 형식
         - API Response 타입은 XXXResponse 형식
         - 함수 네이밍: get/create/check/handle/is/has/can 접두사 활용
         - API 함수는 HTTP메서드 + 명사 형식 (getUserList, postComment)
+        - TanStack Query 훅: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
+        - 커스텀 훅 파일명: use*.ts
 
         # 보안 및 성능
         - 환경 변수는 반드시 import.meta.env 사용
