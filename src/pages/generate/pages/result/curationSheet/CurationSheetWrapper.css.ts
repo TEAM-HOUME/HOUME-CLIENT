@@ -23,7 +23,6 @@ export const sheetWrapper = style({
   vars: {
     '--base-y': `calc(100% - ${CURATION_PEEK_HEIGHT})`, // 상태에 따른 목표
     '--drag-y': '0px', // 드래그 변화량
-    '--sheet-max-h': 'min(var(--sheet-max-h), 100vh)', // 시트 최대 높이
   },
 
   display: 'flex',
