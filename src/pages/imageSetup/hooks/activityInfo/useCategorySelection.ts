@@ -10,6 +10,7 @@ export const useCategorySelection = (
   setFormData: React.Dispatch<React.SetStateAction<ActivityInfoFormData>>,
   globalConstraints: {
     applyConstraints: (ids: number[]) => number[];
+    canSelectFurniture: (furnitureId: number) => boolean;
   }
 ) => {
   // 카테고리가 없는 경우 빈 배열 반환
@@ -17,6 +18,7 @@ export const useCategorySelection = (
     return {
       selectedValues: [],
       handleChange: () => {},
+      furnitureStatus: [],
     };
   }
 
@@ -44,8 +46,15 @@ export const useCategorySelection = (
     setFormData((prev) => ({ ...prev, selectiveIds: updatedIds }));
   };
 
+  // 각 가구별 활성화 상태 정보
+  const furnitureStatus = category.furnitures.map((furniture) => ({
+    id: furniture.id,
+    isActive: globalConstraints.canSelectFurniture(furniture.id),
+  }));
+
   return {
     selectedValues,
     handleChange,
+    furnitureStatus,
   };
 };

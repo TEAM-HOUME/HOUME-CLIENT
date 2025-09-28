@@ -9,6 +9,11 @@ export interface ButtonOption {
   id?: number;
 }
 
+export interface ButtonStatus {
+  id: number;
+  isActive: boolean;
+}
+
 export interface ButtonGroupProps<T = string> {
   title?: string;
   titleSize?: 'small' | 'large';
@@ -24,6 +29,7 @@ export interface ButtonGroupProps<T = string> {
   hasBorder?: boolean;
   errors?: string;
   disabled?: boolean;
+  buttonStatuses?: ButtonStatus[];
 }
 
 const ButtonGroup = <T = string,>({
@@ -39,17 +45,28 @@ const ButtonGroup = <T = string,>({
   layout,
   hasBorder = false,
   errors,
+  buttonStatuses,
 }: ButtonGroupProps<T>) => {
+  const isButtonActive = (option: ButtonOption): boolean => {
+    // 버튼 활성화 상태 확인
+    const buttonStatus = buttonStatuses?.find(
+      (status) => status.id === option.id
+    );
+
+    return buttonStatus?.isActive ?? true;
+  };
+
   const handleButtonClick = (option: ButtonOption) => {
+    if (!isButtonActive(option)) return;
+
     const value = valueExtractor(option);
+    const isSelected = selectedValues.some(
+      (selected) => String(selected) === String(value)
+    );
 
     if (selectionMode === 'single') {
       onSelectionChange([value]);
     } else {
-      const isSelected = selectedValues.some(
-        (selected) => String(selected) === String(value)
-      );
-
       if (isSelected) {
         // 선택 해제
         onSelectionChange(
@@ -75,12 +92,18 @@ const ButtonGroup = <T = string,>({
             (selected) => String(selected) === String(value)
           );
 
+          // 버튼 활성화 상태 확인 (id 기반)
+          const buttonStatus = buttonStatuses?.find(
+            (status) => status.id === option.id
+          );
+          const isActive = buttonStatus?.isActive ?? true;
+
           return (
             <LargeFilled
               key={String(option.code)}
               buttonSize={buttonSize}
               isSelected={isSelected}
-              // isActive={!option.disabled}
+              isActive={isActive}
               onClick={() => handleButtonClick(option)}
             >
               {option.label}

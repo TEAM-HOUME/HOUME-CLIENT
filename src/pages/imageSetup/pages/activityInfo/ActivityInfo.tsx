@@ -18,7 +18,7 @@ interface ActivityInfoProps {
 const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
     data: activityOptionsData,
-    isLoading,
+    isPending,
     error,
   } = useActivityOptionsQuery();
 
@@ -36,8 +36,8 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     return <div>데이터를 불러올 수 없습니다.</div>;
   }
 
-  // 로딩 중이거나 데이터가 없는 경우
-  if (isLoading || !activityOptionsData || !categorySelections) {
+  // pending / 데이터가 없는 경우
+  if (isPending || !activityOptionsData || !categorySelections) {
     return <Loading />;
   }
 
@@ -95,6 +95,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             selectionMode="single"
             buttonSize="xsmall"
             layout="grid-4"
+            buttonStatuses={categorySelections.bed.furnitureStatus}
           />
 
           <ButtonGroup<number>
@@ -108,6 +109,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             selectionMode="single"
             buttonSize="medium"
             layout="grid-2"
+            buttonStatuses={categorySelections.sofa.furnitureStatus}
           />
 
           <ButtonGroup<number>
@@ -120,6 +122,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
+            buttonStatuses={categorySelections.storage.furnitureStatus}
           />
 
           <ButtonGroup<number>
@@ -132,6 +135,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             selectionMode="multiple"
             buttonSize="small"
             layout="grid-3"
+            buttonStatuses={categorySelections.table.furnitureStatus}
           />
 
           <ButtonGroup<number>
@@ -144,6 +148,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
+            buttonStatuses={categorySelections.selective.furnitureStatus}
           />
         </div>
 

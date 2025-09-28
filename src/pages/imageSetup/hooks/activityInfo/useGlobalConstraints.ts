@@ -38,7 +38,6 @@ export const useGlobalConstraints = (
   // 개별 가구 선택 가능 여부 확인
   const canSelectFurniture = (furnitureId: number): boolean => {
     const isSelected = currentSelections.includes(furnitureId);
-    const isRequired = isRequiredFurniture(furnitureId);
 
     // 이미 선택된 경우는 선택 해제 가능 여부만 확인
     if (isSelected) {
