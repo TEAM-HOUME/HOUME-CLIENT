@@ -25,11 +25,10 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   console.log(activityOptionsData);
 
   const {
-    errors,
     handleSubmit,
     isFormCompleted,
     activitySelection,
-    furnitureSelection,
+    categorySelections,
   } = useActivityInfo(context, activityOptionsData);
 
   // 에러 처리
@@ -38,7 +37,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   }
 
   // 로딩 중이거나 데이터가 없는 경우
-  if (isLoading || !activityOptionsData) {
+  if (isLoading || !activityOptionsData || !categorySelections) {
     return <Loading />;
   }
 
@@ -65,14 +64,14 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             subtitle="선택한 활동에 최적화된 동선을 알려드려요."
           />
           <div className={styles.activityButton}>
-            <ButtonGroup
+            <ButtonGroup<string>
               options={activityTypeOptions}
               selectedValues={activitySelection.selectedValues}
               onSelectionChange={activitySelection.handleActivityChange}
+              valueExtractor={(option) => option.code}
               selectionMode="single"
               buttonSize="large"
               layout="grid-2"
-              errors={errors.activityType}
             />
           </div>
           <div className={styles.caption}>
@@ -85,89 +84,66 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             title="가구"
             subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
           />
-          <ButtonGroup
+          <ButtonGroup<number>
             title={bedOptions.nameKr}
             titleSize="small"
             hasBorder={true}
             options={bedOptions.furnitures}
-            selectedValues={furnitureSelection.getCategorySelectedCodes(
-              bedOptions
-            )}
-            onSelectionChange={(values) =>
-              furnitureSelection.handleCategorySelection(bedOptions, values)
-            }
+            selectedValues={categorySelections.bed.selectedValues}
+            onSelectionChange={categorySelections.bed.handleChange}
+            valueExtractor={(option) => option.id!}
             selectionMode="single"
             buttonSize="xsmall"
             layout="grid-4"
-            errors={errors.selectiveIds}
           />
 
-          <ButtonGroup
+          <ButtonGroup<number>
             title={sofaOptions.nameKr}
             titleSize="small"
             hasBorder={true}
             options={sofaOptions.furnitures}
-            selectedValues={furnitureSelection.getCategorySelectedCodes(
-              sofaOptions
-            )}
-            onSelectionChange={(values) =>
-              furnitureSelection.handleCategorySelection(sofaOptions, values)
-            }
+            selectedValues={categorySelections.sofa.selectedValues}
+            onSelectionChange={categorySelections.sofa.handleChange}
+            valueExtractor={(option) => option.id!}
             selectionMode="single"
             buttonSize="medium"
             layout="grid-2"
-            errors={errors.selectiveIds}
           />
 
-          <ButtonGroup
+          <ButtonGroup<number>
             title={storageOptions.nameKr}
             titleSize="small"
             options={storageOptions.furnitures}
-            selectedValues={furnitureSelection.getCategorySelectedCodes(
-              storageOptions
-            )}
-            onSelectionChange={(values) =>
-              furnitureSelection.handleCategorySelection(storageOptions, values)
-            }
+            selectedValues={categorySelections.storage.selectedValues}
+            onSelectionChange={categorySelections.storage.handleChange}
+            valueExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
-            errors={errors.selectiveIds}
           />
 
-          <ButtonGroup
+          <ButtonGroup<number>
             title={tableOptions.nameKr}
             titleSize="small"
             options={tableOptions.furnitures}
-            selectedValues={furnitureSelection.getCategorySelectedCodes(
-              tableOptions
-            )}
-            onSelectionChange={(values) =>
-              furnitureSelection.handleCategorySelection(tableOptions, values)
-            }
+            selectedValues={categorySelections.table.selectedValues}
+            onSelectionChange={categorySelections.table.handleChange}
+            valueExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="small"
             layout="grid-3"
-            errors={errors.selectiveIds}
           />
 
-          <ButtonGroup
+          <ButtonGroup<number>
             title={selectiveOptions.nameKr}
             titleSize="small"
             options={selectiveOptions.furnitures}
-            selectedValues={furnitureSelection.getCategorySelectedCodes(
-              selectiveOptions
-            )}
-            onSelectionChange={(values) =>
-              furnitureSelection.handleCategorySelection(
-                selectiveOptions,
-                values
-              )
-            }
+            selectedValues={categorySelections.selective.selectedValues}
+            onSelectionChange={categorySelections.selective.handleChange}
+            valueExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
-            errors={errors.selectiveIds}
           />
         </div>
 

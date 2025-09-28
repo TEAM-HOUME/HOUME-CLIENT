@@ -7,12 +7,11 @@ import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
 import { useActivitySelection } from './useActivitySelection';
-import { useFurnitureSelection } from './useFurnitureSelection';
+import { useCategorySelection } from './useCategorySelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
 
 import type { ActivityOptionsResponse } from '../../types/apis/activityInfo';
 import type {
-  ActivityInfoErrors,
   ActivityInfoFormData,
   CompletedActivityInfo,
 } from '../../types/funnel/activityInfo';
@@ -35,8 +34,6 @@ export const useActivityInfo = (
     selectiveIds: context.selectiveIds || [],
   });
 
-  const [errors, setErrors] = useState<ActivityInfoErrors>({});
-
   // 주요활동 선택 훅
   const activitySelection = useActivitySelection(
     activityOptionsData,
@@ -52,14 +49,42 @@ export const useActivityInfo = (
     activitySelection.getRequiredFurnitureIds()
   );
 
-  // 가구 선택 훅
-  const furnitureSelection = useFurnitureSelection(
-    formData.selectiveIds,
-    (selectiveIds) => {
-      setFormData((prev) => ({ ...prev, selectiveIds }));
-    },
+  // 각 카테고리별 가구 선택 훅(for문 안에서는 훅 호출 불가)
+  const bed = useCategorySelection(
+    activityOptionsData?.categories[0] || null,
+    formData,
+    setFormData,
     globalConstraints
   );
+  const sofa = useCategorySelection(
+    activityOptionsData?.categories[1] || null,
+    formData,
+    setFormData,
+    globalConstraints
+  );
+  const storage = useCategorySelection(
+    activityOptionsData?.categories[2] || null,
+    formData,
+    setFormData,
+    globalConstraints
+  );
+  const table = useCategorySelection(
+    activityOptionsData?.categories[3] || null,
+    formData,
+    setFormData,
+    globalConstraints
+  );
+  const selective = useCategorySelection(
+    activityOptionsData?.categories[4] || null,
+    formData,
+    setFormData,
+    globalConstraints
+  );
+
+  // 카테고리 선택 객체 구성
+  const categorySelections = activityOptionsData
+    ? { bed, sofa, storage, table, selective }
+    : null;
 
   // 타입 가드: 완료된 데이터인지 확인
   const isCompleteActivityInfo = (
@@ -72,42 +97,19 @@ export const useActivityInfo = (
     );
   };
 
-  // 에러 상태 관리
-  useEffect(() => {
-    setErrors((prev) => {
-      if (prev.activityType) {
-        const { activityType: _, ...rest } = prev;
-        return rest;
-      }
-      return prev;
-    });
-  }, [formData.activityType]);
-
-  useEffect(() => {
-    setErrors((prev) => {
-      if (prev.selectiveIds) {
-        const { selectiveIds: _, ...rest } = prev;
-        return rest;
-      }
-      return prev;
-    });
-  }, [formData.selectiveIds]);
-
   // 주요활동 변경 시 기존 가구 초기화 후 필수 가구 자동 선택
   useEffect(() => {
     if (formData.activityType) {
       const requiredIds = activitySelection.getRequiredFurnitureIds();
-      const updatedIds = globalConstraints.applyConstraints([...requiredIds]);
       setFormData((prev) => ({
         ...prev,
-        selectiveIds: updatedIds,
+        selectiveIds: requiredIds,
       }));
     }
   }, [formData.activityType]);
 
   // 입력값 완료 여부 확인
-  const isFormCompleted =
-    isCompleteActivityInfo(formData) && Object.values(errors).length === 0;
+  const isFormCompleted = isCompleteActivityInfo(formData);
 
   // 제출 핸들러
   const handleSubmit = async (
@@ -156,14 +158,13 @@ export const useActivityInfo = (
     // 상태
     formData,
     setFormData,
-    errors,
     isFormCompleted,
 
     // 주요활동 관련
     activitySelection,
 
-    // 가구 선택 관련
-    furnitureSelection,
+    // 가구 카테고리 선택 관련
+    categorySelections,
 
     // 전역 제약조건
     globalConstraints,

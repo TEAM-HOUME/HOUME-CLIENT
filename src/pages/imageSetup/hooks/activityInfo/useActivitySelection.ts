@@ -48,15 +48,6 @@ export const useActivitySelection = (
     onActivityChange?.(newActivity);
   };
 
-  // 현재 선택된 활동의 label 가져오기
-  const getCurrentActivityLabel = (): string => {
-    if (!selectedActivity || !activityOptionsData) return '';
-    const option = activityOptionsData.activities.find(
-      (option) => option.code === selectedActivity
-    );
-    return option?.label || '';
-  };
-
   // ButtonGroup에서 사용할 selectedValues
   const selectedValues = selectedActivity ? [selectedActivity] : [];
 
@@ -64,7 +55,6 @@ export const useActivitySelection = (
     selectedValues,
     handleActivityChange,
     getRequiredFurnitureIds,
-    getCurrentActivityLabel,
     isValidActivityKey,
   };
 };

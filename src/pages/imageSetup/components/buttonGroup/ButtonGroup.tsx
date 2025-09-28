@@ -9,13 +9,13 @@ export interface ButtonOption {
   id?: number;
 }
 
-// 항상 code값을 반환함, id값이 필요한 경우 커스텀 훅에서 별도 로직으로 처리
-export interface ButtonGroupProps {
+export interface ButtonGroupProps<T = string> {
   title?: string;
   titleSize?: 'small' | 'large';
   options: ButtonOption[];
-  selectedValues: string[];
-  onSelectionChange: (selectedValues: string[]) => void;
+  selectedValues: T[];
+  onSelectionChange: (selectedValues: T[]) => void;
+  valueExtractor?: (option: ButtonOption) => T;
   selectionMode: 'single' | 'multiple';
   maxSelection?: number;
   buttonSize: 'xsmall' | 'small' | 'medium' | 'large';
@@ -26,32 +26,41 @@ export interface ButtonGroupProps {
   disabled?: boolean;
 }
 
-const ButtonGroup = ({
+const ButtonGroup = <T = string,>({
   title,
   titleSize,
   options,
   selectedValues,
   onSelectionChange,
+  valueExtractor = (option: ButtonOption) => option.code as T,
   selectionMode,
   maxSelection,
   buttonSize,
   layout,
   hasBorder = false,
   errors,
-}: ButtonGroupProps) => {
-  const handleButtonClick = (buttonCode: string) => {
+}: ButtonGroupProps<T>) => {
+  const handleButtonClick = (option: ButtonOption) => {
+    const value = valueExtractor(option);
+
     if (selectionMode === 'single') {
-      onSelectionChange([buttonCode]);
+      onSelectionChange([value]);
     } else {
-      const isSelected = selectedValues.includes(buttonCode);
+      const isSelected = selectedValues.some(
+        (selected) => String(selected) === String(value)
+      );
 
       if (isSelected) {
         // 선택 해제
-        onSelectionChange(selectedValues.filter((code) => code !== buttonCode));
+        onSelectionChange(
+          selectedValues.filter(
+            (selected) => String(selected) !== String(value)
+          )
+        );
       } else {
         // 선택 추가
         if (maxSelection && selectedValues.length >= maxSelection) return;
-        onSelectionChange([...selectedValues, buttonCode]);
+        onSelectionChange([...selectedValues, value]);
       }
     }
   };
@@ -60,17 +69,24 @@ const ButtonGroup = ({
     <div className={styles.container({ hasBorder })}>
       {title && <p className={styles.title({ titleSize })}>{title}</p>}
       <div className={`${styles.buttonGroupStyles({ layout })}`}>
-        {options.map((option) => (
-          <LargeFilled
-            key={String(option.code)}
-            buttonSize={buttonSize}
-            isSelected={selectedValues.includes(option.code)}
-            // isActive={!option.disabled}
-            onClick={() => handleButtonClick(option.code)}
-          >
-            {option.label}
-          </LargeFilled>
-        ))}
+        {options.map((option) => {
+          const value = valueExtractor(option);
+          const isSelected = selectedValues.some(
+            (selected) => String(selected) === String(value)
+          );
+
+          return (
+            <LargeFilled
+              key={String(option.code)}
+              buttonSize={buttonSize}
+              isSelected={isSelected}
+              // isActive={!option.disabled}
+              onClick={() => handleButtonClick(option)}
+            >
+              {option.label}
+            </LargeFilled>
+          );
+        })}
       </div>
       {errors && (
         <div className={styles.errorContainer}>
