@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { ROUTES } from '@/routes/paths';
 import { queryClient } from '@/shared/apis/queryClient';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 
@@ -153,7 +154,7 @@ export const useGenerateImageStatusCheck = (
     queryKey: ['generateImageStatus', houseId],
     queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
-    refetchInterval: 7000, // 5초
+    refetchInterval: 7000, // 7초
     refetchIntervalInBackground: true,
     retry: (failureCount) => {
       // 최대 10번 재시도
@@ -186,7 +187,7 @@ export const useGenerateImageStatusCheck = (
   // 에러 시 처리
   useEffect(() => {
     if (query.isError) {
-      navigate('/imageSetup');
+      navigate(ROUTES.IMAGE_SETUP);
       console.log('fallback api 이미지 생성 실패');
     }
   }, [query.isError, query.error]);
