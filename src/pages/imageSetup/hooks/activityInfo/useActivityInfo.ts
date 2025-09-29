@@ -47,7 +47,7 @@ export const useActivityInfo = (
     !!formData.activityType
   );
 
-  // 각 카테고리별 가구 선택 훅(for문 안에서는 훅 호출 불가)
+  // 각 카테고리별 가구 선택 훅
   const bed = useCategorySelection(
     activityOptionsData?.categories[0] || null,
     formData,
@@ -84,10 +84,11 @@ export const useActivityInfo = (
     ? { bed, sofa, storage, table, selective }
     : null;
 
+  // 선택된 주요 활동의 라벨을 반환하는 메서드
   const selectedActivityLabel = activityOptionsData?.activities.find(
     (activity) => activity.code === formData.activityType
   )?.label;
-  // 선택된 활동의 필수 가구 라벨들을 반환하는 메서드
+  // 선택된 주요 활동의 필수 가구 라벨들을 반환하는 메서드
   const getRequiredFurnitureLabels = (): string[] => {
     if (!formData.activityType || !activityOptionsData) return [];
 
@@ -116,6 +117,9 @@ export const useActivityInfo = (
     );
   };
 
+  // 입력값 완료 여부 확인
+  const isFormCompleted = isCompleteActivityInfo(formData);
+
   // 주요활동 변경 시 기존 가구 초기화 후 필수 가구 자동 선택
   useEffect(() => {
     if (formData.activityType) {
@@ -132,9 +136,6 @@ export const useActivityInfo = (
       }));
     }
   }, [formData.activityType]);
-
-  // 입력값 완료 여부 확인
-  const isFormCompleted = isCompleteActivityInfo(formData);
 
   // 제출 핸들러
   const handleSubmit = async () => {

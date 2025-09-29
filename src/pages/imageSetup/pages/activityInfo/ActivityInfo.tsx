@@ -2,7 +2,6 @@ import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/activityInfo/useActivityInfo';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { selected } from '@/shared/components/card/floorCard/FloorCard.css';
 import Loading from '@/shared/components/loading/Loading';
 
 import * as styles from './ActivityInfo.css';

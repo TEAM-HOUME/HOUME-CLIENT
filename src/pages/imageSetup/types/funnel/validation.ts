@@ -17,13 +17,13 @@ export const MAIN_ACTIVITY_VALIDATION = {
       requiredFurnitures: ['DESK'],
     },
     READING: {
-      requiredFurnitures: ['book_shelf'],
+      requiredFurnitures: ['BOOK_SHELF'],
     },
     FLOOR_LIVING: {
-      requiredFurnitures: ['sitting_table'],
+      requiredFurnitures: ['SITTING_TABLE'],
     },
     HOME_CAFE: {
-      requiredFurnitures: ['table_chairs'],
+      requiredFurnitures: ['TABLE'],
     },
   },
 } as const;

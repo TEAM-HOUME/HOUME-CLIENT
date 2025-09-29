@@ -26,12 +26,12 @@ export const useActivitySelection = (
     )
       return [];
 
-    const requiredCodes =
+    const requiredFurnitureCodes =
       MAIN_ACTIVITY_VALIDATION.combinationRules[selectedActivity]
         ?.requiredFurnitures || [];
 
     // 모든 카테고리의 모든 가구에서 필수 가구 찾기
-    return requiredCodes
+    return requiredFurnitureCodes
       .map((code) => {
         for (const category of activityOptionsData.categories) {
           const furniture = category.furnitures.find((f) => f.code === code);
@@ -39,17 +39,18 @@ export const useActivitySelection = (
         }
         return undefined;
       })
-      .filter((id): id is number => id !== undefined);
+      .filter((id): id is number => id !== undefined); // API 데이터와 로컬 validation 데이터 불일치 시 undefined 반환, 해당 케이스 처리하는 로직
   };
 
-  // 주요활동 변경 핸들러
+  // ButtonGroup 배열 인터페이스와 단일 선택 비즈니스 로직 간 어댑터
   const handleActivityChange = (values: string[]) => {
+    // 주요활동은 단일선택만 가능하지만, ButtonGroup의 onSelectionChange를 다중선택 기준으로 설계(T[]) → values의 타입을 배열로 선언, 메서드 내에서 values[0]으로 단일값으로 처리
     const newActivity = values[0] || undefined;
     onActivityChange?.(newActivity);
   };
 
   // ButtonGroup에서 사용할 selectedValues
-  const selectedValues = selectedActivity ? [selectedActivity] : [];
+  const selectedValues = selectedActivity ? [selectedActivity] : []; // 단일 값을 ButtonGroup 인터페이스에 맞게 배열로 변환
 
   return {
     selectedValues,
