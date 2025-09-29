@@ -39,13 +39,13 @@ export const useGlobalConstraints = (
   };
 
   // 가구 추가/삭제 시에도 항상 필수 가구가 포함된 selection 반환
-  const withRequiredFurniture = (selections: number[]): number[] => {
+  const includeRequiredFurniture = (selections: number[]): number[] => {
     return [...new Set([...requiredFurnitureIds, ...selections])];
   };
 
   // 최대 개수 제한을 적용한 안전한 selection 반환
   // ButtonGroup의 isActive로 UI레벨에서 클릭을 disable시키는 방어 로직이 있지만, 데이터 레벨에서의 방어 로직도 추가해 더 안전하게 관리
-  const withMaxLimit = (selections: number[]): number[] => {
+  const applyMaxCountLimit = (selections: number[]): number[] => {
     if (selections.length <= MAX_SELECTION_COUNT) return selections;
 
     // 필수 가구는 유지하고 나머지에서 조정
@@ -63,7 +63,7 @@ export const useGlobalConstraints = (
 
   // 모든 제약조건을 적용한 최종 selection
   const applyConstraints = (selections: number[]): number[] => {
-    return withMaxLimit(withRequiredFurniture(selections));
+    return applyMaxCountLimit(includeRequiredFurniture(selections));
   };
 
   return {

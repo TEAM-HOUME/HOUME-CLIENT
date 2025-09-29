@@ -20,7 +20,7 @@ export interface ButtonGroupProps<T = string> {
   options: ButtonOption[];
   selectedValues: T[];
   onSelectionChange: (selectedValues: T[]) => void;
-  valueExtractor?: (option: ButtonOption) => T;
+  keyExtractor?: (option: ButtonOption) => T;
   selectionMode: 'single' | 'multiple';
   maxSelection?: number;
   buttonSize: 'xsmall' | 'small' | 'medium' | 'large';
@@ -38,7 +38,7 @@ const ButtonGroup = <T = string,>({
   options,
   selectedValues,
   onSelectionChange,
-  valueExtractor = (option: ButtonOption) => option.code as T,
+  keyExtractor = (option: ButtonOption) => option.code as T, // 이미지 생성 요청 body에 필요한 값 추출
   selectionMode,
   maxSelection,
   buttonSize,
@@ -59,7 +59,7 @@ const ButtonGroup = <T = string,>({
   const handleButtonClick = (option: ButtonOption) => {
     if (!isButtonActive(option)) return;
 
-    const value = valueExtractor(option);
+    const value = keyExtractor(option);
     const isSelected = selectedValues.some(
       (selected) => String(selected) === String(value)
     );
@@ -93,7 +93,7 @@ const ButtonGroup = <T = string,>({
       {title && <p className={styles.title({ titleSize })}>{title}</p>}
       <div className={`${styles.buttonGroupStyles({ layout })}`}>
         {options.map((option) => {
-          const value = valueExtractor(option);
+          const value = keyExtractor(option);
           const isSelected = selectedValues.some(
             (selected) => String(selected) === String(value)
           );

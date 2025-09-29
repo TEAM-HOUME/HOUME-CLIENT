@@ -71,7 +71,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
               options={activityTypeOptions}
               selectedValues={activitySelection.selectedValues}
               onSelectionChange={activitySelection.handleActivityChange}
-              valueExtractor={(option) => option.code}
+              keyExtractor={(option) => option.code}
               selectionMode="single"
               buttonSize="large"
               layout="grid-2"
@@ -99,7 +99,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={bedOptions.furnitures}
             selectedValues={categorySelections.bed.selectedValues}
             onSelectionChange={categorySelections.bed.handleChange}
-            valueExtractor={(option) => option.id!}
+            keyExtractor={(option) => option.id!}
             selectionMode="single"
             buttonSize="xsmall"
             layout="grid-4"
@@ -113,7 +113,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={sofaOptions.furnitures}
             selectedValues={categorySelections.sofa.selectedValues}
             onSelectionChange={categorySelections.sofa.handleChange}
-            valueExtractor={(option) => option.id!}
+            keyExtractor={(option) => option.id!}
             selectionMode="single"
             buttonSize="medium"
             layout="grid-2"
@@ -126,7 +126,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={storageOptions.furnitures}
             selectedValues={categorySelections.storage.selectedValues}
             onSelectionChange={categorySelections.storage.handleChange}
-            valueExtractor={(option) => option.id!}
+            keyExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
@@ -139,7 +139,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={tableOptions.furnitures}
             selectedValues={categorySelections.table.selectedValues}
             onSelectionChange={categorySelections.table.handleChange}
-            valueExtractor={(option) => option.id!}
+            keyExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="small"
             layout="grid-3"
@@ -152,7 +152,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
             options={selectiveOptions.furnitures}
             selectedValues={categorySelections.selective.selectedValues}
             onSelectionChange={categorySelections.selective.handleChange}
-            valueExtractor={(option) => option.id!}
+            keyExtractor={(option) => option.id!}
             selectionMode="multiple"
             buttonSize="large"
             layout="grid-2"
