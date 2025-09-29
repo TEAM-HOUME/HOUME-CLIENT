@@ -1,7 +1,6 @@
 import { recipe } from '@vanilla-extract/recipes';
 
-import { fontStyle } from '@/shared/styles/fontStyle';
-
+import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
 
 export const filterChip = recipe({
@@ -13,7 +12,8 @@ export const filterChip = recipe({
     ...fontStyle('body_r_14'),
     color: colorVars.color.gray500,
     border: `1px solid ${colorVars.color.gray300}`,
-    transition: 'all 0.2s ease-in-out',
+    transition:
+      'color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
   },
   variants: {
     selected: {
