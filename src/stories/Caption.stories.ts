@@ -14,6 +14,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     code: '휴식형',
-    option: '소파',
+    option: ['소파'],
   },
 };
