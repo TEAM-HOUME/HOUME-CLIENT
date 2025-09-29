@@ -28,21 +28,6 @@ export const BottomSheetWrapper = ({
 }: BottomSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
-  // // 드래그로 닫을 때
-  // const animateClose = useCallback(() => {
-  //   if (!sheetRef.current) {
-  //     onClose();
-  //     return;
-  //   }
-  //   const sheet = sheetRef.current;
-  //   sheet.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
-  //   sheet.style.transform = 'translate(-50%, 100%)';
-
-  //   setTimeout(() => {
-  //     onClose();
-  //   }, SHEET_DURATION_MS);
-  // }, [onClose]);
-
   const handleClose = () => {
     onClose();
   };
