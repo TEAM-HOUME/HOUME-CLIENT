@@ -3,14 +3,14 @@ import CaptionChip from './CaptionChip';
 
 interface CaptionProps {
   code: string;
-  option: string;
+  option: string[];
 }
 
 const Caption = ({ code, option }: CaptionProps) => {
   return (
     <div className={style.container}>
       <p className={style.textBox}>
-        <CaptionChip text={code} stroke={true} />
+        <CaptionChip text={code} />
         <span className={style.text}>을 선택하면</span>
       </p>
       <p className={style.textBox}>

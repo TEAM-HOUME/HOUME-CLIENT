@@ -10,13 +10,14 @@ export interface FurnitureOptionItem {
   label: string;
 }
 
-export interface FurnitureGroup {
-  isRequired: boolean;
-  items: FurnitureOptionItem[];
+export interface FurnitureCategory {
+  categoryId: number;
+  nameKr: string;
+  nameEng: string;
+  furnitures: FurnitureOptionItem[];
 }
 
 export interface ActivityOptionsResponse {
   activities: ActivityOptionItem[];
-  beds: FurnitureGroup;
-  selectives: FurnitureGroup;
+  categories: FurnitureCategory[];
 }

@@ -1,6 +1,6 @@
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton.tsx';
+import ErrorMessage from '@/shared/components/button/ErrorButton/ErrorMessage';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton.tsx';
-import ShowErrorMessage from '@/shared/components/button/showErrorButton/ShowErrorButton.tsx';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar.tsx';
 import TextField from '@/shared/components/textField/TextField.tsx';
 import { ERROR_MESSAGES } from '@/shared/constants/clientErrorMessage.ts';
@@ -66,10 +66,10 @@ const SignupPage = () => {
             isError={isNameFormatInvalid || isNameLengthInvalid}
           />
           {isNameFormatInvalid && (
-            <ShowErrorMessage message={ERROR_MESSAGES.NAME_INVALID} />
+            <ErrorMessage message={ERROR_MESSAGES.NAME_INVALID} />
           )}
           {!isNameFormatInvalid && isNameLengthInvalid && (
-            <ShowErrorMessage message={ERROR_MESSAGES.LENGTH_INVALID} />
+            <ErrorMessage message={ERROR_MESSAGES.LENGTH_INVALID} />
           )}
         </div>
 
@@ -107,11 +107,9 @@ const SignupPage = () => {
           </div>
           {(() => {
             if (yearAgeError)
-              return <ShowErrorMessage message={ERROR_MESSAGES.AGE_INVALID} />;
+              return <ErrorMessage message={ERROR_MESSAGES.AGE_INVALID} />;
             if (yearFormatError || monthFieldError || dayFieldError)
-              return (
-                <ShowErrorMessage message={ERROR_MESSAGES.BIRTH_INVALID} />
-              );
+              return <ErrorMessage message={ERROR_MESSAGES.BIRTH_INVALID} />;
             return null;
           })()}
         </div>
