@@ -8,7 +8,16 @@ import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
 
 import * as styles from './GeneratedImg.css.ts';
 
-import type { GenerateImageData } from '@pages/generate/types/generate';
+import type {
+  GenerateImageData,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
+} from '@pages/generate/types/generate';
+
+// 통일된 타입 정의
+interface UnifiedGenerateImageResult {
+  imageInfoResponses: GenerateImageData[];
+}
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (
@@ -27,7 +36,11 @@ const convertMypageDataToGenerateData = (
 };
 
 interface GeneratedImgBProps {
-  result?: GenerateImageData;
+  result?:
+    | UnifiedGenerateImageResult
+    | GenerateImageData
+    | GenerateImageAResponse['data']
+    | GenerateImageBResponse['data'];
 }
 
 const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
@@ -35,11 +48,24 @@ const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
   const [searchParams] = useSearchParams();
 
   // 1차: prop으로 받은 데이터 사용
-  let result = propResult;
+  let result = propResult as
+    | UnifiedGenerateImageResult
+    | GenerateImageData
+    | GenerateImageAResponse['data']
+    | GenerateImageBResponse['data']
+    | undefined;
 
   // 2차: location.state에서 데이터 가져오기 (정상적인 플로우)
   if (!result) {
-    result = (location.state as { result?: GenerateImageData })?.result;
+    result = (
+      location.state as {
+        result?:
+          | UnifiedGenerateImageResult
+          | GenerateImageData
+          | GenerateImageAResponse['data']
+          | GenerateImageBResponse['data'];
+      }
+    )?.result;
   }
 
   // 3차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
@@ -66,7 +92,7 @@ const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
     if (isFromMypage && mypageResult) {
       result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
     } else if (!isFromMypage && apiResult) {
-      result = apiResult as GenerateImageData;
+      result = apiResult as GenerateImageData | UnifiedGenerateImageResult;
     }
   }
 
@@ -81,12 +107,25 @@ const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
     return null;
   }
 
+  // 단일 이미지 데이터로 정규화
+  let image: GenerateImageData | undefined;
+  if ('imageInfoResponses' in (result as UnifiedGenerateImageResult)) {
+    image = (result as UnifiedGenerateImageResult).imageInfoResponses?.[0];
+  } else if ('imageId' in (result as GenerateImageData)) {
+    image = result as GenerateImageData;
+  }
+
+  if (!image) {
+    console.error('Single image data could not be resolved');
+    return null;
+  }
+
   return (
     <div className={styles.container}>
       <img
-        src={result.imageUrl}
-        alt={`${result.name}님을 위한 맞춤 인테리어 스타일링`}
-        className={styles.imgArea({ mirrored: result.isMirror })}
+        src={image.imageUrl}
+        alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
+        className={styles.imgArea({ mirrored: image.isMirror })}
       />
     </div>
   );
