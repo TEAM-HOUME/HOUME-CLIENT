@@ -1,6 +1,5 @@
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Navigation, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -14,7 +13,16 @@ import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
 
 import * as styles from './GeneratedImg.css.ts';
 
-import type { GenerateImageData } from '@pages/generate/types/generate';
+import type {
+  GenerateImageData,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
+} from '@pages/generate/types/generate';
+
+// 통일된 타입 정의
+type UnifiedGenerateImageResult = {
+  imageInfoResponses: GenerateImageData[];
+};
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (
@@ -31,20 +39,32 @@ const convertMypageDataToGenerateData = (
     name: mypageData.name,
   };
 };
+
 interface GeneratedImgAProps {
-  result?: GenerateImageData;
+  result?:
+    | UnifiedGenerateImageResult
+    | GenerateImageAResponse['data']
+    | GenerateImageBResponse['data'];
 }
 
 const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const swiper = useSwiper();
 
   // 1차: prop으로 받은 데이터 사용
   let result = propResult;
 
   // 2차: location.state에서 데이터 가져오기 (정상적인 플로우)
   if (!result) {
-    result = (location.state as { result?: GenerateImageData })?.result;
+    result = (
+      location.state as {
+        result?:
+          | UnifiedGenerateImageResult
+          | GenerateImageAResponse['data']
+          | GenerateImageBResponse['data'];
+      }
+    )?.result;
   }
 
   // 3차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
@@ -69,9 +89,18 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
     if (isFromMypage && mypageResult) {
-      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+      // 마이페이지에서는 단일 이미지 데이터를 배열로 변환
+      const singleImageData = convertMypageDataToGenerateData(
+        mypageResult,
+        Number(imageId)
+      );
+      result = {
+        imageInfoResponses: [singleImageData],
+      };
     } else if (!isFromMypage && apiResult) {
-      result = apiResult as GenerateImageData;
+      result = apiResult as
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
     }
   }
 
@@ -86,6 +115,17 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
     return null;
   }
 
+  // 데이터 타입에 따라 처리 - 이제 통일된 형태로 처리
+  let images: GenerateImageData[] = [];
+
+  if ('imageInfoResponses' in result) {
+    // 통일된 형태 또는 A안: 다중 이미지 데이터
+    images = result.imageInfoResponses;
+  } else {
+    // B안: 단일 이미지 데이터를 배열로 변환
+    images = [result];
+  }
+
   return (
     <div className={styles.container}>
       <Swiper
@@ -93,20 +133,17 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
         onSlideChange={() => console.log('slide change')}
         onSwiper={(swiper) => console.log(swiper)}
       >
-        <SwiperSlide>
-          <img
-            src={result.imageUrl}
-            alt={`${result.name}님을 위한 맞춤 인테리어 스타일링`}
-            className={styles.imgArea({ mirrored: result.isMirror })}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src={result.imageUrl}
-            alt={`${result.name}님을 위한 맞춤 인테리어 스타일링`}
-            className={styles.imgArea({ mirrored: result.isMirror })}
-          />
-        </SwiperSlide>
+        {/* <button onClick={() => swiper.slidePrev()}>prev</button> */}
+        {images.map((image, index) => (
+          <SwiperSlide key={`${image.imageId}-${index}`}>
+            <img
+              src={image.imageUrl}
+              alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
+              className={styles.imgArea({ mirrored: image.isMirror })}
+            />
+          </SwiperSlide>
+        ))}
+        {/* <button onClick={() => swiper.slideNext()}>next</button> */}
       </Swiper>
     </div>
   );
