@@ -4,7 +4,8 @@ import { API_ENDPOINT } from '@constants/apiEndpoints';
 
 import type {
   GenerateImageRequest,
-  GenerateImageResponse,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
   CarouselItem,
   ImageStackResponse,
 } from '@pages/generate/types/generate';
@@ -80,27 +81,40 @@ export const postCreditLog = async () => {
   });
 };
 
-// 이미지 생성 api
+// 이미지 생성 api - A안 (여러 이미지 생성)
+export const postGenerateImages = async (
+  requestData: GenerateImageRequest
+): Promise<GenerateImageAResponse['data']> => {
+  const config: RequestConfig = {
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.GENERATE.IMAGE_V3,
+    body: requestData,
+  };
+
+  return await request<GenerateImageAResponse['data']>(config);
+};
+
+// 이미지 생성 api - B안 (단일 이미지 생성)
 export const postGenerateImage = async (
   requestData: GenerateImageRequest
-): Promise<GenerateImageResponse['data']> => {
+): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.IMAGE_V2,
     body: requestData,
   };
 
-  return await request<GenerateImageResponse['data']>(config);
+  return await request<GenerateImageBResponse['data']>(config);
 };
 
 // 이미지 생성 폴백 api
 export const getCheckGenerateImageStatus = async (
   houseId: number
-): Promise<GenerateImageResponse['data']> => {
+): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
     url: `${API_ENDPOINT.GENERATE.IMAGE_STATUS}?houseId=${houseId}`,
   };
 
-  return await request<GenerateImageResponse['data']>(config);
+  return await request<GenerateImageBResponse['data']>(config);
 };
