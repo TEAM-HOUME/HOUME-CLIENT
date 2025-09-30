@@ -11,6 +11,7 @@ import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 // import HeadingText from '@/shared/components/text/HeadingText';
 
 import Loading from '@components/loading/Loading';
+import { useABTest } from '@pages/generate/hooks/useABTest';
 import {
   // useFurnitureLogMutation,
   useResultPreferenceMutation,
@@ -18,24 +19,39 @@ import {
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 
-// import GeneratedImgA from './components/GeneratedImgA.tsx';
+import GeneratedImgA from './components/GeneratedImgA.tsx';
 import GeneratedImgB from './components/GeneratedImgB.tsx';
 import * as styles from './ResultPage.css.ts';
 
 import type {
-  GenerateImageData,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
   ResultPageLikeState,
+  GenerateImageData,
 } from '@pages/generate/types/generate';
+
+// 통일된 타입 정의
+type UnifiedGenerateImageResult = {
+  imageInfoResponses: GenerateImageData[];
+};
 
 const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { isMultipleImages } = useABTest();
 
   // Hook들을 최상단에 배치
   const [selected, setSelected] = useState<ResultPageLikeState>(null);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
-  let result = (location.state as { result?: GenerateImageData })?.result;
+  let result = (
+    location.state as {
+      result?:
+        | UnifiedGenerateImageResult
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
+    }
+  )?.result;
 
   // 2차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
   const imageId = searchParams.get('imageId');
@@ -59,6 +75,7 @@ const ResultPage = () => {
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
     if (isFromMypage && mypageResult) {
+      // 마이페이지에서는 단일 이미지 데이터로 변환
       result = {
         imageId: Number(imageId),
         imageUrl: mypageResult.generatedImageUrl,
@@ -67,9 +84,11 @@ const ResultPage = () => {
         houseForm: mypageResult.houseForm,
         tagName: mypageResult.tasteTag,
         name: mypageResult.name,
-      };
+      } as GenerateImageBResponse['data'];
     } else if (!isFromMypage && apiResult) {
-      result = apiResult as GenerateImageData;
+      result = apiResult as
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
     }
   }
 
@@ -96,9 +115,20 @@ const ResultPage = () => {
     return <Navigate to="/" replace />;
   }
 
+  // 이미지 ID 추출 (좋아요/싫어요 버튼용)
+  const getImageId = () => {
+    if ('imageInfoResponses' in result) {
+      // 통일된 형태 또는 A안: 다중 이미지의 경우 첫 번째 이미지 ID 사용
+      return result.imageInfoResponses[0]?.imageId || 0;
+    } else {
+      // B안: 단일 이미지
+      return result.imageId;
+    }
+  };
+
   const handleVote = (isLike: boolean) => {
     setSelected(isLike ? 'like' : 'dislike');
-    sendPreference({ imageId: result.imageId, isLike });
+    sendPreference({ imageId: getImageId(), isLike });
   };
 
   // const handleOpenModal = () => {
@@ -118,8 +148,13 @@ const ResultPage = () => {
   return (
     <div className={styles.wrapper}>
       <section className={styles.resultSection}>
-        {/* <GeneratedImgA result={result} /> */}
-        <GeneratedImgB result={result} />
+        {/* A/B 테스트에 따라 다른 컴포넌트 렌더링 */}
+        {isMultipleImages ? (
+          <GeneratedImgA result={result} />
+        ) : (
+          <GeneratedImgB result={result} />
+        )}
+
         <div className={styles.buttonSection}>
           <div className={styles.buttonBox}>
             <p className={styles.boxText}>이미지가 마음에 드셨나요?</p>
