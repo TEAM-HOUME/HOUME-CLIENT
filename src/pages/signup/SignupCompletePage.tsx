@@ -27,8 +27,8 @@ const SignupCompletePage = () => {
           <br />집 꾸미기 시작해봐요!
         </h1>
         <p className={styles.content}>
-          24시간 동안 무료로 이미지를 생성할 수 있는 <br />
-          토큰 1개를 선물로 드렸어요.
+          무료로 이미지를 생성할 수 있는 <br />
+          토큰 5개를 선물로 드렸어요!
         </p>
       </div>
       <div className={styles.imgbox}>
