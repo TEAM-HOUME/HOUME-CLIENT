@@ -1,4 +1,4 @@
-import ProfileIcon from '@/shared/assets/icons/me.svg?react';
+import profileImage from '@/shared/assets/images/cardExImg.svg';
 import CreditBox from '@/shared/components/creditBox/CreditBox';
 
 import * as styles from './ProfileSection.css';
@@ -17,18 +17,13 @@ const ProfileSection = ({
   return (
     <section className={styles.container}>
       <div className={styles.profileBox}>
-        <div className={styles.iconWrapper}>
-          <ProfileIcon />
-        </div>
-
-        <div className={styles.creditWrapper}>
-          <div className={styles.textArea}>
-            <p>{userName}님,</p>
-            <p>또 오셨네요!</p>
-          </div>
-          <CreditBox credit={credit} disabled={isChargeDisabled} />
-        </div>
+        <div
+          className={styles.profileImage}
+          style={{ backgroundImage: `url(${profileImage})` }}
+        />
+        <p className={styles.userName}>{userName}님</p>
       </div>
+      <CreditBox credit={credit} disabled={isChargeDisabled} />
     </section>
   );
 };
