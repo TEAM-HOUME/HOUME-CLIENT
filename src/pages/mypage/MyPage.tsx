@@ -93,9 +93,9 @@ const MyPage = () => {
       <TapNavBar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === 'saveditem' ? (
-        <GeneratedImagesSection />
-      ) : (
         <SavedItemsSection />
+      ) : (
+        <GeneratedImagesSection />
       )}
 
       <SettingSection />

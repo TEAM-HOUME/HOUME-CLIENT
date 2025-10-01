@@ -10,18 +10,18 @@ const TapNavBar = ({ activeTab, onTabChange }: TapNavBarProps) => {
     <div className={styles.tapNavBar}>
       <button
         className={styles.tapButton({
-          state: activeTab === 'saveditem' ? 'active' : 'inactive',
+          state: activeTab === 'genImg' ? 'active' : 'inactive',
         })}
-        onClick={() => onTabChange('saveditem')}
+        onClick={() => onTabChange('genImg')}
       >
         <div className={styles.tapButtonText}>생성된 이미지</div>
       </button>
 
       <button
         className={styles.tapButton({
-          state: activeTab === 'genImg' ? 'active' : 'inactive',
+          state: activeTab === 'saveditem' ? 'active' : 'inactive',
         })}
-        onClick={() => onTabChange('genImg')}
+        onClick={() => onTabChange('saveditem')}
       >
         <div className={styles.tapButtonText}>찜한 가구</div>
       </button>
