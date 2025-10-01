@@ -4,41 +4,43 @@ import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const container = style({
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '4.4rem 2rem 6rem 2rem',
-  alignItems: 'flex-start',
-  alignSelf: 'stretch',
+  width: '100%',
+  padding: '2.4rem 2rem 0 2rem',
 });
 
-export const title = style({
+export const section = style({
+  marginBottom: '4rem',
+});
+
+export const sectionTitle = style({
   ...fontStyle('title_sb_16'),
   color: colorVars.color.gray800,
-  padding: '0rem 0rem 2.4rem 0rem',
+  marginBottom: '1.6rem',
 });
 
 export const buttonArea = style({
   display: 'flex',
   flexDirection: 'column',
-  alignSelf: 'stretch',
+  gap: '1.2rem',
+});
+
+export const buttonItem = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.2rem',
 });
 
 export const settingButton = style({
   display: 'flex',
-  alignItems: 'center',
-  height: '4rem',
-  padding: '1.2rem 0rem',
-  gap: '1rem',
+  width: '100%',
+  padding: 0,
+  backgroundColor: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  textAlign: 'left',
 });
 
 export const buttonText = style({
   ...fontStyle('body_r_14'),
   color: colorVars.color.gray600,
-});
-
-export const divider = style({
-  width: 'calc(100% + 4rem)',
-  height: '0.1rem',
-  backgroundColor: colorVars.color.gray100,
-  marginLeft: '-2rem',
 });
