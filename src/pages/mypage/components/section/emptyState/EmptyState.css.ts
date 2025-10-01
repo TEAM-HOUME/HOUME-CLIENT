@@ -9,8 +9,6 @@ export const container = style({
   alignItems: 'center',
   justifyContent: 'center',
   width: '100%',
-  minHeight: '40rem',
-  padding: '2rem',
 });
 
 export const image = style({
@@ -29,7 +27,8 @@ export const textWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: '1.6rem',
+  padding: '1.6rem 2rem',
+  gap: '1.2rem',
 });
 
 export const title = style({
