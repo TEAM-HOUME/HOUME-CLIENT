@@ -9,6 +9,8 @@ export const ROUTES = {
   IMAGE_SETUP: '/imageSetup',
   GENERATE: '/generate',
   MYPAGE: '/mypage',
+  SETTING_SERVICE: '/mypage/setting/service',
+  SETTING_PRIVACY: '/mypage/setting/privacy',
   OAUTH: '/oauth/kakao/callback',
 } as const;
 

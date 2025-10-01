@@ -19,6 +19,8 @@ import HomePage from '@/pages/home/HomePage';
 import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
 import LoginPage from '@/pages/login/LoginPage';
+import PrivacyPolicy from '@/pages/mypage/components/section/setting/PrivacyPolicy';
+import ServicePolicy from '@/pages/mypage/components/section/setting/ServicePolicy';
 import MyPage from '@/pages/mypage/MyPage';
 import SignupCompletePage from '@/pages/signup/SignupCompletePage';
 import SignupPage from '@/pages/signup/SignupPage';
@@ -70,6 +72,14 @@ const protectedRoutes = [
   {
     path: ROUTES.MYPAGE,
     element: <MyPage />,
+  },
+  {
+    path: '/mypage/setting/service',
+    element: <ServicePolicy />,
+  },
+  {
+    path: '/mypage/setting/privacy',
+    element: <PrivacyPolicy />,
   },
   {
     path: ROUTES.SIGNUPCOMPLETE,
