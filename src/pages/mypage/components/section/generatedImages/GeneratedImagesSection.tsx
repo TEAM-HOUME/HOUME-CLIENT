@@ -1,5 +1,6 @@
+//import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
-import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
 
 import * as styles from './GeneratedImages.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
