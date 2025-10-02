@@ -8,6 +8,7 @@ export const ROUTES = {
   SIGNUPCOMPLETE: '/signup/complete',
   IMAGE_SETUP: '/imageSetup',
   GENERATE: '/generate',
+  GENERATE_RESULT: '/generate/result',
   MYPAGE: '/mypage',
   OAUTH: '/oauth/kakao/callback',
 } as const;
