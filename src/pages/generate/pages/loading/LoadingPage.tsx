@@ -8,16 +8,17 @@ import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
-import * as styles from './LoadingPage.css';
-import ProgressBar from './ProgressBar';
 import {
   useStackData,
   usePostCarouselLikeMutation,
   usePostCarouselHateMutation,
   useGenerateImageApi,
   useGenerateImageStatusCheck,
-} from '../../hooks/useGenerate';
-import { useGenerateStore } from '../../stores/useGenerateStore';
+} from '@pages/generate/hooks/useGenerate';
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
+
+import * as styles from './LoadingPage.css';
+import ProgressBar from './ProgressBar';
 
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
