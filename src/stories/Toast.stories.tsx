@@ -1,6 +1,6 @@
 import { TOAST_TYPE } from '@/shared/types/toast';
 
-import Toast from './Toast';
+import Toast from '../shared/components/toast/Toast';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -22,7 +22,7 @@ const meta = {
       description: {
         component:
           'react-toastify로 구현한 토스트 컴포넌트입니다.\n' +
-          'toast type(success, warning)을 설정해 상황에 적절한 토스트 컴포넌트를 렌더링합니다.',
+          'toast type을 설정해 상황에 적절한 토스트 컴포넌트를 렌더링합니다.',
       },
     },
   },
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 export const Success: Story = {
   args: {
     text: '작업이 성공적으로 완료되었습니다!',
-    type: TOAST_TYPE.SUCCESS,
+    type: TOAST_TYPE.INFO,
   },
 };
 

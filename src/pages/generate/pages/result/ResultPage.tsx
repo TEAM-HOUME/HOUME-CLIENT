@@ -149,14 +149,12 @@ const ResultPage = () => {
         />
         <div className={styles.buttonGroup}>
           <LikeButton
-            size={'large'}
             onClick={() => handleVote(true)}
             isSelected={selected === 'like'}
           >
             만족스러워요
           </LikeButton>
           <DislikeButton
-            size={'large'}
             onClick={() => handleVote(false)}
             isSelected={selected === 'dislike'}
           >

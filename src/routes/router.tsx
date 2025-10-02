@@ -12,9 +12,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import RootLayout from '@/layout/RootLayout';
-import LoadingPage from '@/pages/generate/components/loading/LoadingPage';
-import ResultPage from '@/pages/generate/components/result/ResultPage';
 import GeneratePage from '@/pages/generate/GeneratePage';
+import LoadingPage from '@/pages/generate/pages/loading/LoadingPage';
+import ResultPage from '@/pages/generate/pages/result/ResultPage';
 import HomePage from '@/pages/home/HomePage';
 import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
