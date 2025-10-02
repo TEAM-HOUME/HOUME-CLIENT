@@ -5,7 +5,7 @@ import * as styles from './CtaButton.css';
 interface CtaButtonProps extends React.ComponentProps<'button'> {
   children: React.ReactNode;
   isActive?: boolean;
-  typeVariant?: 'default' | 'kakao';
+  typeVariant?: 'default' | 'kakao' | 'notFound';
   buttonSize?: 'small' | 'medium' | 'large' | 'xlarge';
   fontSize?: 'default' | 'body';
 }
