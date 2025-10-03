@@ -15,6 +15,8 @@ import { useABTest } from '@pages/generate/hooks/useABTest';
 import {
   // useFurnitureLogMutation,
   useResultPreferenceMutation,
+  useFactorsQuery,
+  useFactorPreferenceMutation,
   // useCreditLogMutation,
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
@@ -40,8 +42,8 @@ const ResultPage = () => {
   const [searchParams] = useSearchParams();
   const { isMultipleImages } = useABTest();
 
-  // Hook들을 최상단에 배치
   const [selected, setSelected] = useState<ResultPageLikeState>(null);
+  const [selectedFactors, setSelectedFactors] = useState<number[]>([]);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (
@@ -74,16 +76,17 @@ const ResultPage = () => {
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult) {
+    if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
       // 마이페이지에서는 단일 이미지 데이터로 변환
+      const history = mypageResult.histories[0];
       result = {
         imageId: Number(imageId),
-        imageUrl: mypageResult.generatedImageUrl,
+        imageUrl: history.generatedImageUrl,
         isMirror: false,
-        equilibrium: mypageResult.equilibrium,
-        houseForm: mypageResult.houseForm,
-        tagName: mypageResult.tasteTag,
-        name: mypageResult.name,
+        equilibrium: history.equilibrium,
+        houseForm: history.houseForm,
+        tagName: history.tasteTag,
+        name: history.name,
       } as GenerateImageBResponse['data'];
     } else if (!isFromMypage && apiResult) {
       result = apiResult as
@@ -94,15 +97,32 @@ const ResultPage = () => {
 
   // result가 있을 때만 mutation hook들 호출
   const { mutate: sendPreference } = useResultPreferenceMutation();
+  const { mutate: sendFactorPreference } = useFactorPreferenceMutation();
   // const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
   // const { mutate: sendCreditLogs } = useCreditLogMutation();
 
+  // 요인 문구 데이터 가져오기 (좋아요용)
+  const {
+    data: likeFactorsData,
+    isLoading: isLikeFactorsLoading,
+    isError: isLikeFactorsError,
+    error: likeFactorsError,
+  } = useFactorsQuery(true);
+
+  // 요인 문구 데이터 가져오기 (싫어요용)
+  const {
+    data: dislikeFactorsData,
+    isLoading: isDislikeFactorsLoading,
+    isError: isDislikeFactorsError,
+    error: dislikeFactorsError,
+  } = useFactorsQuery(false);
+
   // 마이페이지에서 온 경우 기존 isLike 상태를 버튼에 반영
   useEffect(() => {
-    if (isFromMypage && mypageResult?.isLike !== undefined) {
-      setSelected(mypageResult.isLike ? 'like' : 'dislike');
+    if (isFromMypage && mypageResult?.histories?.[0]?.isLike !== undefined) {
+      setSelected(mypageResult.histories[0].isLike ? 'like' : 'dislike');
     }
-  }, [isFromMypage, mypageResult?.isLike]);
+  }, [isFromMypage, mypageResult?.histories]);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
@@ -145,6 +165,19 @@ const ResultPage = () => {
   // if (isLoading) return <div>로딩중</div>;
   // if (isError || !data) return <div>에러 발생!</div>;
 
+  // 태그 버튼 클릭 핸들러 추가
+  const handleFactorClick = (factorId: number) => {
+    const imageId = getImageId();
+    const isSelected = selectedFactors.includes(factorId);
+
+    if (isSelected) {
+      setSelectedFactors((prev) => prev.filter((id) => id !== factorId));
+    } else {
+      setSelectedFactors((prev) => [...prev, factorId]);
+      sendFactorPreference({ imageId, factorId });
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <section className={styles.resultSection}>
@@ -172,6 +205,78 @@ const ResultPage = () => {
                 aria-label="이미지 싫어요 버튼"
               />
             </div>
+            {selected === 'like' &&
+              likeFactorsData &&
+              likeFactorsData.length > 0 && (
+                <div className={styles.tagGroup}>
+                  <div className={styles.tagFlexItem}>
+                    {likeFactorsData.slice(0, 2).map((factor) => (
+                      <button
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          selectedFactors.includes(factor.id)
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.tagFlexItem}>
+                    {likeFactorsData.slice(2, 4).map((factor) => (
+                      <button
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          selectedFactors.includes(factor.id)
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            {selected === 'dislike' &&
+              dislikeFactorsData &&
+              dislikeFactorsData.length > 0 && (
+                <div className={styles.tagGroup}>
+                  <div className={styles.tagFlexItem}>
+                    {dislikeFactorsData.slice(0, 2).map((factor) => (
+                      <button
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          selectedFactors.includes(factor.id)
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.tagFlexItem}>
+                    {dislikeFactorsData.slice(2, 4).map((factor) => (
+                      <button
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          selectedFactors.includes(factor.id)
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </section>
