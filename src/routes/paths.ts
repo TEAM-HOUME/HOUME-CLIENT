@@ -10,6 +10,7 @@ export const ROUTES = {
   GENERATE: '/generate',
   GENERATE_RESULT: '/generate/result',
   MYPAGE: '/mypage',
+  SETTING: '/mypage/setting',
   OAUTH: '/oauth/kakao/callback',
 } as const;
 
