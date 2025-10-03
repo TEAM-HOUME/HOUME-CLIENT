@@ -53,7 +53,7 @@ export const buttonSection = style({
 export const buttonBox = style({
   display: 'flex',
   flexDirection: 'column',
-  padding: '1.6rem',
+  padding: '1.6rem clamp(1.6rem, 4vw, 4rem)',
   width: '100%',
   height: '100%',
   borderRadius: '1.2rem',
@@ -70,6 +70,39 @@ export const boxText = style({
 export const buttonGroup = style({
   display: 'flex',
   gap: '0.6rem',
+});
+
+export const tagGroup = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.8rem',
+});
+
+export const tagFlexItem = style({
+  display: 'flex',
+  gap: '0.6rem',
+});
+
+export const tagButton = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '99.9rem',
+  height: '3.6rem',
+  padding: '0 1.6rem',
+  ...fontStyle('body_r_14'),
+  cursor: 'pointer',
+  backgroundColor: colorVars.color.gray000,
+  color: colorVars.color.gray700,
+
+  ':active': {
+    backgroundColor: colorVars.color.gray300,
+  },
+});
+
+export const tagButtonSelected = style({
+  backgroundColor: colorVars.color.gray000,
+  color: colorVars.color.primary,
 });
 
 // export const curationSection = style({
