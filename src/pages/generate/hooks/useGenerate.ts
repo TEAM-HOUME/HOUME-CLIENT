@@ -17,6 +17,8 @@ import {
   postStackHate,
   postStackLike,
   postResultPreference,
+  getPreferFactors,
+  postFactorPreference,
 } from '@pages/generate/apis/generate';
 
 import { useABTest } from './useABTest';
@@ -69,6 +71,19 @@ export const useResultPreferenceMutation = () => {
   });
 };
 
+// 생성된 이미지 좋아요 여부에 따란 요인 문구
+export const useFactorsQuery = (
+  isLike: boolean,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEY.GENERATE_FACTORS, isLike],
+    queryFn: () => getPreferFactors(isLike),
+    staleTime: 5 * 60 * 1000, // 5분간 캐시
+    ...options,
+  });
+};
+
 // 가구 추천 받기 버튼 클릭 로그
 export const useFurnitureLogMutation = () => {
   return useMutation({
@@ -111,6 +126,7 @@ export const useGenerateImageApi = () => {
     },
     onSuccess: (data) => {
       console.log('이미지 제작 완료:', new Date().toLocaleTimeString());
+      console.log('생성된 이미지 데이터 보기', data);
       const derivedType =
         (data?.imageInfoResponses?.length ?? 0) > 1 ? 'multiple' : 'single';
       console.log('생성된 이미지 타입:', derivedType);
@@ -179,4 +195,17 @@ export const useGenerateImageStatusCheck = (
   }, [query.isError, query.error]);
 
   return query;
+};
+
+// 요인 선택 mutation
+export const useFactorPreferenceMutation = () => {
+  return useMutation({
+    mutationFn: ({
+      imageId,
+      factorId,
+    }: {
+      imageId: number;
+      factorId: number;
+    }) => postFactorPreference(imageId, factorId),
+  });
 };
