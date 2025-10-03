@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
+import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
 
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
@@ -21,7 +21,7 @@ interface UnifiedGenerateImageResult {
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (
-  mypageData: MyPageImageDetailData,
+  mypageData: MyPageImageDetail,
   imageId: number
 ): GenerateImageData => {
   return {
@@ -89,8 +89,11 @@ const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult) {
-      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+    if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
+      result = convertMypageDataToGenerateData(
+        mypageResult.histories[0],
+        Number(imageId)
+      );
     } else if (!isFromMypage && apiResult) {
       result = apiResult as GenerateImageData | UnifiedGenerateImageResult;
     }
