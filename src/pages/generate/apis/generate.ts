@@ -8,6 +8,7 @@ import type {
   GenerateImageBResponse,
   CarouselItem,
   ImageStackResponse,
+  FactorsResponse,
 } from '@pages/generate/types/generate';
 
 // 스택 UI
@@ -63,6 +64,33 @@ export const postResultPreference = async (
       isLike,
     },
   });
+};
+
+// 생성된 이미지 좋아요 여부에 따란 요인 문구
+export const getPreferFactors = async (isLike: boolean) => {
+  const res = await request<FactorsResponse>({
+    method: HTTPMethod.GET,
+    url: API_ENDPOINT.GENERATE.FACTORS,
+    query: { isLike },
+  });
+  return res?.factors || [];
+};
+
+// 사용자가 특정 요인을 선택했을 때 서버에 전송
+export const postFactorPreference = async (
+  imageId: number,
+  factorId: number
+) => {
+  try {
+    const res = await request({
+      method: HTTPMethod.POST,
+      url: API_ENDPOINT.GENERATE.FACTOR_PREFERENCE(imageId, factorId),
+    });
+    return res;
+  } catch (error) {
+    console.error('Error in postFactorPreference:', error);
+    throw error;
+  }
 };
 
 // 가구 추천 받기 버튼 클릭 로그 확인
