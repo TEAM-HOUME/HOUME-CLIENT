@@ -1,15 +1,22 @@
+import { useState } from 'react';
+
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
+import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
 
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
+import SlideNext from '@shared/assets/icons/nextAbled.svg?react';
+import SlideNextDisabled from '@shared/assets/icons/nextDisabled.svg?react';
+import SlidePrev from '@shared/assets/icons/prevAbled.svg?react';
+import SlidePrevDisabled from '@shared/assets/icons/prevDisabled.svg?react';
+import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
 import * as styles from './GeneratedImg.css.ts';
 
@@ -18,6 +25,7 @@ import type {
   GenerateImageAResponse,
   GenerateImageBResponse,
 } from '@pages/generate/types/generate';
+import type { Swiper as SwiperType } from 'swiper';
 
 // 통일된 타입 정의
 type UnifiedGenerateImageResult = {
@@ -26,7 +34,7 @@ type UnifiedGenerateImageResult = {
 
 // 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
 const convertMypageDataToGenerateData = (
-  mypageData: MyPageImageDetailData,
+  mypageData: MyPageImageDetail,
   imageId: number
 ): GenerateImageData => {
   return {
@@ -50,7 +58,8 @@ interface GeneratedImgAProps {
 const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const swiper = useSwiper();
+  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0); // 현재 슬라이드 인덱스 추가
 
   // 1차: prop으로 받은 데이터 사용
   let result = propResult;
@@ -86,23 +95,26 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
     { enabled: shouldFetchFromAPI && isFromMypage }
   );
 
-  // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
-  if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult) {
-      // 마이페이지에서는 단일 이미지 데이터를 배열로 변환
-      const singleImageData = convertMypageDataToGenerateData(
-        mypageResult,
-        Number(imageId)
-      );
-      result = {
-        imageInfoResponses: [singleImageData],
-      };
-    } else if (!isFromMypage && apiResult) {
-      result = apiResult as
-        | GenerateImageAResponse['data']
-        | GenerateImageBResponse['data'];
-    }
+  // 마이페이지에서 온 경우 항상 히스토리 데이터 사용
+  if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
+    // 마이페이지에서는 모든 히스토리를 배열로 변환
+    const allImageData = mypageResult.histories.map((history, index) =>
+      convertMypageDataToGenerateData(history, Number(imageId) + index)
+    );
+    result = {
+      imageInfoResponses: allImageData,
+    };
   }
+  // 일반 생성 플로우에서 온 경우
+  else if (!isFromMypage && shouldFetchFromAPI && apiResult) {
+    result = apiResult as
+      | GenerateImageAResponse['data']
+      | GenerateImageBResponse['data'];
+  }
+
+  console.log('result', result);
+  console.log('mypageResult', mypageResult);
+  console.log('isFromMypage', isFromMypage);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
@@ -130,10 +142,24 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
     <div className={styles.container}>
       <Swiper
         slidesPerView={1}
-        onSlideChange={() => console.log('slide change')}
-        onSwiper={(swiper) => console.log(swiper)}
+        onSlideChange={(swiper) => {
+          setCurrentSlideIndex(swiper.activeIndex);
+          console.log('slide change');
+        }}
+        onSwiper={setSwiper}
       >
-        {/* <button onClick={() => swiper.slidePrev()}>prev</button> */}
+        <div className={styles.slideNum}>
+          <span>{currentSlideIndex + 1}</span>
+          <span>/</span>
+          <span>{images.length}</span>
+        </div>
+        <button
+          onClick={() => swiper?.slidePrev()}
+          className={styles.slidePrevBtn}
+          disabled={!swiper || currentSlideIndex === 0}
+        >
+          {currentSlideIndex === 0 ? <SlidePrevDisabled /> : <SlidePrev />}
+        </button>
         {images.map((image, index) => (
           <SwiperSlide key={`${image.imageId}-${index}`}>
             <img
@@ -143,7 +169,20 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
             />
           </SwiperSlide>
         ))}
-        {/* <button onClick={() => swiper.slideNext()}>next</button> */}
+        <button
+          onClick={() => swiper?.slideNext()}
+          className={styles.slideNextBtn}
+          disabled={!swiper || currentSlideIndex === images.length - 1}
+        >
+          {currentSlideIndex === images.length - 1 ? (
+            <SlideNextDisabled />
+          ) : (
+            <SlideNext />
+          )}
+        </button>
+        <button className={styles.tagBtn}>
+          <Tag />
+        </button>
       </Swiper>
     </div>
   );
