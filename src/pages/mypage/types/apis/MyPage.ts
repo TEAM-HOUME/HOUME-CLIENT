@@ -24,13 +24,17 @@ export interface MyPageImagesData {
 export type MyPageImagesResponse = BaseResponse<MyPageImagesData>;
 
 // 마이페이지 이미지 상세 조회 API
-export interface MyPageImageDetailData {
+export interface MyPageImageDetail {
   equilibrium: string;
   houseForm: string;
-  tasteTag: string; // 서버 응답 필드명 그대로 사용
+  tasteTag: string;
   name: string;
-  generatedImageUrl: string; // 서버 응답 필드명 그대로 사용
-  isLike: boolean; // 이미지 선호도 여부
+  generatedImageUrl: string;
+  isLike: boolean;
+}
+
+export interface MyPageImageDetailData {
+  histories: MyPageImageDetail[];
 }
 
 export type MyPageImageDetailResponse = BaseResponse<MyPageImageDetailData>;
