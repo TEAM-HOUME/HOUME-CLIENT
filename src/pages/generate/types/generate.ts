@@ -56,3 +56,14 @@ export interface GenerateImageBResponse {
   msg: string;
   data: GenerateImageData;
 }
+
+// 요인 문구 타입
+export interface Factor {
+  id: number;
+  text: string;
+}
+
+// 요인 문구 API 응답 타입
+export interface FactorsResponse {
+  factors: Factor[];
+}
