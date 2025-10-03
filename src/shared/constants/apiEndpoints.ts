@@ -27,6 +27,9 @@ export const API_ENDPOINT = {
     IMAGE_V3: '/api/v3/generated-images/generate',
     IMAGE_STATUS: '/api/v1/generated-images/generate',
     IMAGE_PREFERENCE: '/api/v1/generated-images',
+    FACTORS: '/api/v1/factors',
+    FACTOR_PREFERENCE: (imageId: number, factorId: number) =>
+      `/api/v1/generated-images/${imageId}/preference/factors/${factorId}`,
   },
   ANALYTICS: {
     FURNITURE_LOGS: '/api/v1/furnitures/logs',
