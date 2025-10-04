@@ -50,6 +50,11 @@ export const buttonSection = style({
   width: '100%',
 });
 
+export const buttonSectionDisabled = style({
+  opacity: 0.3,
+  pointerEvents: 'none',
+});
+
 export const buttonBox = style({
   display: 'flex',
   flexDirection: 'column',

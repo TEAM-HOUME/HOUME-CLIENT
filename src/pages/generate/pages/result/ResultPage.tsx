@@ -44,6 +44,7 @@ const ResultPage = () => {
 
   const [selected, setSelected] = useState<ResultPageLikeState>(null);
   const [selectedFactors, setSelectedFactors] = useState<number[]>([]);
+  const [isLastSlide, setIsLastSlide] = useState(false);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (
@@ -178,17 +179,23 @@ const ResultPage = () => {
     }
   };
 
+  const handleSlideChange = (currentIndex: number, totalCount: number) => {
+    setIsLastSlide(currentIndex === totalCount - 1);
+  };
+
   return (
     <div className={styles.wrapper}>
       <section className={styles.resultSection}>
         {/* A/B 테스트에 따라 다른 컴포넌트 렌더링 */}
         {isMultipleImages ? (
-          <GeneratedImgA result={result} />
+          <GeneratedImgA result={result} onSlideChange={handleSlideChange} />
         ) : (
           <GeneratedImgB result={result} />
         )}
 
-        <div className={styles.buttonSection}>
+        <div
+          className={`${styles.buttonSection} ${isLastSlide ? styles.buttonSectionDisabled : ''}`}
+        >
           <div className={styles.buttonBox}>
             <p className={styles.boxText}>이미지가 마음에 드셨나요?</p>
             <div className={styles.buttonGroup}>
