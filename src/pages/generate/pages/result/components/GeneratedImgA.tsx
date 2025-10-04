@@ -12,6 +12,7 @@ import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
 
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
+import LockIcon from '@shared/assets/icons/lockIcon.svg?react';
 import SlideNext from '@shared/assets/icons/nextAbled.svg?react';
 import SlideNextDisabled from '@shared/assets/icons/nextDisabled.svg?react';
 import SlidePrev from '@shared/assets/icons/prevAbled.svg?react';
@@ -53,9 +54,13 @@ interface GeneratedImgAProps {
     | UnifiedGenerateImageResult
     | GenerateImageAResponse['data']
     | GenerateImageBResponse['data'];
+  onSlideChange?: (currentIndex: number, totalCount: number) => void;
 }
 
-const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
+const GeneratedImgA = ({
+  result: propResult,
+  onSlideChange,
+}: GeneratedImgAProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -138,12 +143,19 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
     images = [result];
   }
 
+  // 두 번째 이미지가 있는 경우 블러 처리된 추가 슬라이드를 생성
+  const shouldAddBlurredSlide = images.length >= 2;
+  const totalSlideCount = shouldAddBlurredSlide
+    ? images.length + 1
+    : images.length;
+
   return (
     <div className={styles.container}>
       <Swiper
         slidesPerView={1}
         onSlideChange={(swiper) => {
           setCurrentSlideIndex(swiper.activeIndex);
+          onSlideChange?.(swiper.activeIndex, totalSlideCount);
           console.log('slide change');
         }}
         onSwiper={setSwiper}
@@ -151,7 +163,7 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
         <div className={styles.slideNum}>
           <span>{currentSlideIndex + 1}</span>
           <span>/</span>
-          <span>{images.length}</span>
+          <span>{totalSlideCount}</span>
         </div>
         <button
           onClick={() => swiper?.slidePrev()}
@@ -169,12 +181,28 @@ const GeneratedImgA = ({ result: propResult }: GeneratedImgAProps) => {
             />
           </SwiperSlide>
         ))}
+        {shouldAddBlurredSlide && (
+          <SwiperSlide key="blurred-second-image">
+            <div
+              className={styles.imgAreaBlurred({
+                mirrored: images[1].isMirror,
+              })}
+              style={{
+                background: `url(${images[1].imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
+              }}
+            />
+            <div className={styles.lockWrapper}>
+              <LockIcon />
+              <button className={styles.moreBtn}>이미지 더보기</button>
+            </div>
+          </SwiperSlide>
+        )}
         <button
           onClick={() => swiper?.slideNext()}
           className={styles.slideNextBtn}
-          disabled={!swiper || currentSlideIndex === images.length - 1}
+          disabled={!swiper || currentSlideIndex === totalSlideCount - 1}
         >
-          {currentSlideIndex === images.length - 1 ? (
+          {currentSlideIndex === totalSlideCount - 1 ? (
             <SlideNextDisabled />
           ) : (
             <SlideNext />
