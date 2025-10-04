@@ -97,6 +97,55 @@ export const slideNextBtn = style({
   },
 });
 
+export const imgAreaBlurred = recipe({
+  base: {
+    width: '100%',
+    aspectRatio: '3 / 2',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    filter: 'blur(15px)',
+  },
+  variants: {
+    mirrored: {
+      true: {
+        transform: 'scaleX(-1) scale(1.1)',
+      },
+      false: {
+        transform: 'scale(1.1)',
+      },
+    },
+  },
+  defaultVariants: {
+    mirrored: false,
+  },
+});
+
+export const lockWrapper = style({
+  position: 'absolute',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '1.6rem',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  zIndex: 1,
+  filter: 'none',
+});
+
+export const moreBtn = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '11.6rem',
+  height: '4.4rem',
+  backgroundColor: colorVars.color.gray999,
+  borderRadius: '99.9rem',
+  ...fontStyle('body_m_14'),
+  color: colorVars.color.gray000,
+});
+
 export const tagBtn = style({
   position: 'absolute',
   display: 'flex',
