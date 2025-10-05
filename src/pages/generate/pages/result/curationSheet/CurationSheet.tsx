@@ -20,7 +20,11 @@ import { CurationSheetWrapper } from './CurationSheetWrapper';
 export const CurationSheet = () => {
   // 전역상태 사용
   const userName = useUserStore((state) => state.userName);
-  const { savedProductIds, toggleSaveProduct } = useSavedItemsStore();
+  const savedProductIds = useSavedItemsStore((state) => state.savedProductIds);
+  const toggleSaveProduct = useSavedItemsStore(
+    (state) => state.toggleSaveProduct
+  );
+  const displayName = userName ?? '사용자';
 
   const navigate = useNavigate();
 
@@ -68,7 +72,7 @@ export const CurationSheet = () => {
       </div>
       <div className={styles.scrollContentArea}>
         <p className={styles.headerText}>
-          {userName}님의 취향에 딱 맞는 가구 추천
+          {displayName}님의 취향에 딱 맞는 가구 추천
         </p>
         {/* 그리드 영역 */}
         <div className={styles.curationSection}>
