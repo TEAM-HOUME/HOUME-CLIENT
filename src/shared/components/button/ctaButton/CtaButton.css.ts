@@ -19,7 +19,6 @@ export const CtaButton = recipe({
     justifyContent: 'center',
     width: '100%',
     minWidth: '12.1rem',
-    maxWidth: '37.1rem',
     height: '5.6rem',
     padding: '1.7rem 0',
     gap: '0.8rem',
@@ -54,6 +53,14 @@ export const CtaButton = recipe({
 
         ':active': {
           backgroundColor: '#FEE500',
+        },
+      },
+      notFound: {
+        backgroundColor: colorVars.color.gray200,
+        color: colorVars.color.gray900,
+
+        ':active': {
+          backgroundColor: colorVars.color.gray300,
         },
       },
     },

@@ -6,17 +6,17 @@ import { useUserStore } from '@/store/useUserStore';
 
 import CreditIcon from '@assets/icons/modalCoin.png';
 
-import * as styles from './Modal.css';
+import * as styles from './CreditModal.css';
 import CtaButton from '../../button/ctaButton/CtaButton';
 import { useToast } from '../../toast/useToast';
 
-export interface ModalProps {
+export interface CreditModalProps {
   onClose: () => void;
   title: string;
   onCreditAction?: () => void;
 }
 
-const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
+const CreditModal = ({ onClose, title, onCreditAction }: CreditModalProps) => {
   const { notify } = useToast();
   const [isButtonActive, setIsButtonActive] = useState(true);
 
@@ -76,4 +76,4 @@ const Modal = ({ onClose, title, onCreditAction }: ModalProps) => {
   );
 };
 
-export default Modal;
+export default CreditModal;
