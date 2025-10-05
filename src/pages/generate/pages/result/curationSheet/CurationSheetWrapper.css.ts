@@ -25,6 +25,11 @@ export const sheetWrapper = style({
     '--drag-y': '0px', // 드래그 변화량
   },
 
+  userSelect: 'none',
+  touchAction: 'none',
+  overscrollBehavior: 'none',
+  WebkitOverflowScrolling: 'touch',
+
   display: 'flex',
   flexDirection: 'column',
 });
