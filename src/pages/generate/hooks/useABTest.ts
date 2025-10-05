@@ -25,8 +25,8 @@ const readLocalOverride = (): ImageGenerationVariant | null => {
     if (lsOverride === 'single' || lsOverride === 'multiple') {
       return lsOverride;
     }
-  } catch (_) {
-    // noop (예: SSR 환경 대비)
+  } catch {
+    console.error('Local override error');
   }
   return null;
 };
