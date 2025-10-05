@@ -7,7 +7,7 @@ import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 import { SHEET_BASIC_THRESHOLD } from '@/shared/constants/bottomSheet';
 import { useBottomSheetDrag } from '@/shared/hooks/useBottomSheetDrag.ts';
 
-import * as styles from './BottomSheetWrapper.css.ts';
+import * as styles from './BottomSheetWrapper.css';
 
 interface BottomSheetWrapperProps {
   isOpen: boolean;
