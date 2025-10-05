@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import { overlay } from 'overlay-kit';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -9,6 +10,7 @@ import 'swiper/css/pagination';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
+import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
@@ -67,7 +69,7 @@ const GeneratedImgA = ({
   const [searchParams] = useSearchParams();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [currentImgId, setCurrentImgId] = useState(0); // 사용하지 않으므로 주석 처리
+  const [currentImgId, setCurrentImgId] = useState(0);
 
   // currentImgId가 변경될 때마다 부모에게 전달
   useEffect(() => {
@@ -179,6 +181,29 @@ const GeneratedImgA = ({
     ? images.length + 1
     : images.length;
 
+  const handleOpenModal = () => {
+    overlay.open(
+      (
+        { unmount } // @toss/overlay-kit 사용
+      ) => (
+        <GeneralModal
+          title="더 다양한 이미지가 궁금하신가요?"
+          content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
+          cancelText="돌아가기" // 좌측 버튼 텍스트
+          confirmText="이미지 새로 만들기" // 우측 버튼 텍스트
+          cancelVariant="default" // 좌측 버튼 색깔(회색 or 보라색)
+          confirmVariant="primary" // 우측 버튼 색깔(회색 or 보라색)
+          showCreditChip={true} // CreditChip 사용되면 true, 기본값 false
+          creditCount={4} // CreditChip 사용될 시 전달
+          maxCredit={5} // CreditChip 사용될 시 전달
+          onCancel={unmount} // 좌측 버튼 액션
+          onConfirm={unmount} // 우측 버튼 액션
+          onClose={unmount} // 모달 외부 영역 탭할 시 모달 닫기
+        />
+      )
+    );
+  };
+
   return (
     <div className={styles.container}>
       <Swiper
@@ -222,7 +247,9 @@ const GeneratedImgA = ({
             />
             <div className={styles.lockWrapper}>
               <LockIcon />
-              <button className={styles.moreBtn}>이미지 더보기</button>
+              <button className={styles.moreBtn} onClick={handleOpenModal}>
+                이미지 더보기
+              </button>
             </div>
           </SwiperSlide>
         )}
