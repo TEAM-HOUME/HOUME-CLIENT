@@ -71,7 +71,8 @@ export const BottomSheetWrapper = ({
           styles.sheetState[isOpen ? 'expanded' : 'collapsed']
         )}
         onTransitionEnd={(e) => {
-          // 닫힘 애니메이션이 끝났을 때만 onExited 호출
+          // 닫힘 애니메이션이 끝났을 때만 onExited 호출(자식 이벤트 무시)
+          if (e.target !== e.currentTarget) return;
           if (e.propertyName !== 'transform') return;
           if (!isOpen) onExited?.();
         }}
