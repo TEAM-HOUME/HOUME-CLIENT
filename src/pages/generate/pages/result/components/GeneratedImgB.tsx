@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
@@ -41,11 +43,35 @@ interface GeneratedImgBProps {
     | GenerateImageData
     | GenerateImageAResponse['data']
     | GenerateImageBResponse['data'];
+  onCurrentImgIdChange?: (currentImgId: number) => void;
 }
 
-const GeneratedImgB = ({ result: propResult }: GeneratedImgBProps) => {
+const GeneratedImgB = ({
+  result: propResult,
+  onCurrentImgIdChange,
+}: GeneratedImgBProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  // currentImgId를 부모에게 전달하는 useEffect
+  useEffect(() => {
+    // result가 있을 때만 currentImgId 전달
+    if (propResult) {
+      let imageId = 0;
+
+      // 단일 이미지 데이터에서 imageId 추출
+      if ('imageInfoResponses' in (propResult as UnifiedGenerateImageResult)) {
+        const firstImage = (propResult as UnifiedGenerateImageResult)
+          .imageInfoResponses?.[0];
+        imageId = firstImage?.imageId || 0;
+      } else if ('imageId' in (propResult as GenerateImageData)) {
+        imageId = (propResult as GenerateImageData).imageId;
+      }
+
+      console.log('GeneratedImgB - onCurrentImgIdChange 호출:', imageId);
+      onCurrentImgIdChange?.(imageId);
+    }
+  }, [propResult, onCurrentImgIdChange]);
 
   // 1차: prop으로 받은 데이터 사용
   let result = propResult as

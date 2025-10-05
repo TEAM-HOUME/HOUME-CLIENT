@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -55,16 +55,25 @@ interface GeneratedImgAProps {
     | GenerateImageAResponse['data']
     | GenerateImageBResponse['data'];
   onSlideChange?: (currentIndex: number, totalCount: number) => void;
+  onCurrentImgIdChange?: (currentImgId: number) => void;
 }
 
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
+  onCurrentImgIdChange,
 }: GeneratedImgAProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0); // 현재 슬라이드 인덱스 추가
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentImgId, setCurrentImgId] = useState(0); // 사용하지 않으므로 주석 처리
+
+  // currentImgId가 변경될 때마다 부모에게 전달
+  useEffect(() => {
+    console.log('GeneratedImgA - onCurrentImgIdChange 호출:', currentImgId);
+    onCurrentImgIdChange?.(currentImgId);
+  }, [currentImgId, onCurrentImgIdChange]);
 
   // 1차: prop으로 받은 데이터 사용
   let result = propResult;
@@ -117,11 +126,32 @@ const GeneratedImgA = ({
       | GenerateImageBResponse['data'];
   }
 
-  console.log('result', result);
-  console.log('mypageResult', mypageResult);
-  console.log('isFromMypage', isFromMypage);
+  // 타입 가드로 imageInfoResponses가 있는지 확인 후 콘솔 출력
+  if (
+    result &&
+    'imageInfoResponses' in result &&
+    Array.isArray(result.imageInfoResponses)
+  ) {
+    console.log('result', result);
+  }
 
-  // 로딩 중이면 로딩 표시
+  useEffect(() => {
+    if (
+      result &&
+      'imageInfoResponses' in result &&
+      Array.isArray(result.imageInfoResponses)
+    ) {
+      const newImgId = result.imageInfoResponses[currentSlideIndex]?.imageId;
+      console.log(
+        'GeneratedImgA - currentSlideIndex:',
+        currentSlideIndex,
+        'newImgId:',
+        newImgId
+      );
+      setCurrentImgId(newImgId);
+    }
+  }, [currentSlideIndex, result]);
+
   if (!result && (isLoading || mypageLoading)) {
     return <Loading />;
   }
@@ -156,7 +186,6 @@ const GeneratedImgA = ({
         onSlideChange={(swiper) => {
           setCurrentSlideIndex(swiper.activeIndex);
           onSlideChange?.(swiper.activeIndex, totalSlideCount);
-          console.log('slide change');
         }}
         onSwiper={setSwiper}
       >
