@@ -1,7 +1,9 @@
+import type { ComponentProps, ReactNode } from 'react';
+
 import * as styles from './FilterChip.css';
 
-interface FilterChipProps extends React.ComponentProps<'button'> {
-  children: React.ReactNode;
+interface FilterChipProps extends ComponentProps<'button'> {
+  children: ReactNode;
   isSelected?: boolean;
 }
 const FilterChip = ({
