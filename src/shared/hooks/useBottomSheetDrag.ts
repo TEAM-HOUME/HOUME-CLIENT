@@ -45,21 +45,6 @@ export const useBottomSheetDrag = ({
       // 포인터 캡처 설정 (윈도우 밖 이동 시에도 이벤트 수신)
       target.setPointerCapture?.(e.pointerId);
 
-      // 이벤트 리스너 정리 함수
-      const cleanup = () => {
-        target.releasePointerCapture?.(e.pointerId);
-        target.removeEventListener('pointermove', handlePointerMove);
-        target.removeEventListener('pointerup', handlePointerUp);
-        target.removeEventListener('pointercancel', handlePointerCancel);
-        target.removeEventListener('lostpointercapture', handlePointerCancel);
-
-        // 드래그가 종료되면 --drag-y 변수를 초기화
-        if (sheetRef.current) {
-          sheetRef.current.style.setProperty('--drag-y', '0px');
-          sheetRef.current.style.transition = ''; // 인라인 transition도 제거
-        }
-      };
-
       // 포인터 취소/캡처 해제 시 정리
       const handlePointerCancel = () => {
         isDraggingRef.current = false;
@@ -111,6 +96,21 @@ export const useBottomSheetDrag = ({
         }
 
         cleanup();
+      };
+
+      // 이벤트 리스너 정리 함수
+      const cleanup = () => {
+        target.releasePointerCapture?.(e.pointerId);
+        target.removeEventListener('pointermove', handlePointerMove);
+        target.removeEventListener('pointerup', handlePointerUp);
+        target.removeEventListener('pointercancel', handlePointerCancel);
+        target.removeEventListener('lostpointercapture', handlePointerCancel);
+
+        // 드래그가 종료되면 --drag-y 변수를 초기화
+        if (sheetRef.current) {
+          sheetRef.current.style.setProperty('--drag-y', '0px');
+          sheetRef.current.style.transition = ''; // 인라인 transition도 제거
+        }
       };
 
       // 대상 요소에 이벤트 리스너 등록
