@@ -32,9 +32,12 @@ export const filterSection = style({
 export const scrollContentArea = style({
   overflowY: 'auto',
   maxHeight: '52rem',
+  overscrollBehavior: 'contain', // 내부 스크롤 - 상위 시트 간 드래그 간섭 완화
 
-  '::-webkit-scrollbar': {
-    display: 'none',
+  selectors: {
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
   },
   scrollbarWidth: 'none', // Firefox
   msOverflowStyle: 'none', // IE and Edge
