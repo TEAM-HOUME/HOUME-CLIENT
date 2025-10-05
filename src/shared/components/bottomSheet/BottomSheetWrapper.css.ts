@@ -100,6 +100,7 @@ export const dragHandleContainer = recipe({
     height: '2.8rem',
     touchAction: 'none',
     userSelect: 'none',
+    cursor: 'grab',
   },
   variants: {
     type: {
