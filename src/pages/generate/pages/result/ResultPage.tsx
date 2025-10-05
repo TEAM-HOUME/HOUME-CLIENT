@@ -41,7 +41,7 @@ const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isMultipleImages } = useABTest();
-  const [selectedFactors, setSelectedFactors] = useState<number[]>([]);
+  const [selectedFactor, setSelectedFactor] = useState<number | null>(null);
   const [isLastSlide, setIsLastSlide] = useState(false);
   const [currentImgId, setCurrentImgId] = useState(0);
   // 각 이미지별로 좋아요/싫어요 상태를 관리 (imageId를 키로 사용)
@@ -204,12 +204,14 @@ const ResultPage = () => {
   // 태그 버튼 클릭 핸들러 추가
   const handleFactorClick = (factorId: number) => {
     const imageId = currentImgId;
-    const isSelected = selectedFactors.includes(factorId);
+    const isSelected = selectedFactor === factorId;
 
     if (isSelected) {
-      setSelectedFactors((prev) => prev.filter((id) => id !== factorId));
+      // 이미 선택된 factor를 다시 클릭하면 선택 해제
+      setSelectedFactor(null);
     } else {
-      setSelectedFactors((prev) => [...prev, factorId]);
+      // 새로운 factor 선택
+      setSelectedFactor(factorId);
       sendFactorPreference({ imageId, factorId });
     }
   };
@@ -263,7 +265,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactors.includes(factor.id)
+                          selectedFactor === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -278,7 +280,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactors.includes(factor.id)
+                          selectedFactor === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -299,7 +301,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactors.includes(factor.id)
+                          selectedFactor === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -314,7 +316,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactors.includes(factor.id)
+                          selectedFactor === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
