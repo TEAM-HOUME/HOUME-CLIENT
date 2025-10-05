@@ -23,8 +23,8 @@ if (import.meta.env.DEV) {
       // const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}${window.location.hash}`;
       // window.history.replaceState(null, '', newUrl);
     }
-  } catch (_) {
-    // noop
+  } catch {
+    console.error('Error setting ab_image_variant');
   }
 }
 
