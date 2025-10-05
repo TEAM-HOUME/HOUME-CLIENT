@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { overlay } from 'overlay-kit';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import 'swiper/css';
@@ -9,6 +9,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
+import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 
@@ -67,9 +68,13 @@ const GeneratedImgA = ({
 }: GeneratedImgAProps) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
+
+  // 마이페이지 사용자 정보 (크레딧 정보 포함)
+  const { data: userData } = useMyPageUser();
 
   // currentImgId가 변경될 때마다 부모에게 전달
   useEffect(() => {
@@ -189,16 +194,19 @@ const GeneratedImgA = ({
         <GeneralModal
           title="더 다양한 이미지가 궁금하신가요?"
           content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
-          cancelText="돌아가기" // 좌측 버튼 텍스트
-          confirmText="이미지 새로 만들기" // 우측 버튼 텍스트
-          cancelVariant="default" // 좌측 버튼 색깔(회색 or 보라색)
-          confirmVariant="primary" // 우측 버튼 색깔(회색 or 보라색)
-          showCreditChip={true} // CreditChip 사용되면 true, 기본값 false
-          creditCount={4} // CreditChip 사용될 시 전달
-          maxCredit={5} // CreditChip 사용될 시 전달
-          onCancel={unmount} // 좌측 버튼 액션
-          onConfirm={unmount} // 우측 버튼 액션
-          onClose={unmount} // 모달 외부 영역 탭할 시 모달 닫기
+          cancelText="돌아가기"
+          confirmText="이미지 새로 만들기"
+          cancelVariant="default"
+          confirmVariant="primary"
+          showCreditChip={true}
+          creditCount={userData?.CreditCount || 0}
+          maxCredit={5}
+          onCancel={unmount}
+          onConfirm={() => {
+            unmount();
+            navigate('/signup/complete');
+          }}
+          onClose={unmount}
         />
       )
     );
