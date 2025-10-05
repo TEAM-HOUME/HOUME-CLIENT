@@ -15,7 +15,6 @@ import * as commonStyles from '@components/bottomSheet/BottomSheetWrapper.css';
 
 import * as styles from './CurationSheetWrapper.css';
 
-export const CURATION_PEEK_HEIGHT = '8.8rem';
 const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
