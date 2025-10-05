@@ -4,20 +4,22 @@ import { ROUTES } from '@/routes/paths';
 
 import BackIcon from '@shared/assets/icons/backIcon.svg?react';
 
-import * as btnStyles from './LoginNavBtn.css';
+import * as btnStyles from './NavBtn.css';
 import * as styles from './TitleNavBar.css';
 
 interface TitleNavBarProps extends React.ComponentProps<'nav'> {
   title: string;
   isBackIcon?: boolean;
   isLoginBtn?: boolean;
+  isSettingBtn?: boolean;
   onBackClick?: () => void;
 }
 
 const TitleNavBar = ({
   title,
   isBackIcon = true,
-  isLoginBtn = true,
+  isLoginBtn = false,
+  isSettingBtn = false,
   onBackClick,
   ...props
 }: TitleNavBarProps) => {
@@ -43,6 +45,15 @@ const TitleNavBar = ({
             className={btnStyles.loginNav}
           >
             로그인
+          </button>
+        )}
+        {isSettingBtn && (
+          <button
+            type="button"
+            onClick={() => navigate(ROUTES.SETTING)}
+            className={btnStyles.settingNav}
+          >
+            설정
           </button>
         )}
       </div>

@@ -99,6 +99,15 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: protectedRoutes,
       },
+      {
+        path: '*',
+        lazy: async () => {
+          const { default: Error404Page } = await import(
+            '@/pages/Error404Page/Error404Page'
+          );
+          return { Component: Error404Page };
+        },
+      },
     ],
   },
 ]);

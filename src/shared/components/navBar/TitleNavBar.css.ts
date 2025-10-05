@@ -45,7 +45,6 @@ export const rightdiv = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  width: '8rem',
   height: '4.8rem',
   padding: '1.2rem 1.6rem',
   ...fontStyle('body_r_14'),

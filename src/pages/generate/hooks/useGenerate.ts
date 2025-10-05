@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { ROUTES } from '@/routes/paths';
 import { queryClient } from '@/shared/apis/queryClient';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 
@@ -20,16 +21,42 @@ import {
 
 import { useGenerateStore } from '../stores/useGenerateStore';
 
-import type { GenerateImageRequest } from '@pages/generate/types/generate';
+import type {
+  GenerateImageRequest,
+  CarouselItem,
+  GenerateImageResponse,
+} from '@pages/generate/types/generate';
+import type { UseMutationResult } from '@tanstack/react-query';
 
-export const useStackData = (page: number, options: { enabled: boolean }) => {
-  return useQuery({
+export const useStackData = (
+  page: number,
+  options: {
+    enabled: boolean;
+    onSuccess?: (data: CarouselItem[]) => void;
+    onError?: (err: unknown) => void;
+  }
+) => {
+  const query = useQuery<CarouselItem[], unknown>({
     queryKey: [QUERY_KEY.GENERATE_LOADING, page],
     queryFn: () => getStackData(page),
     staleTime: 2 * 60 * 1000,
     retry: 2,
-    ...options,
+    enabled: options.enabled,
   });
+  // v5에서는 onSuccess/onError가 제거됨: effect로 래핑
+  useEffect(() => {
+    if (query.isSuccess && query.data) {
+      options.onSuccess?.(query.data);
+    }
+  }, [query.isSuccess, query.data]);
+
+  useEffect(() => {
+    if (query.isError) {
+      options.onError?.(query.error);
+    }
+  }, [query.isError, query.error]);
+
+  return query;
 };
 
 export const useGetResultDataQuery = (
@@ -79,11 +106,19 @@ export const useCreditLogMutation = () => {
 };
 
 // 이미지 생성 api
-export const useGenerateImageApi = () => {
+export const useGenerateImageApi = (): UseMutationResult<
+  GenerateImageResponse['data'],
+  unknown,
+  GenerateImageRequest
+> => {
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
 
-  const generateImageRequest = useMutation({
+  const generateImageRequest = useMutation<
+    GenerateImageResponse['data'],
+    unknown,
+    GenerateImageRequest
+  >({
     mutationFn: (userInfo: GenerateImageRequest) => {
       console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
       return postGenerateImage(userInfo);
@@ -115,11 +150,11 @@ export const useGenerateImageStatusCheck = (
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
 
-  const query = useQuery({
+  const query = useQuery<GenerateImageResponse['data'], unknown>({
     queryKey: ['generateImageStatus', houseId],
     queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
-    refetchInterval: 7000, // 5초
+    refetchInterval: 7000, // 7초
     refetchIntervalInBackground: true,
     retry: (failureCount) => {
       // 최대 10번 재시도
@@ -152,7 +187,7 @@ export const useGenerateImageStatusCheck = (
   // 에러 시 처리
   useEffect(() => {
     if (query.isError) {
-      navigate('/imageSetup');
+      navigate(ROUTES.IMAGE_SETUP);
       console.log('fallback api 이미지 생성 실패');
     }
   }, [query.isError, query.error]);

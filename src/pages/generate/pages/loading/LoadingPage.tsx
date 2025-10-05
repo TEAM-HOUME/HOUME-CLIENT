@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -8,18 +8,54 @@ import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 import Loading from '@/shared/components/loading/Loading';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 
-import * as styles from './LoadingPage.css';
-import ProgressBar from './ProgressBar';
 import {
   useStackData,
   usePostCarouselLikeMutation,
   usePostCarouselHateMutation,
   useGenerateImageApi,
   useGenerateImageStatusCheck,
-} from '../../hooks/useGenerate';
-import { useGenerateStore } from '../../stores/useGenerateStore';
+} from '@pages/generate/hooks/useGenerate';
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
+
+import * as styles from './LoadingPage.css';
+import ProgressBar from './ProgressBar';
 
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
+
+const ANIMATION_DURATION = 600;
+
+type GenerateLocationState = {
+  generateImageRequest: GenerateImageRequest;
+};
+
+const isGenerateLocationState = (
+  value: unknown
+): value is GenerateLocationState => {
+  if (!value || typeof value !== 'object') return false;
+
+  const { generateImageRequest } = value as Record<string, unknown>;
+  if (!generateImageRequest || typeof generateImageRequest !== 'object') {
+    return false;
+  }
+
+  const request = generateImageRequest as Record<string, unknown>;
+  const floorPlan = request.floorPlan as Record<string, unknown> | undefined;
+
+  return (
+    typeof request.houseId === 'number' &&
+    typeof request.equilibrium === 'string' &&
+    typeof request.activity === 'string' &&
+    typeof request.bedId === 'number' &&
+    Array.isArray(request.moodBoardIds) &&
+    (request.moodBoardIds as unknown[]).every((n) => typeof n === 'number') &&
+    Array.isArray(request.selectiveIds) &&
+    (request.selectiveIds as unknown[]).every((n) => typeof n === 'number') &&
+    floorPlan !== undefined &&
+    typeof floorPlan === 'object' &&
+    typeof floorPlan.floorPlanId === 'number' &&
+    typeof floorPlan.isMirror === 'boolean'
+  );
+};
 
 const LoadingPage = () => {
   // 이미지 생성 api 코드 ...
@@ -29,65 +65,78 @@ const LoadingPage = () => {
   const { isApiCompleted, navigationData } = useGenerateStore();
   // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
-  // TODO: location.state의 타입 검증 로직 개선 필요(런타임 오류 방지)
-  const requestData: GenerateImageRequest | null =
-    (location.state as { generateImageRequest?: GenerateImageRequest })
-      ?.generateImageRequest || null;
-  const generateImageRequest = useGenerateImageApi();
+  const rawState = location.state;
+  const hasInvalidState =
+    rawState != null && !isGenerateLocationState(rawState);
+  const requestData: GenerateImageRequest | null = isGenerateLocationState(
+    rawState
+  )
+    ? rawState.generateImageRequest
+    : null;
+  const { mutate: mutateGenerateImage } = useGenerateImageApi();
+  // 브라우저 환경에 맞춰 setTimeout 반환을 number로 정규화
+  const transitionTimeoutRef = useRef<number | null>(null);
 
-  useGenerateImageStatusCheck(requestData?.houseId || 0, true);
+  // 상태 폴링은 requestData가 있을 때만 시작
+  useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
 
   useEffect(() => {
-    if (requestData) {
-      console.log('이미지 생성 요청 시작:', requestData);
-      generateImageRequest.mutate(requestData, {
-        onError: (error: any) => {
-          // 재요청 코드 42900 확인
-          if (error?.response?.data?.code === 42900) {
-            console.log('재요청 필요, 상태 체크 시작');
-            // setShouldCheckStatus(true);
-          } else {
-            console.error('이미지 생성 실패:', error);
-          }
-        },
-      });
-    } else {
-      console.log('requestData is null, redirect to /imageSetup');
-      navigate(ROUTES.IMAGE_SETUP);
+    if (hasInvalidState) {
+      console.warn('잘못된 generate 페이지 진입 - requestData 누락');
     }
-  }, [requestData, navigate]); // resetGenerate 의존성 추가
+  }, [hasInvalidState]);
+
+  useEffect(() => {
+    if (!requestData) return;
+
+    console.log('이미지 생성 요청 시작:', requestData);
+    mutateGenerateImage(requestData, {
+      onError: (error: any) => {
+        // 재요청 코드 42900 확인
+        if (error?.response?.data?.code === 42900) {
+          console.log('재요청 필요, 상태 체크 시작');
+          // setShouldCheckStatus(true);
+        } else {
+          console.error('이미지 생성 실패:', error);
+        }
+      },
+    });
+  }, [mutateGenerateImage, requestData]);
   // ... 이미지 생성 api 코드 끝
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const [currentPage, setCurrentPage] = useState(0);
   const {
     data: currentImages,
     isLoading,
     isError,
-    error,
-  } = useStackData(currentPage, { enabled: true });
+  } = useStackData(currentPage, {
+    enabled: !!requestData,
+    onSuccess: () => setCurrentIndex(0),
+    onError: (err) => handleError(err, 'loading'),
+  });
   const { data: nextImages } = useStackData(currentPage + 1, {
-    enabled: !!currentImages, // next prefetch
+    enabled: !!currentImages && !!requestData, // next prefetch
   });
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
-  const ANIMATION_DURATION = 600;
 
   const likeMutation = usePostCarouselLikeMutation();
   const hateMutation = usePostCarouselHateMutation();
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [currentImages]);
+  // currentImages 변화에 따른 인덱스 초기화와 에러 처리는
+  // useStackData의 onSuccess/onError 콜백으로 이관
 
-  useEffect(() => {
-    // 실제 에러가 발생했거나, 로딩이 완료되었는데 데이터가 없는 경우에만 에러 처리
-    if (isError || (!isLoading && !currentImages)) {
-      handleError(error || new Error('Stack data load failed'), 'loading');
-    }
-  }, [isError, isLoading, currentImages, error, handleError]);
-
+  if (!requestData) return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
   if (isLoading) return <Loading />;
 
   // 에러 상황 체크
@@ -115,7 +164,7 @@ const LoadingPage = () => {
         '🎯 프로그래스 바 완료 후 페이지 이동:',
         new Date().toLocaleTimeString()
       );
-      navigate('/generate/result', {
+      navigate(ROUTES.GENERATE_RESULT, {
         state: {
           result: navigationData,
         },
@@ -144,7 +193,11 @@ const LoadingPage = () => {
       });
     }
 
-    setTimeout(() => {
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+    }
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
       if (!isLast) {
         setSelected(null);
         setCurrentIndex((prev) => prev + 1);
@@ -158,6 +211,7 @@ const LoadingPage = () => {
         }
       }
       setAnimating(false);
+      transitionTimeoutRef.current = null;
     }, ANIMATION_DURATION);
   };
 
