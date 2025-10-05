@@ -22,7 +22,6 @@ export const useSavedItemsStore = create<SavedItemsState>((set) => ({
         newSavedIds.delete(productId); // 저장 취소
       } else {
         newSavedIds.add(productId); // 저장
-        console.log(`${productId} 저장됨`);
       }
 
       return { savedProductIds: newSavedIds };
