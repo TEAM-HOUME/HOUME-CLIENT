@@ -48,9 +48,9 @@ export const useBottomSheetDrag = ({
       // 포인터 취소/캡처 해제 시 정리
       const handlePointerCancel = () => {
         isDraggingRef.current = false;
+        cleanup();
         // 원위치로 복귀
         onDragCancel();
-        cleanup();
       };
 
       // 드래그 중 실시간 움직임 처리
