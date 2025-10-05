@@ -47,6 +47,7 @@ export const useBottomSheetDrag = ({
 
       // 포인터 취소/캡처 해제 시 정리
       const handlePointerCancel = () => {
+        setIsDragging(false);
         isDraggingRef.current = false;
         cleanup();
         // 원위치로 복귀
@@ -108,8 +109,8 @@ export const useBottomSheetDrag = ({
 
         // 드래그가 종료되면 --drag-y 변수를 초기화
         if (sheetRef.current) {
-          sheetRef.current.style.setProperty('--drag-y', '0px');
           sheetRef.current.style.transition = ''; // 인라인 transition도 제거
+          sheetRef.current.style.setProperty('--drag-y', '0px');
         }
       };
 
