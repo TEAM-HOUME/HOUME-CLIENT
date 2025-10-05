@@ -43,7 +43,7 @@ export const sheetWrapper = style({
   },
 
   userSelect: 'none',
-  touchAction: 'none', // Pull-to-refresh 방지
+  // touchAction: 'none', // Pull-to-refresh 방지
   overscrollBehavior: 'none', // overscroll 방지
   WebkitOverflowScrolling: 'touch', // iOS에서 부드러운 스크롤
   WebkitUserSelect: 'none', // Safari에서 텍스트 선택 방지
