@@ -68,6 +68,12 @@ export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postResultPreference(imageId, isLike),
+    onSuccess: (data) => {
+      console.log('sendPreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('sendPreference 실패:', error);
+    },
   });
 };
 
@@ -207,5 +213,11 @@ export const useFactorPreferenceMutation = () => {
       imageId: number;
       factorId: number;
     }) => postFactorPreference(imageId, factorId),
+    onSuccess: (data) => {
+      console.log('sendFactorPreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('sendFactorPreference 실패:', error);
+    },
   });
 };
