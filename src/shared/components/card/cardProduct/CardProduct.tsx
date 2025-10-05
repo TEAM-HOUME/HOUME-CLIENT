@@ -1,4 +1,4 @@
-import CardImage from '@assets/images/cardExImg.svg';
+import CardImage from '@assets/images/cardExImg.svg?url';
 import LinkButton from '@components/button/linkButton/LinkButton';
 import SaveButton from '@components/button/saveButton/SaveButton';
 
