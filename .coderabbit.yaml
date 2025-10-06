@@ -2,16 +2,10 @@
 language: 'ko-KR' # 리뷰 언어 설정
 early_access: true # 얼리 액세스 기능 활성화
 
-# 리뷰 톤 및 스타일 지정
+# 리뷰 톤 및 스타일 지정(스키마 maxLength=250을 준수해 축약)
 tone_instructions: |
-  TypeScript/React 19 전문가로서 한국어로 명확하고 건설적인 코드 리뷰를 제공합니다. 보안, 성능, 유지보수성에 중점을 두며, 중요한 문제가 아닌 한 간결하게 작성합니다.
-  본 리포지토리의 README.md에 정리된 컨벤션을 최우선으로 적용합니다.
-  - 타입/인터페이스: PascalCase, Type/I/T 접두사·접미사 금지(제네릭 T 제외)
-  - 함수 네이밍: get/create/check/handle/is/has/can 접두사 사용
-  - API 함수 네이밍: HTTP 메서드 + 명사 형식 (예: getUserList, postComment)
-  - TanStack Query 훅: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
-  - 커스텀 훅 파일명: use*.ts
-  - PR/Commit 형식 준수 여부도 간단히 점검([type] 제목, type: 제목)
+  한국어(ko-KR)로 간결하고 건설적인 코드 리뷰를 제공해요. 보안(security), 성능(performance), 유지보수성(maintainability)을 우선해요.
+  상세 컨벤션은 리포의 규칙 문서를 최우선으로 적용해요(knowledge_base.code_guidelines 참조).
 
 reviews:
   profile: 'assertive' # 리뷰 스타일: assertive(엄격), chill(관대)
@@ -22,13 +16,13 @@ reviews:
   assess_linked_issues: false # 연결된 이슈 분석
   related_prs: false # 관련 PR 표시
   suggested_labels: true # 라벨 자동 제안
-  sequence_diagrams: true # 시퀀스 다이어그램 생성
+  sequence_diagrams: false # 시퀀스 다이어그램 생성 비활성화(기본 노이즈 절감)
   changed_files_summary: true # 변경된 파일 요약
 
   # 워크플로우 개선
   high_level_summary_in_walkthrough: true # 요약을 워크스루에 포함
   high_level_summary_placeholder: '이 PR의 주요 변경사항을 요약합니다'
-  collapse_walkthrough: false # 워크스루 섹션 접기 비활성화
+  collapse_walkthrough: true # 워크스루 섹션 접기(기본은 접어서 노이즈 감소)
   commit_status: true # 커밋 상태 체크
   fail_commit_status: false # 커밋 실패 시 상태 체크 실패하지 않음
   related_issues: false # 관련 이슈 추적
@@ -36,19 +30,25 @@ reviews:
 
   # 파일 경로 필터링 (프로젝트 구조에 맞춘 설정)
   path_filters:
+    # 포함(allow-list)
+    - 'src/**'
+    - '.storybook/**'
+    - 'vite.config.ts'
+    - 'eslint.config.js'
+    - 'tsconfig*.json'
+    - 'package.json'
+    - '.coderabbit.yaml'
+    # 제외(deny-list)
     - '!node_modules/**'
     - '!dist/**'
     - '!storybook-static/**'
     - '!build/**'
     - '!coverage/**'
+    - '!**/*.snap'
+    - '!**/*.{png,jpg,jpeg,svg,gif,webp,ico,avif}'
+    - '!**/*.{mp4,webm,mp3,ogg}'
     - '!*.lock'
     - '!pnpm-lock.yaml'
-    - '.storybook/vitest.setup.ts'
-    - 'src/**'
-    - '.storybook/**/*.ts'
-    - 'vite.config.ts'
-    - 'tsconfig*.json'
-    - '.coderabbit.yaml'
 
   # 경로별 특별 지침 (구체적인 패턴부터 일반적인 패턴 순으로 배열)
   path_instructions:
@@ -169,16 +169,36 @@ reviews:
   auto_review:
     enabled: true # 자동 리뷰 활성화
     drafts: false # 드래프트 리뷰 사용 여부
+    base_branches: # Git Flow와 정렬
+      - 'develop'
+      - 'main'
+    labels: # 라벨 기반 필터(느슨한 NOT 매칭)
+      - '!wip'
+      - '!draft'
+      - '!skip-review'
+    ignore_usernames: # 봇 PR 무시
+      - 'dependabot'
+      - 'renovate'
     ignore_title_keywords: # 특정 키워드가 포함된 PR 제목 무시
       - '[docs]'
       - '[skip-review]'
 
-  # 코드 개선 기능 (finishing_touches)
+  # 사전 병합 검사(팀 규칙의 가시화, 엄격도는 warning로 시작)
+  pre_merge_checks:
+    title:
+      mode: 'warning'
+      requirements: 'PR 제목은 [type] 제목 형식을 따르고 50자 이내로 간결하게 작성해요.'
+    description:
+      mode: 'warning'
+    issue_assessment:
+      mode: 'off'
+
+  # 코드 개선 기능 (finishing_touches) - 전역 비활성화
   finishing_touches:
     docstrings:
-      enabled: true
+      enabled: false
     unit_tests:
-      enabled: true
+      enabled: false
 
   # TypeScript/React 환경에 최적화된 도구들 (실제 사용하는 것만)
   tools:
@@ -198,12 +218,18 @@ reviews:
 
 # 채팅 설정
 chat:
+  art: false # 아스키/이모지 아트 비활성화(전문성 유지)
   auto_reply: true # AI 자동 답변 활성화
 
 # 지식 베이스 설정
 knowledge_base:
   web_search:
     enabled: true # 웹 검색 기능 활성화
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - 'README.md'
+      - 'CLAUDE.md'
 
 # 코드 생성 설정
 code_generation:
