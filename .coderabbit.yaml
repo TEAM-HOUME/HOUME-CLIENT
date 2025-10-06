@@ -260,9 +260,3 @@ knowledge_base:
     enabled: true
     filePatterns:
       - 'README.md'
-
-# 코드 생성 설정
-code_generation:
-  docstrings:
-    language: 'ko-KR' # 독스트링을 한국어로 생성
-  unit_tests: {} # 유닛 테스트 생성 (기본값 사용)
