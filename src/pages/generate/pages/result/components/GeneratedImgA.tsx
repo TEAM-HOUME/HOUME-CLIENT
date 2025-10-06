@@ -79,7 +79,6 @@ const GeneratedImgA = ({
 
   // currentImgId가 변경될 때마다 부모에게 전달
   useEffect(() => {
-    console.log('GeneratedImgA - onCurrentImgIdChange 호출:', currentImgId);
     onCurrentImgIdChange?.(currentImgId);
   }, [currentImgId, onCurrentImgIdChange]);
 
@@ -134,15 +133,6 @@ const GeneratedImgA = ({
       | GenerateImageBResponse['data'];
   }
 
-  // 타입 가드로 imageInfoResponses가 있는지 확인 후 콘솔 출력
-  if (
-    result &&
-    'imageInfoResponses' in result &&
-    Array.isArray(result.imageInfoResponses)
-  ) {
-    console.log('result', result);
-  }
-
   useEffect(() => {
     if (
       result &&
@@ -150,12 +140,6 @@ const GeneratedImgA = ({
       Array.isArray(result.imageInfoResponses)
     ) {
       const newImgId = result.imageInfoResponses[currentSlideIndex]?.imageId;
-      console.log(
-        'GeneratedImgA - currentSlideIndex:',
-        currentSlideIndex,
-        'newImgId:',
-        newImgId
-      );
       setCurrentImgId(newImgId);
     }
   }, [currentSlideIndex, result]);

@@ -3,7 +3,6 @@ import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { animationTokens } from '@/shared/styles/tokens/animation.css';
-// import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 import { colorVars } from '@styles/tokens/color.css';
 
@@ -109,50 +108,3 @@ export const tagButtonSelected = style({
   backgroundColor: colorVars.color.gray000,
   color: colorVars.color.primary,
 });
-
-// export const curationSection = style({
-//   display: 'flex',
-//   flexDirection: 'column',
-//   paddingTop: '4rem',
-//   backgroundColor: colorVars.color.gray100,
-//   width: '100%',
-// });
-
-// export const textContainer = style({
-//   display: 'flex',
-//   flexDirection: 'column',
-//   gap: '0.8rem',
-//   textAlign: 'center',
-// });
-
-// export const headerText = style({
-//   ...fontStyle('heading_sb_18'),
-//   color: colorVars.color.gray900,
-// });
-
-// export const bodyText = style({
-//   ...fontStyle('body_r_14'),
-//   color: colorVars.color.gray600,
-// });
-
-// export const premiumContentSection = style({
-//   position: 'relative',
-//   width: '100%',
-//   display: 'flex',
-//   justifyContent: 'center',
-//   alignItems: 'center',
-// });
-
-// export const unlockSection = style({
-//   position: 'absolute',
-//   top: '42%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   zIndex: zIndex.blurButton,
-//   width: '12.1rem',
-//   height: '4rem',
-//   display: 'flex',
-//   flexDirection: 'column',
-//   alignItems: 'center',
-//   gap: '1.2rem',
-// });
