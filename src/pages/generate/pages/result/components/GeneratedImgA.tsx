@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
+import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 
 import Loading from '@components/loading/Loading';
@@ -204,7 +205,7 @@ const GeneratedImgA = ({
           onCancel={unmount}
           onConfirm={() => {
             unmount();
-            navigate('/signup/complete');
+            navigate(ROUTES.GENERATE_START);
           }}
           onClose={unmount}
         />
