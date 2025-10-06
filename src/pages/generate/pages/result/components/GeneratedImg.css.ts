@@ -71,7 +71,7 @@ export const slidePrevBtn = style({
   },
 
   ':disabled': {
-    backgroundColor: colorVars.color.gray000_30,
+    backgroundColor: colorVars.color.gray999_04,
   },
 });
 
@@ -93,7 +93,7 @@ export const slideNextBtn = style({
   },
 
   ':disabled': {
-    backgroundColor: colorVars.color.gray000_30,
+    backgroundColor: colorVars.color.gray999_04,
   },
 });
 
