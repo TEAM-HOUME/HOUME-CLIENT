@@ -301,6 +301,7 @@ const ResultPage = () => {
                   <div className={styles.tagFlexItem}>
                     {likeFactorsData.slice(0, 2).map((factor) => (
                       <button
+                        type="button"
                         key={factor.id}
                         className={`${styles.tagButton} ${
                           currentFactorId === factor.id
@@ -316,6 +317,7 @@ const ResultPage = () => {
                   <div className={styles.tagFlexItem}>
                     {likeFactorsData.slice(2, 4).map((factor) => (
                       <button
+                        type="button"
                         key={factor.id}
                         className={`${styles.tagButton} ${
                           currentFactorId === factor.id
@@ -337,6 +339,7 @@ const ResultPage = () => {
                   <div className={styles.tagFlexItem}>
                     {dislikeFactorsData.slice(0, 2).map((factor) => (
                       <button
+                        type="button"
                         key={factor.id}
                         className={`${styles.tagButton} ${
                           currentFactorId === factor.id
@@ -352,6 +355,7 @@ const ResultPage = () => {
                   <div className={styles.tagFlexItem}>
                     {dislikeFactorsData.slice(2, 4).map((factor) => (
                       <button
+                        type="button"
                         key={factor.id}
                         className={`${styles.tagButton} ${
                           currentFactorId === factor.id

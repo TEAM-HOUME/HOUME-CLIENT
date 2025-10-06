@@ -213,6 +213,7 @@ const GeneratedImgA = ({
           <span>{totalSlideCount}</span>
         </div>
         <button
+          type="button"
           onClick={() => swiper?.slidePrev()}
           className={styles.slidePrevBtn}
           disabled={!swiper || currentSlideIndex === 0}
@@ -240,13 +241,18 @@ const GeneratedImgA = ({
             />
             <div className={styles.lockWrapper}>
               <LockIcon />
-              <button className={styles.moreBtn} onClick={handleOpenModal}>
+              <button
+                type="button"
+                className={styles.moreBtn}
+                onClick={handleOpenModal}
+              >
                 이미지 더보기
               </button>
             </div>
           </SwiperSlide>
         )}
         <button
+          type="button"
           onClick={() => swiper?.slideNext()}
           className={styles.slideNextBtn}
           disabled={!swiper || currentSlideIndex === totalSlideCount - 1}
@@ -257,7 +263,7 @@ const GeneratedImgA = ({
             <SlideNext />
           )}
         </button>
-        <button className={styles.tagBtn}>
+        <button type="button" className={styles.tagBtn}>
           <Tag />
         </button>
       </Swiper>
