@@ -108,6 +108,7 @@ reviews:
         - 의존성 배열(exhaustive-deps) 준수, 참조 안정성 유지(함수/객체 메모이제이션)
         - 반환 값 일관성(tuple/object), 에러/로딩 상태 명확화
         - 제네릭 훅은 타입 매개변수 기본값 검토
+        - TanStack Query 훅 네이밍: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
 
     - path: 'src/**/types/**/*.ts'
       instructions: |
