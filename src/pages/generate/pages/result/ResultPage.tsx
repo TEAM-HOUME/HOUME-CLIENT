@@ -1,23 +1,18 @@
 import { useState, useEffect } from 'react';
 
-// import { overlay } from 'overlay-kit';
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-// import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-// import Modal from '@/shared/components/overlay/modal/Modal';
-// import HeadingText from '@/shared/components/text/HeadingText';
 
 import Loading from '@components/loading/Loading';
 import { useABTest } from '@pages/generate/hooks/useABTest';
 import {
-  // useFurnitureLogMutation,
   useResultPreferenceMutation,
+  useDeleteResultPreferenceMutation,
   useFactorsQuery,
   useFactorPreferenceMutation,
-  // useCreditLogMutation,
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 
@@ -41,12 +36,15 @@ const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isMultipleImages } = useABTest();
-  const [selectedFactor, setSelectedFactor] = useState<number | null>(null);
   const [isLastSlide, setIsLastSlide] = useState(false);
   const [currentImgId, setCurrentImgId] = useState(0);
   // 각 이미지별로 좋아요/싫어요 상태를 관리 (imageId를 키로 사용)
   const [imageLikeStates, setImageLikeStates] = useState<{
     [imageId: number]: ResultPageLikeState;
+  }>({});
+  // 각 이미지별로 factor 선택 상태를 관리 (imageId를 키로 사용)
+  const [imageFactorStates, setImageFactorStates] = useState<{
+    [imageId: number]: number | null;
   }>({});
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
@@ -104,9 +102,8 @@ const ResultPage = () => {
 
   // result가 있을 때만 mutation hook들 호출
   const { mutate: sendPreference } = useResultPreferenceMutation();
+  const { mutate: deletePreference } = useDeleteResultPreferenceMutation();
   const { mutate: sendFactorPreference } = useFactorPreferenceMutation();
-  // const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
-  // const { mutate: sendCreditLogs } = useCreditLogMutation();
 
   // 요인 문구 데이터 가져오기 (좋아요용)
   const { data: likeFactorsData } = useFactorsQuery(true);
@@ -121,8 +118,8 @@ const ResultPage = () => {
 
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
   const currentLikeState = (() => {
-    // 1. 로컬 상태가 있으면 사용
-    if (imageLikeStates[currentImgId]) {
+    // 1. 로컬 상태가 있으면 사용 (null도 포함)
+    if (imageLikeStates[currentImgId] !== undefined) {
       return imageLikeStates[currentImgId];
     }
 
@@ -131,87 +128,128 @@ const ResultPage = () => {
       const historyIndex = currentImgId - Number(imageId);
       const currentHistory = mypageResult.histories[historyIndex];
       if (currentHistory && currentHistory.isLike !== undefined) {
-        return currentHistory.isLike ? 'like' : 'dislike';
+        // isLike가 null이면 null 반환, 그렇지 않으면 boolean 값에 따라 변환
+        return currentHistory.isLike === null
+          ? null
+          : currentHistory.isLike
+            ? 'like'
+            : 'dislike';
       }
     }
 
     return null;
   })();
 
-  // 디버깅용 로그
-  console.log('=== ResultPage 렌더링 ===');
-  console.log('currentImgId:', currentImgId);
-  console.log('currentLikeState:', currentLikeState);
-  console.log('imageLikeStates:', imageLikeStates);
+  // 현재 슬라이드의 선택된 factor ID를 직접 계산
+  const currentFactorId = (() => {
+    // 1. 로컬 상태가 있으면 사용 (null도 포함)
+    if (imageFactorStates[currentImgId] !== undefined) {
+      return imageFactorStates[currentImgId];
+    }
+
+    // 2. 마이페이지 히스토리에서 찾기
+    if (isFromMypage && mypageResult?.histories) {
+      const historyIndex = currentImgId - Number(imageId);
+      const currentHistory = mypageResult.histories[historyIndex];
+      if (currentHistory && currentHistory.factorId) {
+        return currentHistory.factorId;
+      }
+    }
+
+    return null;
+  })();
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
     return <Loading />;
   }
 
-  // 여전히 데이터가 없으면 홈으로 리다이렉션
+  // 데이터 없으면 홈으로 리다이렉션
   if (!result) {
     console.error('Result data is missing');
     return <Navigate to="/" replace />;
   }
 
-  // // 이미지 ID 추출 (좋아요/싫어요 버튼용)
-  // const getImageId = (slideIndex: number) => {
-  //   if ('imageInfoResponses' in result) {
-  //     // 통일된 형태 또는 A안: 다중 이미지의 경우
-  //     return result.imageInfoResponses[slideIndex]?.imageId || 0;
-  //   } else {
-  //     // B안: 단일 이미지
-  //     return result.imageId;
-  //   }
-  // };
-
   const handleVote = (isLike: boolean) => {
     const imageId = currentImgId;
-    console.log('=== handleVote 호출 ===');
-    console.log('currentImgId:', currentImgId);
-    console.log('imageId:', imageId);
-    console.log('isLike:', isLike);
-    console.log('현재 imageLikeStates:', imageLikeStates);
+
+    const currentState = imageLikeStates[imageId];
+    const newState = isLike ? 'like' : 'dislike';
+
+    // 같은 상태를 다시 클릭하면 취소 (null로 설정)
+    const finalState = currentState === newState ? null : newState;
 
     // 해당 이미지의 로컬 상태 즉시 업데이트
     setImageLikeStates((prev) => {
       const newStates = {
         ...prev,
-        [imageId]: (isLike ? 'like' : 'dislike') as ResultPageLikeState,
+        [imageId]: finalState as ResultPageLikeState,
       };
       console.log('업데이트된 imageLikeStates:', newStates);
       return newStates;
     });
 
-    sendPreference({ imageId, isLike });
+    // 좋아요/싫어요가 취소되면 factor 선택도 초기화
+    if (finalState === null) {
+      setImageFactorStates((prev) => ({
+        ...prev,
+        [imageId]: null,
+      }));
+      // 취소 요청 API 호출 (DELETE)
+      deletePreference(imageId);
+    } else {
+      // 좋아요/싫어요 상태가 바뀌었다면 현재 선택된 factor 취소
+      if (
+        currentState !== null &&
+        currentState !== newState &&
+        currentFactorId
+      ) {
+        console.log(
+          '좋아요/싫어요 상태 변경으로 factor 취소:',
+          currentFactorId
+        );
+        sendFactorPreference({ imageId, factorId: currentFactorId });
+        setImageFactorStates((prev) => ({
+          ...prev,
+          [imageId]: null,
+        }));
+      }
+
+      // 새로운 선택 요청 API 호출
+      const apiValue = finalState === 'like';
+      sendPreference({ imageId, isLike: apiValue });
+    }
   };
 
-  // const handleOpenModal = () => {
-  //   overlay.open(({ unmount }) => (
-  //     <Modal
-  //       onClose={unmount}
-  //       title={`스타일링 이미지대로 가구를\n추천 받으려면 크레딧이 필요해요`}
-  //       onCreditAction={sendCreditLogs} // 크레딧 액션 콜백 전달
-  //     />
-  //   ));
-  //   sendFurnituresLogs();
-  // };
-
-  // if (isLoading) return <div>로딩중</div>;
-  // if (isError || !data) return <div>에러 발생!</div>;
-
-  // 태그 버튼 클릭 핸들러 추가
+  // 태그 버튼 클릭 핸들러 (좋아요/싫어요 상태 변경 시 factor 취소 및 선택)
   const handleFactorClick = (factorId: number) => {
     const imageId = currentImgId;
-    const isSelected = selectedFactor === factorId;
+    const isSelected = currentFactorId === factorId;
 
     if (isSelected) {
       // 이미 선택된 factor를 다시 클릭하면 선택 해제
-      setSelectedFactor(null);
+      setImageFactorStates((prev) => ({
+        ...prev,
+        [imageId]: null,
+      }));
+      sendFactorPreference({ imageId, factorId });
     } else {
+      // 다른 factor가 선택되어 있다면 먼저 취소
+      if (currentFactorId && currentFactorId !== factorId) {
+        console.log(
+          '이전 factor 취소 후 새 factor 선택:',
+          currentFactorId,
+          '→',
+          factorId
+        );
+        sendFactorPreference({ imageId, factorId: currentFactorId });
+      }
+
       // 새로운 factor 선택
-      setSelectedFactor(factorId);
+      setImageFactorStates((prev) => ({
+        ...prev,
+        [imageId]: factorId,
+      }));
       sendFactorPreference({ imageId, factorId });
     }
   };
@@ -265,7 +303,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactor === factor.id
+                          currentFactorId === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -280,7 +318,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactor === factor.id
+                          currentFactorId === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -301,7 +339,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactor === factor.id
+                          currentFactorId === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
@@ -316,7 +354,7 @@ const ResultPage = () => {
                       <button
                         key={factor.id}
                         className={`${styles.tagButton} ${
-                          selectedFactor === factor.id
+                          currentFactorId === factor.id
                             ? styles.tagButtonSelected
                             : ''
                         }`}
