@@ -52,7 +52,7 @@ export const getResultData = async (imageId: number) => {
   });
 };
 
-// 생성된 이미지 선호 여부
+// 생성된 이미지 선호도 전송
 export const postResultPreference = async (
   imageId: number,
   isLike: boolean
@@ -63,6 +63,14 @@ export const postResultPreference = async (
     body: {
       isLike,
     },
+  });
+};
+
+// 생성된 이미지 선호도 선택 해제 (취소)
+export const deleteResultPreference = async (imageId: number) => {
+  return request({
+    method: HTTPMethod.DELETE,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
   });
 };
 
