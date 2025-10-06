@@ -20,6 +20,7 @@ import {
   postResultPreference,
   getPreferFactors,
   postFactorPreference,
+  deleteResultPreference,
 } from '@pages/generate/apis/generate';
 
 import { useABTest } from './useABTest';
@@ -100,6 +101,19 @@ export const useResultPreferenceMutation = () => {
   });
 };
 
+// 결과 이미지 선호도 취소용 (DELETE)
+export const useDeleteResultPreferenceMutation = () => {
+  return useMutation({
+    mutationFn: (imageId: number) => deleteResultPreference(imageId),
+    onSuccess: (data) => {
+      console.log('deletePreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('deletePreference 실패:', error);
+    },
+  });
+};
+
 // 생성된 이미지 좋아요 여부에 따란 요인 문구
 export const useFactorsQuery = (
   isLike: boolean,
@@ -131,7 +145,7 @@ export const useCreditLogMutation = () => {
 export const useGenerateImageApi = () => {
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
-  const { variant, isSingleImage, isMultipleImages } = useABTest();
+  const { variant, isMultipleImages } = useABTest();
 
   const generateImageRequest = useMutation<
     { imageInfoResponses: GenerateImageData[] },
