@@ -15,12 +15,12 @@ import RootLayout from '@/layout/RootLayout';
 import GeneratePage from '@/pages/generate/GeneratePage';
 import LoadingPage from '@/pages/generate/pages/loading/LoadingPage';
 import ResultPage from '@/pages/generate/pages/result/ResultPage';
+import StartPage from '@/pages/generate/pages/start/StartPage';
 import HomePage from '@/pages/home/HomePage';
 import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
 import LoginPage from '@/pages/login/LoginPage';
 import MyPage from '@/pages/mypage/MyPage';
-import SignupCompletePage from '@/pages/signup/SignupCompletePage';
 import SignupPage from '@/pages/signup/SignupPage';
 import { ROUTES } from '@/routes/paths';
 import ProtectedRoute from '@/routes/ProtectedRoute';
@@ -72,8 +72,8 @@ const protectedRoutes = [
     element: <MyPage />,
   },
   {
-    path: ROUTES.SIGNUPCOMPLETE,
-    element: <SignupCompletePage />,
+    path: ROUTES.GENERATE_START,
+    element: <StartPage />,
   },
 ];
 
