@@ -229,7 +229,6 @@ knowledge_base:
     enabled: true
     filePatterns:
       - 'README.md'
-      - 'CLAUDE.md'
 
 # 코드 생성 설정
 code_generation:
