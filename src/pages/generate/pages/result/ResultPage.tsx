@@ -173,21 +173,12 @@ const ResultPage = () => {
   const handleVote = (isLike: boolean) => {
     const imageId = currentImgId;
 
-    const currentState = imageLikeStates[imageId];
+    // currentLikeState를 사용하여 현재 상태 확인
+    const currentState = currentLikeState;
     const newState = isLike ? 'like' : 'dislike';
 
     // 같은 상태를 다시 클릭하면 취소 (null로 설정)
     const finalState = currentState === newState ? null : newState;
-
-    // 해당 이미지의 로컬 상태 즉시 업데이트
-    setImageLikeStates((prev) => {
-      const newStates = {
-        ...prev,
-        [imageId]: finalState as ResultPageLikeState,
-      };
-      console.log('업데이트된 imageLikeStates:', newStates);
-      return newStates;
-    });
 
     // 좋아요/싫어요가 취소되면 factor 선택도 초기화
     if (finalState === null) {
@@ -196,7 +187,17 @@ const ResultPage = () => {
         [imageId]: null,
       }));
       // 취소 요청 API 호출 (DELETE)
-      deletePreference(imageId);
+      deletePreference(imageId, {
+        onSuccess: () => {
+          setImageLikeStates((prev) => ({
+            ...prev,
+            [imageId]: null,
+          }));
+        },
+        onError: (error) => {
+          console.error('취소 API 실패:', error);
+        },
+      });
     } else {
       // 좋아요/싫어요 상태가 바뀌었다면 현재 선택된 factor 취소
       if (
@@ -217,7 +218,20 @@ const ResultPage = () => {
 
       // 새로운 선택 요청 API 호출
       const apiValue = finalState === 'like';
-      sendPreference({ imageId, isLike: apiValue });
+      sendPreference(
+        { imageId, isLike: apiValue },
+        {
+          onSuccess: () => {
+            setImageLikeStates((prev) => ({
+              ...prev,
+              [imageId]: finalState,
+            }));
+          },
+          onError: (error) => {
+            console.error('선택 API 실패:', error);
+          },
+        }
+      );
     }
   };
 
@@ -228,29 +242,36 @@ const ResultPage = () => {
 
     if (isSelected) {
       // 이미 선택된 factor를 다시 클릭하면 선택 해제
-      setImageFactorStates((prev) => ({
-        ...prev,
-        [imageId]: null,
-      }));
-      sendFactorPreference({ imageId, factorId });
+      sendFactorPreference(
+        { imageId, factorId },
+        {
+          onSuccess: () => {
+            setImageFactorStates((prev) => ({
+              ...prev,
+              [imageId]: null,
+            }));
+          },
+          onError: (error) => {
+            console.error('factor 취소 API 실패:', error);
+          },
+        }
+      );
     } else {
-      // 다른 factor가 선택되어 있다면 먼저 취소
-      if (currentFactorId && currentFactorId !== factorId) {
-        console.log(
-          '이전 factor 취소 후 새 factor 선택:',
-          currentFactorId,
-          '→',
-          factorId
-        );
-        sendFactorPreference({ imageId, factorId: currentFactorId });
-      }
-
       // 새로운 factor 선택
-      setImageFactorStates((prev) => ({
-        ...prev,
-        [imageId]: factorId,
-      }));
-      sendFactorPreference({ imageId, factorId });
+      sendFactorPreference(
+        { imageId, factorId },
+        {
+          onSuccess: () => {
+            setImageFactorStates((prev) => ({
+              ...prev,
+              [imageId]: factorId,
+            }));
+          },
+          onError: (error) => {
+            console.error('factor 선택 API 실패:', error);
+          },
+        }
+      );
     }
   };
 
