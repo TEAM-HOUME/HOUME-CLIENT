@@ -46,10 +46,22 @@ reviews:
     - '!build/**'
     - '!coverage/**'
     - '!**/*.snap'
-    - '!**/*.{png,jpg,jpeg,svg,gif,webp,ico,avif}'
-    - '!**/*.{mp4,webm,mp3,ogg}'
+    - '!**/*.png'
+    - '!**/*.jpg'
+    - '!**/*.jpeg'
+    - '!**/*.svg'
+    - '!**/*.gif'
+    - '!**/*.webp'
+    - '!**/*.ico'
+    - '!**/*.avif'
+    - '!**/*.mp4'
+    - '!**/*.webm'
+    - '!**/*.mp3'
+    - '!**/*.ogg'
     - '!*.lock'
     - '!pnpm-lock.yaml'
+    - '!package-lock.json'
+    - '!bun.lockb'
 
   # 경로별 특별 지침 (구체적인 패턴부터 일반적인 패턴 순으로 배열)
   path_instructions:
@@ -91,16 +103,6 @@ reviews:
         - 불필요한 중복 스타일 제거
         - 전역 스타일 남용 금지, 컴포넌트 범위 캡슐화
 
-    - path: 'src/**/*.ts'
-      instructions: |
-        TypeScript 파일 리뷰 시:
-        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
-        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
-        - API Response는 XXXResponse 네이밍 따르는지 확인
-        - var 사용 금지, const 우선 사용 확인
-        - type-only import 사용(import type), 불필요한 런타임 의존성 제거
-        - satisfies 연산자 활용으로 정확한 타입 보장
-
     - path: 'src/**/hooks/**/*.ts'
       instructions: |
         커스텀 훅 리뷰 시:
@@ -116,6 +118,16 @@ reviews:
         - import type 사용, default export 지양
         - Discriminated Union으로 분기 명확화
         - 상수 리터럴은 as const로 리터럴 타입 유지
+
+    - path: 'src/**/*.ts'
+      instructions: |
+        TypeScript 파일 리뷰 시:
+        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
+        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
+        - API Response는 XXXResponse 네이밍 따르는지 확인
+        - var 사용 금지, const 우선 사용 확인
+        - type-only import 사용(import type), 불필요한 런타임 의존성 제거
+        - satisfies 연산자 활용으로 정확한 타입 보장
 
     # 중간 수준의 구체적인 패턴들
     - path: 'src/shared/components/**'
