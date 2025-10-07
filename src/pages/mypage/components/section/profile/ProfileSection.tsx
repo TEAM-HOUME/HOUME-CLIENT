@@ -1,29 +1,26 @@
-import profileImage from '@/shared/assets/images/cardExImg.svg';
-import CreditBox from '@/shared/components/creditBox/CreditBox';
+import ProfileImage from '@/shared/assets/images/profileImg.svg?react';
+import CreditChip from '@/shared/components/creditChip/CreditChip';
 
 import * as styles from './ProfileSection.css';
 
 interface ProfileSectionProps {
   userName: string;
   credit: number;
-  isChargeDisabled: boolean;
+  maxCredit: number;
 }
 
 const ProfileSection = ({
   userName,
   credit,
-  isChargeDisabled,
+  maxCredit,
 }: ProfileSectionProps) => {
   return (
     <section className={styles.container}>
       <div className={styles.profileBox}>
-        <div
-          className={styles.profileImage}
-          style={{ backgroundImage: `url(${profileImage})` }}
-        />
+        <ProfileImage className={styles.profileImage} />
         <p className={styles.userName}>{userName}님</p>
       </div>
-      <CreditBox credit={credit} disabled={isChargeDisabled} />
+      <CreditChip creditCount={credit} maxCredit={maxCredit} />
     </section>
   );
 };

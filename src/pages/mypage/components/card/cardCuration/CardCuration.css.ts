@@ -6,6 +6,7 @@ export const cardCurationContainer = style({
   alignItems: 'center',
   gap: '0.6rem',
   width: '100%',
+  overflow: 'visible',
 });
 
 export const cardImage = style({
