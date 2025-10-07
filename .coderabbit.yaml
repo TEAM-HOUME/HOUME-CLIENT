@@ -119,16 +119,6 @@ reviews:
         - Discriminated Union으로 분기 명확화
         - 상수 리터럴은 as const로 리터럴 타입 유지
 
-    - path: 'src/**/*.ts'
-      instructions: |
-        TypeScript 파일 리뷰 시:
-        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
-        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
-        - API Response는 XXXResponse 네이밍 따르는지 확인
-        - var 사용 금지, const 우선 사용 확인
-        - type-only import 사용(import type), 불필요한 런타임 의존성 제거
-        - satisfies 연산자 활용으로 정확한 타입 보장
-
     # 중간 수준의 구체적인 패턴들
     - path: 'src/shared/components/**'
       instructions: |
@@ -170,6 +160,16 @@ reviews:
         - export const 사용 확인
         - 의미있는 이름 사용 여부 확인
         - 리터럴은 as const로 타입 좁히기
+
+    - path: 'src/**/*.ts'
+      instructions: |
+        TypeScript 파일 리뷰 시:
+        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
+        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
+        - API Response는 XXXResponse 네이밍 따르는지 확인
+        - var 사용 금지, const 우선 사용 확인
+        - type-only import 사용(import type), 불필요한 런타임 의존성 제거
+        - satisfies 연산자 활용으로 정확한 타입 보장
 
     # 가장 일반적인 패턴 (마지막에 배치)
     - path: 'src/**'
