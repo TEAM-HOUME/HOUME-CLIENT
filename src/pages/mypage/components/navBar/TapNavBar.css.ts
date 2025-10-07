@@ -7,23 +7,23 @@ import { colorVars } from '@styles/tokens/color.css';
 
 export const tapNavBar = style({
   display: 'flex',
-  width: '37.5rem',
   justifyContent: 'center',
   alignItems: 'center',
-  textAlign: 'center',
 });
 
 export const tapButton = recipe({
   base: {
     display: 'flex',
     width: '18.8rem',
-    flexDirection: 'column' as const,
-    alignItems: 'flex-start' as const,
-    flexShrink: 0,
+    height: '5rem',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
-    position: 'relative' as const,
+    position: 'relative',
+    padding: 0,
 
     '::after': {
       content: '""',
@@ -58,11 +58,5 @@ export const tapButton = recipe({
 });
 
 export const tapButtonText = style({
-  display: 'flex',
-  height: '4.8rem',
-  padding: '0 6rem',
   whiteSpace: 'nowrap',
-  alignItems: 'center',
-  gap: '1rem',
-  alignSelf: 'stretch',
 });
