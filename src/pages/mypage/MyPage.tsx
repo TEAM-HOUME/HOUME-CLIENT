@@ -12,7 +12,6 @@ import TapNavBar from './components/navBar/TapNavBar';
 import GeneratedImagesSection from './components/section/generatedImages/GeneratedImagesSection';
 import ProfileSection from './components/section/profile/ProfileSection';
 import SavedItemsSection from './components/section/savedItems/SavedItemsSection';
-import SettingSection from './components/section/setting/SettingSection';
 import { useMyPageUser } from './hooks/useMypage';
 import * as styles from './MyPage.css';
 
@@ -80,6 +79,7 @@ const MyPage = () => {
       <TitleNavBar
         title="마이페이지"
         isBackIcon
+        isSettingBtn
         isLoginBtn={false}
         onBackClick={() => navigate(ROUTES.HOME)}
       />
@@ -87,7 +87,7 @@ const MyPage = () => {
       <ProfileSection
         userName={userData.name || '사용자'}
         credit={userData.CreditCount ?? 0}
-        isChargeDisabled={false}
+        maxCredit={5}
       />
 
       <TapNavBar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -97,8 +97,6 @@ const MyPage = () => {
       ) : (
         <GeneratedImagesSection />
       )}
-
-      <SettingSection />
     </div>
   );
 };
