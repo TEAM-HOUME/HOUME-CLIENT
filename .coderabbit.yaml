@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-language: 'ko-KR' # 리뷰 언어 설정
-early_access: true # 얼리 액세스 기능 활성화
+language: 'ko-KR'  # 리뷰 언어 설정
+early_access: true  # 얼리 액세스 기능 활성화
 
 # 리뷰 톤 및 스타일 지정(스키마 maxLength=250을 준수해 축약)
 tone_instructions: |
@@ -8,25 +8,25 @@ tone_instructions: |
   상세 컨벤션은 리포의 규칙 문서를 최우선으로 적용해요(knowledge_base.code_guidelines 참조).
 
 reviews:
-  profile: 'assertive' # 리뷰 스타일: assertive(엄격), chill(관대)
+  profile: 'assertive'  # 리뷰 스타일: assertive(엄격), chill(관대)
   request_changes_workflow: false
-  high_level_summary: true # PR 요약 생성
-  poem: false # 시(POEM) 생성 비활성화
-  review_status: true # 리뷰 상태 표시
-  assess_linked_issues: false # 연결된 이슈 분석
-  related_prs: false # 관련 PR 표시
-  suggested_labels: true # 라벨 자동 제안
-  sequence_diagrams: false # 시퀀스 다이어그램 생성 비활성화(기본 노이즈 절감)
-  changed_files_summary: true # 변경된 파일 요약
+  high_level_summary: true  # PR 요약 생성
+  poem: false  # 시(POEM) 생성 비활성화
+  review_status: true  # 리뷰 상태 표시
+  assess_linked_issues: false  # 연결된 이슈 분석
+  related_prs: false  # 관련 PR 표시
+  suggested_labels: true  # 라벨 자동 제안
+  sequence_diagrams: false  # 시퀀스 다이어그램 생성 비활성화(기본 노이즈 절감)
+  changed_files_summary: true  # 변경된 파일 요약
 
   # 워크플로우 개선
-  high_level_summary_in_walkthrough: true # 요약을 워크스루에 포함
+  high_level_summary_in_walkthrough: true  # 요약을 워크스루에 포함
   high_level_summary_placeholder: '이 PR의 주요 변경사항을 요약합니다'
-  collapse_walkthrough: true # 워크스루 섹션 접기(기본은 접어서 노이즈 감소)
-  commit_status: true # 커밋 상태 체크
-  fail_commit_status: false # 커밋 실패 시 상태 체크 실패하지 않음
-  related_issues: false # 관련 이슈 추적
-  abort_on_close: true # PR 닫힐 때 리뷰 중단
+  collapse_walkthrough: true  # 워크스루 섹션 접기(기본은 접어서 노이즈 감소)
+  commit_status: true  # 커밋 상태 체크
+  fail_commit_status: false  # 커밋 실패 시 상태 체크 실패하지 않음
+  related_issues: false  # 관련 이슈 추적
+  abort_on_close: true  # PR 닫힐 때 리뷰 중단
 
   # 파일 경로 필터링 (프로젝트 구조에 맞춘 설정)
   path_filters:
@@ -210,19 +210,19 @@ reviews:
         - 브랜치 패턴: type/description/#issue-number 형식
 
   auto_review:
-    enabled: true # 자동 리뷰 활성화
-    drafts: false # 드래프트 리뷰 사용 여부
-    base_branches: # Git Flow와 정렬
+    enabled: true  # 자동 리뷰 활성화
+    drafts: false  # 드래프트 리뷰 사용 여부
+    base_branches:  # Git Flow와 정렬
       - 'develop'
       - 'main'
-    labels: # 라벨 기반 필터(느슨한 NOT 매칭)
+    labels:  # 라벨 기반 필터(느슨한 NOT 매칭)
       - '!wip'
       - '!draft'
       - '!skip-review'
-    ignore_usernames: # 봇 PR 무시
+    ignore_usernames:  # 봇 PR 무시
       - 'dependabot'
       - 'renovate'
-    ignore_title_keywords: # 특정 키워드가 포함된 PR 제목 무시
+    ignore_title_keywords:  # 특정 키워드가 포함된 PR 제목 무시
       - '[docs]'
       - '[skip-review]'
 
@@ -246,28 +246,28 @@ reviews:
   # TypeScript/React 환경에 최적화된 도구들 (실제 사용하는 것만)
   tools:
     eslint:
-      enabled: true # TypeScript/React 린팅
+      enabled: true  # TypeScript/React 린팅
     languagetool:
-      enabled: true # 한국어 문법 검사
+      enabled: true  # 한국어 문법 검사
       level: 'default'
     markdownlint:
-      enabled: true # 문서 품질 검사
+      enabled: true  # 문서 품질 검사
     gitleaks:
-      enabled: true # 보안 비밀 정보 스캔
+      enabled: true  # 보안 비밀 정보 스캔
     yamllint:
-      enabled: true # YAML 파일 검증
+      enabled: true  # YAML 파일 검증
     actionlint:
-      enabled: true # GitHub Actions 검증
+      enabled: true  # GitHub Actions 검증
 
 # 채팅 설정
 chat:
-  art: false # 아스키/이모지 아트 비활성화(전문성 유지)
-  auto_reply: true # AI 자동 답변 활성화
+  art: false  # 아스키/이모지 아트 비활성화(전문성 유지)
+  auto_reply: true  # AI 자동 답변 활성화
 
 # 지식 베이스 설정
 knowledge_base:
   web_search:
-    enabled: true # 웹 검색 기능 활성화
+    enabled: true  # 웹 검색 기능 활성화
   code_guidelines:
     enabled: true
     filePatterns:
