@@ -1,5 +1,3 @@
-import ArrowRight from '@/shared/assets/icons/ArrowRightS.svg?react';
-
 import * as styles from './CurationButton.css';
 
 interface CurationButtonProps extends React.ComponentProps<'button'> {}
