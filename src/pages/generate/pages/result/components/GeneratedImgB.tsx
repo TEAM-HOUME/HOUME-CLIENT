@@ -7,6 +7,7 @@ import type { MyPageImageDetail } from '@/pages/mypage/types/apis/MyPage';
 
 import Loading from '@components/loading/Loading';
 import { useGetResultDataQuery } from '@pages/generate/hooks/useGenerate';
+import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
 import * as styles from './GeneratedImg.css.ts';
 
@@ -156,6 +157,9 @@ const GeneratedImgB = ({
         alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
         className={styles.imgArea({ mirrored: image.isMirror })}
       />
+      <button type="button" className={styles.tagBtn}>
+        <Tag />
+      </button>
     </div>
   );
 };
