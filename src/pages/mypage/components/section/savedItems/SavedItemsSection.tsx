@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 
-import * as styles from './SavedItems.css';
+import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
 
 // TODO: API 연동 시 실제 타입으로 변경

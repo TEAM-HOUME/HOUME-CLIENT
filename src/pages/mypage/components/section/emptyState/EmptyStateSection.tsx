@@ -4,7 +4,7 @@ import SmallButton from '@/pages/mypage/components/button/smallButton/SmallButto
 import { ROUTES } from '@/routes/paths';
 import emptyImage from '@/shared/assets/images/mypageEmptyImage.png';
 
-import * as styles from './EmptyState.css';
+import * as styles from './EmptyStateSection.css';
 
 interface EmptyStateSectionProps {
   type: 'genImg' | 'savedItem';

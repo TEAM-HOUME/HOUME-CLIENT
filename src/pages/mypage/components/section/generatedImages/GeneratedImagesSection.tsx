@@ -2,7 +2,7 @@
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
 
-import * as styles from './GeneratedImages.css';
+import * as styles from './GeneratedImagesSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
 
 const GeneratedImagesSection = () => {

@@ -33,18 +33,14 @@ export const textWrapper = style({
 
 export const title = style({
   ...fontStyle('title_sb_16'),
-  width: '14.9rem',
-  height: '1.6rem',
   textAlign: 'center',
   color: colorVars.color.gray999,
+  whiteSpace: 'nowrap',
 });
 
 export const description = style({
   ...fontStyle('body_r_14'),
-  width: '18.2rem',
-  height: 'auto',
-  minHeight: '2.1rem',
   textAlign: 'center',
-  color: colorVars.color.gray700,
+  color: colorVars.color.gray500,
   whiteSpace: 'pre-line',
 });

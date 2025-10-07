@@ -1,9 +1,11 @@
 import { style } from '@vanilla-extract/css';
 
 export const container = style({
+  display: 'flex',
   width: '100%',
   padding: '0 2rem',
   marginTop: '2rem',
+  justifyContent: 'center',
 });
 
 export const gridContainer = style({

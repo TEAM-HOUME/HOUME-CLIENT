@@ -1,39 +1,42 @@
-// import { useState } from 'react';
-
+import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
 
 import { useLogoutMutation } from '@/pages/login/apis/logout';
+import { ROUTES } from '@/routes/paths';
 import Divider from '@/shared/components/divider/Divider';
+import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 import { useToast } from '@/shared/components/toast/useToast';
 import { TOAST_TYPE } from '@/shared/types/toast';
 
-// TODO: GeneralModal 머지 후 주석 해제
-// import GeneralModal from '@/shared/components/modal/generalModal/GeneralModal';
-import * as styles from './SettingSection.css';
+import * as styles from './SettingPage.css';
 
-const SettingSection = () => {
+const SettingPage = () => {
   const navigate = useNavigate();
   const { mutate: logout } = useLogoutMutation();
   const { notify } = useToast();
-  // TODO: GeneralModal 머지 후 주석 해제
-  // const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   const handleServicePolicy = () => {
-    navigate('/mypage/setting/service');
+    navigate(ROUTES.SETTING_SERVICE);
   };
 
   const handlePrivacyPolicy = () => {
-    navigate('/mypage/setting/privacy');
+    navigate(ROUTES.SETTING_PRIVACY);
   };
 
   const handleLogout = () => {
-    if (confirm('로그아웃 하시겠습니까?')) {
-      logout();
-      notify({
-        text: '로그아웃 되었습니다',
-        type: TOAST_TYPE.INFO,
+    notify({
+      text: '로그아웃 되었습니다',
+      type: TOAST_TYPE.INFO,
+    });
+
+    setTimeout(() => {
+      logout(undefined, {
+        onSuccess: () => {
+          navigate(ROUTES.HOME);
+        },
       });
-    }
+    }, 1500); // 1.5초 후 로그아웃 실행
   };
 
   const handleWithdrawConfirm = () => {
@@ -44,26 +47,39 @@ const SettingSection = () => {
       type: TOAST_TYPE.INFO,
     });
 
-    // setIsWithdrawModalOpen(false);
-    navigate('/');
+    navigate(ROUTES.HOME);
   };
 
   const handleWithdraw = () => {
-    // TODO: GeneralModal 머지 후 모달 사용으로 변경
-    const confirmed = window.confirm(
-      '정말 탈퇴하시겠어요?\n탈퇴 시 모든 데이터가 삭제되며, 복구할 수 없습니다.'
-    );
-
-    if (confirmed) {
-      handleWithdrawConfirm();
-    }
-
-    // TODO: GeneralModal 머지 후 아래 코드 사용
-    // setIsWithdrawModalOpen(true);
+    overlay.open(({ unmount }) => (
+      <GeneralModal
+        title="하우미 탈퇴 전 확인하세요"
+        content={
+          '탈퇴 시 생성했던 이미지와 함께\n모든 정보가 삭제되며, 복구가 불가능해요.'
+        }
+        cancelText="탈퇴하기"
+        confirmText="취소하기"
+        cancelVariant="default"
+        confirmVariant="default"
+        onCancel={() => {
+          handleWithdrawConfirm();
+          unmount();
+        }}
+        onConfirm={unmount}
+        onClose={unmount}
+      />
+    ));
   };
 
   return (
     <>
+      <TitleNavBar
+        title="설정"
+        isBackIcon
+        isLoginBtn={false}
+        onBackClick={() => navigate(-1)}
+      />
+
       <div className={styles.container}>
         {/* 약관 및 정책 섹션 */}
         <section className={styles.section}>
@@ -125,23 +141,8 @@ const SettingSection = () => {
           </div>
         </section>
       </div>
-
-      {/* TODO: GeneralModal 머지 후 주석 해제 */}
-      {/* {isWithdrawModalOpen && (
-        <GeneralModal
-          title="정말 탈퇴하시겠어요?"
-          content="탈퇴 시 모든 데이터가 삭제되며,\n복구할 수 없습니다."
-          cancelText="취소"
-          confirmText="그래도 탈퇴하기"
-          cancelVariant="default"
-          confirmVariant="primary"
-          onCancel={() => setIsWithdrawModalOpen(false)}
-          onConfirm={handleWithdrawConfirm}
-          onClose={() => setIsWithdrawModalOpen(false)}
-        />
-      )} */}
     </>
   );
 };
 
-export default SettingSection;
+export default SettingPage;
