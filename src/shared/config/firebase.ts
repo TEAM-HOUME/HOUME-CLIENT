@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getRemoteConfig } from 'firebase/remote-config';
 
 // Firebase 설정
@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Firebase 앱 초기화
-const app = initializeApp(firebaseConfig);
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Remote Config 초기화
 export const remoteConfig = getRemoteConfig(app);
