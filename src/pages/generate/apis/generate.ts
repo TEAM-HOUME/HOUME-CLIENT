@@ -89,16 +89,10 @@ export const postFactorPreference = async (
   imageId: number,
   factorId: number
 ) => {
-  try {
-    const res = await request({
-      method: HTTPMethod.POST,
-      url: API_ENDPOINT.GENERATE.FACTOR_PREFERENCE(imageId, factorId),
-    });
-    return res;
-  } catch (error) {
-    console.error('Error in postFactorPreference:', error);
-    throw error;
-  }
+  return request({
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.GENERATE.FACTOR_PREFERENCE(imageId, factorId),
+  });
 };
 
 // 가구 추천 받기 버튼 클릭 로그 확인
