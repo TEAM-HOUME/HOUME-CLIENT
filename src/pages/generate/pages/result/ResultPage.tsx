@@ -100,22 +100,6 @@ const ResultPage = () => {
     }
   }
 
-  // result가 있을 때만 mutation hook들 호출
-  const { mutate: sendPreference } = useResultPreferenceMutation();
-  const { mutate: deletePreference } = useDeleteResultPreferenceMutation();
-  const { mutate: sendFactorPreference } = useFactorPreferenceMutation();
-
-  // 요인 문구 데이터 가져오기 (좋아요용)
-  const { data: likeFactorsData } = useFactorsQuery(true);
-
-  // 요인 문구 데이터 가져오기 (싫어요용)
-  const { data: dislikeFactorsData } = useFactorsQuery(false);
-
-  // currentImgId가 변경될 때마다 로그 출력
-  useEffect(() => {
-    console.log('currentImgId 변경됨:', currentImgId);
-  }, [currentImgId]);
-
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
   const currentLikeState = (() => {
     // 1. 로컬 상태가 있으면 사용 (null도 포함)
@@ -158,6 +142,26 @@ const ResultPage = () => {
 
     return null;
   })();
+
+  // result가 있을 때만 mutation hook들 호출
+  const { mutate: sendPreference } = useResultPreferenceMutation();
+  const { mutate: deletePreference } = useDeleteResultPreferenceMutation();
+  const { mutate: sendFactorPreference } = useFactorPreferenceMutation();
+
+  // 요인 문구 데이터 가져오기 (좋아요용) - 좋아요가 선택되었을 때만 호출
+  const { data: likeFactorsData } = useFactorsQuery(true, {
+    enabled: currentLikeState === 'like',
+  });
+
+  // 요인 문구 데이터 가져오기 (싫어요용) - 싫어요가 선택되었을 때만 호출
+  const { data: dislikeFactorsData } = useFactorsQuery(false, {
+    enabled: currentLikeState === 'dislike',
+  });
+
+  // currentImgId가 변경될 때마다 로그 출력
+  useEffect(() => {
+    console.log('currentImgId 변경됨:', currentImgId);
+  }, [currentImgId]);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
