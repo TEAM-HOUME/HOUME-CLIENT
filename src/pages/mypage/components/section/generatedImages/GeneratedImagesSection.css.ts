@@ -14,13 +14,4 @@ export const gridContainer = style({
   gridTemplateColumns: 'repeat(2, 16.4rem)',
   columnGap: '0.7rem',
   rowGap: '1.6rem',
-
-  '@media': {
-    'screen and (max-width: 768px)': {
-      gridTemplateColumns: 'repeat(2, 16.4rem)',
-    },
-    'screen and (max-width: 480px)': {
-      gridTemplateColumns: 'repeat(1, 16.4rem)',
-    },
-  },
 });
