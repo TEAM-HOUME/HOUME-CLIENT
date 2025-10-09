@@ -3,4 +3,5 @@ dist
 build
 *.lock
 package.json
+/.coderabbit.yaml
 *.hbs

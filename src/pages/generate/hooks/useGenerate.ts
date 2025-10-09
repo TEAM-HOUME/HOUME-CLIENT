@@ -10,6 +10,7 @@ import { QUERY_KEY } from '@/shared/constants/queryKey';
 import {
   getCheckGenerateImageStatus,
   postGenerateImage,
+  postGenerateImages,
   getResultData,
   getStackData,
   postCreditLog,
@@ -17,16 +18,19 @@ import {
   postStackHate,
   postStackLike,
   postResultPreference,
+  getPreferFactors,
+  postFactorPreference,
+  deleteResultPreference,
 } from '@pages/generate/apis/generate';
 
+import { useABTest } from './useABTest';
 import { useGenerateStore } from '../stores/useGenerateStore';
 
 import type {
-  GenerateImageRequest,
   CarouselItem,
-  GenerateImageResponse,
+  GenerateImageData,
+  GenerateImageRequest,
 } from '@pages/generate/types/generate';
-import type { UseMutationResult } from '@tanstack/react-query';
 
 export const useStackData = (
   page: number,
@@ -88,6 +92,38 @@ export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postResultPreference(imageId, isLike),
+    onSuccess: (data) => {
+      console.log('sendPreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('sendPreference 실패:', error);
+    },
+  });
+};
+
+// 결과 이미지 선호도 취소용 (DELETE)
+export const useDeleteResultPreferenceMutation = () => {
+  return useMutation({
+    mutationFn: (imageId: number) => deleteResultPreference(imageId),
+    onSuccess: (data) => {
+      console.log('deletePreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('deletePreference 실패:', error);
+    },
+  });
+};
+
+// 생성된 이미지 좋아요 여부에 따란 요인 문구
+export const useFactorsQuery = (
+  isLike: boolean,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEY.GENERATE_FACTORS, isLike],
+    queryFn: () => getPreferFactors(isLike),
+    staleTime: 5 * 60 * 1000, // 5분간 캐시
+    ...options,
   });
 };
 
@@ -105,35 +141,44 @@ export const useCreditLogMutation = () => {
   });
 };
 
-// 이미지 생성 api
-export const useGenerateImageApi = (): UseMutationResult<
-  GenerateImageResponse['data'],
-  unknown,
-  GenerateImageRequest
-> => {
+// 이미지 생성 api (A/B 테스트 적용)
+export const useGenerateImageApi = () => {
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
+  const { variant, isMultipleImages } = useABTest();
 
   const generateImageRequest = useMutation<
-    GenerateImageResponse['data'],
-    unknown,
+    { imageInfoResponses: GenerateImageData[] },
+    Error,
     GenerateImageRequest
   >({
-    mutationFn: (userInfo: GenerateImageRequest) => {
-      console.log('🚀 이미지 제작 시작:', new Date().toLocaleTimeString());
-      return postGenerateImage(userInfo);
+    mutationFn: async (userInfo: GenerateImageRequest) => {
+      console.log('이미지 제작 시작:', new Date().toLocaleTimeString());
+      console.log('A/B 테스트 그룹:', variant);
+
+      if (isMultipleImages) {
+        console.log('다중 이미지 생성 API 호출');
+        const res = await postGenerateImages(userInfo);
+        return res; // 이미 { imageInfoResponses: [...] } 형태
+      } else {
+        console.log('단일 이미지 생성 API 호출');
+        const res = await postGenerateImage(userInfo);
+        // 단일 이미지를 배열로 감싸 통일
+        return { imageInfoResponses: [res] };
+      }
     },
     onSuccess: (data) => {
-      console.log('✅ 이미지 제작 완료:', new Date().toLocaleTimeString());
+      console.log('이미지 제작 완료:', new Date().toLocaleTimeString());
+      console.log('생성된 이미지 데이터 보기', data);
+      const derivedType =
+        (data?.imageInfoResponses?.length ?? 0) > 1 ? 'multiple' : 'single';
+      console.log('생성된 이미지 타입:', derivedType);
       resetGenerate();
 
-      // API 완료 신호 및 네비게이션 데이터를 Zustand store에 저장
       setNavigationData(data);
       setApiCompleted(true);
 
-      // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
-      console.log('🔄 프로그래스 바 완료 대기 중...');
-
+      console.log('프로그래스 바 완료 대기 중...');
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });
@@ -150,7 +195,7 @@ export const useGenerateImageStatusCheck = (
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
 
-  const query = useQuery<GenerateImageResponse['data'], unknown>({
+  const query = useQuery({
     queryKey: ['generateImageStatus', houseId],
     queryFn: () => getCheckGenerateImageStatus(houseId),
     enabled: shouldStart,
@@ -177,7 +222,7 @@ export const useGenerateImageStatusCheck = (
       setApiCompleted(true);
 
       console.log('상태 체크 성공:', query.data);
-      console.log('🔄 프로그래스 바 완료 대기 중...');
+      console.log('프로그래스 바 완료 대기 중...');
 
       // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
@@ -193,4 +238,23 @@ export const useGenerateImageStatusCheck = (
   }, [query.isError, query.error]);
 
   return query;
+};
+
+// 요인 선택 mutation
+export const useFactorPreferenceMutation = () => {
+  return useMutation({
+    mutationFn: ({
+      imageId,
+      factorId,
+    }: {
+      imageId: number;
+      factorId: number;
+    }) => postFactorPreference(imageId, factorId),
+    onSuccess: (data) => {
+      console.log('sendFactorPreference 성공:', data);
+    },
+    onError: (error) => {
+      console.error('sendFactorPreference 실패:', error);
+    },
+  });
 };

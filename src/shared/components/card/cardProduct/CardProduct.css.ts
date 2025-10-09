@@ -7,13 +7,14 @@ import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 export const wrapper = recipe({
   base: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
   variants: {
     size: {
-      large: { width: '16.6rem' },
-      small: { width: '10.8rem' },
+      large: { minWidth: '16.6rem' },
+      small: { minWidth: '10.8rem' },
     },
   },
 });
@@ -34,6 +35,15 @@ export const imgSection = recipe({
       small: {},
     },
   },
+});
+
+export const cardImage = style({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+  display: 'block',
+  boxSizing: 'border-box',
 });
 
 export const linkBtnContainer = style({

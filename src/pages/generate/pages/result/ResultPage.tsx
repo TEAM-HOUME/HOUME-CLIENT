@@ -1,58 +1,61 @@
 import { useState, useEffect } from 'react';
 
-import { overlay } from 'overlay-kit';
-import { useLocation, Navigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageImageDetailData } from '@/pages/mypage/types/apis/MyPage';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
-import CreditModal from '@/shared/components/overlay/modal/CreditModal';
-import HeadingText from '@/shared/components/text/HeadingText';
 
-import BlurImage from '@assets/icons/recommendBlur.svg?react';
-import LockImage from '@assets/icons/recommendCta.png';
 import Loading from '@components/loading/Loading';
+import { useABTest } from '@pages/generate/hooks/useABTest';
 import {
-  useFurnitureLogMutation,
   useResultPreferenceMutation,
-  useCreditLogMutation,
+  useDeleteResultPreferenceMutation,
+  useFactorsQuery,
+  useFactorPreferenceMutation,
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
 
+import GeneratedImgA from './components/GeneratedImgA.tsx';
+import GeneratedImgB from './components/GeneratedImgB.tsx';
 import * as styles from './ResultPage.css.ts';
 
 import type {
-  GenerateImageData,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
   ResultPageLikeState,
+  GenerateImageData,
 } from '@pages/generate/types/generate';
 
-// 마이페이지 데이터를 GenerateImageData 형태로 변환하는 함수
-const convertMypageDataToGenerateData = (
-  mypageData: MyPageImageDetailData,
-  imageId: number
-): GenerateImageData => {
-  return {
-    imageId,
-    imageUrl: mypageData.generatedImageUrl,
-    isMirror: false, // 마이페이지에서는 미러 정보를 제공하지 않음
-    equilibrium: mypageData.equilibrium,
-    houseForm: mypageData.houseForm,
-    tagName: mypageData.tasteTag,
-    name: mypageData.name,
-  };
+// 통일된 타입 정의
+type UnifiedGenerateImageResult = {
+  imageInfoResponses: GenerateImageData[];
 };
 
 const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-
-  // Hook들을 최상단에 배치
-  const [selected, setSelected] = useState<ResultPageLikeState>(null);
+  const { isMultipleImages } = useABTest();
+  const [isLastSlide, setIsLastSlide] = useState(false);
+  const [currentImgId, setCurrentImgId] = useState(0);
+  // 각 이미지별로 좋아요/싫어요 상태를 관리 (imageId를 키로 사용)
+  const [imageLikeStates, setImageLikeStates] = useState<{
+    [imageId: number]: ResultPageLikeState;
+  }>({});
+  // 각 이미지별로 factor 선택 상태를 관리 (imageId를 키로 사용)
+  const [imageFactorStates, setImageFactorStates] = useState<{
+    [imageId: number]: number | null;
+  }>({});
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
-  let result = (location.state as { result?: GenerateImageData })?.result;
+  let result = (
+    location.state as {
+      result?:
+        | UnifiedGenerateImageResult
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
+    }
+  )?.result;
 
   // 2차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
   const imageId = searchParams.get('imageId');
@@ -75,113 +78,323 @@ const ResultPage = () => {
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
   if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult) {
-      result = convertMypageDataToGenerateData(mypageResult, Number(imageId));
+    if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
+      // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
+      console.log('mypageResult.histories', mypageResult.histories);
+      const allImageData = mypageResult.histories.map((history, index) => ({
+        imageId: Number(imageId) + index,
+        imageUrl: history.generatedImageUrl,
+        isMirror: false,
+        equilibrium: history.equilibrium,
+        houseForm: history.houseForm,
+        tagName: history.tasteTag,
+        name: history.name,
+      }));
+      result = {
+        imageInfoResponses: allImageData,
+      } as UnifiedGenerateImageResult;
     } else if (!isFromMypage && apiResult) {
-      result = apiResult as GenerateImageData;
+      result = apiResult as
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
     }
   }
 
+  // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
+  const currentLikeState = (() => {
+    // 1. 로컬 상태가 있으면 사용 (null도 포함)
+    if (imageLikeStates[currentImgId] !== undefined) {
+      return imageLikeStates[currentImgId];
+    }
+
+    // 2. 마이페이지 히스토리에서 찾기
+    if (isFromMypage && mypageResult?.histories) {
+      const historyIndex = currentImgId - Number(imageId);
+      const currentHistory = mypageResult.histories[historyIndex];
+      if (currentHistory && currentHistory.isLike !== undefined) {
+        // isLike가 null이면 null 반환, 그렇지 않으면 boolean 값에 따라 변환
+        return currentHistory.isLike === null
+          ? null
+          : currentHistory.isLike
+            ? 'like'
+            : 'dislike';
+      }
+    }
+
+    return null;
+  })();
+
+  // 현재 슬라이드의 선택된 factor ID를 직접 계산
+  const currentFactorId = (() => {
+    // 1. 로컬 상태가 있으면 사용 (null도 포함)
+    if (imageFactorStates[currentImgId] !== undefined) {
+      return imageFactorStates[currentImgId];
+    }
+
+    // 2. 마이페이지 히스토리에서 찾기
+    if (isFromMypage && mypageResult?.histories) {
+      const historyIndex = currentImgId - Number(imageId);
+      const currentHistory = mypageResult.histories[historyIndex];
+      if (currentHistory && currentHistory.factorId) {
+        return currentHistory.factorId;
+      }
+    }
+
+    return null;
+  })();
+
   // result가 있을 때만 mutation hook들 호출
   const { mutate: sendPreference } = useResultPreferenceMutation();
-  const { mutate: sendFurnituresLogs } = useFurnitureLogMutation();
-  const { mutate: sendCreditLogs } = useCreditLogMutation();
+  const { mutate: deletePreference } = useDeleteResultPreferenceMutation();
+  const { mutate: sendFactorPreference } = useFactorPreferenceMutation();
 
-  // 마이페이지에서 온 경우 기존 isLike 상태를 버튼에 반영
+  // 요인 문구 데이터 가져오기 (좋아요용) - 좋아요가 선택되었을 때만 호출
+  const { data: likeFactorsData } = useFactorsQuery(true, {
+    enabled: currentLikeState === 'like',
+  });
+
+  // 요인 문구 데이터 가져오기 (싫어요용) - 싫어요가 선택되었을 때만 호출
+  const { data: dislikeFactorsData } = useFactorsQuery(false, {
+    enabled: currentLikeState === 'dislike',
+  });
+
+  // currentImgId가 변경될 때마다 로그 출력
   useEffect(() => {
-    if (isFromMypage && mypageResult?.isLike !== undefined) {
-      setSelected(mypageResult.isLike ? 'like' : 'dislike');
-    }
-  }, [isFromMypage, mypageResult?.isLike]);
+    console.log('currentImgId 변경됨:', currentImgId);
+  }, [currentImgId]);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
     return <Loading />;
   }
 
-  // 여전히 데이터가 없으면 홈으로 리다이렉션
+  // 데이터 없으면 홈으로 리다이렉션
   if (!result) {
     console.error('Result data is missing');
     return <Navigate to="/" replace />;
   }
 
   const handleVote = (isLike: boolean) => {
-    setSelected(isLike ? 'like' : 'dislike');
-    sendPreference({ imageId: result.imageId, isLike });
+    const imageId = currentImgId;
+
+    // currentLikeState를 사용하여 현재 상태 확인
+    const currentState = currentLikeState;
+    const newState = isLike ? 'like' : 'dislike';
+
+    // 같은 상태를 다시 클릭하면 취소 (null로 설정)
+    const finalState = currentState === newState ? null : newState;
+
+    // 좋아요/싫어요가 취소되면 factor 선택도 초기화
+    if (finalState === null) {
+      setImageFactorStates((prev) => ({
+        ...prev,
+        [imageId]: null,
+      }));
+      // 취소 요청 API 호출 (DELETE)
+      deletePreference(imageId, {
+        onSuccess: () => {
+          setImageLikeStates((prev) => ({
+            ...prev,
+            [imageId]: null,
+          }));
+        },
+        onError: (error) => {
+          console.error('취소 API 실패:', error);
+        },
+      });
+    } else {
+      // 좋아요/싫어요 상태가 바뀌었다면 현재 선택된 factor 취소
+      if (
+        currentState !== null &&
+        currentState !== newState &&
+        currentFactorId
+      ) {
+        console.log(
+          '좋아요/싫어요 상태 변경으로 factor 취소:',
+          currentFactorId
+        );
+        sendFactorPreference({ imageId, factorId: currentFactorId });
+        setImageFactorStates((prev) => ({
+          ...prev,
+          [imageId]: null,
+        }));
+      }
+
+      // 새로운 선택 요청 API 호출
+      const apiValue = finalState === 'like';
+      sendPreference(
+        { imageId, isLike: apiValue },
+        {
+          onSuccess: () => {
+            setImageLikeStates((prev) => ({
+              ...prev,
+              [imageId]: finalState,
+            }));
+          },
+          onError: (error) => {
+            console.error('선택 API 실패:', error);
+          },
+        }
+      );
+    }
   };
 
-  const handleOpenModal = () => {
-    overlay.open(({ unmount }) => (
-      <CreditModal
-        onClose={unmount}
-        title={`스타일링 이미지대로 가구를\n추천 받으려면 크레딧이 필요해요`}
-        onCreditAction={sendCreditLogs} // 크레딧 액션 콜백 전달
-      />
-    ));
-    sendFurnituresLogs();
+  // 태그 버튼 클릭 핸들러 (좋아요/싫어요 상태 변경 시 factor 취소 및 선택)
+  const handleFactorClick = (factorId: number) => {
+    const imageId = currentImgId;
+    const isSelected = currentFactorId === factorId;
+
+    if (isSelected) {
+      // 이미 선택된 factor를 다시 클릭하면 선택 해제
+      sendFactorPreference(
+        { imageId, factorId },
+        {
+          onSuccess: () => {
+            setImageFactorStates((prev) => ({
+              ...prev,
+              [imageId]: null,
+            }));
+          },
+          onError: (error) => {
+            console.error('factor 취소 API 실패:', error);
+          },
+        }
+      );
+    } else {
+      // 새로운 factor 선택
+      sendFactorPreference(
+        { imageId, factorId },
+        {
+          onSuccess: () => {
+            setImageFactorStates((prev) => ({
+              ...prev,
+              [imageId]: factorId,
+            }));
+          },
+          onError: (error) => {
+            console.error('factor 선택 API 실패:', error);
+          },
+        }
+      );
+    }
   };
 
-  // if (isLoading) return <div>로딩중</div>;
-  // if (isError || !data) return <div>에러 발생!</div>;
-
-  // 마이페이지에서 온 경우 체크 (이미 위에서 정의했으므로 제거)
-
-  // 조건부 헤더 타이틀 설정
-  const headerTitle = isFromMypage
-    ? '저장된 스타일링 이미지예요!'
-    : '이미지 생성이 완료됐어요!';
+  const handleSlideChange = (currentIndex: number, totalCount: number) => {
+    setIsLastSlide(currentIndex === totalCount - 1);
+  };
 
   return (
     <div className={styles.wrapper}>
-      <section className={styles.headerSection}>
-        {!isFromMypage && <HeadingText title={headerTitle} content="" />}
-        <div className={styles.infoSection}>
-          <p className={styles.infoText}>
-            {`${result.equilibrium}에 거주하며 ${result.tagName}한 취향을 가진\n${result.name}님을 위한 맞춤 인테리어 스타일링이에요!`}
-          </p>
-        </div>
-      </section>
       <section className={styles.resultSection}>
-        <img
-          src={result.imageUrl}
-          alt={`${result.name}님을 위한 맞춤 인테리어 스타일링`}
-          className={styles.imgArea({ mirrored: result.isMirror })}
-        />
-        <div className={styles.buttonGroup}>
-          <LikeButton
-            onClick={() => handleVote(true)}
-            isSelected={selected === 'like'}
-          >
-            만족스러워요
-          </LikeButton>
-          <DislikeButton
-            onClick={() => handleVote(false)}
-            isSelected={selected === 'dislike'}
-          >
-            아쉬워요
-          </DislikeButton>
-        </div>
-      </section>
-      <section className={styles.curationSection}>
-        <div className={styles.textContainer}>
-          <p className={styles.headerText}>생성한 이미지처럼 방을 꾸며봐요</p>
-          <p className={styles.bodyText}>
-            이미지의 분위기를 기반으로, <br />
-            좋아하실 만한 가구를 골라봤어요!
-          </p>
-        </div>
-        <div className={styles.premiumContentSection}>
-          <BlurImage />
-          <div className={styles.unlockSection}>
-            <img src={LockImage} alt="자물쇠 아이콘" role="presentation" />
-            <CtaButton
-              aria-label="프리미엄 가구 추천 기능 잠금 해제"
-              buttonSize={'small'}
-              fontSize={'body'}
-              onClick={handleOpenModal}
-            >
-              가구 추천받기
-            </CtaButton>
+        {/* A/B 테스트에 따라 다른 컴포넌트 렌더링 */}
+        {isMultipleImages ? (
+          <GeneratedImgA
+            result={result}
+            onSlideChange={handleSlideChange}
+            onCurrentImgIdChange={setCurrentImgId}
+          />
+        ) : (
+          <GeneratedImgB
+            result={result}
+            onCurrentImgIdChange={setCurrentImgId}
+          />
+        )}
+
+        <div
+          className={`${styles.buttonSection} ${isLastSlide ? styles.buttonSectionDisabled : ''}`}
+        >
+          <div className={styles.buttonBox}>
+            <p className={styles.boxText}>이미지가 마음에 드셨나요?</p>
+            <div className={styles.buttonGroup}>
+              <LikeButton
+                onClick={() => handleVote(true)}
+                isSelected={currentLikeState === 'like'}
+                typeVariant={'onlyIcon'}
+                aria-label="이미지 좋아요 버튼"
+              />
+              <DislikeButton
+                onClick={() => handleVote(false)}
+                isSelected={currentLikeState === 'dislike'}
+                typeVariant={'onlyIcon'}
+                aria-label="이미지 싫어요 버튼"
+              />
+            </div>
+            {currentLikeState === 'like' &&
+              likeFactorsData &&
+              likeFactorsData.length > 0 && (
+                <div className={styles.tagGroup}>
+                  <div className={styles.tagFlexItem}>
+                    {likeFactorsData.slice(0, 2).map((factor) => (
+                      <button
+                        type="button"
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          currentFactorId === factor.id
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.tagFlexItem}>
+                    {likeFactorsData.slice(2, 4).map((factor) => (
+                      <button
+                        type="button"
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          currentFactorId === factor.id
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            {currentLikeState === 'dislike' &&
+              dislikeFactorsData &&
+              dislikeFactorsData.length > 0 && (
+                <div className={styles.tagGroup}>
+                  <div className={styles.tagFlexItem}>
+                    {dislikeFactorsData.slice(0, 2).map((factor) => (
+                      <button
+                        type="button"
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          currentFactorId === factor.id
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.tagFlexItem}>
+                    {dislikeFactorsData.slice(2, 4).map((factor) => (
+                      <button
+                        type="button"
+                        key={factor.id}
+                        className={`${styles.tagButton} ${
+                          currentFactorId === factor.id
+                            ? styles.tagButtonSelected
+                            : ''
+                        }`}
+                        onClick={() => handleFactorClick(factor.id)}
+                      >
+                        {factor.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </section>

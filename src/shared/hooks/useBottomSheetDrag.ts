@@ -1,102 +1,135 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
-
-import { SHEET_DURATION_MS } from '../constants/bottomSheet';
-
+import { useCallback, useRef, useState, type RefObject } from 'react';
 interface UseBottomSheetDragProps {
-  onClose: () => void;
-  threshold?: number; // 드래그로 닫히는 임계치(px)
+  sheetRef: RefObject<HTMLDivElement | null>;
+  threshold: number;
+  onDragUp: () => void;
+  onDragDown: (delta?: number) => void;
+  onDragCancel: () => void;
+  mode?: 'close-only' | 'open-close';
 }
 
+interface UseBottomSheetDragReturn {
+  isDragging: boolean;
+  onHandlePointerDown: (e: React.PointerEvent) => void;
+}
+
+/**
+ * Pointer Event 기반 드래그 (마우스, 터치, 펜 지원)
+ * 바텀시트 드래그/닫기 동작을 담당
+ */
 export const useBottomSheetDrag = ({
-  onClose,
-  threshold = 100,
-}: UseBottomSheetDragProps) => {
-  const sheetRef = useRef<HTMLDivElement | null>(null);
-  const [isDragging, setIsDragging] = useState(false); // 드래그 중 여부 (UI용)
-  const isDraggingRef = useRef(false); // 리스너 가드용
+  sheetRef,
+  threshold,
+  onDragUp,
+  onDragDown,
+  onDragCancel,
+  mode = 'close-only',
+}: UseBottomSheetDragProps): UseBottomSheetDragReturn => {
+  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
 
-  // 닫기 애니메이션 (시트 변경 후 onClose 호출)
-  const animateClose = useCallback(() => {
-    if (!sheetRef.current) {
-      onClose();
-      return;
-    }
-    const el = sheetRef.current;
-    el.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
-    el.style.transform = 'translate(-50%, 100%)';
+  const onHandlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!sheetRef.current) return;
 
-    window.setTimeout(() => {
-      el.style.transition = '';
-      el.style.transform = '';
-      onClose();
-    }, 300);
-  }, [onClose]);
-
-  // Pointer Event 기반 드래그 (마우스, 터치, 펜 모두 처리)
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
 
+      // 드래그 시작 상태 설정 (useRef로 즉시 반영)
       setIsDragging(true);
       isDraggingRef.current = true;
+
       const startY = e.clientY;
 
+      const target = e.currentTarget as HTMLElement;
+      // 포인터 캡처 설정 (윈도우 밖 이동 시에도 이벤트 수신)
+      target.setPointerCapture?.(e.pointerId);
+
+      // 포인터 취소/캡처 해제 시 정리
+      const handlePointerCancel = () => {
+        setIsDragging(false);
+        isDraggingRef.current = false;
+        cleanup();
+        // 원위치로 복귀
+        onDragCancel();
+      };
+
+      // 드래그 중 실시간 움직임 처리
       const handlePointerMove = (ev: PointerEvent) => {
-        if (!isDragging) return;
-        if (!isDraggingRef.current) return;
+        if (!isDraggingRef.current || !sheetRef.current) return;
 
         ev.preventDefault();
         ev.stopPropagation();
 
         const deltaY = ev.clientY - startY;
 
-        if (deltaY > 0 && sheetRef.current) {
-          const translateY = Math.min(deltaY, threshold);
-          sheetRef.current.style.transform = `translate(-50%, ${translateY}px)`;
-          sheetRef.current.style.transition = 'none';
+        if (mode === 'close-only' && deltaY < 0) {
+          return;
         }
+
+        sheetRef.current.style.setProperty('--drag-y', `${deltaY}px`);
+        // 드래그 중에는 transition을 비활성화
+        sheetRef.current.style.transition = 'none';
       };
 
+      // 드래그 종료 시 동작 결정 (닫기 또는 원위치 복귀)
       const handlePointerUp = (ev: PointerEvent) => {
+        if (!isDraggingRef.current) return;
         setIsDragging(false);
         isDraggingRef.current = false;
-        const deltaY = ev.clientY - startY;
+        const deltaY = ev.clientY - startY; // 드래그를 시작한 지점으로부터의 변화량
 
-        if (sheetRef.current) {
+        if (mode === 'close-only') {
           if (deltaY > threshold) {
-            animateClose();
+            onDragDown();
           } else {
-            sheetRef.current.style.transform = 'translate(-50%, 0)';
-            sheetRef.current.style.transition = `transform ${SHEET_DURATION_MS}ms ease-in-out`;
+            onDragCancel();
+          }
+        } else {
+          // 열기/닫기
+          if (deltaY > threshold) {
+            onDragDown(deltaY);
+          } else if (deltaY < -threshold) {
+            onDragUp();
+          } else {
+            onDragCancel();
           }
         }
 
-        document.removeEventListener('pointermove', handlePointerMove);
-        document.removeEventListener('pointerup', handlePointerUp);
+        cleanup();
       };
 
-      document.addEventListener('pointermove', handlePointerMove);
-      document.addEventListener('pointerup', handlePointerUp);
+      // 이벤트 리스너 정리 함수
+      const cleanup = () => {
+        target.releasePointerCapture?.(e.pointerId);
+        target.removeEventListener('pointermove', handlePointerMove);
+        target.removeEventListener('pointerup', handlePointerUp);
+        target.removeEventListener('pointercancel', handlePointerCancel);
+        target.removeEventListener('lostpointercapture', handlePointerCancel);
+
+        // 드래그가 종료되면 --drag-y 변수를 초기화
+        if (sheetRef.current) {
+          sheetRef.current.style.transition = ''; // 인라인 transition도 제거
+          sheetRef.current.style.setProperty('--drag-y', '0px');
+        }
+      };
+
+      // 대상 요소에 이벤트 리스너 등록
+      target.addEventListener('pointermove', handlePointerMove, {
+        passive: false,
+      });
+      target.addEventListener('pointerup', handlePointerUp, {
+        passive: false,
+      });
+      target.addEventListener('pointercancel', handlePointerCancel, {
+        passive: false,
+      });
+      target.addEventListener('lostpointercapture', handlePointerCancel, {
+        passive: false,
+      });
     },
-    [threshold, animateClose, isDragging]
+    [mode, onDragCancel, onDragDown, onDragUp, sheetRef, threshold]
   );
 
-  // 정리
-  useEffect(() => {
-    const el = sheetRef.current;
-    return () => {
-      if (el) {
-        el.style.transition = '';
-        el.style.transform = '';
-      }
-    };
-  }, []);
-
-  return {
-    sheetRef,
-    isDragging,
-    handlePointerDown,
-    closeWithAnimation: animateClose,
-  };
+  return { isDragging, onHandlePointerDown };
 };

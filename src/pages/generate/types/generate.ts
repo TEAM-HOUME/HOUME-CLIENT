@@ -27,7 +27,6 @@ export interface GenerateImageRequest extends Record<string, unknown> {
   };
   moodBoardIds: number[];
   activity: string;
-  bedId: number;
   selectiveIds: number[];
 }
 
@@ -42,9 +41,29 @@ export interface GenerateImageData {
   name: string;
 }
 
-// 이미지 생성 API 응답 데이터 타입
-export interface GenerateImageResponse {
+// 이미지 생성 API 응답 데이터 타입 - 여러 이미지 응답 (A안)
+export interface GenerateImageAResponse {
+  code: number;
+  msg: string;
+  data: {
+    imageInfoResponses: GenerateImageData[];
+  };
+}
+
+// 이미지 생성 API 응답 데이터 타입 - 단일 이미지 (B안)
+export interface GenerateImageBResponse {
   code: number;
   msg: string;
   data: GenerateImageData;
+}
+
+// 요인 문구 타입
+export interface Factor {
+  id: number;
+  text: string;
+}
+
+// 요인 문구 API 응답 타입
+export interface FactorsResponse {
+  factors: Factor[];
 }

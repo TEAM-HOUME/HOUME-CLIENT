@@ -4,9 +4,11 @@ import { API_ENDPOINT } from '@constants/apiEndpoints';
 
 import type {
   GenerateImageRequest,
-  GenerateImageResponse,
+  GenerateImageAResponse,
+  GenerateImageBResponse,
   CarouselItem,
   ImageStackResponse,
+  FactorsResponse,
 } from '@pages/generate/types/generate';
 
 // 스택 UI
@@ -50,7 +52,7 @@ export const getResultData = async (imageId: number) => {
   });
 };
 
-// 생성된 이미지 선호 여부
+// 생성된 이미지 선호도 전송
 export const postResultPreference = async (
   imageId: number,
   isLike: boolean
@@ -61,6 +63,35 @@ export const postResultPreference = async (
     body: {
       isLike,
     },
+  });
+};
+
+// 생성된 이미지 선호도 선택 해제 (취소)
+export const deleteResultPreference = async (imageId: number) => {
+  return request({
+    method: HTTPMethod.DELETE,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
+  });
+};
+
+// 생성된 이미지 좋아요 여부에 따란 요인 문구
+export const getPreferFactors = async (isLike: boolean) => {
+  const res = await request<FactorsResponse>({
+    method: HTTPMethod.GET,
+    url: API_ENDPOINT.GENERATE.FACTORS,
+    query: { isLike },
+  });
+  return res?.factors || [];
+};
+
+// 사용자가 특정 요인을 선택했을 때 서버에 전송
+export const postFactorPreference = async (
+  imageId: number,
+  factorId: number
+) => {
+  return request({
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.GENERATE.FACTOR_PREFERENCE(imageId, factorId),
   });
 };
 
@@ -80,27 +111,40 @@ export const postCreditLog = async () => {
   });
 };
 
-// 이미지 생성 api
+// 이미지 생성 api - A안 (여러 이미지 생성)
+export const postGenerateImages = async (
+  requestData: GenerateImageRequest
+): Promise<GenerateImageAResponse['data']> => {
+  const config: RequestConfig = {
+    method: HTTPMethod.POST,
+    url: API_ENDPOINT.GENERATE.IMAGE_V3,
+    body: requestData,
+  };
+
+  return await request<GenerateImageAResponse['data']>(config);
+};
+
+// 이미지 생성 api - B안 (단일 이미지 생성)
 export const postGenerateImage = async (
   requestData: GenerateImageRequest
-): Promise<GenerateImageResponse['data']> => {
+): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.POST,
     url: API_ENDPOINT.GENERATE.IMAGE_V2,
     body: requestData,
   };
 
-  return await request<GenerateImageResponse['data']>(config);
+  return await request<GenerateImageBResponse['data']>(config);
 };
 
 // 이미지 생성 폴백 api
 export const getCheckGenerateImageStatus = async (
   houseId: number
-): Promise<GenerateImageResponse['data']> => {
+): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
     url: `${API_ENDPOINT.GENERATE.IMAGE_STATUS}?houseId=${houseId}`,
   };
 
-  return await request<GenerateImageResponse['data']>(config);
+  return await request<GenerateImageBResponse['data']>(config);
 };
