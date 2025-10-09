@@ -24,7 +24,6 @@ import MyPage from '@/pages/mypage/MyPage';
 import PrivacyPolicy from '@/pages/mypage/pages/setting/PrivacyPolicyPage';
 import ServicePolicy from '@/pages/mypage/pages/setting/ServicePolicyPage';
 import Setting from '@/pages/mypage/pages/setting/SettingPage';
-import SignupCompletePage from '@/pages/signup/SignupCompletePage';
 import SignupPage from '@/pages/signup/SignupPage';
 import { ROUTES } from '@/routes/paths';
 import ProtectedRoute from '@/routes/ProtectedRoute';
