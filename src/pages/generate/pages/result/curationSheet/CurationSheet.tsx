@@ -19,12 +19,12 @@ import { CurationSheetWrapper } from './CurationSheetWrapper';
 
 export const CurationSheet = () => {
   // 전역상태 사용
-  const userName = useUserStore((state) => state.userName);
+  const displayName = useUserStore((state) => state.userName ?? '사용자');
+
   const savedProductIds = useSavedItemsStore((state) => state.savedProductIds);
   const toggleSaveProduct = useSavedItemsStore(
     (state) => state.toggleSaveProduct
   );
-  const displayName = userName ?? '사용자';
 
   const navigate = useNavigate();
 
