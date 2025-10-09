@@ -11,38 +11,53 @@ export const filterMockData = [
 // product
 export const productMockData = [
   {
-    id: 1,
-    title: '제품 이름은 최대 2줄까지 쓸 수 있어요',
-    brand: '브랜드 이름',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
+    furnitureProductId: 89580682374,
+    furnitureProductName:
+      '접는 폴딩 침대 간병 베드 간이 휴대용 1인용 흰색 정사각형 파이프 A',
+    furnitureProductMallName: '월드딜마켓',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12036171682',
+    furnitureProductImageUrl:
+      'https://shopping-phinf.pstatic.net/main_8958068/89580682374.jpg',
   },
   {
-    id: 2,
-    title: '편안한 좌식 의자',
-    brand: 'H-Brand',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
+    furnitureProductId: 89513123451,
+    furnitureProductName:
+      '접는 폴딩 침대 간병 베드 간이 휴대용 1인용 흰색 정사각형 파이프 70cm',
+    furnitureProductMallName: '쇼핑퐁',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/11968612763',
+    furnitureProductImageUrl:
+      'https://shopping-phinf.pstatic.net/main_8951312/89513123451.jpg',
   },
   {
-    id: 3,
-    title: '원목 4인 식탁',
-    brand: 'Wood & Co',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
+    furnitureProductId: 89699341491,
+    furnitureProductName:
+      '접는 폴딩 침대 1인용 간이 휴대용 베드 간병 흰색 프레임 정사각형 파이프 A',
+    furnitureProductMallName: '베스트디',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12154830786',
+    furnitureProductImageUrl:
+      'https://shopping-phinf.pstatic.net/main_8969934/89699341491.jpg',
   },
   {
-    id: 4,
-    title: '버섯 모양 조명',
-    brand: 'LightLab',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
+    furnitureProductId: 89924633277,
+    furnitureProductName:
+      '평상형원목침대 자취방 프레임 트윈 1인 침대프 A. 흰색 소프트 백 침대 보드 60x196',
+    furnitureProductMallName: '현명마켓7',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12380122560',
+    furnitureProductImageUrl:
+      'https://shopping-phinf.pstatic.net/main_8992463/89924633277.jpg',
   },
   {
-    id: 5,
-    title: '3단 와이드 서랍장',
-    brand: 'StorageX',
-    linkHref: 'https://houme.kr',
-    imageUrl: '',
+    furnitureProductId: 90033069305,
+    furnitureProductName:
+      '고시원 침대 1인용 접이식철제 메탈 1200mm 원목 휴대용 2000mm 접히는 접이식 흰색 900mm 900mm 좁은방 흰색 1200mm 2000mm 4단침대 간이침대',
+    furnitureProductMallName: '달미의샵',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12488558461',
+    furnitureProductImageUrl:
+      'https://shopping-phinf.pstatic.net/main_9003306/90033069305.jpg',
   },
 ];

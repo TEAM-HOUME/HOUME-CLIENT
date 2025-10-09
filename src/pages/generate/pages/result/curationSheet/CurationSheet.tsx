@@ -79,14 +79,14 @@ export const CurationSheet = () => {
           <div className={styles.gridbox}>
             {productMockData.map((p) => (
               <CardProduct
-                key={p.id}
+                key={p.furnitureProductId}
                 size="large"
-                title={p.title}
-                brand={p.brand}
-                imageUrl={p.imageUrl}
-                linkHref={p.linkHref}
-                isSaved={savedProductIds.has(p.id)}
-                onToggleSave={() => handleSaveClick(p.id)}
+                title={p.furnitureProductName}
+                brand={p.furnitureProductMallName}
+                imageUrl={p.furnitureProductImageUrl}
+                linkHref={p.furnitureProductSiteUrl}
+                isSaved={savedProductIds.has(p.furnitureProductId)}
+                onToggleSave={() => handleSaveClick(p.furnitureProductId)}
               />
             ))}
           </div>
