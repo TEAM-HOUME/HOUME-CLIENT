@@ -6,11 +6,13 @@ export const container = style({
   padding: '0 2rem',
   marginTop: '2rem',
   justifyContent: 'center',
+  boxSizing: 'border-box',
 });
 
 export const gridContainer = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 10.8rem)',
+  width: '100%',
+  gridTemplateColumns: 'repeat(3, minmax(10.8rem, 1fr))',
   columnGap: '0.55rem',
   rowGap: '0',
 });
