@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +16,7 @@ const SettingPage = () => {
   const navigate = useNavigate();
   const { notify } = useToast();
   const { mutate: logout } = useLogoutMutation();
+  const logoutTimerRef = useRef<number | null>(null);
 
   const handleServicePolicy = () => {
     navigate(ROUTES.SETTING_SERVICE);
@@ -34,9 +37,16 @@ const SettingPage = () => {
     // 1) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
     navigate(ROUTES.HOME, { replace: true });
 
-    setTimeout(() => {
+    // 기존 타이머가 있으면 제거하고, 새 타이머로 갱신
+    if (logoutTimerRef.current !== null) {
+      window.clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+
+    logoutTimerRef.current = window.setTimeout(() => {
       // 전역 훅(useLogoutMutation)이 onSettled에서 홈으로 이동 처리함
       logout();
+      logoutTimerRef.current = null; // 실행 후 레퍼런스 정리
     }, 1000); // 1초 후 로그아웃 실행
   };
 
