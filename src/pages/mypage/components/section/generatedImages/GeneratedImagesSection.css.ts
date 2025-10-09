@@ -5,13 +5,15 @@ export const container = style({
   flexDirection: 'column',
   width: '100%',
   padding: '2rem 2rem 4rem 2rem',
-  alignItems: 'center',
+  alignItems: 'stretch',
+  boxSizing: 'border-box',
   gap: '1rem',
 });
 
 export const gridContainer = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(2, 16.4rem)',
+  width: '100%',
+  gridTemplateColumns: 'repeat(2, minmax(16.4rem, 1fr))',
   columnGap: '0.7rem',
   rowGap: '1.6rem',
 });
