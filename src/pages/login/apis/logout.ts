@@ -35,7 +35,7 @@ export const postLogout = async (): Promise<LogoutResponse> => {
  * 로그아웃 React Query 훅
  *
  * 사용자 로그아웃을 처리하는 TanStack Query mutation 훅입니다.
- * 로그아웃 성공/실패와 관계없이 로컬 스토리지를 정리하고 로그인 페이지로 이동합니다.
+ * 로그아웃 성공/실패와 관계없이 로컬 스토리지를 정리하고 홈페이지로 이동합니다.
  *
  * @returns {UseMutationResult<LogoutResponse, Error, void>} 로그아웃 상태와 함수를 반환
  *
@@ -47,9 +47,9 @@ export const useLogoutMutation = () => {
   return useMutation<LogoutResponse, Error, void>({
     mutationFn: postLogout, // 로그아웃 API 호출 함수
     onSettled: () => {
-      // 에러가 발생해도 로컬 토큰은 제거하고 로그인 페이지로 이동
+      // 에러가 발생해도 로컬 토큰은 제거하고 홈페이지로 이동
       useUserStore.getState().clearUser();
-      navigate(ROUTES.LOGIN);
+      navigate(ROUTES.HOME);
     },
   });
 };
