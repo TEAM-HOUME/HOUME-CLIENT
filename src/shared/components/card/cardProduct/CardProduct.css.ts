@@ -14,7 +14,7 @@ export const wrapper = recipe({
   variants: {
     size: {
       large: { minWidth: '16.6rem' },
-      small: { width: '10.8rem' },
+      small: { minWidth: '10.8rem' },
     },
   },
 });

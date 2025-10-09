@@ -11,6 +11,8 @@ export const ROUTES = {
   GENERATE_RESULT: '/generate/result',
   MYPAGE: '/mypage',
   SETTING: '/mypage/setting',
+  SETTING_SERVICE: '/mypage/setting/service',
+  SETTING_PRIVACY: '/mypage/setting/privacy',
   OAUTH: '/oauth/kakao/callback',
 } as const;
 
