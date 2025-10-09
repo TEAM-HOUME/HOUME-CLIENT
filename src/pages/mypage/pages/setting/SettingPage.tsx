@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { useLogoutMutation } from '@/pages/login/apis/logout';
 import { ROUTES } from '@/routes/paths';
-import Divider from '@/shared/components/divider/Divider';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 import { useToast } from '@/shared/components/toast/useToast';
@@ -13,8 +12,8 @@ import * as styles from './SettingPage.css';
 
 const SettingPage = () => {
   const navigate = useNavigate();
-  const { mutate: logout } = useLogoutMutation();
   const { notify } = useToast();
+  const { mutate: logout } = useLogoutMutation();
 
   const handleServicePolicy = () => {
     navigate(ROUTES.SETTING_SERVICE);
@@ -25,6 +24,7 @@ const SettingPage = () => {
   };
 
   const handleLogout = () => {
+    // 1) 토스트 표시 (5초 유지)
     notify({
       text: '로그아웃 되었습니다',
       type: TOAST_TYPE.INFO,
@@ -37,7 +37,7 @@ const SettingPage = () => {
     setTimeout(() => {
       // 전역 훅(useLogoutMutation)이 onSettled에서 홈으로 이동 처리함
       logout();
-    }, 1500); // 1.5초 후 로그아웃 실행
+    }, 1000); // 1초 후 로그아웃 실행
   };
 
   const handleWithdrawConfirm = () => {
@@ -85,9 +85,8 @@ const SettingPage = () => {
         {/* 약관 및 정책 섹션 */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>약관 및 정책</h2>
-          <div className={styles.buttonArea}>
-            <div className={styles.buttonItem}>
-              <Divider />
+          <ul className={styles.buttonArea} aria-label="약관 및 정책 목록">
+            <li className={styles.buttonItem}>
               <button
                 type="button"
                 className={styles.settingButton}
@@ -96,9 +95,8 @@ const SettingPage = () => {
               >
                 <span className={styles.buttonText}>서비스 이용 약관</span>
               </button>
-            </div>
-            <div className={styles.buttonItem}>
-              <Divider />
+            </li>
+            <li className={styles.buttonItem}>
               <button
                 type="button"
                 className={styles.settingButton}
@@ -107,17 +105,15 @@ const SettingPage = () => {
               >
                 <span className={styles.buttonText}>개인정보 처리방침</span>
               </button>
-              <Divider />
-            </div>
-          </div>
+            </li>
+          </ul>
         </section>
 
         {/* 계정 설정 섹션 */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>계정 설정</h2>
-          <div className={styles.buttonArea}>
-            <div className={styles.buttonItem}>
-              <Divider />
+          <ul className={styles.buttonArea} aria-label="계정 설정 목록">
+            <li className={styles.buttonItem}>
               <button
                 type="button"
                 className={styles.settingButton}
@@ -126,9 +122,8 @@ const SettingPage = () => {
               >
                 <span className={styles.buttonText}>로그아웃</span>
               </button>
-            </div>
-            <div className={styles.buttonItem}>
-              <Divider />
+            </li>
+            <li className={styles.buttonItem}>
               <button
                 type="button"
                 className={styles.settingButton}
@@ -137,9 +132,8 @@ const SettingPage = () => {
               >
                 <span className={styles.buttonText}>탈퇴하기</span>
               </button>
-              <Divider />
-            </div>
-          </div>
+            </li>
+          </ul>
         </section>
       </div>
     </>
