@@ -10,9 +10,9 @@ interface CreditChipProps {
 const CreditChip = ({ creditCount, maxCredit }: CreditChipProps) => {
   return (
     <div className={style.container}>
-      <div className={style.imageContainer}>
+      <span className={style.imageContainer}>
         <IcnCredit aria-hidden="true" focusable="false" />
-      </div>
+      </span>
       <p className={style.textWrapper}>
         <span className={style.text['primary']}>{creditCount}</span>
         <span className={style.text['default']}>/</span>

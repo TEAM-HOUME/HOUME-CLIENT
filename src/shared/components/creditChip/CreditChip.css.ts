@@ -13,7 +13,7 @@ export const container = style({
 });
 
 export const imageContainer = style({
-  display: 'flex',
+  display: 'inline-flex',
   height: '2.4rem',
   width: '2.4rem',
   justifyContent: 'center',
