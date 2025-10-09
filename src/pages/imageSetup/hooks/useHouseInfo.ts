@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useHousingSelectionMutation } from '../apis/houseInfo';
+import { useFunnelStore } from '../stores/useFunnelStore';
 import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
 
 import type {
@@ -14,11 +15,14 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   // 주거 옵션 선택 API
   const housingSelection = useHousingSelectionMutation();
 
-  // 초기값 설정: funnel의 context에서 가져오기
+  // Zustand store에서 저장된 데이터
+  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
+
+  // 초기값 설정: Zustand에 값이 있으면 사용, 없으면 context 사용
   const [formData, setFormData] = useState<HouseInfoFormData>({
-    houseType: context.houseType,
-    roomType: context.roomType,
-    areaType: context.areaType,
+    houseType: savedHouseInfo?.houseType ?? context.houseType,
+    roomType: savedHouseInfo?.roomType ?? context.roomType,
+    areaType: savedHouseInfo?.areaType ?? context.areaType,
   });
 
   const [errors, setErrors] = useState<HouseInfoErrors>({});
@@ -101,12 +105,17 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
       },
       {
         onSuccess: (res) => {
-          onNext({
+          const completedData: CompletedHouseInfo = {
             houseType: formData.houseType,
             roomType: formData.roomType,
             areaType: formData.areaType,
             houseId: res.houseId,
-          });
+          };
+
+          // Zustand에 저장
+          useFunnelStore.getState().setHouseInfo(completedData);
+
+          onNext(completedData);
         },
       }
     );

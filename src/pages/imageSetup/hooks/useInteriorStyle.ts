@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { MAX_MOOD_BOARD_SELECTION } from '../constants/interiorStyle';
+import { useFunnelStore } from '../stores/useFunnelStore';
 
 import type {
   CompletedInteriorStyle,
@@ -11,8 +12,13 @@ export const useInteriorStyle = (
   context: ImageSetupSteps['InteriorStyle'],
   onNext: (data: CompletedInteriorStyle) => void
 ) => {
+  // Zustand store에서 저장된 데이터
+  const savedMoodBoardIds = useFunnelStore((state) => state.moodBoardIds);
+  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
+  const savedFloorPlan = useFunnelStore((state) => state.floorPlan);
+
   const [selectedImages, setSelectedImages] = useState<number[]>(
-    context.moodBoardIds || []
+    savedMoodBoardIds ?? context.moodBoardIds ?? []
   );
 
   // 이미지 선택/해제를 처리하는 함수
@@ -36,28 +42,21 @@ export const useInteriorStyle = (
   );
 
   const handleNext = () => {
-    // 디버깅용
-    const payload = {
-      houseType: context.houseType,
-      roomType: context.roomType,
-      areaType: context.areaType,
-      floorPlan: {
-        floorPlanId: context.floorPlan.floorPlanId,
-        isMirror: context.floorPlan.isMirror,
-      },
+    // Zustand에 저장
+    useFunnelStore.getState().setMoodBoardIds(selectedImages);
+
+    const payload: CompletedInteriorStyle = {
+      houseType: savedHouseInfo?.houseType ?? context.houseType,
+      roomType: savedHouseInfo?.roomType ?? context.roomType,
+      areaType: savedHouseInfo?.areaType ?? context.areaType,
+      houseId: savedHouseInfo?.houseId ?? context.houseId,
+      floorPlan: savedFloorPlan ?? context.floorPlan,
       moodBoardIds: selectedImages,
     };
 
     console.log('선택된 퍼널 페이로드:', payload);
 
-    onNext({
-      houseType: context.houseType,
-      roomType: context.roomType,
-      areaType: context.areaType,
-      houseId: context.houseId,
-      floorPlan: context.floorPlan,
-      moodBoardIds: selectedImages,
-    });
+    onNext(payload);
   };
 
   // 최소 1개 이상 선택

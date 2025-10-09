@@ -1,5 +1,3 @@
-import { Activity } from 'react';
-
 import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageGeneration';
 import ActivityInfo from './pages/activityInfo/ActivityInfo';
@@ -22,36 +20,32 @@ export const ImageSetup = () => {
         HouseInfo={funnel.Render.with({
           events: {
             selectHouseInfo: (data: CompletedHouseInfo, { history }) => {
-              history.replace('HouseInfo', data);
+              // Zustand가 데이터를 관리하므로 다음 스텝으로만 이동
               history.push('FloorPlan', data);
             },
           },
-          render({ dispatch, context, step }) {
+          render({ dispatch, context }) {
             return (
-              <Activity mode={step === 'HouseInfo' ? 'visible' : 'hidden'}>
-                <HouseInfo
-                  context={context}
-                  onNext={(data) => dispatch('selectHouseInfo', data)}
-                />
-              </Activity>
+              <HouseInfo
+                context={context}
+                onNext={(data) => dispatch('selectHouseInfo', data)}
+              />
             );
           },
         })}
         FloorPlan={funnel.Render.with({
           events: {
             selectedFloorPlan: (data: CompletedFloorPlan, { history }) => {
-              history.replace('FloorPlan', data);
+              // Zustand가 데이터를 관리하므로 빈 객체 전달
               history.push('InteriorStyle', data);
             },
           },
-          render({ dispatch, context, step }) {
+          render({ dispatch, context }) {
             return (
-              <Activity mode={step === 'FloorPlan' ? 'visible' : 'hidden'}>
-                <FloorPlan
-                  context={context}
-                  onNext={(data) => dispatch('selectedFloorPlan', data)}
-                />
-              </Activity>
+              <FloorPlan
+                context={context}
+                onNext={(data) => dispatch('selectedFloorPlan', data)}
+              />
             );
           },
         })}
@@ -61,29 +55,23 @@ export const ImageSetup = () => {
               data: CompletedInteriorStyle,
               { history }
             ) => {
-              history.replace('InteriorStyle', data);
+              // Zustand가 데이터를 관리하므로 빈 객체 전달
               history.push('ActivityInfo', data);
             },
           },
-          render({ dispatch, context, step }) {
+          render({ dispatch, context }) {
             return (
-              <Activity mode={step === 'InteriorStyle' ? 'visible' : 'hidden'}>
-                <InteriorStyle
-                  context={context}
-                  onNext={(data) => dispatch('selectInteriorStyle', data)}
-                />
-              </Activity>
+              <InteriorStyle
+                context={context}
+                onNext={(data) => dispatch('selectInteriorStyle', data)}
+              />
             );
           },
         })}
         ActivityInfo={funnel.Render.with({
           events: {},
-          render({ dispatch, context, step }) {
-            return (
-              <Activity mode={step === 'ActivityInfo' ? 'visible' : 'hidden'}>
-                <ActivityInfo context={context} />
-              </Activity>
-            );
+          render({ context }) {
+            return <ActivityInfo context={context} />;
           },
         })}
       />
