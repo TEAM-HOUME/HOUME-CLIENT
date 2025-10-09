@@ -13,7 +13,7 @@ export const container = style({
 export const gridContainer = style({
   display: 'grid',
   width: '100%',
-  gridTemplateColumns: 'repeat(2, minmax(16.4rem, 1fr))',
+  gridTemplateColumns: 'repeat(2, 1fr)',
   columnGap: '0.7rem',
   rowGap: '1.6rem',
 });
