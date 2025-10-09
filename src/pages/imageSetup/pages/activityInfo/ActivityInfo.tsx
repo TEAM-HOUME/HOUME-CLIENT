@@ -14,10 +14,9 @@ import type { ImageSetupSteps } from '../../types/funnel/steps';
 
 interface ActivityInfoProps {
   context: ImageSetupSteps['ActivityInfo'];
-  onContextChange: (data: ImageSetupSteps['ActivityInfo']) => void;
 }
 
-const ActivityInfo = ({ context, onContextChange }: ActivityInfoProps) => {
+const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const {
     data: activityOptionsData,
     isPending,

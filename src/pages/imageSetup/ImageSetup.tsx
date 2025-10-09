@@ -9,7 +9,6 @@ import InteriorStyle from './pages/interiorStyle/InteriorStyle';
 import {
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
-  type ImageSetupSteps,
 } from './types/funnel/steps';
 
 import type { CompletedHouseInfo } from './types/funnel/houseInfo';
@@ -78,23 +77,11 @@ export const ImageSetup = () => {
           },
         })}
         ActivityInfo={funnel.Render.with({
-          events: {
-            selectActivityInfo: (
-              data: ImageSetupSteps['ActivityInfo'],
-              { history }
-            ) => {
-              history.replace('ActivityInfo', data);
-            },
-          },
+          events: {},
           render({ dispatch, context, step }) {
             return (
               <Activity mode={step === 'ActivityInfo' ? 'visible' : 'hidden'}>
-                <ActivityInfo
-                  context={context}
-                  onContextChange={(data) =>
-                    dispatch('selectActivityInfo', data)
-                  }
-                />
+                <ActivityInfo context={context} />
               </Activity>
             );
           },

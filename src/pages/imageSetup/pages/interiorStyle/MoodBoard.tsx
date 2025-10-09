@@ -50,7 +50,6 @@ const MoodBoard = ({ selectedImages, onImageSelect }: MoodBoardProps) => {
     isError,
   } = useMoodBoardQuery();
   const images = moodBoardData?.moodBoardResponseList || [];
-  console.log('이미지: ', images);
 
   // 3초간만 스켈레톤 보여주기
   // const [showSkeleton, setShowSkeleton] = useState(true);
