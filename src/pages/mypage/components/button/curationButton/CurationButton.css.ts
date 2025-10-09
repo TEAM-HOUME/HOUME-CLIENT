@@ -8,7 +8,7 @@ import { colorVars } from '@styles/tokens/color.css';
 export const curationButton = recipe({
   base: {
     display: 'flex',
-    width: '16.4rem',
+    width: '100%',
     height: '3rem',
     padding: '0.8rem 0.4rem',
     justifyContent: 'space-between',
