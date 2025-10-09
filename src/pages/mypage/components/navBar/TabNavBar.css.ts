@@ -5,13 +5,13 @@ import { fontStyle } from '@/shared/styles/fontStyle';
 
 import { colorVars } from '@styles/tokens/color.css';
 
-export const tapNavBar = style({
+export const tabNavBar = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
 });
 
-export const tapButton = recipe({
+export const tabButton = recipe({
   base: {
     display: 'flex',
     width: '18.8rem',
@@ -57,6 +57,6 @@ export const tapButton = recipe({
   },
 });
 
-export const tapButtonText = style({
+export const tabButtonText = style({
   whiteSpace: 'nowrap',
 });
