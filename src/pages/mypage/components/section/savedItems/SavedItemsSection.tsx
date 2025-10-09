@@ -93,7 +93,7 @@ const SavedItemsSection = () => {
 
   // 저장된 아이템이 없을 때
   if (savedItems.length === 0) {
-    return <EmptyStateSection type="savedItem" />;
+    return <EmptyStateSection type="savedItems" />;
   }
 
   return (

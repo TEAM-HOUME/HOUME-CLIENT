@@ -7,20 +7,20 @@ import emptyImage from '@/shared/assets/images/mypageEmptyImage.png';
 import * as styles from './EmptyStateSection.css';
 
 interface EmptyStateSectionProps {
-  type: 'genImg' | 'savedItem';
+  type: 'generatedImages' | 'savedItems';
 }
 
 const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
   const navigate = useNavigate();
 
   const content = {
-    genImg: {
+    generatedImages: {
       title: '생성된 이미지가 없어요.',
       description: '지금 바로 이미지를 만들어보세요.',
       buttonText: '이미지 만들러 가기',
       onClick: () => navigate(ROUTES.HOME), // TODO: 이미지 생성 페이지로 이동
     },
-    savedItem: {
+    savedItems: {
       title: '찜 가구가 없어요.',
       description:
         '지금 바로 이미지를 만들고\n내 취향에 딱 맞는 가구를 추천받아보세요.',

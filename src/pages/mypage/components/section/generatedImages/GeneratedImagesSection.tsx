@@ -66,7 +66,7 @@ const GeneratedImagesSection = () => {
 
   // 이미지가 없을 때
   if (!imagesData || imagesData.histories.length === 0) {
-    return <EmptyStateSection type="genImg" />;
+    return <EmptyStateSection type="generatedImages" />;
   }
 
   return (
