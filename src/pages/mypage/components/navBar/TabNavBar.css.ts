@@ -44,10 +44,10 @@ export const tabButton = recipe({
         },
       },
       inactive: {
-        color: colorVars.color.gray100,
+        color: colorVars.color.gray500,
         ...fontStyle('title_m_16'),
         '::after': {
-          backgroundColor: colorVars.color.gray500,
+          backgroundColor: colorVars.color.gray100,
         },
       },
     },
