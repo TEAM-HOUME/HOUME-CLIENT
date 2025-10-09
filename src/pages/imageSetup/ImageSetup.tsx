@@ -20,7 +20,6 @@ export const ImageSetup = () => {
         HouseInfo={funnel.Render.with({
           events: {
             selectHouseInfo: (data: CompletedHouseInfo, { history }) => {
-              // Zustand가 데이터를 관리하므로 다음 스텝으로만 이동
               history.push('FloorPlan', data);
             },
           },
@@ -36,7 +35,6 @@ export const ImageSetup = () => {
         FloorPlan={funnel.Render.with({
           events: {
             selectedFloorPlan: (data: CompletedFloorPlan, { history }) => {
-              // Zustand가 데이터를 관리하므로 빈 객체 전달
               history.push('InteriorStyle', data);
             },
           },
@@ -55,7 +53,6 @@ export const ImageSetup = () => {
               data: CompletedInteriorStyle,
               { history }
             ) => {
-              // Zustand가 데이터를 관리하므로 빈 객체 전달
               history.push('ActivityInfo', data);
             },
           },
