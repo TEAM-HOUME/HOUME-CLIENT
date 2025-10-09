@@ -49,7 +49,7 @@ export const useLogoutMutation = () => {
     onSettled: () => {
       // 에러가 발생해도 로컬 토큰은 제거하고 홈페이지로 이동
       useUserStore.getState().clearUser();
-      navigate(ROUTES.HOME);
+      navigate(ROUTES.HOME, { replace: true });
     },
   });
 };
