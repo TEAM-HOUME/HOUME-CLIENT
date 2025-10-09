@@ -28,7 +28,7 @@ const SettingPage = () => {
     notify({
       text: '로그아웃 되었습니다',
       type: TOAST_TYPE.INFO,
-      options: { autoClose: 5000 },
+      options: { autoClose: 2500 },
     });
 
     // 1) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
