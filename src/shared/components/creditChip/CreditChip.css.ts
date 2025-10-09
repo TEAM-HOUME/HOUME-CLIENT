@@ -12,8 +12,12 @@ export const container = style({
   backgroundColor: colorVars.color.gray100,
 });
 
-export const image = style({
-  margin: '0.4rem',
+export const imageContainer = style({
+  display: 'flex',
+  height: '2.4rem',
+  width: '2.4rem',
+  justifyContent: 'center',
+  alignItems: 'center',
 });
 
 export const textWrapper = style({
