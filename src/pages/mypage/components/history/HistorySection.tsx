@@ -54,7 +54,7 @@ const HistorySection = () => {
       {hasImages ? (
         imagesData.histories.map((history) => (
           <CardHistory
-            key={history.imageId}
+            key={history.houseId}
             src={history.generatedImageUrl}
             title={`${history.tasteTag}의 ${history.equilibrium} ${history.houseForm}`}
             btnText="가구 추천 보러가기"
