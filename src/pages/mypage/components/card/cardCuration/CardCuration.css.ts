@@ -11,8 +11,7 @@ export const cardCurationContainer = style({
 
 export const cardImage = style({
   display: 'flex',
-  width: '16.6rem',
-  height: '16.6rem',
+  width: '100%',
   justifyContent: 'center',
   alignItems: 'center',
   aspectRatio: '1/1',
