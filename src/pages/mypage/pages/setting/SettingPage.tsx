@@ -28,14 +28,15 @@ const SettingPage = () => {
     notify({
       text: '로그아웃 되었습니다',
       type: TOAST_TYPE.INFO,
+      options: { autoClose: 5000 },
     });
 
+    // 1) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
+    navigate(ROUTES.HOME, { replace: true });
+
     setTimeout(() => {
-      logout(undefined, {
-        onSuccess: () => {
-          navigate(ROUTES.HOME);
-        },
-      });
+      // 전역 훅(useLogoutMutation)이 onSettled에서 홈으로 이동 처리함
+      logout();
     }, 1500); // 1.5초 후 로그아웃 실행
   };
 
