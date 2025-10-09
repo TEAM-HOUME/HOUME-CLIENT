@@ -8,7 +8,7 @@ import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 import { useUserStore } from '@/store/useUserStore';
 
-import TapNavBar from './components/navBar/TapNavBar';
+import TabNavBar from './components/navBar/TabNavBar';
 import GeneratedImagesSection from './components/section/generatedImages/GeneratedImagesSection';
 import ProfileSection from './components/section/profile/ProfileSection';
 import SavedItemsSection from './components/section/savedItems/SavedItemsSection';
@@ -18,8 +18,8 @@ import * as styles from './MyPage.css';
 const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'saveditem' | 'genImg'>(
-    'saveditem'
+  const [activeTab, setActiveTab] = useState<'savedItems' | 'generatedImages'>(
+    'savedItems'
   );
 
   // 로그인 상태 확인
@@ -90,9 +90,9 @@ const MyPage = () => {
         maxCredit={5}
       />
 
-      <TapNavBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <TabNavBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === 'saveditem' ? (
+      {activeTab === 'savedItems' ? (
         <SavedItemsSection />
       ) : (
         <GeneratedImagesSection />
