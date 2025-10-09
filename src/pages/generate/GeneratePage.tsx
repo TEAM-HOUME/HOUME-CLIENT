@@ -19,7 +19,7 @@ const GeneratePage = () => {
   const isFromMypage = from === 'mypage';
 
   // 조건부 타이틀 설정
-  const title = isFromMypage ? '이미지 생성 히스토리' : '스타일링 이미지 생성';
+  const title = '이미지 생성 완료';
 
   // 현재 경로에 따라 뒤로가기 로직 결정
   const handleBackClick = () => {

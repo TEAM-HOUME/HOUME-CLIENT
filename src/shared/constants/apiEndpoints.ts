@@ -24,8 +24,12 @@ export const API_ENDPOINT = {
     CAROUSELS_LIKE: '/api/v1/carousels/like',
     CAROUSELS_HATE: '/api/v1/carousels/hate',
     IMAGE_V2: '/api/v2/generated-images/generate',
+    IMAGE_V3: '/api/v3/generated-images/generate',
     IMAGE_STATUS: '/api/v1/generated-images/generate',
     IMAGE_PREFERENCE: '/api/v1/generated-images',
+    FACTORS: '/api/v1/factors',
+    FACTOR_PREFERENCE: (imageId: number, factorId: number) =>
+      `/api/v1/generated-images/${imageId}/preference/factors/${factorId}`,
   },
   ANALYTICS: {
     FURNITURE_LOGS: '/api/v1/furnitures/logs',
