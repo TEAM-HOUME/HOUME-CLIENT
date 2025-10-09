@@ -14,7 +14,7 @@ export const tabNavBar = style({
 export const tabButton = recipe({
   base: {
     display: 'flex',
-    width: '18.8rem',
+    width: '100%',
     height: '5rem',
     flexDirection: 'column',
     justifyContent: 'center',
