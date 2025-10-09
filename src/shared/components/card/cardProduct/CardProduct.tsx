@@ -1,4 +1,4 @@
-import CardImage from '@assets/images/cardExImg.svg?react';
+import CardImage from '@assets/images/cardExImg.svg?url';
 import LinkButton from '@components/button/linkButton/LinkButton';
 import SaveButton from '@components/button/saveButton/SaveButton';
 
@@ -10,7 +10,7 @@ interface CardProductProps {
   size: CardSize;
   title: string;
   brand?: string;
-  // image: string;
+  imageUrl: string;
   isSaved: boolean;
   onToggleSave: () => void;
   linkHref?: string;
@@ -21,6 +21,7 @@ const CardProduct = ({
   size,
   title,
   brand,
+  imageUrl,
   isSaved,
   onToggleSave,
   linkHref,
@@ -31,7 +32,11 @@ const CardProduct = ({
   return (
     <div className={styles.wrapper({ size })}>
       <section className={styles.imgSection({ size })}>
-        <CardImage />
+        <img
+          className={styles.cardImage}
+          src={imageUrl || CardImage}
+          alt="카드 이미지"
+        />
         <div className={styles.linkBtnContainer}>
           {linkHref && (
             <LinkButton
