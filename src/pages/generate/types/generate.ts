@@ -27,7 +27,6 @@ export interface GenerateImageRequest extends Record<string, unknown> {
   };
   moodBoardIds: number[];
   activity: string;
-  bedId: number;
   selectiveIds: number[];
 }
 

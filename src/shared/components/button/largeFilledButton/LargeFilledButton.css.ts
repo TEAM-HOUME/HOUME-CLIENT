@@ -37,18 +37,29 @@ export const largeFilled = recipe({
       },
     },
     buttonSize: {
-      small: {
+      xsmall: {
+        // 너비 1/4 버튼
         minWidth: '7.4rem',
         height: '3.2rem',
         padding: '0.7rem 0',
         borderRadius: '6px',
         ...fontStyle('caption_r_12'),
       },
-      medium: {
+      small: {
+        // 너비 1/3 버튼
         minWidth: '10.7rem',
         textAlign: 'center',
       },
+      medium: {
+        // '소파'에 사용되는 버튼
+        minWidth: '15.45rem',
+        height: '3.2rem',
+        padding: '0.7rem 0',
+        borderRadius: '6px',
+        ...fontStyle('caption_r_12'),
+      },
       large: {
+        // 너비 1/2 버튼
         minWidth: '16.4rem',
       },
     },
@@ -61,21 +72,32 @@ export const largeFilled = recipe({
       false: {},
     },
   },
-  compoundVariants: [
-    // small + selected
-    {
-      variants: { buttonSize: 'small', selected: true },
-      style: { ...fontStyle('caption_m_12') },
-    },
-    // small + error
-    {
-      variants: { buttonSize: 'small', state: 'error' },
-      style: { ...fontStyle('caption_m_12') },
-    },
-  ],
   defaultVariants: {
     state: 'active',
     buttonSize: 'large',
     selected: false,
   },
+  compoundVariants: [
+    // compundVariants: 특정 조건이 동시에 만족될 때 추가로 적용되는 스타일
+    // small + selected
+    {
+      variants: { buttonSize: 'xsmall', selected: true },
+      style: { ...fontStyle('caption_m_12') },
+    },
+    // small + error
+    {
+      variants: { buttonSize: 'xsmall', state: 'error' },
+      style: { ...fontStyle('caption_m_12') },
+    },
+    // medium + selected
+    {
+      variants: { buttonSize: 'medium', selected: true },
+      style: { ...fontStyle('caption_m_12') },
+    },
+    // medium + error
+    {
+      variants: { buttonSize: 'medium', state: 'error' },
+      style: { ...fontStyle('caption_m_12') },
+    },
+  ],
 });

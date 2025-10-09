@@ -1,12 +1,12 @@
 import WarningIcon from '@assets/icons/warningRed.svg?react';
 
-import * as styles from './ShowErrorButton.css';
+import * as styles from './ErrorButton.css';
 
-interface ShowErrorMessageProps {
+interface ErrorMessageProps {
   message: string;
 }
 
-const ShowErrorMessage = ({ message }: ShowErrorMessageProps) => {
+const ErrorMessage = ({ message }: ErrorMessageProps) => {
   return (
     <div className={styles.messageWrapper}>
       <WarningIcon />
@@ -15,4 +15,4 @@ const ShowErrorMessage = ({ message }: ShowErrorMessageProps) => {
   );
 };
 
-export default ShowErrorMessage;
+export default ErrorMessage;
