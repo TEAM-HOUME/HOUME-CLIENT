@@ -1,6 +1,6 @@
 import CurationButton from '@/pages/mypage/components/button/curationButton/CurationButton';
 
-import CardImage from '@assets/images/cardExImg.svg?react';
+import CardImageUrl from '@assets/images/cardExImg.svg?url';
 
 import * as styles from './CardCuration.css';
 
@@ -19,7 +19,7 @@ const CardCurationSection = ({
         {imageUrl ? (
           <img src={imageUrl} alt="생성된 이미지" className={styles.image} />
         ) : (
-          <CardImage />
+          <img src={CardImageUrl} alt="기본 이미지" className={styles.image} />
         )}
       </div>
       <CurationButton onClick={onCurationClick} />
