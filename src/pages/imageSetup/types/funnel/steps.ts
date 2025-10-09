@@ -1,11 +1,3 @@
-import type { ActivityType } from './activityInfo';
-import type {
-  HouseType,
-  RoomType,
-  AreaType,
-  HouseInfoContext,
-} from './houseInfo';
-
 interface FloorPlan {
   floorPlanId: number;
   isMirror: boolean;
@@ -14,30 +6,35 @@ interface FloorPlan {
 // Funnel Step 정의
 export type ImageSetupSteps = {
   // TODO(지성): 재사용 가능한 타입들 재사용하기
-  HouseInfo: HouseInfoContext;
+  HouseInfo: {
+    houseType?: string;
+    roomType?: string;
+    areaType?: string;
+    houseId?: number;
+  };
   FloorPlan: {
-    houseType: HouseType;
-    roomType: RoomType;
-    areaType: AreaType;
+    houseType: string;
+    roomType: string;
+    areaType: string;
     houseId: number;
     floorPlan?: FloorPlan;
   };
   InteriorStyle: {
-    houseType: HouseType;
-    roomType: RoomType;
-    areaType: AreaType;
+    houseType: string;
+    roomType: string;
+    areaType: string;
     houseId: number;
     floorPlan: FloorPlan;
     moodBoardIds?: number[];
   };
   ActivityInfo: {
-    houseType: HouseType;
-    roomType: RoomType;
-    areaType: AreaType;
+    houseType: string;
+    roomType: string;
+    areaType: string;
     houseId: number;
     floorPlan: FloorPlan;
     moodBoardIds: number[];
-    activityType?: ActivityType;
+    activityType?: string;
     bedId?: number;
     selectiveIds?: number[];
   };

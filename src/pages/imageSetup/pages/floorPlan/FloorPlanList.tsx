@@ -56,7 +56,18 @@ const FloorPlanList = ({
     handleOpenSheet('flip');
   };
 
+  // 동일한 시트를 연속 클릭할 때, 기존 DOM이 그대로여서 열림 트리거가 무시되는 경우가 있음.
+  // 같은 타입을 다시 열면 일단 '닫힘 상태'로 만들고(open=false) DOM에서 제거한 뒤(null),
+  // 다음 프레임에 다시 타입을 세팅해 리마운트 → 항상 열림 애니메이션과 초기 상태가 보장됨.
   const handleOpenSheet = (type: 'noMatch' | 'flip') => {
+    if (openSheet === type) {
+      setIsSheetOpen(false);
+      setOpenSheet(null);
+      requestAnimationFrame(() => {
+        setOpenSheet(type);
+      });
+      return;
+    }
     setOpenSheet(type);
   };
 

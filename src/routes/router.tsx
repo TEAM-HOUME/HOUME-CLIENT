@@ -15,6 +15,7 @@ import RootLayout from '@/layout/RootLayout';
 import GeneratePage from '@/pages/generate/GeneratePage';
 import LoadingPage from '@/pages/generate/pages/loading/LoadingPage';
 import ResultPage from '@/pages/generate/pages/result/ResultPage';
+import StartPage from '@/pages/generate/pages/start/StartPage';
 import HomePage from '@/pages/home/HomePage';
 import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
@@ -87,8 +88,8 @@ const protectedRoutes = [
     element: <PrivacyPolicy />,
   },
   {
-    path: ROUTES.SIGNUPCOMPLETE,
-    element: <SignupCompletePage />,
+    path: ROUTES.GENERATE_START,
+    element: <StartPage />,
   },
 ];
 

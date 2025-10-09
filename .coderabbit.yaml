@@ -1,47 +1,67 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-language: 'ko-KR' # 리뷰 언어 설정
-early_access: true # 얼리 액세스 기능 활성화
+language: 'ko-KR'  # 리뷰 언어 설정
+early_access: true  # 얼리 액세스 기능 활성화
 
-# 리뷰 톤 및 스타일 지정
+# 리뷰 톤 및 스타일 지정(스키마 maxLength=250을 준수해 축약)
 tone_instructions: |
-  TypeScript/React 19 전문가로서 한국어로 명확하고 건설적인 코드 리뷰를 제공합니다. 보안, 성능, 유지보수성에 중점을 두며, 중요한 문제가 아닌 한 간결하게 작성합니다.
+  한국어(ko-KR)로 간결하고 건설적인 코드 리뷰를 제공해요. 보안(security), 성능(performance), 유지보수성(maintainability)을 우선해요.
+  상세 컨벤션은 리포의 규칙 문서를 최우선으로 적용해요(knowledge_base.code_guidelines 참조).
 
 reviews:
-  profile: 'assertive' # 리뷰 스타일: assertive(엄격), chill(관대)
+  profile: 'assertive'  # 리뷰 스타일: assertive(엄격), chill(관대)
   request_changes_workflow: false
-  high_level_summary: true # PR 요약 생성
-  poem: false # 시(POEM) 생성 비활성화
-  review_status: true # 리뷰 상태 표시
-  assess_linked_issues: false # 연결된 이슈 분석
-  related_prs: false # 관련 PR 표시
-  suggested_labels: true # 라벨 자동 제안
-  sequence_diagrams: true # 시퀀스 다이어그램 생성
-  changed_files_summary: true # 변경된 파일 요약
+  high_level_summary: true  # PR 요약 생성
+  poem: false  # 시(POEM) 생성 비활성화
+  review_status: true  # 리뷰 상태 표시
+  assess_linked_issues: false  # 연결된 이슈 분석
+  related_prs: false  # 관련 PR 표시
+  suggested_labels: true  # 라벨 자동 제안
+  sequence_diagrams: false  # 시퀀스 다이어그램 생성 비활성화(기본 노이즈 절감)
+  changed_files_summary: true  # 변경된 파일 요약
 
   # 워크플로우 개선
-  high_level_summary_in_walkthrough: true # 요약을 워크스루에 포함
+  high_level_summary_in_walkthrough: true  # 요약을 워크스루에 포함
   high_level_summary_placeholder: '이 PR의 주요 변경사항을 요약합니다'
-  collapse_walkthrough: false # 워크스루 섹션 접기 비활성화
-  commit_status: true # 커밋 상태 체크
-  fail_commit_status: false # 커밋 실패 시 상태 체크 실패하지 않음
-  related_issues: false # 관련 이슈 추적
-  abort_on_close: true # PR 닫힐 때 리뷰 중단
+  collapse_walkthrough: true  # 워크스루 섹션 접기(기본은 접어서 노이즈 감소)
+  commit_status: true  # 커밋 상태 체크
+  fail_commit_status: false  # 커밋 실패 시 상태 체크 실패하지 않음
+  related_issues: false  # 관련 이슈 추적
+  abort_on_close: true  # PR 닫힐 때 리뷰 중단
 
   # 파일 경로 필터링 (프로젝트 구조에 맞춘 설정)
   path_filters:
+    # 포함(allow-list)
+    - 'src/**'
+    - '.storybook/**'
+    - '.github/**'
+    - 'vite.config.ts'
+    - 'eslint.config.js'
+    - 'tsconfig*.json'
+    - 'package.json'
+    - '.coderabbit.yaml'
+    # 제외(deny-list)
     - '!node_modules/**'
     - '!dist/**'
     - '!storybook-static/**'
     - '!build/**'
     - '!coverage/**'
+    - '!**/*.snap'
+    - '!**/*.png'
+    - '!**/*.jpg'
+    - '!**/*.jpeg'
+    - '!**/*.svg'
+    - '!**/*.gif'
+    - '!**/*.webp'
+    - '!**/*.ico'
+    - '!**/*.avif'
+    - '!**/*.mp4'
+    - '!**/*.webm'
+    - '!**/*.mp3'
+    - '!**/*.ogg'
     - '!*.lock'
     - '!pnpm-lock.yaml'
-    - '.storybook/vitest.setup.ts'
-    - 'src/**'
-    - '.storybook/**/*.ts'
-    - 'vite.config.ts'
-    - 'tsconfig*.json'
-    - '.coderabbit.yaml'
+    - '!package-lock.json'
+    - '!bun.lockb'
 
   # 경로별 특별 지침 (구체적인 패턴부터 일반적인 패턴 순으로 배열)
   path_instructions:
@@ -67,8 +87,11 @@ reviews:
         컴포넌트 파일 리뷰 시:
         - 파일명이 PascalCase인지 확인
         - Props 타입이 '컴포넌트명Props' 형식인지 확인
-        - 단일 export는 default export 사용하는지 확인
+        - 단일 export는 default export 권장(팀 가이드 우선 적용)
         - 이벤트 핸들러는 handle로 시작하는지 확인
+        - 접근성 준수: ARIA 속성, label 연결, 키보드 포커스
+        - 성능: memo/useMemo/useCallback 적절 사용
+        - ref 전달 시 forwardRef 사용 및 displayName 지정
 
     - path: 'src/**/*.css.ts'
       instructions: |
@@ -78,14 +101,23 @@ reviews:
         - recipe와 styleVariants 패턴의 적절한 사용
         - 반응형 스타일 구현 방식
         - 불필요한 중복 스타일 제거
+        - 전역 스타일 남용 금지, 컴포넌트 범위 캡슐화
 
-    - path: 'src/**/*.ts'
+    - path: 'src/**/hooks/**/*.ts'
       instructions: |
-        TypeScript 파일 리뷰 시:
-        - 타입명에 -Types 접미사가 있는지 확인 (Props 제외)
-        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
-        - API Response는 XXXResponse 네이밍 따르는지 확인
-        - var 사용 금지, const 우선 사용 확인
+        커스텀 훅 리뷰 시:
+        - 파일명/함수명은 use* 접두사 사용
+        - 의존성 배열(exhaustive-deps) 준수, 참조 안정성 유지(함수/객체 메모이제이션)
+        - 반환 값 일관성(tuple/object), 에러/로딩 상태 명확화
+        - 제네릭 훅은 타입 매개변수 기본값 검토
+        - TanStack Query 훅 네이밍: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
+
+    - path: 'src/**/types/**/*.ts'
+      instructions: |
+        타입 정의 리뷰 시:
+        - import type 사용, default export 지양
+        - Discriminated Union으로 분기 명확화
+        - 상수 리터럴은 as const로 리터럴 타입 유지
 
     # 중간 수준의 구체적인 패턴들
     - path: 'src/shared/components/**'
@@ -107,12 +139,19 @@ reviews:
     - path: 'src/**/apis/**'
       instructions: |
         API 레이어 리뷰 시:
-        - axiosInstance의 일관된 사용
-        - TanStack Query 훅과의 적절한 통합
-        - 에러 처리 패턴의 일관성
-        - 타입 안정성 확보
+        - request 래퍼 사용(axios 직접 호출 금지), 공통 에러 포맷 정규화
+        - TanStack Query와의 통합(QueryKey Factory 사용) 
+        - 재시도/취소 신호(AbortController) 처리 일관성
+        - 타입 안정성 확보(응답 제네릭, 불변 데이터)
         - HTTP메서드 + 명사 네이밍 규칙 확인 (getUserList, postComment 등)
         - async/await 패턴 일관성 확인
+
+    - path: 'src/routes/**'
+      instructions: |
+        라우팅 리뷰 시:
+        - 코드 스플리팅(dynamic import)과 적절한 청크 분리
+        - 라우트 전환 시 상태 보존 전략 검토
+        - 중첩 라우트의 레이아웃/에러 경계 사용 확인
 
     - path: 'src/**/constants/**'
       instructions: |
@@ -120,6 +159,17 @@ reviews:
         - 모든 상수가 BIG_SNAKE_CASE로 작성되었는지 확인
         - export const 사용 확인
         - 의미있는 이름 사용 여부 확인
+        - 리터럴은 as const로 타입 좁히기
+
+    - path: 'src/**/*.ts'
+      instructions: |
+        TypeScript 파일 리뷰 시:
+        - 타입/인터페이스는 PascalCase 사용, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
+        - interface는 객체 타입, type은 union/별칭에 사용하는지 확인
+        - API Response는 XXXResponse 네이밍 따르는지 확인
+        - var 사용 금지, const 우선 사용 확인
+        - type-only import 사용(import type), 불필요한 런타임 의존성 제거
+        - satisfies 연산자 활용으로 정확한 타입 보장
 
     # 가장 일반적인 패턴 (마지막에 배치)
     - path: 'src/**'
@@ -139,11 +189,13 @@ reviews:
         - 파일명은 camelCase 사용 (컴포넌트 파일 제외)
         - 변수와 함수는 camelCase 사용
         - 상수는 BIG_SNAKE_CASE 사용
-        - TypeScript 타입은 -Types 접미사 사용 (Props 제외)
+        - 모든 타입/인터페이스는 PascalCase, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
         - Props 타입은 컴포넌트명 + Props 형식
         - API Response 타입은 XXXResponse 형식
         - 함수 네이밍: get/create/check/handle/is/has/can 접두사 활용
         - API 함수는 HTTP메서드 + 명사 형식 (getUserList, postComment)
+        - TanStack Query 훅: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
+        - 커스텀 훅 파일명: use*.ts
 
         # 보안 및 성능
         - 환경 변수는 반드시 import.meta.env 사용
@@ -158,46 +210,65 @@ reviews:
         - 브랜치 패턴: type/description/#issue-number 형식
 
   auto_review:
-    enabled: true # 자동 리뷰 활성화
-    drafts: false # 드래프트 리뷰 사용 여부
-    ignore_title_keywords: # 특정 키워드가 포함된 PR 제목 무시
+    enabled: true  # 자동 리뷰 활성화
+    drafts: false  # 드래프트 리뷰 사용 여부
+    base_branches:  # Git Flow와 정렬
+      - 'develop'
+      - 'main'
+    labels:  # 라벨 기반 필터(느슨한 NOT 매칭)
+      - '!wip'
+      - '!draft'
+      - '!skip-review'
+    ignore_usernames:  # 봇 PR 무시
+      - 'dependabot'
+      - 'renovate'
+    ignore_title_keywords:  # 특정 키워드가 포함된 PR 제목 무시
       - '[docs]'
       - '[skip-review]'
 
-  # 코드 개선 기능 (finishing_touches)
+  # 사전 병합 검사(팀 규칙의 가시화, 엄격도는 warning로 시작)
+  pre_merge_checks:
+    title:
+      mode: 'warning'
+      requirements: 'PR 제목은 [type] 제목 형식을 따르고 50자 이내로 간결하게 작성해요.'
+    description:
+      mode: 'warning'
+    issue_assessment:
+      mode: 'off'
+
+  # 코드 개선 기능 (finishing_touches) - 전역 비활성화
   finishing_touches:
     docstrings:
-      enabled: true
+      enabled: false
     unit_tests:
-      enabled: true
+      enabled: false
 
   # TypeScript/React 환경에 최적화된 도구들 (실제 사용하는 것만)
   tools:
     eslint:
-      enabled: true # TypeScript/React 린팅
+      enabled: true  # TypeScript/React 린팅
     languagetool:
-      enabled: true # 한국어 문법 검사
+      enabled: true  # 한국어 문법 검사
       level: 'default'
     markdownlint:
-      enabled: true # 문서 품질 검사
+      enabled: true  # 문서 품질 검사
     gitleaks:
-      enabled: true # 보안 비밀 정보 스캔
+      enabled: true  # 보안 비밀 정보 스캔
     yamllint:
-      enabled: true # YAML 파일 검증
+      enabled: true  # YAML 파일 검증
     actionlint:
-      enabled: true # GitHub Actions 검증
+      enabled: true  # GitHub Actions 검증
 
 # 채팅 설정
 chat:
-  auto_reply: true # AI 자동 답변 활성화
+  art: false  # 아스키/이모지 아트 비활성화(전문성 유지)
+  auto_reply: true  # AI 자동 답변 활성화
 
 # 지식 베이스 설정
 knowledge_base:
   web_search:
-    enabled: true # 웹 검색 기능 활성화
-
-# 코드 생성 설정
-code_generation:
-  docstrings:
-    language: 'ko-KR' # 독스트링을 한국어로 생성
-  unit_tests: {} # 유닛 테스트 생성 (기본값 사용)
+    enabled: true  # 웹 검색 기능 활성화
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - 'README.md'

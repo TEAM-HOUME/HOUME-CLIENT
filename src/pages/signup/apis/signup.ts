@@ -30,7 +30,7 @@ export const useSignupMutation = () => {
     retry: 3,
     onSuccess: (response) => {
       setUserName(response.data); // userName 전역 저장 (zustand)
-      navigate(ROUTES.SIGNUPCOMPLETE); // 회원가입 완료 페이지 이동
+      navigate(ROUTES.GENERATE_START);
     },
     onError: (error) => {
       console.error('[useSignupMutation] 회원가입 실패:', error); // 에러는 useErrorHandler에서 처리
