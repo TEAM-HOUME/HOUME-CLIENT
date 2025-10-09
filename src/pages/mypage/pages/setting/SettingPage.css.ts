@@ -19,15 +19,17 @@ export const sectionTitle = style({
 });
 
 export const buttonArea = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1.2rem',
+  display: 'block',
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
+  borderTop: `0.1rem solid ${colorVars.color.gray100}`,
 });
 
 export const buttonItem = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1.2rem',
+  display: 'block',
+  padding: '1.2rem 0',
+  borderBottom: `0.1rem solid ${colorVars.color.gray100}`,
 });
 
 export const settingButton = style({
