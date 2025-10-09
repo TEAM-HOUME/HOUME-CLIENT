@@ -45,7 +45,6 @@ const isGenerateLocationState = (
     typeof request.houseId === 'number' &&
     typeof request.equilibrium === 'string' &&
     typeof request.activity === 'string' &&
-    typeof request.bedId === 'number' &&
     Array.isArray(request.moodBoardIds) &&
     (request.moodBoardIds as unknown[]).every((n) => typeof n === 'number') &&
     Array.isArray(request.selectiveIds) &&
