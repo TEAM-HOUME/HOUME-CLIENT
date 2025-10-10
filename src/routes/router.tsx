@@ -21,6 +21,9 @@ import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
 import LoginPage from '@/pages/login/LoginPage';
 import MyPage from '@/pages/mypage/MyPage';
+import PrivacyPolicy from '@/pages/mypage/pages/setting/PrivacyPolicyPage';
+import ServicePolicy from '@/pages/mypage/pages/setting/ServicePolicyPage';
+import Setting from '@/pages/mypage/pages/setting/SettingPage';
 import SignupPage from '@/pages/signup/SignupPage';
 import { ROUTES } from '@/routes/paths';
 import ProtectedRoute from '@/routes/ProtectedRoute';
@@ -70,6 +73,18 @@ const protectedRoutes = [
   {
     path: ROUTES.MYPAGE,
     element: <MyPage />,
+  },
+  {
+    path: ROUTES.SETTING,
+    element: <Setting />,
+  },
+  {
+    path: ROUTES.SETTING_SERVICE,
+    element: <ServicePolicy />,
+  },
+  {
+    path: ROUTES.SETTING_PRIVACY,
+    element: <PrivacyPolicy />,
   },
   {
     path: ROUTES.GENERATE_START,

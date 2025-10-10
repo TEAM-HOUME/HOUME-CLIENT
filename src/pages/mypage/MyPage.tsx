@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -8,15 +8,19 @@ import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
 import { useUserStore } from '@/store/useUserStore';
 
-import HistorySection from './components/history/HistorySection';
-import ProfileSection from './components/profile/ProfileSection';
-import SettingSection from './components/setting/SettingSection';
+import TabNavBar from './components/navBar/TabNavBar';
+import GeneratedImagesSection from './components/section/generatedImages/GeneratedImagesSection';
+import ProfileSection from './components/section/profile/ProfileSection';
+import SavedItemsSection from './components/section/savedItems/SavedItemsSection';
 import { useMyPageUser } from './hooks/useMypage';
 import * as styles from './MyPage.css';
 
 const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'savedItems' | 'generatedImages'>(
+    'savedItems'
+  );
 
   // 로그인 상태 확인
   const accessToken = useUserStore((state) => state.accessToken);
@@ -28,7 +32,7 @@ const MyPage = () => {
     isError: isUserError,
     error,
   } = useMyPageUser({
-    enabled: isLoggedIn, // 로그인 상태일 때만 API 호출
+    enabled: isLoggedIn,
   });
 
   useEffect(() => {
@@ -37,7 +41,6 @@ const MyPage = () => {
       navigate(ROUTES.LOGIN);
       return;
     }
-
     // 로그인 상태에서 API 에러가 발생한 경우 에러 처리
     if (isUserError && error) {
       handleError(error, 'api');
@@ -76,16 +79,24 @@ const MyPage = () => {
       <TitleNavBar
         title="마이페이지"
         isBackIcon
+        isSettingBtn
         isLoginBtn={false}
         onBackClick={() => navigate(ROUTES.HOME)}
       />
+
       <ProfileSection
         userName={userData.name || '사용자'}
         credit={userData.CreditCount ?? 0}
-        isChargeDisabled={false}
+        maxCredit={5}
       />
-      <HistorySection />
-      <SettingSection />
+
+      <TabNavBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {activeTab === 'savedItems' ? (
+        <SavedItemsSection />
+      ) : (
+        <GeneratedImagesSection />
+      )}
     </div>
   );
 };

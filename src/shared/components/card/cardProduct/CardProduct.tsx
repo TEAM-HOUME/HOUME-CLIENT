@@ -10,7 +10,7 @@ interface CardProductProps {
   size: CardSize;
   title: string;
   brand?: string;
-  imageUrl: string;
+  imageUrl?: string;
   isSaved: boolean;
   onToggleSave: () => void;
   linkHref?: string;
