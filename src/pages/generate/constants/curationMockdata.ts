@@ -11,53 +11,59 @@ export const filterMockData = [
 // product
 export const productMockData = [
   {
-    furnitureProductId: 89580682374,
-    furnitureProductName:
-      '접는 폴딩 침대 간병 베드 간이 휴대용 1인용 흰색 정사각형 파이프 A',
-    furnitureProductMallName: '월드딜마켓',
-    furnitureProductSiteUrl:
-      'https://smartstore.naver.com/main/products/12036171682',
+    id: 11,
     furnitureProductImageUrl:
-      'https://shopping-phinf.pstatic.net/main_8958068/89580682374.jpg',
+      'https://shopping-phinf.pstatic.net/main_8968914/89689147989.jpg',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12144637284',
+    furnitureProductName:
+      '앤틱 철제프레임침대 복고풍 모던 빈티지 프랑스 하얀색 1200mmx2000mm',
+    furnitureProductMallName: '하늘하우스',
+    furnitureProductId: 89689147989,
+    similarity: 0.7797,
   },
   {
-    furnitureProductId: 89513123451,
-    furnitureProductName:
-      '접는 폴딩 침대 간병 베드 간이 휴대용 1인용 흰색 정사각형 파이프 70cm',
-    furnitureProductMallName: '쇼핑퐁',
-    furnitureProductSiteUrl:
-      'https://smartstore.naver.com/main/products/11968612763',
+    id: 12,
     furnitureProductImageUrl:
-      'https://shopping-phinf.pstatic.net/main_8951312/89513123451.jpg',
+      'https://shopping-phinf.pstatic.net/main_8997960/89979601023.jpg',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12435090276',
+    furnitureProductName:
+      '미니멀 빈티지 클래식 흰색 엔틱 철제 모던 유럽 침대프레임',
+    furnitureProductMallName: '업소용대량전문가마켓',
+    furnitureProductId: 89979601023,
   },
   {
-    furnitureProductId: 89699341491,
-    furnitureProductName:
-      '접는 폴딩 침대 1인용 간이 휴대용 베드 간병 흰색 프레임 정사각형 파이프 A',
-    furnitureProductMallName: '베스트디',
-    furnitureProductSiteUrl:
-      'https://smartstore.naver.com/main/products/12154830786',
+    id: 13,
     furnitureProductImageUrl:
-      'https://shopping-phinf.pstatic.net/main_8969934/89699341491.jpg',
+      'https://shopping-phinf.pstatic.net/main_9004327/90043275781.jpg',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12498764928',
+    furnitureProductName:
+      '미니멀 빈티지 클래식 모던 철제 흰색 유럽 침대프레임 검정',
+    furnitureProductMallName: 'SAJAMALL',
+    furnitureProductId: 90043275781,
   },
   {
-    furnitureProductId: 89924633277,
-    furnitureProductName:
-      '평상형원목침대 자취방 프레임 트윈 1인 침대프 A. 흰색 소프트 백 침대 보드 60x196',
-    furnitureProductMallName: '현명마켓7',
-    furnitureProductSiteUrl:
-      'https://smartstore.naver.com/main/products/12380122560',
+    id: 14,
     furnitureProductImageUrl:
-      'https://shopping-phinf.pstatic.net/main_8992463/89924633277.jpg',
+      'https://shopping-phinf.pstatic.net/main_8974434/89744347853.jpg',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12199837148',
+    furnitureProductName:
+      '침대 헤드보드 호텔식 머리판 침실 북유럽 베드 흰색-회색 기술 직물 A',
+    furnitureProductMallName: '더굿 라이프',
+    furnitureProductId: 89744347853,
   },
   {
-    furnitureProductId: 90033069305,
-    furnitureProductName:
-      '고시원 침대 1인용 접이식철제 메탈 1200mm 원목 휴대용 2000mm 접히는 접이식 흰색 900mm 900mm 좁은방 흰색 1200mm 2000mm 4단침대 간이침대',
-    furnitureProductMallName: '달미의샵',
-    furnitureProductSiteUrl:
-      'https://smartstore.naver.com/main/products/12488558461',
+    id: 15,
     furnitureProductImageUrl:
-      'https://shopping-phinf.pstatic.net/main_9003306/90033069305.jpg',
+      'https://shopping-phinf.pstatic.net/main_8994883/89948836626.jpg',
+    furnitureProductSiteUrl:
+      'https://smartstore.naver.com/main/products/12404325901',
+    furnitureProductName:
+      '미니멀 빈티지 클래식 침대프레임 유럽 모던 흰색 철제 블랙',
+    furnitureProductMallName: '글로빈스마켓',
+    furnitureProductId: 89948836626,
   },
 ];
