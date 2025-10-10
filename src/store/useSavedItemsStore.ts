@@ -7,6 +7,7 @@ import { create } from 'zustand';
 interface SavedItemsState {
   savedProductIds: Set<number>;
   toggleSaveProduct: (productId: number) => void;
+  setSavedProductIds: (ids: number[] | Set<number>) => void;
 }
 
 export const useSavedItemsStore = create<SavedItemsState>((set) => ({
@@ -26,4 +27,7 @@ export const useSavedItemsStore = create<SavedItemsState>((set) => ({
 
       return { savedProductIds: newSavedIds };
     }),
+
+  // 서버 찜 목록으로 전역 상태 초기화(새로고침 시 하트 복구)
+  setSavedProductIds: (ids) => set(() => ({ savedProductIds: new Set(ids) })),
 }));

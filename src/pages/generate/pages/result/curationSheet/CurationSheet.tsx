@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -7,7 +7,9 @@ import {
   filterMockData,
   productMockData,
 } from '@/pages/generate/constants/curationMockdata';
+import { useGetJjymList } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
+import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
 
 import { CardProductItem } from './CardProductItem';
@@ -26,6 +28,16 @@ export const CurationSheet = () => {
   const handleGotoMypage = () => {
     navigate(ROUTES.MYPAGE);
   };
+
+  // 서버 찜 목록 불러오기
+  const { data: jjymItems = [] } = useGetJjymList();
+  const setSavedProductIds = useSavedItemsStore((s) => s.setSavedProductIds);
+
+  useEffect(() => {
+    // 추천ID(recommendId) 기준으로 맞춰서 넣기
+    const ids = jjymItems.map((item) => item.id);
+    setSavedProductIds(ids);
+  }, [jjymItems, setSavedProductIds]);
 
   return (
     <CurationSheetWrapper>
