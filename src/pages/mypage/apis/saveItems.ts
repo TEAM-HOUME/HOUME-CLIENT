@@ -3,8 +3,10 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 
-export const getJjym = async () => {
-  return request({
+import type { JjymsResponse } from '../types/apis/saveItems';
+
+export const getJjymList = async () => {
+  return request<JjymsResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.GENERATE.MYPAGE_JJYM_LIST,
   });
