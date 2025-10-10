@@ -47,6 +47,7 @@ export const CurationSheet = () => {
         {/* 그리드 영역 */}
         <div className={styles.curationSection}>
           <div className={styles.gridbox}>
+            {/* TODO: 목데이터 사용 > 실제 api 연동 */}
             {productMockData.map((p) => (
               <CardProductItem
                 key={p.furnitureProductId}
