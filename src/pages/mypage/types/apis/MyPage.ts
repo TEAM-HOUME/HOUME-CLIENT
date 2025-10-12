@@ -34,6 +34,7 @@ export interface MyPageImageDetail {
   isLike: boolean;
   factorId?: number;
   factorText?: string;
+  imageId: number;
 }
 
 export interface MyPageImageDetailData {
