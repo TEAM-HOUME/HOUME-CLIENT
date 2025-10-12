@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { type Id, toast, type ToastOptions } from 'react-toastify';
 
@@ -17,14 +17,7 @@ interface UseToastParams {
 export const useToast = () => {
   const toastId = useRef<Id | null>(null);
 
-  // 컴포넌트가 언마운트될 때 활성화된 토스트를 정리 -> 메모리 누수 방지
-  useEffect(() => {
-    return () => {
-      if (toastId.current !== null && toast.isActive(toastId.current)) {
-        toast.dismiss(toastId.current);
-      }
-    };
-  }, []);
+  // 네비게이션 간 토스트 유지: 언마운트 시 자동 dismiss 제거
 
   const notify = useCallback(
     ({
