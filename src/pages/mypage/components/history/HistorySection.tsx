@@ -11,8 +11,8 @@ const HistorySection = () => {
   const navigate = useNavigate();
   const { data: imagesData, isLoading, isError } = useMyPageImages();
 
-  const handleViewResult = (imageId: number) => {
-    navigate(`/generate/result?from=mypage&imageId=${imageId}`);
+  const handleViewResult = (houseId: number) => {
+    navigate(`/generate/result?from=mypage&houseId=${houseId}`);
   };
 
   const handleCreateImage = () => {
@@ -58,7 +58,7 @@ const HistorySection = () => {
             src={history.generatedImageUrl}
             title={`${history.tasteTag}의 ${history.equilibrium} ${history.houseForm}`}
             btnText="가구 추천 보러가기"
-            onClick={() => handleViewResult(history.imageId)}
+            onClick={() => handleViewResult(history.houseId)}
           />
         ))
       ) : (
