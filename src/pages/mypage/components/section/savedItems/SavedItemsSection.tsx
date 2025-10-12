@@ -20,12 +20,7 @@ const SavedItemsSection = () => {
   const { mutate: toggleJjym } = usePostJjymMutation();
 
   const handleToggleSave = (id: number) => {
-    toggleJjym(id, {
-      onSuccess: () => {
-        // 목록 다시 요청
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEY.JJYM_LIST] });
-      },
-    });
+    toggleJjym(id);
   };
 
   // 자동 스크롤 포커싱
