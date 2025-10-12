@@ -11,18 +11,18 @@ interface SavedItemsState {
 }
 
 export const useSavedItemsStore = create<SavedItemsState>((set) => ({
-  // 초기 상태
+  // 초기 상태 (recommendId Set)
   savedProductIds: new Set(),
 
   // 상품 ID를 받아 저장 상태 토글
-  toggleSaveProduct: (productId) =>
+  toggleSaveProduct: (recommendId) =>
     set((state) => {
       const newSavedIds = new Set(state.savedProductIds);
 
-      if (newSavedIds.has(productId)) {
-        newSavedIds.delete(productId); // 저장 취소
+      if (newSavedIds.has(recommendId)) {
+        newSavedIds.delete(recommendId); // 저장 취소
       } else {
-        newSavedIds.add(productId); // 저장
+        newSavedIds.add(recommendId); // 저장
       }
 
       return { savedProductIds: newSavedIds };
