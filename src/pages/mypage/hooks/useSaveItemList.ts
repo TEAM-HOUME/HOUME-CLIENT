@@ -13,6 +13,8 @@ export const useGetJjymList = (
     queryKey: [QUERY_KEY.JJYM_LIST],
     queryFn: getJjymList,
     select: (data) => data.items,
+    staleTime: 0,
+    refetchOnMount: 'always',
     ...options,
   });
 };
