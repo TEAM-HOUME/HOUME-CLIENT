@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import { useGetJjymList } from '@/pages/mypage/hooks/useSaveItemList';
-import { queryClient } from '@/shared/apis/queryClient';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
