@@ -3,7 +3,7 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 
-import type { JjymsResponse } from '../types/apis/saveItems';
+import type { JjymsResponse } from '../types/apis/saveItemsList';
 
 export const getJjymList = async () => {
   return request<JjymsResponse>({

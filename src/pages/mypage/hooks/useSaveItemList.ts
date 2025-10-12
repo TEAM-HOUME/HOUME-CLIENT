@@ -2,9 +2,9 @@ import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 
-import { getJjymList } from '../apis/saveItems';
+import { getJjymList } from '../apis/saveItemsList';
 
-import type { FurnitureItem, JjymsResponse } from '../types/apis/saveItems';
+import type { FurnitureItem, JjymsResponse } from '../types/apis/saveItemsList';
 
 export const useGetJjymList = (
   options?: UseQueryOptions<JjymsResponse, unknown, FurnitureItem[]>
