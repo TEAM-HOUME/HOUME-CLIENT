@@ -1,5 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
+import { queryClient } from '@/shared/apis/queryClient';
+import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 
 import { postJjym } from '../apis/saveItems';
@@ -15,7 +17,7 @@ export const usePostJjymMutation = () => {
     mutationFn: (recommendFurnitureId) => postJjym({ recommendFurnitureId }),
 
     onMutate: async (recommendFurnitureId) => {
-      toggleSaveProduct(recommendFurnitureId);
+      toggleSaveProduct(recommendFurnitureId); // UI 즉시 반영
       return { recommendFurnitureId };
     },
 
@@ -28,6 +30,10 @@ export const usePostJjymMutation = () => {
       if (isSavedNow !== data.favorited) {
         toggleSaveProduct(recommendFurnitureId);
       }
+
+      // 찜 목록 토글 성공시 목록 최신화
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.JJYM_LIST] });
+
       console.log('찜하기 성공', data);
     },
 
