@@ -65,8 +65,9 @@ export const CurationSheetWrapper = ({
 
   // backdrop 활성화시 body의 스크롤 막기
   useEffect(() => {
-    document.body.style.overflow =
-      snapState === 'expanded' ? 'hidden' : 'unset';
+    const lock = snapState !== 'collapsed';
+
+    document.body.style.overflow = lock ? 'hidden' : 'unset';
     return () => {
       document.body.style.overflow = 'unset';
     };
