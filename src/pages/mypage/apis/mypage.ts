@@ -38,14 +38,14 @@ export const getMyPageImages = async (): Promise<
 
 /**
  * 마이페이지 이미지 상세 조회 API
- * GET /api/v1/mypage/images/{imageId}
+ * GET /api/v1/mypage/images/{houseId}
  */
 export const getMyPageImageDetail = async (
-  imageId: number
+  houseId: number
 ): Promise<MyPageImageDetailResponse['data']> => {
   const config: RequestConfig = {
     method: HTTPMethod.GET,
-    url: API_ENDPOINT.USER.MYPAGE_IMAGE_DETAIL(imageId),
+    url: API_ENDPOINT.USER.MYPAGE_IMAGE_DETAIL(houseId),
   };
 
   return await request<MyPageImageDetailResponse['data']>(config);
