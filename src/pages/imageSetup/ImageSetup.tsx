@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
+
 import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageGeneration';
 import ActivityInfo from './pages/activityInfo/ActivityInfo';
 import FloorPlan from './pages/floorPlan/FloorPlan';
 import HouseInfo from './pages/houseInfo/HouseInfo';
 import InteriorStyle from './pages/interiorStyle/InteriorStyle';
+import { useFunnelStore } from './stores/useFunnelStore';
 import {
   type CompletedFloorPlan,
   type CompletedInteriorStyle,
@@ -13,6 +16,13 @@ import type { CompletedHouseInfo } from './types/funnel/houseInfo';
 
 export const ImageSetup = () => {
   const funnel = useImageSetup();
+
+  // 퍼널 전체가 unmount될 때 (퍼널 벗어날 때) 데이터 초기화
+  useEffect(() => {
+    return () => {
+      useFunnelStore.getState().reset();
+    };
+  }, []);
 
   return (
     <FunnelLayout>
