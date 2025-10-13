@@ -132,7 +132,7 @@ describe('API_ENDPOINT 상수 테스트', () => {
       // 현재 정의된 엔드포인트 총 개수
       const expectedCount =
         3 + // AUTH (KAKAO_CALLBACK, LOGOUT, REISSUE)
-        4 + // USER (SIGN_UP, MYPAGE, MYPAGE_IMAGES, MYPAGE_IMAGE_DETAIL)
+        5 + // USER (SIGN_UP, MYPAGE, MYPAGE_IMAGES, MYPAGE_IMAGE_DETAIL, DELETE)
         4 + // ONBOARDING
         6 + // GENERATE
         3; // ANALYTICS
