@@ -69,7 +69,7 @@ const SettingPage = () => {
 
           // 토스트 표시
           notify({
-            text: '회원 탈퇴가 완료되었습니다',
+            text: '탈퇴되었습니다',
             type: TOAST_TYPE.INFO,
             options: { autoClose: 2500 },
           });
