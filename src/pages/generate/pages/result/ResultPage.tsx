@@ -61,19 +61,20 @@ const ResultPage = () => {
   const houseId = searchParams.get('houseId');
   const from = searchParams.get('from');
   const isFromMypage = from === 'mypage';
-  const shouldFetchFromAPI = !result && !!houseId;
+  const parsedHouseId = houseId ? Number(houseId) : null;
+  const shouldFetchFromAPI = !result && parsedHouseId !== null;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
   const { data: apiResult, isLoading } = useGetResultDataQuery(
-    Number(houseId || 0),
+    parsedHouseId ?? 0,
     {
-      enabled: shouldFetchFromAPI && !isFromMypage,
+      enabled: shouldFetchFromAPI && !isFromMypage && parsedHouseId !== null,
     }
   );
 
   const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
-    Number(houseId || 0),
-    { enabled: shouldFetchFromAPI && isFromMypage }
+    parsedHouseId ?? 0,
+    { enabled: shouldFetchFromAPI && isFromMypage && parsedHouseId !== null }
   );
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
