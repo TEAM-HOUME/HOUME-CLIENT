@@ -13,7 +13,11 @@ const GeneratedImagesSection = () => {
   const { data: imagesData, isLoading, isError } = useMyPageImages();
 
   const handleViewResult = (houseId: number) => {
-    navigate(`${ROUTES.GENERATE_RESULT}?from=mypage&houseId=${houseId}`);
+    const params = new URLSearchParams({
+      from: 'mypage',
+      houseId: String(houseId),
+    });
+    navigate(`${ROUTES.GENERATE_RESULT}?${params.toString()}`);
   };
 
   // 로딩 중
