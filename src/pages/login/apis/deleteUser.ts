@@ -67,8 +67,8 @@ export const deleteUser = async (): Promise<DeleteUserResponse> => {
 export const useDeleteUserMutation = () => {
   return useMutation<DeleteUserResponse, Error, void>({
     mutationFn: deleteUser,
-    onSettled: () => {
-      // 성공/실패 관계없이 로컬 토큰 제거
+    onSuccess: () => {
+      // 성공 시에만 로컬 토큰 제거
       useUserStore.getState().clearUser();
     },
   });
