@@ -80,7 +80,7 @@ const SettingPage = () => {
           // 회원탈퇴 API 호출
           deleteUser(undefined, {
             onSuccess: (response) => {
-              console.log('회원탈퇴 성공:', response.msg);
+              console.log('회원탈퇴 성공:', response.message, response.data);
             },
             onError: (error) => {
               console.error('회원탈퇴 실패:', error);

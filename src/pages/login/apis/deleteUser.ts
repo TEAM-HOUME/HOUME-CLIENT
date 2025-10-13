@@ -1,18 +1,20 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { HTTPMethod, request } from '@/shared/apis/request';
+import type { BaseResponse } from '@/shared/types/apis';
 import { useUserStore } from '@/store/useUserStore';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 
 /**
+ * 회원탈퇴 응답 데이터 타입
+ */
+export type DeleteUserData = string;
+
+/**
  * 회원탈퇴 응답 타입
  */
-export interface DeleteUserResponse {
-  code: number;
-  msg: string;
-  data: string;
-}
+export type DeleteUserResponse = BaseResponse<DeleteUserData>;
 
 /**
  * 회원탈퇴 API 함수
