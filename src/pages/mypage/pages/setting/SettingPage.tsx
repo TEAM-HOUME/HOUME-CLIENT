@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
 
+import { useDeleteUserMutation } from '@/pages/login/apis/deleteUser';
 import { useLogoutMutation } from '@/pages/login/apis/logout';
 import { ROUTES } from '@/routes/paths';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
@@ -16,6 +17,7 @@ const SettingPage = () => {
   const navigate = useNavigate();
   const { notify } = useToast();
   const { mutate: logout } = useLogoutMutation();
+  const { mutate: deleteUser } = useDeleteUserMutation();
   const logoutTimerRef = useRef<number | null>(null);
 
   const handleServicePolicy = () => {
@@ -27,14 +29,14 @@ const SettingPage = () => {
   };
 
   const handleLogout = () => {
-    // 1) 토스트 표시 (5초 유지)
+    // 1) 토스트 표시 (2.5초 유지)
     notify({
       text: '로그아웃 되었습니다',
       type: TOAST_TYPE.INFO,
       options: { autoClose: 2500 },
     });
 
-    // 1) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
+    // 2) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
     navigate(ROUTES.HOME, { replace: true });
 
     // 기존 타이머가 있으면 제거하고, 새 타이머로 갱신
@@ -50,17 +52,6 @@ const SettingPage = () => {
     }, 1000); // 1초 후 로그아웃 실행
   };
 
-  const handleWithdrawConfirm = () => {
-    // TODO: 실제 회원 탈퇴 API 호출
-
-    notify({
-      text: '회원 탈퇴가 완료되었습니다',
-      type: TOAST_TYPE.INFO,
-    });
-
-    navigate(ROUTES.HOME);
-  };
-
   const handleWithdraw = () => {
     overlay.open(({ unmount }) => (
       <GeneralModal
@@ -73,8 +64,28 @@ const SettingPage = () => {
         cancelVariant="default"
         confirmVariant="default"
         onCancel={() => {
-          handleWithdrawConfirm();
+          // 모달 닫기
           unmount();
+
+          // 토스트 표시
+          notify({
+            text: '회원 탈퇴가 완료되었습니다',
+            type: TOAST_TYPE.INFO,
+            options: { autoClose: 2500 },
+          });
+
+          // 홈으로 이동
+          navigate(ROUTES.HOME, { replace: true });
+
+          // 회원탈퇴 API 호출
+          deleteUser(undefined, {
+            onSuccess: (response) => {
+              console.log('회원탈퇴 성공:', response.msg);
+            },
+            onError: (error) => {
+              console.error('회원탈퇴 실패:', error);
+            },
+          });
         }}
         onConfirm={unmount}
         onClose={unmount}
