@@ -6,6 +6,7 @@ export interface JjymsResponse {
 export interface FurnitureItem {
   id: number;
   furnitureProductImageUrl: string;
+  furnitureProductSiteUrl: string;
   furnitureProductName: string;
   furnitureProductId: number;
 }

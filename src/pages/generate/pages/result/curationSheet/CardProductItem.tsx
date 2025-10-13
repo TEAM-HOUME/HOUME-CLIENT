@@ -53,7 +53,6 @@ export const CardProductItem = memo(
 
     return (
       <CardProduct
-        key={product.furnitureProductId}
         size="large"
         title={product.furnitureProductName}
         brand={product.furnitureProductMallName}

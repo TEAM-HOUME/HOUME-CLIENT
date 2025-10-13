@@ -29,7 +29,7 @@ const SavedItemsSection = () => {
 
     if (id) {
       setFocusItemId(id);
-      sessionStorage.removeItem('focusItemId'); //
+      sessionStorage.removeItem('focusItemId');
     }
   }, []);
 
@@ -50,13 +50,12 @@ const SavedItemsSection = () => {
               ref={isTargetItem ? itemFocusRef : null}
             >
               <CardProduct
-                key={item.furnitureProductId}
                 size="small"
                 title={item.furnitureProductName}
                 imageUrl={item.furnitureProductImageUrl}
+                linkHref={item.furnitureProductSiteUrl}
                 isSaved={true}
                 onToggleSave={() => handleToggleSave(item.id)}
-                // linkHref={item.furnitureProductSiteUrl}
               />
             </div>
           );
