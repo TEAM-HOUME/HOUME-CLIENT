@@ -70,8 +70,10 @@ export const useDeleteUserMutation = () => {
   return useMutation<DeleteUserResponse, Error, void>({
     mutationFn: deleteUser,
     onSuccess: () => {
-      // 성공 시에만 로컬 토큰 제거
-      useUserStore.getState().clearUser();
+      // 네비게이션 완료 후 토큰 삭제 (100ms 지연)
+      setTimeout(() => {
+        useUserStore.getState().clearUser();
+      }, 100);
     },
   });
 };
