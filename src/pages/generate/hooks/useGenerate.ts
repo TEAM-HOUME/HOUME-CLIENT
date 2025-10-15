@@ -64,12 +64,12 @@ export const useStackData = (
 };
 
 export const useGetResultDataQuery = (
-  imageId: number,
+  houseId: number,
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: [QUERY_KEY.GENERATE_RESULT, imageId],
-    queryFn: () => getResultData(imageId),
+    queryKey: [QUERY_KEY.GENERATE_RESULT, houseId],
+    queryFn: () => getResultData(houseId),
     ...options,
   });
 };
