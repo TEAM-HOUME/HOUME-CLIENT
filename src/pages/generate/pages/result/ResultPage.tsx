@@ -75,13 +75,13 @@ const ResultPage = () => {
   const { data: apiResult, isLoading } = useGetResultDataQuery(
     parsedHouseId ?? 0,
     {
-      enabled: shouldFetchFromAPI && !isFromMypage && parsedHouseId !== null,
+      enabled: shouldFetchFromAPI && !isFromMypage,
     }
   );
 
   const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
     parsedHouseId ?? 0,
-    { enabled: shouldFetchFromAPI && isFromMypage && parsedHouseId !== null }
+    { enabled: shouldFetchFromAPI && isFromMypage }
   );
 
   // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
