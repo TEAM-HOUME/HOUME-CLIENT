@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
@@ -108,6 +108,15 @@ const ResultPage = () => {
     }
   }
 
+  // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)
+  const historyById = useMemo(
+    () =>
+      isFromMypage && mypageResult?.histories
+        ? new Map(mypageResult.histories.map((h) => [h.imageId, h]))
+        : null,
+    [isFromMypage, mypageResult?.histories]
+  );
+
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
   const currentLikeState = (() => {
     // 1. 로컬 상태가 있으면 사용 (null도 포함)
@@ -116,10 +125,8 @@ const ResultPage = () => {
     }
 
     // 2. 마이페이지 히스토리에서 찾기 (imageId로 매칭)
-    if (isFromMypage && mypageResult?.histories) {
-      const currentHistory = mypageResult.histories.find(
-        (history) => history.imageId === currentImgId
-      );
+    if (historyById) {
+      const currentHistory = historyById.get(currentImgId);
       if (currentHistory && currentHistory.isLike !== undefined) {
         // isLike가 null이면 null 반환, 그렇지 않으면 boolean 값에 따라 변환
         return currentHistory.isLike === null
@@ -141,10 +148,8 @@ const ResultPage = () => {
     }
 
     // 2. 마이페이지 히스토리에서 찾기 (imageId로 매칭)
-    if (isFromMypage && mypageResult?.histories) {
-      const currentHistory = mypageResult.histories.find(
-        (history) => history.imageId === currentImgId
-      );
+    if (historyById) {
+      const currentHistory = historyById.get(currentImgId);
       if (currentHistory && currentHistory.factorId) {
         return currentHistory.factorId;
       }
