@@ -19,7 +19,7 @@ const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'savedItems' | 'generatedImages'>(
-    'savedItems'
+    'generatedImages'
   );
 
   // 로그인 상태 확인
