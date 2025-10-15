@@ -9,6 +9,7 @@ import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 import { useActivitySelection } from './useActivitySelection';
 import { useCategorySelection } from './useCategorySelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
+import { useFunnelStore } from '../../stores/useFunnelStore';
 
 import type { ActivityOptionsResponse } from '../../types/apis/activityInfo';
 import type { ActivityInfoFormData } from '../../types/funnel/activityInfo';
@@ -25,11 +26,25 @@ export const useActivityInfo = (
   // 버튼 비활성화 상태 (토스트 표시 후 비활성화)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  // funnel의 context값으로 초기값 설정
+  // Zustand store에서 저장된 데이터
+  const savedActivityInfo = useFunnelStore((state) => state.activityInfo);
+  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
+  const savedFloorPlan = useFunnelStore((state) => state.floorPlan);
+  const savedMoodBoardIds = useFunnelStore((state) => state.moodBoardIds);
+
+  // 초기값 설정: Zustand에 값이 있으면 사용, 없으면 context 사용
   const [formData, setFormData] = useState<ActivityInfoFormData>({
-    activityType: context.activityType,
-    selectiveIds: context.selectiveIds || [],
+    activityType: savedActivityInfo?.activityType ?? context.activityType,
+    selectiveIds: savedActivityInfo?.selectiveIds ?? context.selectiveIds ?? [],
   });
+
+  // ActivityInfo는 마지막 스텝이므로 formData가 변경될 때마다 값 저장하도록 아래 로직 구현(다른 스텝에서는 스텝 이동 핸들러에서 값 저장)
+  useEffect(() => {
+    useFunnelStore.getState().setActivityInfo({
+      activityType: formData.activityType,
+      selectiveIds: formData.selectiveIds,
+    });
+  }, [formData.activityType, formData.selectiveIds]);
 
   // 주요활동 선택 훅
   const activitySelection = useActivitySelection(
@@ -122,6 +137,11 @@ export const useActivityInfo = (
 
   // 주요활동 변경 시 기존 가구 초기화 후 필수 가구 자동 선택
   useEffect(() => {
+    // Zustand에 저장된 데이터가 있으면 해당 데이터 유지
+    if (savedActivityInfo?.activityType === formData.activityType) {
+      return;
+    }
+
     if (formData.activityType) {
       const requiredIds = activitySelection.getRequiredFurnitureIds();
       setFormData((prev) => ({
@@ -135,7 +155,7 @@ export const useActivityInfo = (
         selectiveIds: [],
       }));
     }
-  }, [formData.activityType]);
+  }, [formData.activityType, savedActivityInfo]);
 
   // 제출 핸들러
   const handleSubmit = async () => {
@@ -153,18 +173,22 @@ export const useActivityInfo = (
     }
 
     const generateImageRequest: GenerateImageRequest = {
-      houseId: context.houseId,
-      equilibrium: context.areaType,
+      houseId: savedHouseInfo?.houseId ?? context.houseId,
+      equilibrium: savedHouseInfo?.areaType ?? context.areaType,
       floorPlan: {
-        floorPlanId: context.floorPlan.floorPlanId,
-        isMirror: context.floorPlan.isMirror,
+        floorPlanId:
+          savedFloorPlan?.floorPlanId ?? context.floorPlan.floorPlanId,
+        isMirror: savedFloorPlan?.isMirror ?? context.floorPlan.isMirror,
       },
-      moodBoardIds: context.moodBoardIds,
+      moodBoardIds: savedMoodBoardIds ?? context.moodBoardIds,
       activity: formData.activityType!,
       selectiveIds: formData.selectiveIds!,
     };
 
     navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
+
+    // 퍼널 완료 후 Zustand 초기화
+    useFunnelStore.getState().reset();
   };
 
   return {
