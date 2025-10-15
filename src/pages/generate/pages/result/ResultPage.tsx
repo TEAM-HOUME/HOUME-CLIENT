@@ -58,10 +58,17 @@ const ResultPage = () => {
   )?.result;
 
   // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
-  const houseId = searchParams.get('houseId');
+  const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');
   const isFromMypage = from === 'mypage';
-  const parsedHouseId = houseId ? Number(houseId) : null;
+  // houseId 파싱 및 검증: 양의 정수 문자열만 허용
+  const trimmedHouseId = rawHouseId?.trim() ?? null;
+  const parsedHouseId =
+    trimmedHouseId !== null &&
+    /^[1-9]\d*$/.test(trimmedHouseId) &&
+    Number.isSafeInteger(Number(trimmedHouseId))
+      ? Number(trimmedHouseId)
+      : null;
   const shouldFetchFromAPI = !result && parsedHouseId !== null;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
