@@ -6,6 +6,7 @@ export const container = style({
   display: 'flex',
   width: '100%',
   maxWidth: '100%',
+  height: '6.4rem',
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '0 2rem',

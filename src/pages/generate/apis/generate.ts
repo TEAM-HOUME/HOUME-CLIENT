@@ -45,10 +45,10 @@ export const postStackHate = async (carouselId: number) => {
 
 // 생성 결과
 // 생성된 이미지 조회
-export const getResultData = async (imageId: number) => {
+export const getResultData = async (houseId: number) => {
   return request({
     method: HTTPMethod.GET,
-    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${imageId}/preference`,
+    url: `${API_ENDPOINT.GENERATE.IMAGE_PREFERENCE}/${houseId}/preference`,
   });
 };
 

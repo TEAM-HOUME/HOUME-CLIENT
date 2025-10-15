@@ -35,12 +35,12 @@ export const useMyPageImages = () => {
  * 마이페이지 이미지 상세 조회 훅
  */
 export const useMyPageImageDetail = (
-  imageId: number,
+  houseId: number,
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, imageId],
-    queryFn: () => getMyPageImageDetail(imageId),
+    queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, houseId],
+    queryFn: () => getMyPageImageDetail(houseId),
     staleTime: 0,
     ...options,
   });

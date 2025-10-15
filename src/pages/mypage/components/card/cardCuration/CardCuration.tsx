@@ -15,7 +15,7 @@ const CardCurationSection = ({
 }: CardCurationSectionProps) => {
   return (
     <div className={styles.cardCurationContainer}>
-      <div className={styles.cardImage}>
+      <div className={styles.cardImage} onClick={onCurationClick}>
         {imageUrl ? (
           <img src={imageUrl} alt="생성된 이미지" className={styles.image} />
         ) : (
