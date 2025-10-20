@@ -33,6 +33,16 @@ const SavedItemsSection = () => {
     }
   }, []);
 
+  // 데이터 로드 완료 후 스크롤 실행
+  useEffect(() => {
+    if (focusItemId && isFetched && itemFocusRef.current) {
+      itemFocusRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [focusItemId, isFetched]);
+
   // 저장된 아이템이 없을 때
   if (isFetched && savedItems.length === 0) {
     return <EmptyStateSection type="savedItems" />;
