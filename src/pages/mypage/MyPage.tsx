@@ -18,9 +18,19 @@ import * as styles from './MyPage.css';
 const MyPage = () => {
   const { handleError } = useErrorHandler('mypage');
   const navigate = useNavigate();
+
+  // sessionStorage에서 탭 정보 가져오기
+  const initialTab =
+    (sessionStorage.getItem('activeTab') as 'savedItems' | 'generatedImages') ||
+    'generatedImages';
   const [activeTab, setActiveTab] = useState<'savedItems' | 'generatedImages'>(
-    'generatedImages'
+    initialTab
   );
+
+  useEffect(() => {
+    // 탭 정보 사용 후 제거
+    sessionStorage.removeItem('activeTab');
+  }, []);
 
   // 로그인 상태 확인
   const accessToken = useUserStore((state) => state.accessToken);

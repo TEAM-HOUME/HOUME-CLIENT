@@ -31,6 +31,7 @@ export const CardProductItem = memo(
 
     const handleNavigateAndFocus = () => {
       sessionStorage.setItem('focusItemId', String(recommendId)); // 세션 스톨지에 잠시 저장
+      sessionStorage.setItem('activeTab', 'savedItems'); // Tab 정보
       onGotoMypage();
     };
 
