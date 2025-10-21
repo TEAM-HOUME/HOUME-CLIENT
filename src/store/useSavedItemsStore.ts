@@ -10,7 +10,7 @@ interface SavedItemsState {
   setSavedProductIds: (ids: number[] | Set<number>) => void;
 }
 
-export const useSavedItemsStore = create<SavedItemsState>((set) => ({
+export const useSavedItemsStore = create<SavedItemsState>((set, get) => ({
   // 초기 상태 (recommendId Set)
   savedProductIds: new Set(),
 
@@ -29,5 +29,14 @@ export const useSavedItemsStore = create<SavedItemsState>((set) => ({
     }),
 
   // 서버 찜 목록으로 전역 상태 초기화(새로고침 시 하트 복구)
-  setSavedProductIds: (ids) => set(() => ({ savedProductIds: new Set(ids) })),
+  setSavedProductIds: (ids) => {
+    const next = new Set(ids);
+    const prev = get().savedProductIds; // 현재 전역 상태에 저장되어 있는 set 가져오기
+
+    // 현재와 가져온 set 비교 (크기, 원소)
+    const isEqual =
+      prev.size === next.size && [...next].every((id) => prev.has(id));
+    if (isEqual) return; // no-op (아무 동작 X)
+    set({ savedProductIds: next }); // 내용이 달라진 경우에만 새로운 set으로 갱신
+  },
 }));
