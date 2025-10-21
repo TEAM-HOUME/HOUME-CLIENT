@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
-import { useGetJjymList } from '@/pages/mypage/hooks/useSaveItemList';
+import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 
 import * as styles from './SavedItemsSection.css';
@@ -12,7 +12,7 @@ const SavedItemsSection = () => {
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
 
   // 찜한 목록 조회
-  const { data: savedItems = [], isFetched } = useGetJjymList();
+  const { data: savedItems = [], isFetched } = useGetJjymListQuery();
 
   // 찜 해제 토글
   const { mutate: toggleJjym } = usePostJjymMutation();

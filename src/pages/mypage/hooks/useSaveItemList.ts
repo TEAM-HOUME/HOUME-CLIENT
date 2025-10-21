@@ -6,7 +6,7 @@ import { getJjymList } from '../apis/saveItemsList';
 
 import type { FurnitureItem, JjymsResponse } from '../types/apis/saveItemsList';
 
-export const useGetJjymList = (
+export const useGetJjymListQuery = (
   options?: UseQueryOptions<JjymsResponse, unknown, FurnitureItem[]>
 ) => {
   return useQuery({
