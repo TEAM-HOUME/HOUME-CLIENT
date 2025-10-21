@@ -7,7 +7,7 @@ import {
   filterMockData,
   productMockData,
 } from '@/pages/generate/constants/curationMockdata';
-import { useGetJjymList } from '@/pages/mypage/hooks/useSaveItemList';
+import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
 import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -30,7 +30,7 @@ export const CurationSheet = () => {
   };
 
   // 서버 찜 목록 불러오기
-  const { data: jjymItems = [] } = useGetJjymList();
+  const { data: jjymItems = [] } = useGetJjymListQuery();
   const setSavedProductIds = useSavedItemsStore((s) => s.setSavedProductIds);
 
   useEffect(() => {
