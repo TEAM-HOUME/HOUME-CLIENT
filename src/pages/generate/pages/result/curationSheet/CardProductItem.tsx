@@ -20,6 +20,9 @@ interface CardProductItemProps {
   onGotoMypage: () => void;
 }
 
+const SS_KEY_FOCUS_ITEM_ID = 'focusItemId';
+const SS_KEY_ACTIVE_TAB = 'activeTab';
+
 export const CardProductItem = memo(
   ({ product, onGotoMypage }: CardProductItemProps) => {
     const recommendId = product.id;
@@ -39,8 +42,8 @@ export const CardProductItem = memo(
       }) > 0;
 
     const handleNavigateAndFocus = () => {
-      sessionStorage.setItem('focusItemId', String(recommendId)); // 세션 스톨지에 잠시 저장
-      sessionStorage.setItem('activeTab', 'savedItems'); // Tab 정보
+      sessionStorage.setItem(SS_KEY_FOCUS_ITEM_ID, String(recommendId)); // 세션 스토리지에 잠시 저장
+      sessionStorage.setItem(SS_KEY_ACTIVE_TAB, 'savedItems'); // Tab 정보
       onGotoMypage();
     };
 
