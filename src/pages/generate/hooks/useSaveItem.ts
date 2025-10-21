@@ -34,12 +34,13 @@ export const usePostJjymMutation = () => {
       // 찜 목록 토글 성공시 목록 최신화
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY.JJYM_LIST] });
 
-      console.log('찜하기 성공', data);
+      if (import.meta.env.DEV) console.log('찜하기 성공', data);
     },
 
     onError: (error, recommendFurnitureId) => {
       toggleSaveProduct(recommendFurnitureId); // 롤백
-      console.error('찜하기 토글 변경 중 에러 발생', error);
+      if (import.meta.env.DEV)
+        console.error('찜하기 토글 변경 중 에러 발생', error);
     },
   });
 };
