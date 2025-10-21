@@ -6,7 +6,7 @@ import { create } from 'zustand';
 
 interface SavedItemsState {
   savedProductIds: Set<number>;
-  toggleSaveProduct: (productId: number) => void;
+  toggleSaveProduct: (recommendId: number) => void;
   setSavedProductIds: (ids: number[] | Set<number>) => void;
 }
 
@@ -14,7 +14,7 @@ export const useSavedItemsStore = create<SavedItemsState>((set) => ({
   // 초기 상태 (recommendId Set)
   savedProductIds: new Set(),
 
-  // 상품 ID를 받아 저장 상태 토글
+  // 추천ID(recommendId) 기준으로 저장 상태 토글
   toggleSaveProduct: (recommendId) =>
     set((state) => {
       const newSavedIds = new Set(state.savedProductIds);
