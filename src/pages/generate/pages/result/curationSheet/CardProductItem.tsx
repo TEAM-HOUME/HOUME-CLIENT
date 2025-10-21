@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { useIsMutating } from '@tanstack/react-query';
+
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { useToast } from '@/shared/components/toast/useToast';
@@ -29,6 +31,13 @@ export const CardProductItem = memo(
     const { mutate: toggleJjym } = usePostJjymMutation();
     const { notify } = useToast();
 
+    const isMutating =
+      useIsMutating({
+        predicate: (mutation) =>
+          mutation.options.mutationKey?.[0] === 'jjym' &&
+          mutation.state.variables === recommendId, // 이 카드 id만 추적
+      }) > 0;
+
     const handleNavigateAndFocus = () => {
       sessionStorage.setItem('focusItemId', String(recommendId)); // 세션 스톨지에 잠시 저장
       sessionStorage.setItem('activeTab', 'savedItems'); // Tab 정보
@@ -36,6 +45,7 @@ export const CardProductItem = memo(
     };
 
     const handleToggle = () => {
+      if (isMutating) return;
       const wasSaved = isSaved;
 
       toggleJjym(recommendId, {
@@ -61,6 +71,7 @@ export const CardProductItem = memo(
         linkHref={product.furnitureProductSiteUrl}
         isSaved={isSaved}
         onToggleSave={handleToggle}
+        disabled={isMutating}
       />
     );
   }

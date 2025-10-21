@@ -15,6 +15,7 @@ interface CardProductProps {
   onToggleSave: () => void;
   linkHref?: string;
   linkLabel?: string;
+  disabled?: boolean;
 }
 
 const CardProduct = ({
@@ -26,6 +27,7 @@ const CardProduct = ({
   onToggleSave,
   linkHref,
   linkLabel = '사이트',
+  disabled = false,
 }: CardProductProps) => {
   const isLarge = size === 'large';
 
@@ -55,7 +57,11 @@ const CardProduct = ({
           {isLarge && !!brand && <p className={styles.brandText}>{brand}</p>}
         </div>
         <div className={styles.saveBtnContainer}>
-          <SaveButton isSelected={isSaved} onClick={onToggleSave} />
+          <SaveButton
+            disabled={disabled}
+            isSelected={isSaved}
+            onClick={onToggleSave}
+          />
         </div>
       </section>
     </div>

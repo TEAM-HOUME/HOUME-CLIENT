@@ -14,6 +14,7 @@ export const usePostJjymMutation = () => {
   const toggleSaveProduct = useSavedItemsStore((s) => s.toggleSaveProduct);
 
   return useMutation<SaveItemsResponse, AxiosError, number>({
+    mutationKey: ['jjym'],
     mutationFn: (recommendFurnitureId) => postJjym({ recommendFurnitureId }),
 
     onMutate: async (recommendFurnitureId) => {
