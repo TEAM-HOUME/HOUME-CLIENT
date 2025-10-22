@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
+import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
 import type {
@@ -63,11 +64,7 @@ const GeneratedImgB = ({
 
   return (
     <div className={styles.container}>
-      <img
-        src={image.imageUrl}
-        alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
-        className={styles.imgArea({ mirrored: image.isMirror })}
-      />
+      <DetectionHotspots imageUrl={image.imageUrl} mirrored={image.isMirror} />
       <button type="button" className={styles.tagBtn}>
         <Tag />
       </button>
