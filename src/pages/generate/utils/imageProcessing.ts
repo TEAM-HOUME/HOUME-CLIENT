@@ -13,35 +13,37 @@ export async function preprocessImage(
 
   canvas.width = targetWidth;
   canvas.height = targetHeight;
-
-  const scale = Math.min(
-    targetWidth / imageElement.width,
-    targetHeight / imageElement.height
-  );
-  const scaledWidth = imageElement.width * scale;
-  const scaledHeight = imageElement.height * scale;
+  // CSS나 레이아웃 영향 없이 원본 크기를 기준으로 계산
+  const srcW = imageElement.naturalWidth || imageElement.width;
+  const srcH = imageElement.naturalHeight || imageElement.height;
+  const scale = Math.min(targetWidth / srcW, targetHeight / srcH);
+  const scaledWidth = srcW * scale;
+  const scaledHeight = srcH * scale;
   const padX = (targetWidth - scaledWidth) / 2;
   const padY = (targetHeight - scaledHeight) / 2;
 
+  // 빈 영역은 검정색으로 채워 letterbox를 만들도록
   ctx.fillStyle = '#000000';
   ctx.fillRect(0, 0, targetWidth, targetHeight);
+  // 중앙 정렬된 상태로 원본 이미지를 그림
   ctx.drawImage(imageElement, padX, padY, scaledWidth, scaledHeight);
 
   const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
   const { data } = imageData;
 
+  // RGB 세 채널을 Float32Array로 준비
   const floatData = new Float32Array(3 * targetHeight * targetWidth);
 
   for (let i = 0; i < targetHeight * targetWidth; i++) {
-    floatData[i] = data[i * 4] / 255.0; // R
-    floatData[targetHeight * targetWidth + i] = data[i * 4 + 1] / 255.0; // G
-    floatData[2 * targetHeight * targetWidth + i] = data[i * 4 + 2] / 255.0; // B
+    floatData[i] = data[i * 4] / 255.0; // R(적색) 채널을 0~1로 정규화
+    floatData[targetHeight * targetWidth + i] = data[i * 4 + 1] / 255.0; // G(녹색) 채널을 0~1로 정규화
+    floatData[2 * targetHeight * targetWidth + i] = data[i * 4 + 2] / 255.0; // B(청색) 채널을 0~1로 정규화
   }
 
   return {
     tensor: floatData,
-    originalWidth: imageElement.width,
-    originalHeight: imageElement.height,
+    originalWidth: srcW,
+    originalHeight: srcH,
     scale,
   };
 }
@@ -66,8 +68,10 @@ export function toImageSpaceBBox(
     realH += realY;
     realY = 0;
   }
-  realW = Math.max(1, Math.min(realW, image.width - realX));
-  realH = Math.max(1, Math.min(realH, image.height - realY));
+  const baseW = image.naturalWidth || image.width;
+  const baseH = image.naturalHeight || image.height;
+  realW = Math.max(1, Math.min(realW, baseW - realX));
+  realH = Math.max(1, Math.min(realH, baseH - realY));
 
   return { x: realX, y: realY, w: realW, h: realH };
 }
@@ -78,9 +82,11 @@ export function getLetterboxParams(
   targetW: number,
   targetH: number
 ): { scale: number; padX: number; padY: number } {
-  const s = Math.min(targetW / image.width, targetH / image.height);
-  const scaledW = image.width * s;
-  const scaledH = image.height * s;
+  const srcW = image.naturalWidth || image.width;
+  const srcH = image.naturalHeight || image.height;
+  const s = Math.min(targetW / srcW, targetH / srcH);
+  const scaledW = srcW * s;
+  const scaledH = srcH * s;
   const padX = (targetW - scaledW) / 2;
   const padY = (targetH - scaledH) / 2;
   return { scale: s, padX, padY };
