@@ -1,10 +1,14 @@
-export type FurnitureCategory =
-  | 'lowerCabinet'
-  | 'upperCabinet'
-  | 'wardrobe'
-  | 'builtInCloset'
-  | 'chestOfDrawers'
-  | 'storageCabinet';
+import {
+  FURNITURE_CATEGORY_LABELS,
+  type FurnitureCategory,
+} from './furnitureCategories';
+import {
+  isCabinetShelfClassId,
+  isCabinetShelfClassName,
+} from './obj365Classes';
+
+export { FURNITURE_CATEGORY_LABELS } from './furnitureCategories';
+export type { FurnitureCategory } from './furnitureCategories';
 
 export interface Detection {
   bbox: [number, number, number, number];
@@ -60,15 +64,6 @@ export interface RefinedFurnitureDetection extends Detection {
   features: FurnitureFeatures;
   contributions: Record<FurnitureCategory, Record<string, number>>;
 }
-
-const CATEGORY_LABELS: Record<FurnitureCategory, { ko: string; en: string }> = {
-  lowerCabinet: { ko: '하부장', en: 'base cabinet' },
-  upperCabinet: { ko: '상부장', en: 'wall cabinet' },
-  wardrobe: { ko: '옷장', en: 'wardrobe' },
-  builtInCloset: { ko: '붙박이장', en: 'built-in closet' },
-  chestOfDrawers: { ko: '서랍장', en: 'chest of drawers' },
-  storageCabinet: { ko: '수납장', en: 'storage cabinet' },
-};
 
 const DEFAULT_OPTIONS: FurnitureRefinementOptions = {
   detectionScoreExponent: 0.7,
@@ -241,6 +236,8 @@ const CATEGORY_DEFINITIONS: CategoryComputation[] = [
   },
 ];
 
+// NOTE: 본 리파인 로직은 Cabinet/Shelf 클래스에만 적용
+// - 입력이 섞여 들어와도 Cabinet/Shelf 외 클래스는 무시하고 제외
 export const refineFurnitureDetections = (
   detections: Detection[] | null | undefined,
   imageMeta?: FurnitureImageMeta | null,
@@ -260,13 +257,28 @@ export const refineFurnitureDetections = (
     };
   }
 
+  // Cabinet/Shelf 만 선별
+  const cabinetOnly = detections.filter(
+    (d) =>
+      isCabinetShelfClassId(d.label as number) ||
+      isCabinetShelfClassName(d.className)
+  );
+
+  if (cabinetOnly.length === 0) {
+    return {
+      refinedDetections: [],
+      context: null,
+      options: mergedOptions,
+    };
+  }
+
   const effectiveImage = ensureImageMeta(imageMeta, DEFAULT_IMAGE_META);
-  const featureList = detections.map((detection) =>
+  const featureList = cabinetOnly.map((detection) =>
     deriveFeatures(detection, effectiveImage, mergedOptions)
   );
   const context = computeContext(featureList);
 
-  const refinedDetections = detections.map((detection, idx) =>
+  const refinedDetections = cabinetOnly.map((detection, idx) =>
     refineSingle(detection, featureList[idx], context, mergedOptions)
   );
 
@@ -450,14 +462,13 @@ const refineSingle = (
   });
 
   let bestLabel: FurnitureCategory = rawEntries[0]?.key ?? 'storageCabinet';
-  let bestProbability =
-    probabilities[bestLabel] ??
-    0(Object.keys(probabilities) as FurnitureCategory[]).forEach((key) => {
-      if ((probabilities[key] ?? 0) > bestProbability) {
-        bestLabel = key;
-        bestProbability = probabilities[key];
-      }
-    });
+  let bestProbability = probabilities[bestLabel] ?? 0;
+  (Object.keys(probabilities) as FurnitureCategory[]).forEach((key) => {
+    if ((probabilities[key] ?? 0) > bestProbability) {
+      bestLabel = key;
+      bestProbability = probabilities[key];
+    }
+  });
 
   const confidence = clamp01(bestProbability * baseScore);
 
@@ -482,7 +493,7 @@ const refineSingle = (
   return {
     ...detection,
     refinedLabel: bestLabel,
-    refinedKoLabel: CATEGORY_LABELS[bestLabel].ko,
+    refinedKoLabel: FURNITURE_CATEGORY_LABELS[bestLabel].ko,
     confidence,
     probabilities,
     features: furnitureFeatures,

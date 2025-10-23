@@ -11,7 +11,10 @@ import {
   type FurnitureCategory,
 } from '@/pages/generate/utils/furnitureCategories';
 import { toImageSpaceBBox } from '@/pages/generate/utils/imageProcessing';
-import { isFurnitureClassId } from '@/pages/generate/utils/obj365Classes';
+import {
+  isCabinetShelfClassId,
+  isCabinetShelfClassName,
+} from '@/pages/generate/utils/obj365Classes';
 import {
   refineFurnitureDetections,
   type Detection as RawDetection,
@@ -30,14 +33,15 @@ const clamp = (value: number, min: number, max: number) =>
 // - refineFurnitureDetections.confidence ∈ [0,1]
 const MIN_CONFIDENCE = 0.35;
 
-// 가구 관련 클래스만 선별
-// - 후보가 0개면 사용자 경험을 위해 원본 일부 유지
-const selectFurnitureCandidates = (detections: RawDetection[]) => {
-  const filtered = detections.filter((detection) =>
-    isFurnitureClassId(detection.label)
+// Cabinet/Shelf 클래스만 선별
+// - 본 프로젝트에서 세부 카테고리 리파인은 Cabinet/Shelf 전용
+// - 비-Cabinet은 여기서 제외해 후속 refine에 전달하지 않음
+const selectCabinetCandidates = (detections: RawDetection[]) => {
+  const filtered = detections.filter(
+    (d) =>
+      isCabinetShelfClassId(d.label) || isCabinetShelfClassName(d.className)
   );
-  // 필터 결과가 없으면 원본을 그대로 사용해 최소한의 핫스팟을 유지해요.
-  return filtered.length > 0 ? filtered : detections;
+  return filtered; // 없으면 빈 배열 반환 → refine 호출되지 않음
 };
 
 type DetectionData = {
@@ -137,8 +141,8 @@ export const DetectionHotspots = ({
         }
       );
 
-      const candidateDetections = selectFurnitureCandidates(pixelDetections);
-      console.log('[Detection] furniture candidates:', {
+      const candidateDetections = selectCabinetCandidates(pixelDetections);
+      console.log('[Detection] cabinet/shelf candidates:', {
         total: pixelDetections.length,
         candidates: candidateDetections.length,
       });
@@ -151,7 +155,7 @@ export const DetectionHotspots = ({
         return;
       }
 
-      // refineFurnitureDetections 로 가구 카테고리 재매핑 및 신뢰도 보정
+      // refineFurnitureDetections 는 Cabinet/Shelf 전용 추가 분석
       const { refinedDetections, context, options } = refineFurnitureDetections(
         candidateDetections,
         {

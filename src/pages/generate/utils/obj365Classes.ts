@@ -44,3 +44,14 @@ export const OBJ365_FURNITURE_CLASS_ID_SET = new Set(
 
 export const isFurnitureClassId = (classId: number | undefined | null) =>
   typeof classId === 'number' && OBJ365_FURNITURE_CLASS_ID_SET.has(classId);
+
+// Cabinet/Shelf 전용 식별자/체커
+// - 주의: 본 프로젝트에선 refine 단계는 Cabinet/Shelf에만 적용
+export const OBJ365_CABINET_SHELF_CLASS_ID = 12; // zero-based index in OBJ365_ALL_CLASSES
+export const OBJ365_CABINET_SHELF_CLASS_NAME = 'Cabinet/shelf';
+
+export const isCabinetShelfClassId = (classId: number | undefined | null) =>
+  typeof classId === 'number' && classId === OBJ365_CABINET_SHELF_CLASS_ID;
+
+export const isCabinetShelfClassName = (name: string | undefined | null) =>
+  (name ?? '') === OBJ365_CABINET_SHELF_CLASS_NAME;
