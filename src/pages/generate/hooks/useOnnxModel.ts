@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 
 import * as ort from 'onnxruntime-web';
 
-import { Detection, ProcessedDetections } from '../types';
 import { COCO_CLASSES } from '../utils/cocoClasses';
 import { preprocessImage } from '../utils/imageProcessing';
-import { OBJ365_CLASSES } from '../utils/obj365Classes';
+import { OBJ365_ALL_CLASSES } from '../utils/obj365AllClasses';
+
+import type { Detection, ProcessedDetections } from '../types/detection';
 
 ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 
@@ -122,7 +123,7 @@ export function useONNXModel(modelPath: string) {
 
           // Objects365 모델인지 확인
           const isObj365Model = modelPath.includes('obj365');
-          const classes = isObj365Model ? OBJ365_CLASSES : COCO_CLASSES;
+          const classes = isObj365Model ? OBJ365_ALL_CLASSES : COCO_CLASSES;
 
           // Objects365는 인덱스가 1부터 시작 (0은 background)
           const classIndex = isObj365Model ? labelValue - 1 : labelValue;
