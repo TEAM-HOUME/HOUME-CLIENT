@@ -2,10 +2,7 @@ import {
   FURNITURE_CATEGORY_LABELS,
   type FurnitureCategory,
 } from './furnitureCategories';
-import {
-  isCabinetShelfClassId,
-  isCabinetShelfClassName,
-} from './obj365Classes';
+import { isCabinetShelfIndex } from './obj365Furniture';
 
 export { FURNITURE_CATEGORY_LABELS } from './furnitureCategories';
 export type { FurnitureCategory } from './furnitureCategories';
@@ -257,11 +254,9 @@ export const refineFurnitureDetections = (
     };
   }
 
-  // Cabinet/Shelf 만 선별
-  const cabinetOnly = detections.filter(
-    (d) =>
-      isCabinetShelfClassId(d.label as number) ||
-      isCabinetShelfClassName(d.className)
+  // Cabinet/Shelf 만 선별 (라벨은 0‑based 기준)
+  const cabinetOnly = detections.filter((d) =>
+    isCabinetShelfIndex(d.label as number)
   );
 
   if (cabinetOnly.length === 0) {
