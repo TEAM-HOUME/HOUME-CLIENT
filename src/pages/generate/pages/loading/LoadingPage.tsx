@@ -28,6 +28,9 @@ type GenerateLocationState = {
   generateImageRequest: GenerateImageRequest;
 };
 
+// Location.state 형태 검증 헬퍼
+// - GenerateImageRequest 필수 필드만 검사
+// - 배열 요소 타입까지 확인
 const isGenerateLocationState = (
   value: unknown
 ): value is GenerateLocationState => {
@@ -41,24 +44,31 @@ const isGenerateLocationState = (
   const request = generateImageRequest as Record<string, unknown>;
   const floorPlan = request.floorPlan as Record<string, unknown> | undefined;
 
+  // GenerateImageRequest 인터페이스와 동일한 필수 항목만 검증
+  // - bedId는 타입에 없으므로 제외
+  const hasValidArrays =
+    Array.isArray(request.moodBoardIds) &&
+    (request.moodBoardIds as unknown[]).every((n) => typeof n === 'number') &&
+    Array.isArray(request.selectiveIds) &&
+    (request.selectiveIds as unknown[]).every((n) => typeof n === 'number');
+
+  const hasValidFloorPlan =
+    floorPlan !== undefined &&
+    typeof floorPlan === 'object' &&
+    typeof floorPlan.floorPlanId === 'number' &&
+    typeof floorPlan.isMirror === 'boolean';
+
   return (
     typeof request.houseId === 'number' &&
     typeof request.equilibrium === 'string' &&
     typeof request.activity === 'string' &&
-    typeof request.bedId === 'number' &&
-    Array.isArray(request.moodBoardIds) &&
-    (request.moodBoardIds as unknown[]).every((n) => typeof n === 'number') &&
-    Array.isArray(request.selectiveIds) &&
-    (request.selectiveIds as unknown[]).every((n) => typeof n === 'number') &&
-    floorPlan !== undefined &&
-    typeof floorPlan === 'object' &&
-    typeof floorPlan.floorPlanId === 'number' &&
-    typeof floorPlan.isMirror === 'boolean'
+    hasValidArrays &&
+    hasValidFloorPlan
   );
 };
 
 const LoadingPage = () => {
-  // 이미지 생성 api 코드 ...
+  // 이미지 생성 API 관련 훅/상태
   const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
@@ -89,7 +99,7 @@ const LoadingPage = () => {
   useEffect(() => {
     if (!requestData) return;
 
-    console.log('이미지 생성 요청 시작:', requestData);
+    console.log('이미지 생성 요청 시작:', requestData); // 서버로 생성 요청 트리거
     mutateGenerateImage(requestData, {
       onError: (error: any) => {
         // 재요청 코드 42900 확인
@@ -102,7 +112,7 @@ const LoadingPage = () => {
       },
     });
   }, [mutateGenerateImage, requestData]);
-  // ... 이미지 생성 api 코드 끝
+  // 이미지 생성 API 처리 끝
 
   useEffect(() => {
     return () => {
@@ -146,7 +156,7 @@ const LoadingPage = () => {
     !currentImages ||
     currentImages.length === 0;
 
-  // 정상 데이터가 있을 때만 현재 이미지 정보 계산
+  // 정상 데이터일 때 현재/다음 이미지 계산
   const currentImage = hasError ? null : currentImages[currentIndex];
   const isLast = hasError ? false : currentIndex === currentImages.length - 1;
   const nextImage = hasError
@@ -174,6 +184,7 @@ const LoadingPage = () => {
   };
 
   const handleVote = (isLike: boolean) => {
+    // 좋아요/별로예요 선택 시 서버 반영 + 애니메이션 전환
     if (isLoading) return;
 
     setSelected(isLike ? 'like' : 'dislike');
