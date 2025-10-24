@@ -1,14 +1,23 @@
+// useONNXModel 훅
+// - ONNX 모델 로딩 및 추론 실행 책임
+// - 입력: HTMLImageElement
+// - 전처리: 640x640 letterbox → float32 tensor 생성
+// - 출력: boxes/scores/labels를 가공해 Detection[] 반환
+// - 라벨: 모델(1‑based 가정) → 내부 표준(0‑based)로 정규화
+// - 가구 외 클래스는 훅 단계에서 즉시 제외
 import { useState, useEffect, useCallback } from 'react';
 
 import * as ort from 'onnxruntime-web';
 
-import { COCO_CLASSES } from '../utils/cocoClasses';
-import { preprocessImage } from '../utils/imageProcessing';
-import { OBJ365_ALL_CLASSES } from '../utils/obj365AllClasses';
+import { preprocessImage } from '../utils/imageProcessing'; // 입력 이미지를 640x640 텐서로 변환
+import {
+  isFurnitureIndex,
+  normalizeObj365Label,
+} from '../utils/obj365Furniture';
 
 import type { Detection, ProcessedDetections } from '../types/detection';
 
-ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
+ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/'; // WebAssembly 경로 설정
 
 export function useONNXModel(modelPath: string) {
   const [session, setSession] = useState<ort.InferenceSession | null>(null);
@@ -17,6 +26,8 @@ export function useONNXModel(modelPath: string) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // 모델 바이너리 로드 및 세션 생성
+    // - content-type 및 헤더 스니핑으로 잘못된 경로 조기 차단
     let isMounted = true;
 
     async function loadModel() {
@@ -38,7 +49,7 @@ export function useONNXModel(modelPath: string) {
         }
 
         setProgress(30);
-        const arrayBuffer = await response.arrayBuffer();
+        const arrayBuffer = await response.arrayBuffer(); // 모델 바이너리 로드
         const head = new Uint8Array(arrayBuffer.slice(0, 256));
         const headText = new TextDecoder('utf-8', { fatal: false }).decode(
           head
@@ -83,9 +94,10 @@ export function useONNXModel(modelPath: string) {
 
       const startTime = performance.now();
 
+      // 1) 전처리: 640x640 letterbox 후 CHW(float32) 텐서 생성
       const { tensor } = await preprocessImage(imageElement, 640, 640);
 
-      const inputTensor = new ort.Tensor('float32', tensor, [1, 3, 640, 640]);
+      const inputTensor = new ort.Tensor('float32', tensor, [1, 3, 640, 640]); // 입력 이미지 텐서
       // orig_target_sizes는 int64 타입이어야 함
       const sizeTensor = new ort.Tensor(
         'int64',
@@ -98,9 +110,11 @@ export function useONNXModel(modelPath: string) {
         orig_target_sizes: sizeTensor,
       };
 
+      // 2) 추론 실행: labels/boxes/scores 출력 기대
       const results = await session.run(feeds);
 
-      // labels는 BigInt64Array로 반환될 수 있음
+      // 3) 출력 텐서 파싱
+      // - labels는 BigInt64Array로 반환될 수 있음
       const labelsData = results.labels.data;
       const boxes = results.boxes.data as Float32Array;
       const scores = results.scores.data as Float32Array;
@@ -109,36 +123,37 @@ export function useONNXModel(modelPath: string) {
       const numDetections = scores.length;
 
       for (let i = 0; i < numDetections; i++) {
+        // 4) 점수 임계값 필터(실험값 0.5)
         if (scores[i] > 0.5) {
           const x = boxes[i * 4];
           const y = boxes[i * 4 + 1];
           const x2 = boxes[i * 4 + 2];
           const y2 = boxes[i * 4 + 3];
 
-          // BigInt를 Number로 변환
-          const labelValue =
+          // 5) 라벨 정규화: 모델 1‑based → 내부 0‑based
+          // - DETR/DFINE 계열은 0: 배경, 1부터 실제 클래스인 구성이 흔함
+          // - 내부 로직(JS/TS)은 0‑based가 자연스러우므로 경계에서 변환
+          const label1 =
             labelsData instanceof BigInt64Array
               ? Number(labelsData[i])
               : (labelsData as Float32Array)[i];
 
-          // Objects365 모델인지 확인
-          const isObj365Model = modelPath.includes('obj365');
-          const classes = isObj365Model ? OBJ365_ALL_CLASSES : COCO_CLASSES;
-
-          // Objects365는 인덱스가 1부터 시작 (0은 background)
-          const classIndex = isObj365Model ? labelValue - 1 : labelValue;
+          const classIndex0 = normalizeObj365Label(label1);
+          // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
+          if (!isFurnitureIndex(classIndex0)) continue;
 
           detections.push({
             bbox: [x, y, x2 - x, y2 - y],
             score: scores[i],
-            label: labelValue,
-            className: classes[classIndex] || `Class ${labelValue}`,
+            label: classIndex0, // 내부 표준: 0‑based index 저장
+            // className 부여 안 함: 이름표 비사용 정책
           });
         }
       }
 
       const inferenceTime = performance.now() - startTime;
 
+      // 7) 실행 시간과 함께 결과 반환
       return {
         detections,
         inferenceTime,
