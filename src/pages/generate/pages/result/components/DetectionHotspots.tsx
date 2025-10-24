@@ -1,7 +1,8 @@
 // DetectionHotspots
-// - 모델 추론 결과를 가구 후보로 정제하고 핫스팟으로 렌더
-// - 좌표 흐름: 모델(640) → 원본 픽셀 → 컨테이너(object-fit: cover 보정)
-// - 컴포넌트 책임: 추론 실행/후처리 호출, 좌표 투영, 단순 토글 UI
+// - 역할: 추론 결과 중 Cabinet/Shelf만 세부 리파인 → 핫스팟 렌더
+// - 좌표 흐름: 모델(640) → 원본 픽셀(toImageSpaceBBox) → 컨테이너(object-fit: cover 보정)
+// - 상태: 원본 메타, 컨테이너 크기, 감지 목록, 선택 id
+// - 비고: 리파인은 Cabinet/Shelf 전용, 신뢰도 임계값 기반 표시
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useONNXModel } from '@/pages/generate/hooks/useOnnxModel';
@@ -11,10 +12,7 @@ import {
   type FurnitureCategory,
 } from '@/pages/generate/utils/furnitureCategories';
 import { toImageSpaceBBox } from '@/pages/generate/utils/imageProcessing';
-import {
-  isCabinetShelfClassId,
-  isCabinetShelfClassName,
-} from '@/pages/generate/utils/obj365Classes';
+import { isCabinetShelfIndex } from '@/pages/generate/utils/obj365Furniture';
 import {
   refineFurnitureDetections,
   type Detection as RawDetection,
@@ -26,23 +24,20 @@ import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 import * as styles from './DetectionHotspots.css.ts';
 
 // 수치 보정 유틸리티
+// - clamp: 값을 [min,max] 범위로 고정
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 // 감지 신뢰도 최소 임계값(threshold)
 // - refineFurnitureDetections.confidence ∈ [0,1]
+// - UI 최소 표시 기준, 낮을수록 false positive 가능성 증가
 const MIN_CONFIDENCE = 0.35;
 
-// Cabinet/Shelf 클래스만 선별
-// - 본 프로젝트에서 세부 카테고리 리파인은 Cabinet/Shelf 전용
-// - 비-Cabinet은 여기서 제외해 후속 refine에 전달하지 않음
-const selectCabinetCandidates = (detections: RawDetection[]) => {
-  const filtered = detections.filter(
-    (d) =>
-      isCabinetShelfClassId(d.label) || isCabinetShelfClassName(d.className)
-  );
-  return filtered; // 없으면 빈 배열 반환 → refine 호출되지 않음
-};
+// Cabinet/Shelf 후보 선별기 (라벨은 0‑based 기준)
+// - 리파인은 Cabinet/Shelf 전용
+// - 비-Cabinet은 제외
+const selectCabinetCandidates = (detections: RawDetection[]) =>
+  detections.filter((d) => isCabinetShelfIndex(d.label as number));
 
 type DetectionData = {
   id: number;
@@ -123,9 +118,9 @@ export const DetectionHotspots = ({
   }
 
   // 후처리 파이프라인
-  // 1) 640 좌표 → 원본 픽셀 역투영
-  // 2) 가구 클래스 선별 → 도메인 리파인
-  // 3) UI 임계값 필터 및 폴백
+  // 1) 640 좌표 → 원본 픽셀 역투영(toImageSpaceBBox)
+  // 2) Cabinet/Shelf 후보 선별 → 도메인 리파인(refineFurnitureDetections)
+  // 3) UI 임계값 필터(MIN_CONFIDENCE) 및 폴백(최대 3개)
   const processDetections = useCallback(
     (imageEl: HTMLImageElement, inference: ProcessedDetections) => {
       const natW = imageEl.naturalWidth || imageEl.width;
@@ -155,7 +150,7 @@ export const DetectionHotspots = ({
         return;
       }
 
-      // refineFurnitureDetections 는 Cabinet/Shelf 전용 추가 분석
+      // Cabinet/Shelf 전용 추가 분석
       const { refinedDetections, context, options } = refineFurnitureDetections(
         candidateDetections,
         {
@@ -346,7 +341,7 @@ export const DetectionHotspots = ({
                   prev === hotspot.id ? null : hotspot.id
                 )
               }
-              aria-label={`hotspot ${hotspot.refinedKoLabel ?? hotspot.className ?? ''}`}
+              aria-label={`hotspot ${hotspot.refinedKoLabel ?? 'cabinet'}`}
             >
               {selectedId === hotspot.id ? <HotspotColor /> : <HotspotGray />}
             </button>
