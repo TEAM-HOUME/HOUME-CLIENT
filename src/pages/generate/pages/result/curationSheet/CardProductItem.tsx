@@ -5,6 +5,7 @@ import { useIsMutating } from '@tanstack/react-query';
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { useToast } from '@/shared/components/toast/useToast';
+import { SESSION_STORAGE_KEYS } from '@/shared/constants/bottomSheet';
 import { TOAST_TYPE } from '@/shared/types/toast';
 import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 
@@ -19,9 +20,6 @@ interface CardProductItemProps {
   };
   onGotoMypage: () => void;
 }
-
-const SS_KEY_FOCUS_ITEM_ID = 'focusItemId';
-const SS_KEY_ACTIVE_TAB = 'activeTab';
 
 const CardProductItem = memo(
   ({ product, onGotoMypage }: CardProductItemProps) => {
@@ -42,8 +40,11 @@ const CardProductItem = memo(
       }) > 0;
 
     const handleNavigateAndFocus = () => {
-      sessionStorage.setItem(SS_KEY_FOCUS_ITEM_ID, String(recommendId)); // 세션 스토리지에 잠시 저장
-      sessionStorage.setItem(SS_KEY_ACTIVE_TAB, 'savedItems'); // Tab 정보
+      sessionStorage.setItem(
+        SESSION_STORAGE_KEYS.FOCUS_ITEM_ID,
+        String(recommendId)
+      ); // 세션 스토리지에 잠시 저장
+      sessionStorage.setItem(SESSION_STORAGE_KEYS.ACTIVE_TAB, 'savedItems'); // Tab 정보
       onGotoMypage();
     };
 

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
+import { SESSION_STORAGE_KEYS } from '@/shared/constants/bottomSheet';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
@@ -25,11 +26,11 @@ const SavedItemsSection = () => {
   const itemFocusRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const id = sessionStorage.getItem('focusItemId');
+    const id = sessionStorage.getItem(SESSION_STORAGE_KEYS.FOCUS_ITEM_ID);
 
     if (id) {
       setFocusItemId(id);
-      sessionStorage.removeItem('focusItemId');
+      sessionStorage.removeItem(SESSION_STORAGE_KEYS.FOCUS_ITEM_ID);
     }
   }, []);
 
