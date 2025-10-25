@@ -19,7 +19,7 @@ const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
 interface CurationSheetWrapperProps {
-  children: ReactNode;
+  children: (snapState: 'collapsed' | 'mid' | 'expanded') => ReactNode;
 }
 
 export const CurationSheetWrapper = ({
@@ -101,7 +101,7 @@ export const CurationSheetWrapper = ({
           >
             <DragHandle />
           </div>
-          {children}
+          {children(snapState)}
         </div>
       </div>
     </>

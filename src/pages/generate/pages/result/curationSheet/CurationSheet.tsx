@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 
 import FilterChip from '@/pages/generate/components/filterChip/FilterChip';
@@ -41,35 +42,46 @@ export const CurationSheet = () => {
 
   return (
     <CurationSheetWrapper>
-      <div className={styles.filterSection}>
-        {filterMockData.map((filter) => (
-          <FilterChip
-            key={filter.id}
-            isSelected={selectedFilter === filter.id}
-            onClick={() => setSelectedFilter(filter.id)}
-          >
-            {filter.furniture}
-          </FilterChip>
-        ))}
-      </div>
-      <div className={styles.scrollContentArea}>
-        <p className={styles.headerText}>
-          {displayName}님의 취향에 딱 맞는 가구 추천
-        </p>
-        {/* 그리드 영역 */}
-        <div className={styles.curationSection}>
-          <div className={styles.gridbox}>
-            {/* TODO: 목데이터 사용 > 실제 api 연동 */}
-            {productMockData.map((p) => (
-              <CardProductItem
-                key={p.furnitureProductId}
-                product={p}
-                onGotoMypage={handleGotoMypage}
-              />
+      {(snapState) => (
+        <>
+          <div className={styles.filterSection}>
+            {filterMockData.map((filter) => (
+              <FilterChip
+                key={filter.id}
+                isSelected={selectedFilter === filter.id}
+                onClick={() => setSelectedFilter(filter.id)}
+              >
+                {filter.furniture}
+              </FilterChip>
             ))}
           </div>
-        </div>
-      </div>
+          <div
+            className={clsx(
+              styles.scrollContentBase,
+              styles.scrollContentArea[
+                snapState === 'expanded' ? 'expanded' : 'mid'
+              ]
+            )}
+          >
+            <p className={styles.headerText}>
+              {displayName}님의 취향에 딱 맞는 가구 추천
+            </p>
+            {/* 그리드 영역 */}
+            <div className={styles.curationSection}>
+              <div className={styles.gridbox}>
+                {/* TODO: 목데이터 사용 > 실제 api 연동 */}
+                {productMockData.map((p) => (
+                  <CardProductItem
+                    key={p.furnitureProductId}
+                    product={p}
+                    onGotoMypage={handleGotoMypage}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </CurationSheetWrapper>
   );
 };

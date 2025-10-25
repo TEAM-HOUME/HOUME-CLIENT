@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
@@ -29,7 +29,7 @@ export const filterSection = style({
   msOverflowStyle: 'none', // IE and Edge
 });
 
-export const scrollContentArea = style({
+export const scrollContentBase = style({
   overflowY: 'auto',
   maxHeight: '52rem',
   overscrollBehavior: 'contain', // 내부 스크롤 - 상위 시트 간 드래그 간섭 완화
@@ -41,6 +41,11 @@ export const scrollContentArea = style({
   },
   scrollbarWidth: 'none', // Firefox
   msOverflowStyle: 'none', // IE and Edge
+});
+
+export const scrollContentArea = styleVariants({
+  mid: { maxHeight: '28.9rem' },
+  expanded: { maxHeight: '52rem' },
 });
 
 export const headerText = style({
