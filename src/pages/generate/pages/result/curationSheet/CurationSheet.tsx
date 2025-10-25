@@ -12,7 +12,7 @@ import { ROUTES } from '@/routes/paths';
 import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
 
-import { CardProductItem } from './CardProductItem';
+import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
 import { CurationSheetWrapper } from './CurationSheetWrapper';
 

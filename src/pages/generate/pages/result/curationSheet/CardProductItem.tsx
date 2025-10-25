@@ -23,7 +23,7 @@ interface CardProductItemProps {
 const SS_KEY_FOCUS_ITEM_ID = 'focusItemId';
 const SS_KEY_ACTIVE_TAB = 'activeTab';
 
-export const CardProductItem = memo(
+const CardProductItem = memo(
   ({ product, onGotoMypage }: CardProductItemProps) => {
     const recommendId = product.id;
 
@@ -81,3 +81,4 @@ export const CardProductItem = memo(
 );
 
 CardProductItem.displayName = 'CardProductItem';
+export default CardProductItem;
