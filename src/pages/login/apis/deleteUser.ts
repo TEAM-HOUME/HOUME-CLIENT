@@ -1,7 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
+import { ROUTES } from '@/routes/paths';
 import { HTTPMethod, request } from '@/shared/apis/request';
+import { useToast } from '@/shared/components/toast/useToast';
 import type { BaseResponse } from '@/shared/types/apis';
+import { TOAST_TYPE } from '@/shared/types/toast';
 import { useUserStore } from '@/store/useUserStore';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
@@ -42,8 +46,8 @@ export const deleteUser = async (): Promise<DeleteUserResponse> => {
  * 회원탈퇴 React Query 훅
  *
  * 사용자 회원탈퇴를 처리하는 TanStack Query mutation 훅입니다.
- * 회원탈퇴 성공 시 로컬 스토리지를 정리하고 홈으로 이동합니다.
- * 실패 시에도 사용자 데이터를 정리하여 보안을 유지합니다.
+ * 모든 성공/에러 처리를 훅 내부에서 통합 관리하여 재사용성을 높였습니다.
+ * 컴포넌트에서는 단순히 deleteUser() 호출만 하면 됩니다.
  *
  * @returns {UseMutationResult<DeleteUserResponse, Error, void>} 회원탈퇴 상태와 함수를 반환
  *
@@ -53,8 +57,8 @@ export const deleteUser = async (): Promise<DeleteUserResponse> => {
  *   const { mutate: deleteAccount, isPending } = useDeleteUserMutation();
  *
  *   const handleDelete = () => {
- *     if (confirm('정말로 회원탈퇴 하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
- *       deleteAccount();
+ *     if (confirm('정말로 회원탈퇴 하시겠습니까?')) {
+ *       deleteAccount(); // 모든 처리는 훅 내부에서!
  *     }
  *   };
  *
@@ -67,13 +71,39 @@ export const deleteUser = async (): Promise<DeleteUserResponse> => {
  * ```
  */
 export const useDeleteUserMutation = () => {
+  const navigate = useNavigate();
+  const { notify } = useToast();
+
   return useMutation<DeleteUserResponse, Error, void>({
     mutationFn: deleteUser,
-    onSuccess: () => {
+    retry: false,
+    onSuccess: (response) => {
+      console.log('회원탈퇴 성공:', response.message, response.data);
+
+      // 성공 토스트 표시
+      notify({
+        text: '탈퇴되었습니다',
+        type: TOAST_TYPE.INFO,
+        options: { autoClose: 2500 },
+      });
+
+      // 홈으로 이동
+      navigate(ROUTES.HOME, { replace: true });
+
       // 네비게이션 완료 후 토큰 삭제 (100ms 지연)
       setTimeout(() => {
         useUserStore.getState().clearUser();
       }, 100);
+    },
+    onError: (error) => {
+      console.error('회원탈퇴 실패:', error);
+
+      // 에러 토스트 표시
+      notify({
+        text: '탈퇴에 실패했습니다. 다시 시도해주세요.',
+        type: TOAST_TYPE.WARNING,
+        options: { autoClose: 2500 },
+      });
     },
   });
 };

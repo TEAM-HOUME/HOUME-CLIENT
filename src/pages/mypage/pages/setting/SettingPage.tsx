@@ -66,32 +66,7 @@ const SettingPage = () => {
         onCancel={() => {
           // 모달 닫기
           unmount();
-
-          // 회원탈퇴 API 호출
-          deleteUser(undefined, {
-            onSuccess: (response) => {
-              console.log('회원탈퇴 성공:', response.message, response.data);
-
-              // API 성공 시 토스트 표시
-              notify({
-                text: '탈퇴되었습니다',
-                type: TOAST_TYPE.INFO,
-                options: { autoClose: 2500 },
-              });
-
-              // 홈으로 이동
-              navigate(ROUTES.HOME, { replace: true });
-            },
-            onError: (error) => {
-              console.error('회원탈퇴 실패:', error);
-              // 에러 시 에러 토스트 표시
-              notify({
-                text: '탈퇴에 실패했습니다. 다시 시도해주세요.',
-                type: TOAST_TYPE.WARNING,
-                options: { autoClose: 2500 },
-              });
-            },
-          });
+          deleteUser();
         }}
         onConfirm={unmount}
         onClose={unmount}
