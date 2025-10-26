@@ -62,7 +62,7 @@ const LoadingPage = () => {
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
   const { isApiCompleted, navigationData } = useGenerateStore();
-  // const [shouldCheckStatus, setShouldCheckStatus] = useState(true); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
+  const [shouldCheckStatus, setShouldCheckStatus] = useState(false); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
   const rawState = location.state;
   const hasInvalidState =
@@ -76,8 +76,10 @@ const LoadingPage = () => {
   // 브라우저 환경에 맞춰 setTimeout 반환을 number로 정규화
   const transitionTimeoutRef = useRef<number | null>(null);
 
-  // 상태 폴링은 requestData가 있을 때만 시작
-  useGenerateImageStatusCheck(requestData?.houseId || 0, !!requestData);
+  // 폴백 API는 42900/42901 에러 발생 시 또는 새로고침 시에만 실행
+  // requestData가 있으면 새로고침이거나 이미 폴백이 시작된 상황
+  const shouldRunFallback = shouldCheckStatus || !!requestData;
+  useGenerateImageStatusCheck(requestData?.houseId || 0, shouldRunFallback);
 
   useEffect(() => {
     if (hasInvalidState) {
@@ -91,17 +93,28 @@ const LoadingPage = () => {
     console.log('이미지 생성 요청 시작:', requestData);
     mutateGenerateImage(requestData, {
       onError: (error: any) => {
-        // 재요청 코드 42900 확인
-        if (error?.response?.data?.code === 42900) {
-          console.log('재요청 필요, 상태 체크 시작');
-          // setShouldCheckStatus(true);
-        } else {
+        // 일반 429 에러 처리 (Too Many Requests)
+        if (error?.response?.status === 429) {
+          console.log('요청 과다, 폴백 API 시작');
+          setShouldCheckStatus(true);
+        }
+        // 42900 에러 처리 (단일 이미지 생성 시 재요청 필요)
+        else if (error?.response?.data?.code === 42900) {
+          console.log('단일 이미지 생성 재요청 필요, 폴백 API 시작');
+          setShouldCheckStatus(true);
+        }
+        // 42901 에러 처리 (다중 이미지 생성 시 서버 가용 한계치 초과)
+        else if (error?.response?.data?.code === 42901) {
+          console.log('다중 이미지 생성 요청 과다, 폴백 API 시작');
+          setShouldCheckStatus(true);
+        }
+        // 기타 에러 처리
+        else {
           console.error('이미지 생성 실패:', error);
         }
       },
     });
-  }, [mutateGenerateImage, requestData]);
-  // ... 이미지 생성 api 코드 끝
+  }, [mutateGenerateImage, requestData, handleError]);
 
   useEffect(() => {
     return () => {
