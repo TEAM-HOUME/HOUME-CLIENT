@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
@@ -57,22 +57,30 @@ const ResultPage = () => {
     }
   )?.result;
 
-  // 2차: query parameter에서 imageId 가져와서 API 호출 (직접 접근 시)
-  const imageId = searchParams.get('imageId');
+  // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
+  const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');
   const isFromMypage = from === 'mypage';
-  const shouldFetchFromAPI = !result && !!imageId;
+  // houseId 파싱 및 검증: 양의 정수 문자열만 허용
+  const trimmedHouseId = rawHouseId?.trim() ?? null;
+  const parsedHouseId =
+    trimmedHouseId !== null &&
+    /^[1-9]\d*$/.test(trimmedHouseId) &&
+    Number.isSafeInteger(Number(trimmedHouseId))
+      ? Number(trimmedHouseId)
+      : null;
+  const shouldFetchFromAPI = !result && parsedHouseId !== null;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
   const { data: apiResult, isLoading } = useGetResultDataQuery(
-    Number(imageId || 0),
+    parsedHouseId ?? 0,
     {
       enabled: shouldFetchFromAPI && !isFromMypage,
     }
   );
 
   const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
-    Number(imageId || 0),
+    parsedHouseId ?? 0,
     { enabled: shouldFetchFromAPI && isFromMypage }
   );
 
@@ -81,8 +89,8 @@ const ResultPage = () => {
     if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
       // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
       console.log('mypageResult.histories', mypageResult.histories);
-      const allImageData = mypageResult.histories.map((history, index) => ({
-        imageId: Number(imageId) + index,
+      const allImageData = mypageResult.histories.map((history) => ({
+        imageId: history.imageId,
         imageUrl: history.generatedImageUrl,
         isMirror: false,
         equilibrium: history.equilibrium,
@@ -100,6 +108,15 @@ const ResultPage = () => {
     }
   }
 
+  // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)
+  const historyById = useMemo(
+    () =>
+      isFromMypage && mypageResult?.histories
+        ? new Map(mypageResult.histories.map((h) => [h.imageId, h]))
+        : null,
+    [isFromMypage, mypageResult?.histories]
+  );
+
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
   const currentLikeState = (() => {
     // 1. 로컬 상태가 있으면 사용 (null도 포함)
@@ -107,10 +124,9 @@ const ResultPage = () => {
       return imageLikeStates[currentImgId];
     }
 
-    // 2. 마이페이지 히스토리에서 찾기
-    if (isFromMypage && mypageResult?.histories) {
-      const historyIndex = currentImgId - Number(imageId);
-      const currentHistory = mypageResult.histories[historyIndex];
+    // 2. 마이페이지 히스토리에서 찾기 (imageId로 매칭)
+    if (historyById) {
+      const currentHistory = historyById.get(currentImgId);
       if (currentHistory && currentHistory.isLike !== undefined) {
         // isLike가 null이면 null 반환, 그렇지 않으면 boolean 값에 따라 변환
         return currentHistory.isLike === null
@@ -131,10 +147,9 @@ const ResultPage = () => {
       return imageFactorStates[currentImgId];
     }
 
-    // 2. 마이페이지 히스토리에서 찾기
-    if (isFromMypage && mypageResult?.histories) {
-      const historyIndex = currentImgId - Number(imageId);
-      const currentHistory = mypageResult.histories[historyIndex];
+    // 2. 마이페이지 히스토리에서 찾기 (imageId로 매칭)
+    if (historyById) {
+      const currentHistory = historyById.get(currentImgId);
       if (currentHistory && currentHistory.factorId) {
         return currentHistory.factorId;
       }

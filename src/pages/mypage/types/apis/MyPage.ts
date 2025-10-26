@@ -15,6 +15,7 @@ export interface MyPageImageHistory {
   equilibrium: string;
   houseForm: string;
   imageId: number;
+  houseId: number;
 }
 
 export interface MyPageImagesData {
@@ -33,6 +34,7 @@ export interface MyPageImageDetail {
   isLike: boolean;
   factorId?: number;
   factorText?: string;
+  imageId: number;
 }
 
 export interface MyPageImageDetailData {

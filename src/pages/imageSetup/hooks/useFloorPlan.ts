@@ -1,17 +1,12 @@
 import { useCallback, useState } from 'react';
 
 import { useFloorPlanQuery } from '../apis/floorPlan';
+import { useFunnelStore } from '../stores/useFunnelStore';
 
 import type {
   CompletedFloorPlan,
   ImageSetupSteps,
 } from '../types/funnel/steps';
-
-// interface SelectedFloorPlanTypes {
-//   id: number;
-//   src: string;
-//   flipped: boolean;
-// }
 
 export const useFloorPlan = (
   context: ImageSetupSteps['FloorPlan'],
@@ -22,11 +17,15 @@ export const useFloorPlan = (
   const { data, isLoading, error, isError } = useFloorPlanQuery();
   console.log('도면 데이터: ', data);
 
+  // Zustand store에서 저장된 데이터
+  const savedFloorPlan = useFunnelStore((state) => state.floorPlan);
+  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
+
   const [selectedId, setSelectedId] = useState<number | null>(
-    context.floorPlan?.floorPlanId || null
+    savedFloorPlan?.floorPlanId ?? context.floorPlan?.floorPlanId ?? null
   );
   const [isMirror, setIsMirror] = useState<boolean>(
-    context.floorPlan?.isMirror || false
+    savedFloorPlan?.isMirror ?? context.floorPlan?.isMirror ?? false
   );
 
   const handleImageSelect = useCallback((id: number) => {
@@ -41,21 +40,27 @@ export const useFloorPlan = (
   const handleFloorPlanSelection = useCallback(() => {
     if (selectedId === null) return;
 
+    const floorPlanData = {
+      floorPlanId: selectedId,
+      isMirror: isMirror,
+    };
+
+    // Zustand에 저장
+    useFunnelStore.getState().setFloorPlan(floorPlanData);
+
     const payload: CompletedFloorPlan = {
-      houseType: context.houseType,
-      roomType: context.roomType,
-      areaType: context.areaType,
-      houseId: context.houseId,
-      floorPlan: {
-        floorPlanId: selectedId,
-        isMirror: isMirror,
-      },
+      houseType: savedHouseInfo?.houseType ?? context.houseType,
+      roomType: savedHouseInfo?.roomType ?? context.roomType,
+      areaType: savedHouseInfo?.areaType ?? context.areaType,
+      houseId: savedHouseInfo?.houseId ?? context.houseId,
+      floorPlan: floorPlanData,
     };
 
     onNext(payload);
   }, [
     selectedId,
     isMirror,
+    savedHouseInfo,
     context.houseType,
     context.roomType,
     context.areaType,

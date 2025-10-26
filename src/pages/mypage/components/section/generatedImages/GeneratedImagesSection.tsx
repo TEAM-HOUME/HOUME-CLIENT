@@ -1,71 +1,37 @@
-//import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
+import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+import { ROUTES } from '@/routes/paths.ts';
+import Loading from '@/shared/components/loading/Loading';
 
 import * as styles from './GeneratedImagesSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
 
 const GeneratedImagesSection = () => {
-  // TODO: API 연동 시 useMyPageImages 훅 사용
-  // const { data: imagesData, isLoading } = useMyPageImages();
+  const navigate = useNavigate();
+  const { data: imagesData, isLoading, isError } = useMyPageImages();
 
-  // 임시 데이터
-  const imagesData = {
-    histories: [
-      {
-        imageId: 1,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-      {
-        imageId: 2,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-      {
-        imageId: 3,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-      {
-        imageId: 4,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-      {
-        imageId: 5,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-      {
-        imageId: 6,
-        generatedImageUrl: '',
-        tasteTag: '',
-        equilibrium: '',
-        houseForm: '',
-      },
-    ],
+  const handleViewResult = (houseId: number) => {
+    const params = new URLSearchParams({
+      from: 'mypage',
+      houseId: String(houseId),
+    });
+    navigate(`${ROUTES.GENERATE_RESULT}?${params.toString()}`);
   };
-
-  const isLoading = false;
 
   // 로딩 중
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
+  }
+
+  // 에러 또는 데이터 없음
+  if (isError || !imagesData) {
+    return <EmptyStateSection type="generatedImages" />;
   }
 
   // 이미지가 없을 때
-  if (!imagesData || imagesData.histories.length === 0) {
+  if (imagesData.histories.length === 0) {
     return <EmptyStateSection type="generatedImages" />;
   }
 
@@ -76,7 +42,7 @@ const GeneratedImagesSection = () => {
           <CardCuration
             key={image.imageId}
             imageUrl={image.generatedImageUrl}
-            onCurationClick={() => console.log('큐레이션 보기', image.imageId)}
+            onCurationClick={() => handleViewResult(image.houseId)}
           />
         ))}
       </div>
