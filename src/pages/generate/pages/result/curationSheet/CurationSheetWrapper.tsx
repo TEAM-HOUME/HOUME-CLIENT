@@ -19,7 +19,7 @@ const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
 interface CurationSheetWrapperProps {
-  children: ReactNode;
+  children: (snapState: 'collapsed' | 'mid' | 'expanded') => ReactNode;
 }
 
 export const CurationSheetWrapper = ({
@@ -65,8 +65,9 @@ export const CurationSheetWrapper = ({
 
   // backdrop 활성화시 body의 스크롤 막기
   useEffect(() => {
-    document.body.style.overflow =
-      snapState === 'expanded' ? 'hidden' : 'unset';
+    const lock = snapState !== 'collapsed';
+
+    document.body.style.overflow = lock ? 'hidden' : 'unset';
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -100,7 +101,7 @@ export const CurationSheetWrapper = ({
           >
             <DragHandle />
           </div>
-          {children}
+          {children(snapState)}
         </div>
       </div>
     </>
