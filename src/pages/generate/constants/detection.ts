@@ -6,6 +6,9 @@
 
 export const OBJ365_MODEL_PATH = '/models/dfine_s_obj365.onnx'; // 모델 경로
 
+// 모델 단계 임계값: 추론 필터링에 사용
+export const MODEL_MIN_CONFIDENCE = 0.5; // 모델 필터 임계값(기존 하드코딩 0.5 유지)
+
 export const DETECTION_MIN_CONFIDENCE = 0.35; // UI 표시 임계값
 
 export const FALLBACK_MAX_CANDIDATES = 3; // 폴백 후보 최대 개수
