@@ -255,9 +255,7 @@ export const refineFurnitureDetections = (
   }
 
   // Cabinet/Shelf 만 선별 (라벨은 0‑based 기준)
-  const cabinetOnly = detections.filter((d) =>
-    isCabinetShelfIndex(d.label as number)
-  );
+  const cabinetOnly = detections.filter((d) => isCabinetShelfIndex(d.label));
 
   if (cabinetOnly.length === 0) {
     return {
