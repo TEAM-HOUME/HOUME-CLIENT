@@ -35,10 +35,11 @@ dist-ssr
 *storybook.log
 storybook-static
 
+.pnpm-store/
+
 # Others
 .claude
 CLAUDE.md
-.taskmaster
 .cursor
 docs/
 
