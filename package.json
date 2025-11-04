@@ -23,7 +23,6 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "onnxruntime": "npm:onnxruntime-node@^1.23.0",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
     "@use-funnel/browser": "^0.0.15",
