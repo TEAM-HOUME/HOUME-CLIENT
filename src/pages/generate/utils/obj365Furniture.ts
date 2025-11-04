@@ -2,9 +2,8 @@
 // - 내부 표준 라벨은 0‑based index를 사용
 // - 모델 출력(1‑based)을 입력받을 경우 normalizeObj365Label로 변환 후 사용
 
-// 가구 관련 0‑based 인덱스 집합
-// 기존 OBJ365_ALL_CLASSES에서 가구성 객체만 선별해 유지
-export const OBJ365_FURNITURE_INDEX_SET = new Set<number>([
+// 가구 관련 0‑based 인덱스는 튜플로 고정
+export const OBJ365_FURNITURE_INDEXES = [
   2, // Chair
   6, // Lamp
   9, // Desk
@@ -32,7 +31,13 @@ export const OBJ365_FURNITURE_INDEX_SET = new Set<number>([
   168, // Side Table
   175, // Radiator
   191, // Bathtub
-]);
+] as const;
+
+// 선정 기준: 실내 가구 및 필수 소품으로 모델 학습 시 검증된 목록 유지
+// Candle 등 소품은 광원/장식 역할로 후처리 로직에서 필요
+export const OBJ365_FURNITURE_INDEX_SET = new Set<number>(
+  OBJ365_FURNITURE_INDEXES
+);
 
 // Cabinet/Shelf 고정 인덱스(0‑based)
 export const OBJ365_CABINET_SHELF_INDEX = 12;

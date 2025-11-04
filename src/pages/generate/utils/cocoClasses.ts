@@ -1,4 +1,5 @@
 // COCO 80 class names (index starts at 0)
+// 모델 클래스 이름 목록은 읽기 전용으로 유지
 export const COCO_CLASSES = [
   'person',
   'bicycle',
@@ -80,4 +81,4 @@ export const COCO_CLASSES = [
   'teddy bear',
   'hair drier',
   'toothbrush',
-];
+] as const;
