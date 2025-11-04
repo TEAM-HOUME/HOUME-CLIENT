@@ -115,13 +115,17 @@ export function useONNXModel(modelPath: string) {
       const startTime = performance.now();
 
       // 1) 전처리: 640x640 letterbox 후 CHW(float32) 텐서 생성
-      const { tensor } = await preprocessImage(imageElement, 640, 640);
+      const { tensor, originalWidth, originalHeight } = await preprocessImage(
+        imageElement,
+        640,
+        640
+      );
 
       const inputTensor = new ort.Tensor('float32', tensor, [1, 3, 640, 640]); // 입력 이미지 텐서
       // orig_target_sizes는 int64 타입이어야 함
       const sizeTensor = new ort.Tensor(
         'int64',
-        new BigInt64Array([BigInt(640), BigInt(640)]),
+        new BigInt64Array([BigInt(originalHeight), BigInt(originalWidth)]),
         [1, 2]
       );
 
