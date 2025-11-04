@@ -1,26 +1,31 @@
-export async function preprocessImage(
+export function preprocessImage(
   imageElement: HTMLImageElement,
   targetWidth: number = 640,
   targetHeight: number = 640
-): Promise<{
+): {
   tensor: Float32Array;
   originalWidth: number;
   originalHeight: number;
   scale: number;
-}> {
+} {
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('2D 컨텍스트(context) 생성 실패');
+  }
 
   canvas.width = targetWidth;
   canvas.height = targetHeight;
-  // CSS나 레이아웃 영향 없이 원본 크기를 기준으로 계산
+  // 레터박스(letterbox) 파라미터는 getLetterboxParams로 재사용해 중복을 방지
+  const { scale, padX, padY } = getLetterboxParams(
+    imageElement,
+    targetWidth,
+    targetHeight
+  );
   const srcW = imageElement.naturalWidth || imageElement.width;
   const srcH = imageElement.naturalHeight || imageElement.height;
-  const scale = Math.min(targetWidth / srcW, targetHeight / srcH);
   const scaledWidth = srcW * scale;
   const scaledHeight = srcH * scale;
-  const padX = (targetWidth - scaledWidth) / 2;
-  const padY = (targetHeight - scaledHeight) / 2;
 
   // 빈 영역은 검정색으로 채워 letterbox를 만들도록
   ctx.fillStyle = '#000000';
