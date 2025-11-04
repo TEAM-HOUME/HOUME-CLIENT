@@ -17,7 +17,7 @@ interface DetectionHotspotsProps {
   mirrored?: boolean;
 }
 
-export const DetectionHotspots = ({
+const DetectionHotspots = ({
   imageUrl,
   mirrored = false,
 }: DetectionHotspotsProps) => {
@@ -37,6 +37,7 @@ export const DetectionHotspots = ({
       <div ref={containerRef} className={styles.container}>
         <img
           ref={imgRef}
+          crossOrigin="anonymous"
           src={imageUrl}
           alt="generated"
           className={styles.image}
