@@ -1,41 +1,58 @@
 // useONNXModel 훅
-// - ONNX 모델 로딩 및 추론 실행 책임
+// - ONNX 모델 로딩 및 추론 실행
 // - 입력: HTMLImageElement
 // - 전처리: 640x640 letterbox → float32 tensor 생성
 // - 출력: boxes/scores/labels를 가공해 Detection[] 반환
 // - 라벨: 모델(1‑based 가정) → 내부 표준(0‑based)로 정규화
 // - 가구 외 클래스는 훅 단계에서 즉시 제외
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-import * as ort from 'onnxruntime-web';
-
-import { preprocessImage } from '../utils/imageProcessing'; // 입력 이미지를 640x640 텐서로 변환
+import { MODEL_MIN_CONFIDENCE } from '@pages/generate/constants/detection';
+import { preprocessImage } from '@pages/generate/utils/imageProcessing'; // 입력 이미지를 640x640 텐서로 변환
 import {
   isFurnitureIndex,
   normalizeObj365Label,
-} from '../utils/obj365Furniture';
+} from '@pages/generate/utils/obj365Furniture';
 
-import type { Detection, ProcessedDetections } from '../types/detection';
+import type {
+  Detection,
+  ProcessedDetections,
+} from '@pages/generate/types/detection';
 
-ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/'; // WebAssembly 경로 설정
-
+/**
+ * Obj365 ONNX 모델을 로드하고 추론 세션을 관리하는 React 훅
+ * - 브라우저(onnxruntime-web)에서 동작하도록 동적 임포트를 사용
+ * - 640×640 렌더링 텐서를 입력으로 받아 감지 결과를 반환
+ * - 추론 결과는 후속 파이프라인(`useFurnitureHotspots`)에서 원본 좌표로 보정
+ */
 export function useONNXModel(modelPath: string) {
-  const [session, setSession] = useState<ort.InferenceSession | null>(null);
+  const [session, setSession] = useState<
+    import('onnxruntime-web').InferenceSession | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  // 동적 임포트된 onnxruntime-web 모듈 보관
+  const ortRef = useRef<null | typeof import('onnxruntime-web')>(null);
 
   useEffect(() => {
     // 모델 바이너리 로드 및 세션 생성
     // - content-type 및 헤더 스니핑으로 잘못된 경로 조기 차단
     let isMounted = true;
+    const ac = new AbortController(); // fetch 취소 컨트롤러
 
     async function loadModel() {
       try {
         setIsLoading(true);
         setProgress(10);
+        // onnxruntime-web을 동적으로 임포트하여 SSR/테스트 환경 충돌을 피함
+        const ort = await import('onnxruntime-web');
+        ortRef.current = ort; // 모듈 보관
+        // WebAssembly 경로 설정(CDN 사용)
+        ort.env.wasm.wasmPaths =
+          'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 
-        const response = await fetch(modelPath);
+        const response = await fetch(modelPath, { signal: ac.signal });
         if (!response.ok)
           throw new Error(`모델 로드 실패: ${response.statusText}`);
         const contentType = response.headers.get('content-type') || '';
@@ -83,6 +100,7 @@ export function useONNXModel(modelPath: string) {
 
     return () => {
       isMounted = false;
+      ac.abort(); // 진행 중인 fetch 중단
     };
   }, [modelPath]);
 
@@ -91,6 +109,8 @@ export function useONNXModel(modelPath: string) {
       if (!session) {
         throw new Error('모델이 로드되지 않았습니다');
       }
+      const ort = ortRef.current;
+      if (!ort) throw new Error('ONNX 런타임이 초기화되지 않았습니다');
 
       const startTime = performance.now();
 
@@ -124,7 +144,7 @@ export function useONNXModel(modelPath: string) {
 
       for (let i = 0; i < numDetections; i++) {
         // 4) 점수 임계값 필터(실험값 0.5)
-        if (scores[i] > 0.5) {
+        if (scores[i] > MODEL_MIN_CONFIDENCE) {
           const x = boxes[i * 4];
           const y = boxes[i * 4 + 1];
           const x2 = boxes[i * 4 + 2];
@@ -133,10 +153,19 @@ export function useONNXModel(modelPath: string) {
           // 5) 라벨 정규화: 모델 1‑based → 내부 0‑based
           // - DETR/DFINE 계열은 0: 배경, 1부터 실제 클래스인 구성이 흔함
           // - 내부 로직(JS/TS)은 0‑based가 자연스러우므로 경계에서 변환
-          const label1 =
-            labelsData instanceof BigInt64Array
-              ? Number(labelsData[i])
-              : (labelsData as Float32Array)[i];
+          let label1: number; // 다양한 정수/실수 TypedArray에 안전하게 대응
+          if (labelsData instanceof BigInt64Array) {
+            label1 = Number(labelsData[i]);
+          } else if (
+            labelsData instanceof Int32Array ||
+            labelsData instanceof Uint32Array
+          ) {
+            label1 = Number(labelsData[i]);
+          } else if (labelsData instanceof Float32Array) {
+            label1 = labelsData[i];
+          } else {
+            throw new Error('지원되지 않는 labels 텐서 타입');
+          }
 
           const classIndex0 = normalizeObj365Label(label1);
           // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
