@@ -4,15 +4,10 @@ import {
 } from './furnitureCategories';
 import { isCabinetShelfIndex } from './obj365Furniture';
 
+import type { Detection } from '@pages/generate/types/detection';
+
 export { FURNITURE_CATEGORY_LABELS } from './furnitureCategories';
 export type { FurnitureCategory } from './furnitureCategories';
-
-export interface Detection {
-  bbox: [number, number, number, number];
-  score: number;
-  label?: number;
-  className?: string;
-}
 
 export interface FurnitureImageMeta {
   width: number;

@@ -1,7 +1,11 @@
 // ML detection shared types
-// 단일 소스(유틸)에서 타입을 가져와 재사용하고, 이 파일 내에서도 참조 가능하게 지역 스코프로 도입
-import type { Detection } from '../utils/refineFurnitureDetections';
-export type { Detection } from '../utils/refineFurnitureDetections';
+// Detection 인터페이스를 단일 소스로 유지해 타입 불일치 방지
+export interface Detection {
+  bbox: [number, number, number, number];
+  score: number;
+  label?: number;
+  className?: string;
+}
 
 /**
  * onnxruntime 한 번 실행 후 반환되는 데이터 묶음
