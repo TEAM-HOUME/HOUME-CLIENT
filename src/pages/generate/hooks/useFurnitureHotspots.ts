@@ -275,10 +275,10 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       }
 
       const cabinet = pixelDetections.filter((d) =>
-        isCabinetShelfIndex(d.label as number)
+        isCabinetShelfIndex(d.label)
       );
       const others = pixelDetections.filter(
-        (d) => !isCabinetShelfIndex(d.label as number)
+        (d) => !isCabinetShelfIndex(d.label)
       );
 
       const { refinedDetections } = cabinet.length
