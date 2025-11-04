@@ -20,6 +20,7 @@ import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
 import {
   refineFurnitureDetections,
   type Detection as RawDetection,
+  type RefinedFurnitureDetection,
 } from '@pages/generate/utils/refineFurnitureDetections';
 import {
   computeCoverParams,
@@ -109,7 +110,7 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       // cabinet 리파인
       const { refinedDetections } = cabinet.length
         ? refineFurnitureDetections(cabinet, { width: natW, height: natH })
-        : ({ refinedDetections: [] } as any);
+        : { refinedDetections: [] as RefinedFurnitureDetection[] };
 
       // 통합 배열 구성
       // - cabinet은 refine 결과 사용(confidence/라벨 보강)
