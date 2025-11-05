@@ -27,6 +27,7 @@ const DetectionHotspots = ({
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored);
+  const hasHotspots = hotspots.length > 0;
 
   if (error) {
     // 모델 로드 실패 시에도 이미지 자체는 보여주도록
@@ -40,7 +41,7 @@ const DetectionHotspots = ({
           crossOrigin="anonymous"
           src={imageUrl}
           alt="generated"
-          className={styles.image}
+          className={styles.image({ mirrored })}
         />
       </div>
     );
@@ -53,9 +54,9 @@ const DetectionHotspots = ({
         crossOrigin="anonymous"
         src={imageUrl}
         alt="generated"
-        className={styles.image}
+        className={styles.image({ mirrored })}
       />
-      <div className={styles.overlay}>
+      <div className={styles.overlay({ visible: hasHotspots })}>
         {hotspots.map((hotspot: FurnitureHotspot) => (
           <button
             key={hotspot.id}
