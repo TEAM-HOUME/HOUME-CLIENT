@@ -19,8 +19,6 @@ interface DetectionHotspotsProps {
   shouldInferHotspots?: boolean;
 }
 
-const SHOW_DEBUG_BBOX = import.meta.env.DEV;
-
 const DetectionHotspots = ({
   imageUrl,
   mirrored = false,
@@ -31,7 +29,7 @@ const DetectionHotspots = ({
 
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   // 페이지 시나리오별로 추론 사용 여부 제어
-  const { imgRef, containerRef, hotspots, debugRects, isLoading, error } =
+  const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
   const hasHotspots = hotspots.length > 0;
 
@@ -104,24 +102,6 @@ const DetectionHotspots = ({
           </button>
         ))}
       </div>
-      {SHOW_DEBUG_BBOX && (
-        <div className={styles.debugLayer} aria-hidden>
-          {debugRects.map((rect) => (
-            <div
-              key={`bbox-${rect.id}`}
-              className={styles.debugBox}
-              style={{
-                left: rect.left,
-                top: rect.top,
-                width: rect.width,
-                height: rect.height,
-              }}
-            >
-              <span className={styles.debugLabel}>{rect.label ?? rect.id}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
