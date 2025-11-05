@@ -58,11 +58,23 @@ export interface RefinedFurnitureDetection extends Detection {
 }
 
 const DEFAULT_OPTIONS: FurnitureRefinementOptions = {
+  // 감지 점수(detection score)에 적용할 지수(exponent)
+  // 0.7
   detectionScoreExponent: 0.7,
+  // 모호한 사례 기본 확률 가중치(ambiguous prior)
+  // 0.12
   ambiguousPrior: 0.12,
+  // 카테고리 최소 확률 바닥(minimum category floor) 값
+  // 1e-4
   minCategoryFloor: 1e-4,
+  // 바닥 접촉 판정 패딩(floor contact padding)
+  // 0.08로 이미지 하단 오차 보정
   floorContactPadding: 0.08,
+  // 천장 접촉 판정 패딩(ceiling contact padding)
+  // 0.04로 상단 오차 보정
   ceilingContactPadding: 0.04,
+  // 측면 접촉 임계(edge contact threshold)
+  // 0.04로 좌우 벽 감지 민감도 설정
   edgeContactThreshold: 0.04,
 };
 
@@ -411,7 +423,7 @@ const refineSingle = (
   options: FurnitureRefinementOptions
 ): RefinedFurnitureDetection => {
   const baseScore = Math.pow(
-    Math.max(detection.score ?? 0.5, 1e-3),
+    Math.max(detection.score ?? 0.5, 1e-3), // 점수 미제공 시 중립값 0.5 사용하고 최소값 1e-3으로 클램프(clamp)
     options.detectionScoreExponent
   );
 
