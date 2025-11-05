@@ -9,14 +9,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 //   - 기준: cabinet은 refine confidence, 그 외는 모델 score 사용(단일 랭크 스코어로 비교)
 //   - 방식: 신뢰도/점수 상위 K개만 노출, K는 FALLBACK_MAX_CANDIDATES
 
-import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
-
 import {
   OBJ365_MODEL_PATH,
   DETECTION_MIN_CONFIDENCE,
   FALLBACK_MAX_CANDIDATES,
 } from '@pages/generate/constants/detection';
+import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
 import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
+import { OBJ365_ALL_CLASSES } from '@pages/generate/utils/obj365AllClasses';
 import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
 import {
   refineFurnitureDetections,
@@ -248,6 +248,7 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const corsAbortRef = useRef<AbortController | null>(null);
   const isRunningRef = useRef(false);
+  const hasRunRef = useRef(false);
 
   const [hotspots, setHotspots] = useState<FurnitureHotspot[]>([]);
   const [imageMeta, setImageMeta] = useState<{
@@ -304,6 +305,26 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       const hotspotCandidates = combinedDetections.map((det) =>
         createHotspotFromDetection(det)
       );
+      const debugItems = hotspotCandidates.map((candidate) => {
+        const labelIndex = candidate.label ?? null;
+        const baseClass =
+          labelIndex !== null && OBJ365_ALL_CLASSES[labelIndex]
+            ? OBJ365_ALL_CLASSES[labelIndex]
+            : null;
+        return {
+          id: candidate.id,
+          labelKo: candidate.refinedKoLabel ?? null,
+          labelEn: candidate.className ?? baseClass,
+          score: candidate.score ?? null,
+          confidence: candidate.confidence ?? null,
+          bbox: candidate.bbox,
+        };
+      });
+      console.info('[useFurnitureHotspots] 추론 결과(inference result)', {
+        imageUrl,
+        total: hotspotCandidates.length,
+        items: debugItems,
+      });
       const effective = hotspotCandidates.length
         ? selectEffectiveHotspots(hotspotCandidates)
         : [];
@@ -324,12 +345,22 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
     // 모델 로딩 또는 에러 상태면 추론 실행 보류
     if (isLoading || error) return;
     if (!imgRef.current || !containerRef.current) return;
+    if (hasRunRef.current) return;
     if (isRunningRef.current) return;
     isRunningRef.current = true;
     try {
       const imageEl = imgRef.current;
+      const naturalWidth = imageEl.naturalWidth || imageEl.width;
+      const naturalHeight = imageEl.naturalHeight || imageEl.height;
+      console.info('[useFurnitureHotspots] 추론 시작(inference start)', {
+        imageUrl,
+        naturalWidth,
+        naturalHeight,
+        mirrored,
+      });
       const result = await runInference(imageEl);
       processDetections(imageEl, result);
+      hasRunRef.current = true;
     } catch (error) {
       if (error instanceof DOMException && error.name === 'SecurityError') {
         corsAbortRef.current?.abort();
@@ -339,9 +370,21 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
           const corsImg = await loadCorsImage(imageUrl, controller.signal);
           if (corsImg) {
             try {
+              const naturalWidth = corsImg.naturalWidth || corsImg.width;
+              const naturalHeight = corsImg.naturalHeight || corsImg.height;
+              console.info(
+                '[useFurnitureHotspots] CORS 추론 시작(cors inference start)',
+                {
+                  imageUrl,
+                  naturalWidth,
+                  naturalHeight,
+                  mirrored,
+                }
+              );
               const result = await runInference(corsImg);
               const targetEl = imgRef.current ?? corsImg;
               processDetections(targetEl, result);
+              hasRunRef.current = true;
               return;
             } catch (retryError) {
               if (
@@ -386,7 +429,7 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       isRunningRef.current = false;
       corsAbortRef.current = null;
     }
-  }, [processDetections, runInference, imageUrl, isLoading, error]);
+  }, [processDetections, runInference, imageUrl, isLoading, error, mirrored]);
 
   // 이미지 onload
   useEffect(() => {
@@ -394,9 +437,15 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
     if (!img) return;
     // 모델 준비 이후에만 이미지 onload 콜백 등록
     if (isLoading || error) return;
-    const onLoad = () => run();
-    if (img.complete) run();
-    else img.addEventListener('load', onLoad);
+    const onLoad = () => {
+      if (hasRunRef.current) return;
+      run();
+    };
+    if (img.complete) {
+      if (!hasRunRef.current) run();
+    } else {
+      img.addEventListener('load', onLoad);
+    }
     return () => img.removeEventListener('load', onLoad);
   }, [imageUrl, run, isLoading, error]);
 
@@ -406,6 +455,10 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
     },
     []
   );
+
+  useEffect(() => {
+    hasRunRef.current = false;
+  }, [imageUrl, mirrored]);
 
   // 컨테이너 크기 관찰
   useEffect(() => {

@@ -29,6 +29,35 @@ const DetectionHotspots = ({
     useFurnitureHotspots(imageUrl, mirrored);
   const hasHotspots = hotspots.length > 0;
 
+  const handleHotspotClick = (hotspot: FurnitureHotspot) => {
+    setSelectedId((prev) => {
+      const next = prev === hotspot.id ? null : hotspot.id;
+      if (next) {
+        console.info('[DetectionHotspots] 활성 핫스팟(active hotspot)', {
+          id: hotspot.id,
+          score: hotspot.score,
+          confidence: hotspot.confidence,
+          label: {
+            ko: hotspot.refinedKoLabel ?? null,
+            en:
+              hotspot.className ??
+              (typeof hotspot.label === 'number'
+                ? hotspot.label.toString()
+                : null),
+            rawIndex: hotspot.label ?? null,
+            refined: hotspot.refinedLabel ?? null,
+          },
+          coords: { cx: hotspot.cx, cy: hotspot.cy },
+        });
+      } else {
+        console.info('[DetectionHotspots] 핫스팟 선택 해제(clear hotspot)', {
+          id: hotspot.id,
+        });
+      }
+      return next;
+    });
+  };
+
   if (error) {
     // 모델 로드 실패 시에도 이미지 자체는 보여주도록
     console.warn('[Detection] model error:', error);
@@ -62,9 +91,7 @@ const DetectionHotspots = ({
             key={hotspot.id}
             className={styles.hotspot}
             style={{ left: hotspot.cx, top: hotspot.cy }}
-            onClick={() =>
-              setSelectedId((prev) => (prev === hotspot.id ? null : hotspot.id))
-            }
+            onClick={() => handleHotspotClick(hotspot)}
             aria-label={`hotspot ${hotspot.refinedKoLabel ?? 'furniture'}`}
           >
             {selectedId === hotspot.id ? <HotspotColor /> : <HotspotGray />}
