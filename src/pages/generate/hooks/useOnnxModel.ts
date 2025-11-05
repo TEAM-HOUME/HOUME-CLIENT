@@ -263,13 +263,24 @@ export function useONNXModel(modelPath: string) {
             // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
             if (!isFurnitureIndex(classIndex0)) continue;
 
-            const xMin = Math.min(rawX0, rawX1);
-            const yMin = Math.min(rawY0, rawY1);
-            const widthVal = Math.max(1e-3, Math.abs(rawX1 - rawX0));
-            const heightVal = Math.max(1e-3, Math.abs(rawY1 - rawY0));
+            const x0 = Math.min(rawX0, rawX1);
+            const x1 = Math.max(rawX0, rawX1);
+            const y0 = Math.min(rawY0, rawY1);
+            const y1 = Math.max(rawY0, rawY1);
+
+            const clampTo = (value: number, min: number, max: number) =>
+              Math.min(max, Math.max(min, value));
+
+            const clampedX0 = clampTo(x0, 0, originalWidth);
+            const clampedY0 = clampTo(y0, 0, originalHeight);
+            const clampedX1 = clampTo(x1, 0, originalWidth);
+            const clampedY1 = clampTo(y1, 0, originalHeight);
+
+            const widthVal = Math.max(1e-3, clampedX1 - clampedX0);
+            const heightVal = Math.max(1e-3, clampedY1 - clampedY0);
 
             detections.push({
-              bbox: [xMin, yMin, widthVal, heightVal],
+              bbox: [clampedX0, clampedY0, widthVal, heightVal],
               score: scores[i],
               label: classIndex0, // 내부 표준: 0‑based index 저장
               className: OBJ365_ALL_CLASSES[classIndex0] ?? undefined,
