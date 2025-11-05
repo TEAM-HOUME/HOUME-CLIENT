@@ -43,6 +43,15 @@ export type FurnitureHotspot = FurnitureDetection & {
   confidence?: number; // cabinet 리파인 결과에서만 노출되는 신뢰도
 };
 
+type DebugRect = {
+  id: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  label: string | null;
+};
+
 // ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
 const HOTSPOT_ID_PRECISION = 3;
 const MIN_BBOX_PIXELS = 8;
@@ -595,8 +604,13 @@ export function useFurnitureHotspots(
   ]);
 
   // 좌표 보정
-  const renderedHotspots = useMemo(() => {
-    if (!renderMetrics || !imageMeta) return [] as FurnitureHotspot[];
+  const { projectedHotspots, debugRects } = useMemo(() => {
+    if (!renderMetrics || !imageMeta) {
+      return {
+        projectedHotspots: [] as FurnitureHotspot[],
+        debugRects: [] as DebugRect[],
+      };
+    }
     const {
       offsetX,
       offsetY,
@@ -605,10 +619,34 @@ export function useFurnitureHotspots(
       width: renderW,
       height: renderH,
     } = renderMetrics;
-    if (scaleX === 0 || scaleY === 0) return [] as FurnitureHotspot[];
+    if (scaleX === 0 || scaleY === 0) {
+      return {
+        projectedHotspots: [] as FurnitureHotspot[],
+        debugRects: [] as DebugRect[],
+      };
+    }
 
     const containerW = containerSize.width || renderW;
     const containerH = containerSize.height || renderH;
+
+    const rects = hotspots.map((det) => {
+      const [x, y, w, h] = det.bbox;
+      let left = offsetX + x * scaleX;
+      if (mirrored) {
+        left = offsetX + renderW - (x + w) * scaleX;
+      }
+      const top = offsetY + y * scaleY;
+      const width = w * scaleX;
+      const height = h * scaleY;
+      return {
+        id: det.id,
+        left: Math.min(containerW, Math.max(0, left)),
+        top: Math.min(containerH, Math.max(0, top)),
+        width: Math.max(1, Math.min(width, containerW)),
+        height: Math.max(1, Math.min(height, containerH)),
+        label: det.className ?? null,
+      };
+    });
 
     const projected = hotspots.map((det) => {
       const [x, y, w, h] = det.bbox;
@@ -638,13 +676,14 @@ export function useFurnitureHotspots(
         })),
       });
     }
-    return projected;
+    return { projectedHotspots: projected, debugRects: rects };
   }, [hotspots, imageMeta, containerSize, mirrored, renderMetrics, imageUrl]);
 
   return {
     imgRef,
     containerRef,
-    hotspots: renderedHotspots,
+    hotspots: projectedHotspots,
+    debugRects,
     isLoading,
     error,
   } as const;

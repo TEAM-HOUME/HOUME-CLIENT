@@ -63,3 +63,26 @@ export const hotspot = style({
   height: 24,
   cursor: 'pointer',
 });
+
+export const debugLayer = style({
+  position: 'absolute',
+  inset: 0,
+  pointerEvents: 'none',
+});
+
+export const debugBox = style({
+  position: 'absolute',
+  border: '1px solid rgba(255, 0, 0, 0.7)',
+  boxSizing: 'border-box',
+});
+
+export const debugLabel = style({
+  position: 'absolute',
+  top: -16,
+  left: 0,
+  background: 'rgba(255, 0, 0, 0.7)',
+  color: '#fff',
+  fontSize: 10,
+  padding: '0 4px',
+  pointerEvents: 'none',
+});
