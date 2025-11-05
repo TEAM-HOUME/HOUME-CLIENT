@@ -19,6 +19,120 @@ import type {
   ProcessedDetections,
 } from '@pages/generate/types/detection';
 
+type OnnxModule = typeof import('onnxruntime-web');
+type InferenceSession = import('onnxruntime-web').InferenceSession;
+
+type ModelLoadResult = {
+  session: InferenceSession;
+  ort: OnnxModule;
+};
+
+type ModelCacheEntry = {
+  promise?: Promise<ModelLoadResult>;
+  session?: InferenceSession;
+  ort?: OnnxModule;
+  error?: string | null;
+};
+
+type ProgressCallback = (value: number) => void;
+
+const WASM_ASSET_BASE = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
+const modelCache = new Map<string, ModelCacheEntry>();
+
+const getCacheEntry = (modelPath: string): ModelCacheEntry => {
+  const existing = modelCache.get(modelPath);
+  if (existing) return existing;
+  const created: ModelCacheEntry = {};
+  modelCache.set(modelPath, created);
+  return created;
+};
+
+const loadOnnxModel = async (
+  modelPath: string,
+  onProgress?: ProgressCallback
+): Promise<ModelLoadResult> => {
+  onProgress?.(10);
+  const ort = await import('onnxruntime-web');
+  onProgress?.(20);
+  ort.env.wasm.wasmPaths = WASM_ASSET_BASE;
+
+  const response = await fetch(modelPath);
+  if (!response.ok) {
+    throw new Error(`모델 로드 실패: ${response.statusText}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('text/html') || contentType.includes('text/plain')) {
+    throw new Error('모델 경로가 잘못되었거나 HTML/텍스트가 반환되었습니다');
+  }
+
+  onProgress?.(40);
+  const arrayBuffer = await response.arrayBuffer();
+  const head = new Uint8Array(arrayBuffer.slice(0, 256));
+  const headText = new TextDecoder('utf-8', { fatal: false }).decode(head);
+  if (/<!doctype|<html|Not Found|Error/i.test(headText)) {
+    throw new Error('모델 파일 대신 HTML/오류 페이지가 로드되었습니다');
+  }
+
+  onProgress?.(70);
+  const session = await ort.InferenceSession.create(arrayBuffer, {
+    executionProviders: ['wasm'],
+    graphOptimizationLevel: 'all',
+  });
+  onProgress?.(95);
+
+  return {
+    session,
+    ort,
+  };
+};
+
+const ensureModelLoad = (
+  modelPath: string,
+  onProgress?: ProgressCallback
+): Promise<ModelLoadResult> => {
+  const entry = getCacheEntry(modelPath);
+
+  if (entry.session && entry.ort) {
+    onProgress?.(100);
+    return Promise.resolve({
+      session: entry.session,
+      ort: entry.ort,
+    });
+  }
+
+  if (entry.promise) {
+    if (onProgress) {
+      entry.promise.then(() => onProgress(100)).catch(() => undefined);
+    }
+    return entry.promise;
+  }
+
+  entry.promise = loadOnnxModel(modelPath, onProgress)
+    .then((result) => {
+      entry.session = result.session;
+      entry.ort = result.ort;
+      entry.error = null;
+      return result;
+    })
+    .catch((err) => {
+      entry.error =
+        err instanceof Error ? err.message : '모델 로드 중 오류 발생';
+      entry.promise = undefined;
+      throw err;
+    });
+
+  return entry.promise;
+};
+
+export const preloadONNXModel = async (
+  modelPath: string
+): Promise<InferenceSession | null> => {
+  if (typeof window === 'undefined') return null;
+  const result = await ensureModelLoad(modelPath);
+  return result.session;
+};
+
 /**
  * Obj365 ONNX 모델을 로드하고 추론 세션을 관리하는 React 훅
  * - 브라우저(onnxruntime-web)에서 동작하도록 동적 임포트를 사용
@@ -26,81 +140,46 @@ import type {
  * - 추론 결과는 후속 파이프라인(`useFurnitureHotspots`)에서 원본 좌표로 보정
  */
 export function useONNXModel(modelPath: string) {
-  const [session, setSession] = useState<
-    import('onnxruntime-web').InferenceSession | null
-  >(null);
+  const [session, setSession] = useState<InferenceSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  // 동적 임포트된 onnxruntime-web 모듈 보관
-  const ortRef = useRef<null | typeof import('onnxruntime-web')>(null);
+  const ortRef = useRef<OnnxModule | null>(null); // onnxruntime-web 모듈 보관
 
   useEffect(() => {
-    // 모델 바이너리 로드 및 세션 생성
-    // - content-type 및 헤더 스니핑으로 잘못된 경로 조기 차단
-    let isMounted = true;
-    const ac = new AbortController(); // fetch 취소 컨트롤러
-
-    async function loadModel() {
-      try {
-        setIsLoading(true);
-        setProgress(10);
-        // onnxruntime-web을 동적으로 임포트하여 SSR/테스트 환경 충돌을 피함
-        const ort = await import('onnxruntime-web');
-        ortRef.current = ort; // 모듈 보관
-        // WebAssembly 경로 설정(CDN 사용)
-        ort.env.wasm.wasmPaths =
-          'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
-
-        const response = await fetch(modelPath, { signal: ac.signal });
-        if (!response.ok)
-          throw new Error(`모델 로드 실패: ${response.statusText}`);
-        const contentType = response.headers.get('content-type') || '';
-        if (
-          contentType.includes('text/html') ||
-          contentType.includes('text/plain')
-        ) {
-          throw new Error(
-            '모델 경로가 잘못되었거나 HTML/텍스트가 반환되었습니다'
-          );
-        }
-
-        setProgress(30);
-        const arrayBuffer = await response.arrayBuffer(); // 모델 바이너리 로드
-        const head = new Uint8Array(arrayBuffer.slice(0, 256));
-        const headText = new TextDecoder('utf-8', { fatal: false }).decode(
-          head
-        );
-        if (/<!doctype|<html|Not Found|Error/i.test(headText)) {
-          throw new Error('모델 파일 대신 HTML/오류 페이지가 로드되었습니다');
-        }
-
-        setProgress(60);
-        const newSession = await ort.InferenceSession.create(arrayBuffer, {
-          executionProviders: ['wasm'],
-          graphOptimizationLevel: 'all',
-        });
-
-        if (isMounted) {
-          setSession(newSession);
-          setProgress(100);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(
-            err instanceof Error ? err.message : '모델 로드 중 오류 발생'
-          );
-          setIsLoading(false);
-        }
-      }
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      setError('브라우저 환경이 아닙니다');
+      return;
     }
 
-    loadModel();
+    let isMounted = true;
+    setIsLoading(true);
+    setError(null);
+    setProgress(0);
+
+    ensureModelLoad(modelPath, (value) => {
+      if (isMounted) setProgress(value);
+    })
+      .then((result) => {
+        if (!isMounted) return;
+        ortRef.current = result.ort;
+        setSession(result.session);
+        setIsLoading(false);
+        setProgress(100);
+      })
+      .catch((loadError) => {
+        if (!isMounted) return;
+        const message =
+          loadError instanceof Error
+            ? loadError.message
+            : '모델 로드 중 오류 발생';
+        setError(message);
+        setIsLoading(false);
+      });
 
     return () => {
       isMounted = false;
-      ac.abort(); // 진행 중인 fetch 중단
     };
   }, [modelPath]);
 
