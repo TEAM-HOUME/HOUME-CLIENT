@@ -52,96 +52,6 @@ type DebugRect = {
   label: string | null;
 };
 
-const CLASS_CENTER_OFFSET: Record<string, number> = {
-  Bed: -0.25,
-  Sofa: -0.18,
-  Chair: -0.12,
-  Pillow: -0.2,
-  Carpet: -0.12,
-  'Potted Plant': -0.1,
-  Lamp: -0.08,
-  'Picture/Frame': -0.05,
-  Clock: -0.05,
-};
-
-const REFINED_CENTER_OFFSET: Record<string, number> = {
-  lowerCabinet: -0.05,
-  upperCabinet: -0.05,
-  storageCabinet: -0.05,
-};
-
-const getCenterOffsetRatio = (
-  hotspot: FurnitureHotspot,
-  imageMeta: { width: number; height: number }
-) => {
-  const baseByClass = hotspot.className
-    ? CLASS_CENTER_OFFSET[hotspot.className]
-    : undefined;
-  const baseByRefined = hotspot.refinedLabel
-    ? REFINED_CENTER_OFFSET[hotspot.refinedLabel]
-    : undefined;
-  let offset = baseByRefined ?? baseByClass ?? 0;
-
-  const normalizedHeight = hotspot.bbox[3] / (imageMeta.height || 1);
-  if (normalizedHeight >= 0.45) {
-    offset -= 0.08;
-  }
-  if (normalizedHeight >= 0.6) {
-    offset -= 0.05;
-  }
-  return offset;
-};
-
-type BBoxAdjustRule = {
-  cropTop?: number;
-  cropBottom?: number;
-};
-
-const CLASS_BBOX_ADJUST: Record<string, BBoxAdjustRule> = {
-  Bed: { cropTop: 0.05, cropBottom: 0.35 },
-  Sofa: { cropTop: 0.05, cropBottom: 0.3 },
-  Chair: { cropTop: 0.05, cropBottom: 0.25 },
-  Pillow: { cropTop: 0.05, cropBottom: 0.25 },
-  Carpet: { cropTop: 0.05, cropBottom: 0.15 },
-  'Potted Plant': { cropTop: 0, cropBottom: 0.12 },
-  Lamp: { cropTop: 0, cropBottom: 0.18 },
-};
-
-const REFINED_BBOX_ADJUST: Record<string, BBoxAdjustRule> = {
-  lowerCabinet: { cropTop: 0.02, cropBottom: 0.08 },
-  upperCabinet: { cropTop: 0.05, cropBottom: 0.02 },
-  storageCabinet: { cropTop: 0.02, cropBottom: 0.08 },
-};
-
-const adjustBoundingBox = (
-  bbox: [number, number, number, number],
-  opts: { className?: string | null; refinedLabel?: string | undefined },
-  imageMeta: { width: number; height: number }
-): [number, number, number, number] => {
-  const [x, y, w, h] = bbox;
-  const rule = opts.refinedLabel
-    ? REFINED_BBOX_ADJUST[opts.refinedLabel]
-    : opts.className
-      ? CLASS_BBOX_ADJUST[opts.className]
-      : undefined;
-  if (!rule) return bbox;
-
-  const cropTopRatio = Math.min(Math.max(rule.cropTop ?? 0, 0), 0.6);
-  const cropBottomRatio = Math.min(Math.max(rule.cropBottom ?? 0, 0), 0.6);
-  if (cropTopRatio === 0 && cropBottomRatio === 0) return bbox;
-
-  const cropTop = h * cropTopRatio;
-  const cropBottom = h * cropBottomRatio;
-  let newY = y + cropTop;
-  let newH = h - cropTop - cropBottom;
-  if (newH < MIN_BBOX_PIXELS) return bbox;
-
-  const maxY = Math.max(0, imageMeta.height - 1);
-  newY = Math.max(0, Math.min(newY, maxY));
-  newH = Math.max(1, Math.min(newH, imageMeta.height - newY));
-  return [x, newY, w, newH];
-};
-
 // ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
 const HOTSPOT_ID_PRECISION = 3;
 const MIN_BBOX_PIXELS = 8;
@@ -422,14 +332,9 @@ export function useFurnitureHotspots(
       const pixelDetections: FurnitureDetection[] = inference.detections.map(
         (det) => {
           const { x, y, w, h } = toImageSpaceBBox(imageEl, det.bbox);
-          const adjustedBBox = adjustBoundingBox(
-            [x, y, w, h],
-            { className: det.className ?? null },
-            { width: natW, height: natH }
-          );
           return {
             ...det,
-            bbox: adjustedBBox,
+            bbox: [x, y, w, h] as [number, number, number, number],
           };
         }
       );
@@ -479,26 +384,9 @@ export function useFurnitureHotspots(
         });
       }
 
-      const adjustedRefined = refinedDetections.map((det) => ({
-        ...det,
-        bbox: adjustBoundingBox(
-          det.bbox,
-          { refinedLabel: det.refinedLabel, className: det.className ?? null },
-          { width: natW, height: natH }
-        ),
-      }));
-      const adjustedOthers = others.map((det) => ({
-        ...det,
-        bbox: adjustBoundingBox(
-          det.bbox,
-          { className: det.className ?? null },
-          { width: natW, height: natH }
-        ),
-      }));
-
       const combinedDetections: Array<
         FurnitureDetection | RefinedFurnitureDetection
-      > = [...adjustedRefined, ...adjustedOthers];
+      > = [...refinedDetections, ...others];
       const hotspotCandidates = combinedDetections.map((det) =>
         createHotspotFromDetection(det)
       );
@@ -764,13 +652,11 @@ export function useFurnitureHotspots(
       const [x, y, w, h] = det.bbox;
       const centerX = x + w / 2;
       const centerY = y + h / 2;
-      const offsetRatio = getCenterOffsetRatio(det, imageMeta);
-      const adjustedCenterY = centerY + offsetRatio * h;
       let cx = offsetX + centerX * scaleX;
       if (mirrored) {
         cx = offsetX + renderW - centerX * scaleX;
       }
-      const cy = offsetY + adjustedCenterY * scaleY;
+      const cy = offsetY + centerY * scaleY;
       const clampedCx = Math.min(containerW, Math.max(0, cx));
       const clampedCy = Math.min(containerH, Math.max(0, cy));
       return { ...det, cx: clampedCx, cy: clampedCy };
@@ -787,7 +673,6 @@ export function useFurnitureHotspots(
           cx: item.cx,
           cy: item.cy,
           bbox: item.bbox,
-          offsetRatio: getCenterOffsetRatio(item, imageMeta),
         })),
       });
     }

@@ -59,63 +59,6 @@ export function toImageSpaceBBox(
   bbox640: [number, number, number, number]
 ): { x: number; y: number; w: number; h: number } {
   const [x, y, w, h] = bbox640;
-  const baseW = image.naturalWidth || image.width;
-  const baseH = image.naturalHeight || image.height;
-
-  const isNormalized =
-    x >= 0 &&
-    y >= 0 &&
-    w >= 0 &&
-    h >= 0 &&
-    x <= 1.01 &&
-    y <= 1.01 &&
-    w <= 1.01 &&
-    h <= 1.01;
-
-  if (isNormalized) {
-    const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
-    const normX = clamp01(x);
-    const normY = clamp01(y);
-    const normW = clamp01(w);
-    const normH = clamp01(h);
-
-    const endX = clamp01(normX + normW);
-    const endY = clamp01(normY + normH);
-
-    const realXNorm = normX * baseW;
-    const realYNorm = normY * baseH;
-    const realWNorm = Math.max(1, (endX - normX) * baseW);
-    const realHNorm = Math.max(1, (endY - normY) * baseH);
-
-    const clampedX = Math.max(0, Math.min(realXNorm, Math.max(0, baseW - 1)));
-    const clampedY = Math.max(0, Math.min(realYNorm, Math.max(0, baseH - 1)));
-    const clampedW = Math.max(1, Math.min(realWNorm, baseW - clampedX));
-    const clampedH = Math.max(1, Math.min(realHNorm, baseH - clampedY));
-
-    return {
-      x: clampedX,
-      y: clampedY,
-      w: clampedW,
-      h: clampedH,
-    };
-  }
-
-  const isLikelyAbsolute =
-    x >= -5 &&
-    y >= -5 &&
-    w >= 0 &&
-    h >= 0 &&
-    x + w <= baseW + 5 &&
-    y + h <= baseH + 5;
-
-  if (isLikelyAbsolute) {
-    const clampedX = Math.max(0, Math.min(x, Math.max(0, baseW - 1)));
-    const clampedY = Math.max(0, Math.min(y, Math.max(0, baseH - 1)));
-    const clampedW = Math.max(1, Math.min(w, baseW - clampedX));
-    const clampedH = Math.max(1, Math.min(h, baseH - clampedY));
-    return { x: clampedX, y: clampedY, w: clampedW, h: clampedH };
-  }
-
   const { scale: s, padX, padY } = getLetterboxParams(image, 640, 640);
   let realX = (x - padX) / s;
   let realY = (y - padY) / s;
@@ -130,10 +73,8 @@ export function toImageSpaceBBox(
     realH += realY;
     realY = 0;
   }
-  const maxStartX = Math.max(0, baseW - 1);
-  const maxStartY = Math.max(0, baseH - 1);
-  realX = Math.max(0, Math.min(realX, maxStartX));
-  realY = Math.max(0, Math.min(realY, maxStartY));
+  const baseW = image.naturalWidth || image.width;
+  const baseH = image.naturalHeight || image.height;
   realW = Math.max(1, Math.min(realW, baseW - realX));
   realH = Math.max(1, Math.min(realH, baseH - realY));
 
