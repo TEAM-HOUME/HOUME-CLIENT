@@ -278,11 +278,29 @@ export function useONNXModel(modelPath: string) {
             const boxWidth = Math.max(1e-3, xMax - xMin);
             const boxHeight = Math.max(1e-3, yMax - yMin);
 
+            let normX = xMin / safeWidth;
+            let normY = yMin / safeHeight;
+            let normW = boxWidth / safeWidth;
+            let normH = boxHeight / safeHeight;
+
+            if (normW + normX > 1) {
+              const overflow = normW + normX - 1;
+              normW -= overflow;
+              if (normW < 1e-3) normW = 1e-3;
+              normX = clamp01(normX);
+            }
+            if (normH + normY > 1) {
+              const overflow = normH + normY - 1;
+              normH -= overflow;
+              if (normH < 1e-3) normH = 1e-3;
+              normY = clamp01(normY);
+            }
+
             const bboxNormalized: [number, number, number, number] = [
-              clamp01(xMin / safeWidth),
-              clamp01(yMin / safeHeight),
-              clamp01(boxWidth / safeWidth),
-              clamp01(boxHeight / safeHeight),
+              clamp01(normX),
+              clamp01(normY),
+              clamp01(normW),
+              clamp01(normH),
             ];
 
             detections.push({

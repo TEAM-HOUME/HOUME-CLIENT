@@ -67,36 +67,36 @@ export function toImageSpaceBBox(
     y >= 0 &&
     w >= 0 &&
     h >= 0 &&
-    x <= 1.05 &&
-    y <= 1.05 &&
-    w <= 1.05 &&
-    h <= 1.05 &&
-    x + w <= 1.05 &&
-    y + h <= 1.05;
+    x <= 1.01 &&
+    y <= 1.01 &&
+    w <= 1.01 &&
+    h <= 1.01;
 
   if (isNormalized) {
-    let realXNorm = x * baseW;
-    let realYNorm = y * baseH;
-    let realWNorm = w * baseW;
-    let realHNorm = h * baseH;
+    const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+    const normX = clamp01(x);
+    const normY = clamp01(y);
+    const normW = clamp01(w);
+    const normH = clamp01(h);
 
-    if (realXNorm < 0) {
-      realWNorm += realXNorm;
-      realXNorm = 0;
-    }
-    if (realYNorm < 0) {
-      realHNorm += realYNorm;
-      realYNorm = 0;
-    }
+    const endX = clamp01(normX + normW);
+    const endY = clamp01(normY + normH);
 
-    realWNorm = Math.max(1, Math.min(realWNorm, baseW - realXNorm));
-    realHNorm = Math.max(1, Math.min(realHNorm, baseH - realYNorm));
+    const realXNorm = normX * baseW;
+    const realYNorm = normY * baseH;
+    const realWNorm = Math.max(1, (endX - normX) * baseW);
+    const realHNorm = Math.max(1, (endY - normY) * baseH);
+
+    const clampedX = Math.max(0, Math.min(realXNorm, Math.max(0, baseW - 1)));
+    const clampedY = Math.max(0, Math.min(realYNorm, Math.max(0, baseH - 1)));
+    const clampedW = Math.max(1, Math.min(realWNorm, baseW - clampedX));
+    const clampedH = Math.max(1, Math.min(realHNorm, baseH - clampedY));
 
     return {
-      x: realXNorm,
-      y: realYNorm,
-      w: realWNorm,
-      h: realHNorm,
+      x: clampedX,
+      y: clampedY,
+      w: clampedW,
+      h: clampedH,
     };
   }
 

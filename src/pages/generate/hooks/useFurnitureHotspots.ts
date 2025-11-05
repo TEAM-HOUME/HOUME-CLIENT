@@ -23,10 +23,6 @@ import {
   type FurnitureCategory,
   type RefinedFurnitureDetection,
 } from '@pages/generate/utils/refineFurnitureDetections';
-import {
-  computeCoverParams,
-  projectCenter,
-} from '@shared/utils/coverProjection';
 
 import type {
   Detection as FurnitureDetection,
@@ -49,6 +45,16 @@ export type FurnitureHotspot = FurnitureDetection & {
 
 // ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
 const HOTSPOT_ID_PRECISION = 3;
+const MIN_BBOX_PIXELS = 8;
+
+type RenderMetrics = {
+  offsetX: number;
+  offsetY: number;
+  scaleX: number;
+  scaleY: number;
+  width: number;
+  height: number;
+};
 
 const formatKeyPart = (value: number) =>
   Number.isFinite(value) ? value.toFixed(HOTSPOT_ID_PRECISION) : 'NaN';
@@ -233,7 +239,11 @@ async function loadCorsImage(
 
 // 가구 전반 핫스팟 훅
 // - 1) 모델 추론(가구만) 2) cabinet만 리파인 3) 임계값 필터/폴백 4) 좌표 보정
-export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
+export function useFurnitureHotspots(
+  imageUrl: string,
+  mirrored = false,
+  enabled = true
+) {
   /**
    * useFurnitureHotspots
    * - 입력: 이미지 URL + 좌우반전 여부
@@ -259,8 +269,39 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
+  const [renderMetrics, setRenderMetrics] = useState<RenderMetrics | null>(
+    null
+  );
 
   const { runInference, isLoading, error } = useONNXModel(OBJ365_MODEL_PATH);
+
+  const measureRenderMetrics = useCallback(() => {
+    const imgEl = imgRef.current;
+    const containerEl = containerRef.current;
+    if (!imgEl || !containerEl) return null;
+    const imgRect = imgEl.getBoundingClientRect();
+    const containerRect = containerEl.getBoundingClientRect();
+    const naturalWidth = imgEl.naturalWidth || imgEl.width;
+    const naturalHeight = imgEl.naturalHeight || imgEl.height;
+    if (
+      !naturalWidth ||
+      !naturalHeight ||
+      imgRect.width === 0 ||
+      imgRect.height === 0
+    ) {
+      return null;
+    }
+    const metrics: RenderMetrics = {
+      offsetX: imgRect.left - containerRect.left,
+      offsetY: imgRect.top - containerRect.top,
+      scaleX: imgRect.width / naturalWidth,
+      scaleY: imgRect.height / naturalHeight,
+      width: imgRect.width,
+      height: imgRect.height,
+    };
+    setRenderMetrics(metrics);
+    return metrics;
+  }, []);
 
   const processDetections = useCallback(
     (imageEl: HTMLImageElement, inference: ProcessedDetections) => {
@@ -307,9 +348,11 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
         return;
       }
 
-      const cabinet = pixelDetections.filter((d) =>
-        isCabinetShelfIndex(d.label)
-      );
+      const cabinet = pixelDetections.filter((d) => {
+        if (!isCabinetShelfIndex(d.label)) return false;
+        const [, , w, h] = d.bbox;
+        return w >= MIN_BBOX_PIXELS && h >= MIN_BBOX_PIXELS;
+      });
       const others = pixelDetections.filter(
         (d) => !isCabinetShelfIndex(d.label)
       );
@@ -375,6 +418,10 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
      * - 역할: 원본 이미지 추론을 수행하고, 실패 시 CORS 재시도를 트리거
      * - 예외 처리: Abort/SecurityError 이외에는 경고 로그를 남겨 디버깅 용이성 확보
      */
+    if (!enabled) {
+      setHotspots((prev) => (prev.length === 0 ? prev : []));
+      return;
+    }
     // 모델 로딩 또는 에러 상태면 추론 실행 보류
     if (isLoading || error) return;
     if (!imgRef.current || !containerRef.current) return;
@@ -391,10 +438,18 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
         naturalHeight,
         mirrored,
       });
+      measureRenderMetrics();
       const result = await runInference(imageEl);
       processDetections(imageEl, result);
       hasRunRef.current = true;
     } catch (error) {
+      if (error instanceof Error) {
+        console.warn('[useFurnitureHotspots] inference failed detail', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+      }
       if (error instanceof DOMException && error.name === 'SecurityError') {
         corsAbortRef.current?.abort();
         const controller = new AbortController();
@@ -462,25 +517,35 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       isRunningRef.current = false;
       corsAbortRef.current = null;
     }
-  }, [processDetections, runInference, imageUrl, isLoading, error, mirrored]);
+  }, [
+    processDetections,
+    runInference,
+    imageUrl,
+    isLoading,
+    error,
+    mirrored,
+    enabled,
+  ]);
 
   // 이미지 onload
   useEffect(() => {
     const img = imgRef.current;
     if (!img) return;
     // 모델 준비 이후에만 이미지 onload 콜백 등록
-    if (isLoading || error) return;
+    if (isLoading || error || !enabled) return;
     const onLoad = () => {
+      measureRenderMetrics();
       if (hasRunRef.current) return;
       run();
     };
     if (img.complete) {
+      measureRenderMetrics();
       if (!hasRunRef.current) run();
     } else {
       img.addEventListener('load', onLoad);
     }
     return () => img.removeEventListener('load', onLoad);
-  }, [imageUrl, run, isLoading, error]);
+  }, [imageUrl, run, isLoading, error, enabled, measureRenderMetrics]);
 
   useEffect(
     () => () => {
@@ -491,6 +556,7 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
 
   useEffect(() => {
     hasRunRef.current = false;
+    setRenderMetrics(null);
   }, [imageUrl, mirrored]);
 
   // 컨테이너 크기 관찰
@@ -515,22 +581,65 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  useEffect(() => {
+    if (!enabled) return;
+    const raf = requestAnimationFrame(() => {
+      measureRenderMetrics();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [
+    enabled,
+    measureRenderMetrics,
+    containerSize.width,
+    containerSize.height,
+  ]);
+
   // 좌표 보정
   const renderedHotspots = useMemo(() => {
-    if (!imageMeta || containerSize.width === 0 || containerSize.height === 0)
-      return [] as FurnitureHotspot[];
-    const cover = computeCoverParams(imageMeta, containerSize);
-    return hotspots.map((det) => {
+    if (!renderMetrics || !imageMeta) return [] as FurnitureHotspot[];
+    const {
+      offsetX,
+      offsetY,
+      scaleX,
+      scaleY,
+      width: renderW,
+      height: renderH,
+    } = renderMetrics;
+    if (scaleX === 0 || scaleY === 0) return [] as FurnitureHotspot[];
+
+    const containerW = containerSize.width || renderW;
+    const containerH = containerSize.height || renderH;
+
+    const projected = hotspots.map((det) => {
       const [x, y, w, h] = det.bbox;
-      const { cx, cy } = projectCenter(
-        { cxImg: x + w / 2, cyImg: y + h / 2 },
-        cover,
-        containerSize,
-        { mirrored }
-      );
-      return { ...det, cx, cy };
+      const centerX = x + w / 2;
+      const centerY = y + h / 2;
+      let cx = offsetX + centerX * scaleX;
+      if (mirrored) {
+        cx = offsetX + renderW - centerX * scaleX;
+      }
+      const cy = offsetY + centerY * scaleY;
+      const clampedCx = Math.min(containerW, Math.max(0, cx));
+      const clampedCy = Math.min(containerH, Math.max(0, cy));
+      return { ...det, cx: clampedCx, cy: clampedCy };
     });
-  }, [hotspots, imageMeta, containerSize, mirrored]);
+    if (projected.length > 0) {
+      console.info('[useFurnitureHotspots] 좌표 보정(projected hotspots)', {
+        imageUrl,
+        mirrored,
+        containerSize,
+        imageMeta,
+        renderMetrics,
+        samples: projected.slice(0, 5).map((item) => ({
+          id: item.id,
+          cx: item.cx,
+          cy: item.cy,
+          bbox: item.bbox,
+        })),
+      });
+    }
+    return projected;
+  }, [hotspots, imageMeta, containerSize, mirrored, renderMetrics, imageUrl]);
 
   return {
     imgRef,
