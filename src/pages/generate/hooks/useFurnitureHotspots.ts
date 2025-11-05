@@ -9,12 +9,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 //   - 기준: cabinet은 refine confidence, 그 외는 모델 score 사용(단일 랭크 스코어로 비교)
 //   - 방식: 신뢰도/점수 상위 K개만 노출, K는 FALLBACK_MAX_CANDIDATES
 
+import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
+
 import {
   OBJ365_MODEL_PATH,
   DETECTION_MIN_CONFIDENCE,
   FALLBACK_MAX_CANDIDATES,
 } from '@pages/generate/constants/detection';
-import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
 import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
 import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
 import {
@@ -320,6 +321,8 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
      * - 역할: 원본 이미지 추론을 수행하고, 실패 시 CORS 재시도를 트리거
      * - 예외 처리: Abort/SecurityError 이외에는 경고 로그를 남겨 디버깅 용이성 확보
      */
+    // 모델 로딩 또는 에러 상태면 추론 실행 보류
+    if (isLoading || error) return;
     if (!imgRef.current || !containerRef.current) return;
     if (isRunningRef.current) return;
     isRunningRef.current = true;
@@ -383,17 +386,19 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       isRunningRef.current = false;
       corsAbortRef.current = null;
     }
-  }, [processDetections, runInference, imageUrl]);
+  }, [processDetections, runInference, imageUrl, isLoading, error]);
 
   // 이미지 onload
   useEffect(() => {
     const img = imgRef.current;
     if (!img) return;
+    // 모델 준비 이후에만 이미지 onload 콜백 등록
+    if (isLoading || error) return;
     const onLoad = () => run();
     if (img.complete) run();
     else img.addEventListener('load', onLoad);
     return () => img.removeEventListener('load', onLoad);
-  }, [imageUrl, run]);
+  }, [imageUrl, run, isLoading, error]);
 
   useEffect(
     () => () => {
