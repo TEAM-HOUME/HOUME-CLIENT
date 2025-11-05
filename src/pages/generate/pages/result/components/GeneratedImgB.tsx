@@ -23,11 +23,13 @@ interface GeneratedImgBProps {
     | GenerateImageAResponse['data']
     | GenerateImageBResponse['data'];
   onCurrentImgIdChange?: (currentImgId: number) => void;
+  shouldInferHotspots?: boolean;
 }
 
 const GeneratedImgB = ({
   result: propResult,
   onCurrentImgIdChange,
+  shouldInferHotspots = true,
 }: GeneratedImgBProps) => {
   // currentImgId를 부모에게 전달하는 useEffect
   useEffect(() => {
@@ -64,7 +66,12 @@ const GeneratedImgB = ({
 
   return (
     <div className={styles.container}>
-      <DetectionHotspots imageUrl={image.imageUrl} mirrored={image.isMirror} />
+      <DetectionHotspots
+        imageUrl={image.imageUrl}
+        mirrored={image.isMirror}
+        // 결과 페이지 플래그로 추론 on/off 제어
+        shouldInferHotspots={shouldInferHotspots}
+      />
       <button type="button" className={styles.tagBtn}>
         <Tag />
       </button>

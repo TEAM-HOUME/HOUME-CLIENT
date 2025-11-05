@@ -5,6 +5,7 @@
 import { useState } from 'react';
 
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
+import { FURNITURE_CATEGORY_LABELS } from '@pages/generate/utils/furnitureCategories';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
 import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 
@@ -15,37 +16,40 @@ import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspot
 interface DetectionHotspotsProps {
   imageUrl: string;
   mirrored?: boolean;
+  shouldInferHotspots?: boolean;
 }
 
 const DetectionHotspots = ({
   imageUrl,
   mirrored = false,
+  shouldInferHotspots = true,
 }: DetectionHotspotsProps) => {
   // 선택 토글 상태만 로컬로 유지
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
+  // 페이지 시나리오별로 추론 사용 여부 제어
   const { imgRef, containerRef, hotspots, isLoading, error } =
-    useFurnitureHotspots(imageUrl, mirrored);
+    useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
   const hasHotspots = hotspots.length > 0;
 
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     setSelectedId((prev) => {
       const next = prev === hotspot.id ? null : hotspot.id;
       if (next) {
+        const refinedInfo = hotspot.refinedLabel
+          ? FURNITURE_CATEGORY_LABELS[hotspot.refinedLabel]
+          : null;
         console.info('[DetectionHotspots] 활성 핫스팟(active hotspot)', {
           id: hotspot.id,
           score: hotspot.score,
           confidence: hotspot.confidence,
           label: {
             ko: hotspot.refinedKoLabel ?? null,
-            en:
-              hotspot.className ??
-              (typeof hotspot.label === 'number'
-                ? hotspot.label.toString()
-                : null),
+            en: refinedInfo?.en ?? hotspot.className ?? null,
+            rawEn: hotspot.className ?? null,
             rawIndex: hotspot.label ?? null,
-            refined: hotspot.refinedLabel ?? null,
+            refinedKey: hotspot.refinedLabel ?? null,
           },
           coords: { cx: hotspot.cx, cy: hotspot.cy },
         });

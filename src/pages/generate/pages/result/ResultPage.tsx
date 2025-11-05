@@ -307,11 +307,15 @@ const ResultPage = () => {
             result={result}
             onSlideChange={handleSlideChange}
             onCurrentImgIdChange={setCurrentImgId}
+            // 마이페이지 경로에서는 추론 비활성 전달
+            shouldInferHotspots={!isFromMypage}
           />
         ) : (
           <GeneratedImgB
             result={result}
             onCurrentImgIdChange={setCurrentImgId}
+            // 마이페이지 경로에서는 추론 비활성 전달
+            shouldInferHotspots={!isFromMypage}
           />
         )}
 

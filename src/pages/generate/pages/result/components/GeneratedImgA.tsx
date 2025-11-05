@@ -41,12 +41,14 @@ interface GeneratedImgAProps {
     | GenerateImageBResponse['data'];
   onSlideChange?: (currentIndex: number, totalCount: number) => void;
   onCurrentImgIdChange?: (currentImgId: number) => void;
+  shouldInferHotspots?: boolean;
 }
 
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
   onCurrentImgIdChange,
+  shouldInferHotspots = true,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -146,6 +148,8 @@ const GeneratedImgA = ({
             <DetectionHotspots
               imageUrl={image.imageUrl}
               mirrored={image.isMirror}
+              // 결과 페이지 플래그로 추론 on/off 제어
+              shouldInferHotspots={shouldInferHotspots}
             />
           </SwiperSlide>
         ))}
