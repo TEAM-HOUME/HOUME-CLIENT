@@ -35,7 +35,6 @@ export type ImageSetupSteps = {
     floorPlan: FloorPlan;
     moodBoardIds: number[];
     activityType?: string;
-    bedId?: number;
     selectiveIds?: number[];
   };
 };

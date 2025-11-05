@@ -17,6 +17,7 @@ export const cardImage = style({
   aspectRatio: '1/1',
   borderRadius: '0.8rem',
   overflow: 'hidden',
+  cursor: 'pointer',
 });
 
 export const image = style({
