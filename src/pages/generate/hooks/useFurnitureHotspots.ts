@@ -19,6 +19,7 @@ import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
 import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
 import {
   refineFurnitureDetections,
+  type FurnitureCategory,
   type RefinedFurnitureDetection,
 } from '@pages/generate/utils/refineFurnitureDetections';
 import {
@@ -40,7 +41,7 @@ export type FurnitureHotspot = FurnitureDetection & {
   id: number;
   cx: number;
   cy: number;
-  refinedLabel?: import('@pages/generate/utils/furnitureCategories').FurnitureCategory;
+  refinedLabel?: FurnitureCategory;
   refinedKoLabel?: string;
   confidence?: number; // cabinet 리파인 결과에서만 노출되는 신뢰도
 };
@@ -203,11 +204,22 @@ async function loadCorsImage(
     const img = new Image();
     img.crossOrigin = 'anonymous';
     await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = (e) => reject(e);
+      img.onload = () => {
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+          objectUrl = null;
+        }
+        resolve();
+      };
+      img.onerror = (e) => {
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+          objectUrl = null;
+        }
+        reject(e);
+      };
       img.src = objectUrl!;
     });
-    URL.revokeObjectURL(objectUrl);
     return img;
   } catch (error) {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
