@@ -272,6 +272,13 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       const natW = imageEl.naturalWidth || imageEl.width;
       const natH = imageEl.naturalHeight || imageEl.height;
 
+      console.info('[useFurnitureHotspots] 원시 감지(raw detections)', {
+        imageUrl,
+        mirrored,
+        total: inference.detections.length,
+        samples: inference.detections.slice(0, 5),
+      });
+
       const pixelDetections: FurnitureDetection[] = inference.detections.map(
         (det) => {
           const { x, y, w, h } = toImageSpaceBBox(imageEl, det.bbox);
@@ -282,6 +289,18 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
         }
       );
       setImageMeta({ width: natW, height: natH });
+
+      console.info('[useFurnitureHotspots] 픽셀 변환 감지(pixel detections)', {
+        imageUrl,
+        mirrored,
+        total: pixelDetections.length,
+        samples: pixelDetections.slice(0, 5).map((det) => ({
+          id: det.label ?? null,
+          bbox: det.bbox,
+          score: det.score,
+          className: det.className ?? null,
+        })),
+      });
 
       if (pixelDetections.length === 0) {
         setHotspots((prev) => (prev.length === 0 ? prev : []));
@@ -298,6 +317,20 @@ export function useFurnitureHotspots(imageUrl: string, mirrored = false) {
       const { refinedDetections } = cabinet.length
         ? refineFurnitureDetections(cabinet, { width: natW, height: natH })
         : { refinedDetections: [] as RefinedFurnitureDetection[] };
+
+      if (refinedDetections.length > 0) {
+        console.info('[useFurnitureHotspots] 리파인 감지(refined detections)', {
+          imageUrl,
+          mirrored,
+          total: refinedDetections.length,
+          samples: refinedDetections.slice(0, 5).map((det) => ({
+            id: det.label ?? null,
+            refinedLabel: det.refinedLabel ?? null,
+            confidence: det.confidence ?? null,
+            bbox: det.bbox,
+          })),
+        });
+      }
 
       const combinedDetections: Array<
         FurnitureDetection | RefinedFurnitureDetection

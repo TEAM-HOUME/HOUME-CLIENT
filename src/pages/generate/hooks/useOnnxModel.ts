@@ -230,6 +230,12 @@ export function useONNXModel(modelPath: string) {
         const scores = results.scores.data as Float32Array;
 
         const detections: Detection[] = [];
+        const debugSamples: Array<{
+          raw: [number, number, number, number];
+          normalized: [number, number, number, number];
+          label: number;
+          score: number;
+        }> = [];
         const numDetections = scores.length;
 
         const safeWidth = Math.max(originalWidth, 1);
@@ -285,7 +291,23 @@ export function useONNXModel(modelPath: string) {
               label: classIndex0, // 내부 표준: 0‑based index 저장
               className: OBJ365_ALL_CLASSES[classIndex0] ?? undefined,
             });
+
+            if (debugSamples.length < 5) {
+              debugSamples.push({
+                raw: [rawX0, rawY0, rawX1, rawY1],
+                normalized: bboxNormalized,
+                label: classIndex0,
+                score: scores[i],
+              });
+            }
           }
+        }
+
+        if (debugSamples.length > 0) {
+          console.info('[useONNXModel] bbox normalization debug', {
+            imageSize: { width: originalWidth, height: originalHeight },
+            samples: debugSamples,
+          });
         }
 
         const inferenceTime = performance.now() - startTime;
