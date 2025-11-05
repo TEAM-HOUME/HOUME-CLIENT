@@ -100,6 +100,22 @@ export function toImageSpaceBBox(
     };
   }
 
+  const isLikelyAbsolute =
+    x >= -5 &&
+    y >= -5 &&
+    w >= 0 &&
+    h >= 0 &&
+    x + w <= baseW + 5 &&
+    y + h <= baseH + 5;
+
+  if (isLikelyAbsolute) {
+    const clampedX = Math.max(0, Math.min(x, Math.max(0, baseW - 1)));
+    const clampedY = Math.max(0, Math.min(y, Math.max(0, baseH - 1)));
+    const clampedW = Math.max(1, Math.min(w, baseW - clampedX));
+    const clampedH = Math.max(1, Math.min(h, baseH - clampedY));
+    return { x: clampedX, y: clampedY, w: clampedW, h: clampedH };
+  }
+
   const { scale: s, padX, padY } = getLetterboxParams(image, 640, 640);
   let realX = (x - padX) / s;
   let realY = (y - padY) / s;
@@ -114,6 +130,10 @@ export function toImageSpaceBBox(
     realH += realY;
     realY = 0;
   }
+  const maxStartX = Math.max(0, baseW - 1);
+  const maxStartY = Math.max(0, baseH - 1);
+  realX = Math.max(0, Math.min(realX, maxStartX));
+  realY = Math.max(0, Math.min(realY, maxStartY));
   realW = Math.max(1, Math.min(realW, baseW - realX));
   realH = Math.max(1, Math.min(realH, baseH - realY));
 

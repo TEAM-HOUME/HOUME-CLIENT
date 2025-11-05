@@ -92,6 +92,56 @@ const getCenterOffsetRatio = (
   return offset;
 };
 
+type BBoxAdjustRule = {
+  cropTop?: number;
+  cropBottom?: number;
+};
+
+const CLASS_BBOX_ADJUST: Record<string, BBoxAdjustRule> = {
+  Bed: { cropTop: 0.05, cropBottom: 0.35 },
+  Sofa: { cropTop: 0.05, cropBottom: 0.3 },
+  Chair: { cropTop: 0.05, cropBottom: 0.25 },
+  Pillow: { cropTop: 0.05, cropBottom: 0.25 },
+  Carpet: { cropTop: 0.05, cropBottom: 0.15 },
+  'Potted Plant': { cropTop: 0, cropBottom: 0.12 },
+  Lamp: { cropTop: 0, cropBottom: 0.18 },
+};
+
+const REFINED_BBOX_ADJUST: Record<string, BBoxAdjustRule> = {
+  lowerCabinet: { cropTop: 0.02, cropBottom: 0.08 },
+  upperCabinet: { cropTop: 0.05, cropBottom: 0.02 },
+  storageCabinet: { cropTop: 0.02, cropBottom: 0.08 },
+};
+
+const adjustBoundingBox = (
+  bbox: [number, number, number, number],
+  opts: { className?: string | null; refinedLabel?: string | undefined },
+  imageMeta: { width: number; height: number }
+): [number, number, number, number] => {
+  const [x, y, w, h] = bbox;
+  const rule = opts.refinedLabel
+    ? REFINED_BBOX_ADJUST[opts.refinedLabel]
+    : opts.className
+      ? CLASS_BBOX_ADJUST[opts.className]
+      : undefined;
+  if (!rule) return bbox;
+
+  const cropTopRatio = Math.min(Math.max(rule.cropTop ?? 0, 0), 0.6);
+  const cropBottomRatio = Math.min(Math.max(rule.cropBottom ?? 0, 0), 0.6);
+  if (cropTopRatio === 0 && cropBottomRatio === 0) return bbox;
+
+  const cropTop = h * cropTopRatio;
+  const cropBottom = h * cropBottomRatio;
+  let newY = y + cropTop;
+  let newH = h - cropTop - cropBottom;
+  if (newH < MIN_BBOX_PIXELS) return bbox;
+
+  const maxY = Math.max(0, imageMeta.height - 1);
+  newY = Math.max(0, Math.min(newY, maxY));
+  newH = Math.max(1, Math.min(newH, imageMeta.height - newY));
+  return [x, newY, w, newH];
+};
+
 // ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
 const HOTSPOT_ID_PRECISION = 3;
 const MIN_BBOX_PIXELS = 8;
@@ -372,9 +422,14 @@ export function useFurnitureHotspots(
       const pixelDetections: FurnitureDetection[] = inference.detections.map(
         (det) => {
           const { x, y, w, h } = toImageSpaceBBox(imageEl, det.bbox);
+          const adjustedBBox = adjustBoundingBox(
+            [x, y, w, h],
+            { className: det.className ?? null },
+            { width: natW, height: natH }
+          );
           return {
             ...det,
-            bbox: [x, y, w, h] as [number, number, number, number],
+            bbox: adjustedBBox,
           };
         }
       );
@@ -424,9 +479,26 @@ export function useFurnitureHotspots(
         });
       }
 
+      const adjustedRefined = refinedDetections.map((det) => ({
+        ...det,
+        bbox: adjustBoundingBox(
+          det.bbox,
+          { refinedLabel: det.refinedLabel, className: det.className ?? null },
+          { width: natW, height: natH }
+        ),
+      }));
+      const adjustedOthers = others.map((det) => ({
+        ...det,
+        bbox: adjustBoundingBox(
+          det.bbox,
+          { className: det.className ?? null },
+          { width: natW, height: natH }
+        ),
+      }));
+
       const combinedDetections: Array<
         FurnitureDetection | RefinedFurnitureDetection
-      > = [...refinedDetections, ...others];
+      > = [...adjustedRefined, ...adjustedOthers];
       const hotspotCandidates = combinedDetections.map((det) =>
         createHotspotFromDetection(det)
       );
