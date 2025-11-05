@@ -16,7 +16,7 @@ export interface Detection {
 
 /**
  * onnxruntime 한 번 실행 후 반환되는 데이터 묶음
- * - `detections`: 원본 이미지 크기를 기준으로 0~1로 정규화(normalized)된 바운딩 박스 목록
+ * - `detections`: 원본 이미지 기준 픽셀 단위 바운딩 박스 목록
  * - `inferenceTime`: 추론에 걸린 시간(ms)
  */
 export interface ProcessedDetections {

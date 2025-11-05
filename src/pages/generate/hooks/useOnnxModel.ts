@@ -41,9 +41,6 @@ type ProgressCallback = (value: number) => void;
 const WASM_ASSET_BASE = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 const modelCache = new Map<string, ModelCacheEntry>();
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
-
 const getCacheEntry = (modelPath: string): ModelCacheEntry => {
   const existing = modelCache.get(modelPath);
   if (existing) return existing;
@@ -230,17 +227,7 @@ export function useONNXModel(modelPath: string) {
         const scores = results.scores.data as Float32Array;
 
         const detections: Detection[] = [];
-        const debugSamples: Array<{
-          raw: [number, number, number, number];
-          normalized: [number, number, number, number];
-          label: number;
-          score: number;
-        }> = [];
         const numDetections = scores.length;
-
-        const safeWidth = Math.max(originalWidth, 1);
-        const safeHeight = Math.max(originalHeight, 1);
-        const clamp01 = (value: number) => clamp(value, 0, 1);
 
         for (let i = 0; i < numDetections; i += 1) {
           // 4) 점수 임계값 필터(실험값 0.5)
@@ -273,59 +260,16 @@ export function useONNXModel(modelPath: string) {
 
             const xMin = Math.min(rawX0, rawX1);
             const yMin = Math.min(rawY0, rawY1);
-            const xMax = Math.max(rawX0, rawX1);
-            const yMax = Math.max(rawY0, rawY1);
-            const boxWidth = Math.max(1e-3, xMax - xMin);
-            const boxHeight = Math.max(1e-3, yMax - yMin);
-
-            let normX = xMin / safeWidth;
-            let normY = yMin / safeHeight;
-            let normW = boxWidth / safeWidth;
-            let normH = boxHeight / safeHeight;
-
-            if (normW + normX > 1) {
-              const overflow = normW + normX - 1;
-              normW -= overflow;
-              if (normW < 1e-3) normW = 1e-3;
-              normX = clamp01(normX);
-            }
-            if (normH + normY > 1) {
-              const overflow = normH + normY - 1;
-              normH -= overflow;
-              if (normH < 1e-3) normH = 1e-3;
-              normY = clamp01(normY);
-            }
-
-            const bboxNormalized: [number, number, number, number] = [
-              clamp01(normX),
-              clamp01(normY),
-              clamp01(normW),
-              clamp01(normH),
-            ];
+            const widthVal = Math.max(1e-3, Math.abs(rawX1 - rawX0));
+            const heightVal = Math.max(1e-3, Math.abs(rawY1 - rawY0));
 
             detections.push({
-              bbox: bboxNormalized,
+              bbox: [xMin, yMin, widthVal, heightVal],
               score: scores[i],
               label: classIndex0, // 내부 표준: 0‑based index 저장
               className: OBJ365_ALL_CLASSES[classIndex0] ?? undefined,
             });
-
-            if (debugSamples.length < 5) {
-              debugSamples.push({
-                raw: [rawX0, rawY0, rawX1, rawY1],
-                normalized: bboxNormalized,
-                label: classIndex0,
-                score: scores[i],
-              });
-            }
           }
-        }
-
-        if (debugSamples.length > 0) {
-          console.info('[useONNXModel] bbox normalization debug', {
-            imageSize: { width: originalWidth, height: originalHeight },
-            samples: debugSamples,
-          });
         }
 
         const inferenceTime = performance.now() - startTime;
