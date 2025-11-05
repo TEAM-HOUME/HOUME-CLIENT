@@ -59,6 +59,47 @@ export function toImageSpaceBBox(
   bbox640: [number, number, number, number]
 ): { x: number; y: number; w: number; h: number } {
   const [x, y, w, h] = bbox640;
+  const baseW = image.naturalWidth || image.width;
+  const baseH = image.naturalHeight || image.height;
+
+  const isNormalized =
+    x >= 0 &&
+    y >= 0 &&
+    w >= 0 &&
+    h >= 0 &&
+    x <= 1.05 &&
+    y <= 1.05 &&
+    w <= 1.05 &&
+    h <= 1.05 &&
+    x + w <= 1.05 &&
+    y + h <= 1.05;
+
+  if (isNormalized) {
+    let realXNorm = x * baseW;
+    let realYNorm = y * baseH;
+    let realWNorm = w * baseW;
+    let realHNorm = h * baseH;
+
+    if (realXNorm < 0) {
+      realWNorm += realXNorm;
+      realXNorm = 0;
+    }
+    if (realYNorm < 0) {
+      realHNorm += realYNorm;
+      realYNorm = 0;
+    }
+
+    realWNorm = Math.max(1, Math.min(realWNorm, baseW - realXNorm));
+    realHNorm = Math.max(1, Math.min(realHNorm, baseH - realYNorm));
+
+    return {
+      x: realXNorm,
+      y: realYNorm,
+      w: realWNorm,
+      h: realHNorm,
+    };
+  }
+
   const { scale: s, padX, padY } = getLetterboxParams(image, 640, 640);
   let realX = (x - padX) / s;
   let realY = (y - padY) / s;
@@ -73,8 +114,6 @@ export function toImageSpaceBBox(
     realH += realY;
     realY = 0;
   }
-  const baseW = image.naturalWidth || image.width;
-  const baseH = image.naturalHeight || image.height;
   realW = Math.max(1, Math.min(realW, baseW - realX));
   realH = Math.max(1, Math.min(realH, baseH - realY));
 
