@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { MODEL_MIN_CONFIDENCE } from '@pages/generate/constants/detection';
 import { preprocessImage } from '@pages/generate/utils/imageProcessing'; // 입력 이미지를 640x640 텐서로 변환
+import { OBJ365_ALL_CLASSES } from '@pages/generate/utils/obj365AllClasses';
 import {
   isFurnitureIndex,
   normalizeObj365Label,
@@ -32,6 +33,7 @@ type ModelCacheEntry = {
   session?: InferenceSession;
   ort?: OnnxModule;
   error?: string | null;
+  inferenceQueue?: Promise<void>;
 };
 
 type ProgressCallback = (value: number) => void;
@@ -191,87 +193,95 @@ export function useONNXModel(modelPath: string) {
       const ort = ortRef.current;
       if (!ort) throw new Error('ONNX 런타임이 초기화되지 않았습니다');
 
-      const startTime = performance.now();
+      const entry = getCacheEntry(modelPath);
+      const task = async (): Promise<ProcessedDetections> => {
+        const startTime = performance.now();
 
-      // 1) 전처리: 640x640 letterbox 후 CHW(float32) 텐서 생성
-      const { tensor, originalWidth, originalHeight } = await preprocessImage(
-        imageElement,
-        640,
-        640
-      );
+        // 1) 전처리: 640x640 letterbox 후 CHW(float32) 텐서 생성
+        const { tensor, originalWidth, originalHeight } = await preprocessImage(
+          imageElement,
+          640,
+          640
+        );
 
-      const inputTensor = new ort.Tensor('float32', tensor, [1, 3, 640, 640]); // 입력 이미지 텐서
-      // orig_target_sizes는 int64 타입이어야 함
-      const sizeTensor = new ort.Tensor(
-        'int64',
-        new BigInt64Array([BigInt(originalHeight), BigInt(originalWidth)]),
-        [1, 2]
-      );
+        const inputTensor = new ort.Tensor('float32', tensor, [1, 3, 640, 640]); // 입력 이미지 텐서
+        // orig_target_sizes는 int64 타입이어야 함
+        const sizeTensor = new ort.Tensor(
+          'int64',
+          new BigInt64Array([BigInt(originalHeight), BigInt(originalWidth)]),
+          [1, 2]
+        );
 
-      const feeds = {
-        images: inputTensor,
-        orig_target_sizes: sizeTensor,
-      };
+        const feeds = {
+          images: inputTensor,
+          orig_target_sizes: sizeTensor,
+        };
 
-      // 2) 추론 실행: labels/boxes/scores 출력 기대
-      const results = await session.run(feeds);
+        // 2) 추론 실행: labels/boxes/scores 출력 기대
+        const results = await session.run(feeds);
 
-      // 3) 출력 텐서 파싱
-      // - labels는 BigInt64Array로 반환될 수 있음
-      const labelsData = results.labels.data;
-      const boxes = results.boxes.data as Float32Array;
-      const scores = results.scores.data as Float32Array;
+        // 3) 출력 텐서 파싱
+        // - labels는 BigInt64Array로 반환될 수 있음
+        const labelsData = results.labels.data;
+        const boxes = results.boxes.data as Float32Array;
+        const scores = results.scores.data as Float32Array;
 
-      const detections: Detection[] = [];
-      const numDetections = scores.length;
+        const detections: Detection[] = [];
+        const numDetections = scores.length;
 
-      for (let i = 0; i < numDetections; i++) {
-        // 4) 점수 임계값 필터(실험값 0.5)
-        if (scores[i] > MODEL_MIN_CONFIDENCE) {
-          const x = boxes[i * 4];
-          const y = boxes[i * 4 + 1];
-          const x2 = boxes[i * 4 + 2];
-          const y2 = boxes[i * 4 + 3];
+        for (let i = 0; i < numDetections; i++) {
+          // 4) 점수 임계값 필터(실험값 0.5)
+          if (scores[i] > MODEL_MIN_CONFIDENCE) {
+            const x = boxes[i * 4];
+            const y = boxes[i * 4 + 1];
+            const x2 = boxes[i * 4 + 2];
+            const y2 = boxes[i * 4 + 3];
 
-          // 5) 라벨 정규화: 모델 1‑based → 내부 0‑based
-          // - DETR/DFINE 계열은 0: 배경, 1부터 실제 클래스인 구성이 흔함
-          // - 내부 로직(JS/TS)은 0‑based가 자연스러우므로 경계에서 변환
-          let label1: number; // 다양한 정수/실수 TypedArray에 안전하게 대응
-          if (labelsData instanceof BigInt64Array) {
-            label1 = Number(labelsData[i]);
-          } else if (
-            labelsData instanceof Int32Array ||
-            labelsData instanceof Uint32Array
-          ) {
-            label1 = Number(labelsData[i]);
-          } else if (labelsData instanceof Float32Array) {
-            label1 = labelsData[i];
-          } else {
-            throw new Error('지원되지 않는 labels 텐서 타입');
+            // 5) 라벨 정규화: 모델 1‑based → 내부 0‑based
+            // - DETR/DFINE 계열은 0: 배경, 1부터 실제 클래스인 구성이 흔함
+            // - 내부 로직(JS/TS)은 0‑based가 자연스러우므로 경계에서 변환
+            let label1: number; // 다양한 정수/실수 TypedArray에 안전하게 대응
+            if (labelsData instanceof BigInt64Array) {
+              label1 = Number(labelsData[i]);
+            } else if (
+              labelsData instanceof Int32Array ||
+              labelsData instanceof Uint32Array
+            ) {
+              label1 = Number(labelsData[i]);
+            } else if (labelsData instanceof Float32Array) {
+              label1 = labelsData[i];
+            } else {
+              throw new Error('지원되지 않는 labels 텐서 타입');
+            }
+
+            const classIndex0 = normalizeObj365Label(label1);
+            // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
+            if (!isFurnitureIndex(classIndex0)) continue;
+
+            detections.push({
+              bbox: [x, y, x2 - x, y2 - y],
+              score: scores[i],
+              label: classIndex0, // 내부 표준: 0‑based index 저장
+              className: OBJ365_ALL_CLASSES[classIndex0] ?? undefined,
+            });
           }
-
-          const classIndex0 = normalizeObj365Label(label1);
-          // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
-          if (!isFurnitureIndex(classIndex0)) continue;
-
-          detections.push({
-            bbox: [x, y, x2 - x, y2 - y],
-            score: scores[i],
-            label: classIndex0, // 내부 표준: 0‑based index 저장
-            // className 부여 안 함: 이름표 비사용 정책
-          });
         }
-      }
 
-      const inferenceTime = performance.now() - startTime;
+        const inferenceTime = performance.now() - startTime;
 
-      // 7) 실행 시간과 함께 결과 반환
-      return {
-        detections,
-        inferenceTime,
+        // 7) 실행 시간과 함께 결과 반환
+        return {
+          detections,
+          inferenceTime,
+        };
       };
+
+      const prevQueue = entry.inferenceQueue ?? Promise.resolve();
+      const next = prevQueue.then(() => task());
+      entry.inferenceQueue = next.then(() => undefined).catch(() => undefined);
+      return next;
     },
-    [session]
+    [session, modelPath]
   );
 
   return {
