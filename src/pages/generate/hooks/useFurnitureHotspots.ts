@@ -52,6 +52,46 @@ type DebugRect = {
   label: string | null;
 };
 
+const CLASS_CENTER_OFFSET: Record<string, number> = {
+  Bed: -0.25,
+  Sofa: -0.18,
+  Chair: -0.12,
+  Pillow: -0.2,
+  Carpet: -0.12,
+  'Potted Plant': -0.1,
+  Lamp: -0.08,
+  'Picture/Frame': -0.05,
+  Clock: -0.05,
+};
+
+const REFINED_CENTER_OFFSET: Record<string, number> = {
+  lowerCabinet: -0.05,
+  upperCabinet: -0.05,
+  storageCabinet: -0.05,
+};
+
+const getCenterOffsetRatio = (
+  hotspot: FurnitureHotspot,
+  imageMeta: { width: number; height: number }
+) => {
+  const baseByClass = hotspot.className
+    ? CLASS_CENTER_OFFSET[hotspot.className]
+    : undefined;
+  const baseByRefined = hotspot.refinedLabel
+    ? REFINED_CENTER_OFFSET[hotspot.refinedLabel]
+    : undefined;
+  let offset = baseByRefined ?? baseByClass ?? 0;
+
+  const normalizedHeight = hotspot.bbox[3] / (imageMeta.height || 1);
+  if (normalizedHeight >= 0.45) {
+    offset -= 0.08;
+  }
+  if (normalizedHeight >= 0.6) {
+    offset -= 0.05;
+  }
+  return offset;
+};
+
 // ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
 const HOTSPOT_ID_PRECISION = 3;
 const MIN_BBOX_PIXELS = 8;
@@ -652,11 +692,13 @@ export function useFurnitureHotspots(
       const [x, y, w, h] = det.bbox;
       const centerX = x + w / 2;
       const centerY = y + h / 2;
+      const offsetRatio = getCenterOffsetRatio(det, imageMeta);
+      const adjustedCenterY = centerY + offsetRatio * h;
       let cx = offsetX + centerX * scaleX;
       if (mirrored) {
         cx = offsetX + renderW - centerX * scaleX;
       }
-      const cy = offsetY + centerY * scaleY;
+      const cy = offsetY + adjustedCenterY * scaleY;
       const clampedCx = Math.min(containerW, Math.max(0, cx));
       const clampedCy = Math.min(containerH, Math.max(0, cy));
       return { ...det, cx: clampedCx, cy: clampedCy };
@@ -673,6 +715,7 @@ export function useFurnitureHotspots(
           cx: item.cx,
           cy: item.cy,
           bbox: item.bbox,
+          offsetRatio: getCenterOffsetRatio(item, imageMeta),
         })),
       });
     }
