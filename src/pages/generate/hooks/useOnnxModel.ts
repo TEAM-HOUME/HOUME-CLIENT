@@ -41,6 +41,9 @@ type ProgressCallback = (value: number) => void;
 const WASM_ASSET_BASE = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 const modelCache = new Map<string, ModelCacheEntry>();
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
 const getCacheEntry = (modelPath: string): ModelCacheEntry => {
   const existing = modelCache.get(modelPath);
   if (existing) return existing;
@@ -229,13 +232,17 @@ export function useONNXModel(modelPath: string) {
         const detections: Detection[] = [];
         const numDetections = scores.length;
 
-        for (let i = 0; i < numDetections; i++) {
+        const safeWidth = Math.max(originalWidth, 1);
+        const safeHeight = Math.max(originalHeight, 1);
+        const clamp01 = (value: number) => clamp(value, 0, 1);
+
+        for (let i = 0; i < numDetections; i += 1) {
           // 4) 점수 임계값 필터(실험값 0.5)
           if (scores[i] > MODEL_MIN_CONFIDENCE) {
-            const x = boxes[i * 4];
-            const y = boxes[i * 4 + 1];
-            const x2 = boxes[i * 4 + 2];
-            const y2 = boxes[i * 4 + 3];
+            const rawX0 = boxes[i * 4];
+            const rawY0 = boxes[i * 4 + 1];
+            const rawX1 = boxes[i * 4 + 2];
+            const rawY1 = boxes[i * 4 + 3];
 
             // 5) 라벨 정규화: 모델 1‑based → 내부 0‑based
             // - DETR/DFINE 계열은 0: 배경, 1부터 실제 클래스인 구성이 흔함
@@ -258,8 +265,22 @@ export function useONNXModel(modelPath: string) {
             // 6) 가구 외 클래스 드롭: 이후 파이프라인 단순화 목적
             if (!isFurnitureIndex(classIndex0)) continue;
 
+            const xMin = Math.min(rawX0, rawX1);
+            const yMin = Math.min(rawY0, rawY1);
+            const xMax = Math.max(rawX0, rawX1);
+            const yMax = Math.max(rawY0, rawY1);
+            const boxWidth = Math.max(1e-3, xMax - xMin);
+            const boxHeight = Math.max(1e-3, yMax - yMin);
+
+            const bboxNormalized: [number, number, number, number] = [
+              clamp01(xMin / safeWidth),
+              clamp01(yMin / safeHeight),
+              clamp01(boxWidth / safeWidth),
+              clamp01(boxHeight / safeHeight),
+            ];
+
             detections.push({
-              bbox: [x, y, x2 - x, y2 - y],
+              bbox: bboxNormalized,
               score: scores[i],
               label: classIndex0, // 내부 표준: 0‑based index 저장
               className: OBJ365_ALL_CLASSES[classIndex0] ?? undefined,
