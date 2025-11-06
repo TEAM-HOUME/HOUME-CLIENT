@@ -130,15 +130,10 @@ export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
         detectedObjects: nextDetectedObjects,
       });
 
-      const nextSelectedHotspotId =
-        nextHotspots.length === 0
-          ? null
-          : prevImageState.selectedHotspotId &&
-              nextHotspots.some(
-                (hotspot) => hotspot.id === prevImageState.selectedHotspotId
-              )
-            ? prevImageState.selectedHotspotId
-            : nextHotspots[0].id;
+      // 요구사항: 추론된 핫스팟 기본 값은 해제 상태 유지
+      // - 이전 선택이 유효하더라도 초기 진입 시 자동 선택하지 않음
+      // - 최초 설정은 항상 null 로 두고 클릭 시에만 선택하도록 위임
+      const nextSelectedHotspotId = null;
       const shouldResetCategory = hotspotsChanged || detectedObjectsChanged;
       const nextSelectedCategoryId = shouldResetCategory
         ? null
