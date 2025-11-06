@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,8 +15,11 @@ import {
 import { useCurationStore } from '@/pages/generate/stores/useCurationStore';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
+import { QUERY_KEY } from '@/shared/constants/queryKey';
 import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
+
+import { getGeneratedImageProducts } from '@pages/generate/apis/furniture';
 
 import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
@@ -80,6 +84,31 @@ export const CurationSheet = () => {
       setSnapState('collapsed');
     }
   }, [activeImageId, snapState, setSnapState]);
+
+  // 카테고리 사전 로딩 이후, 각 카테고리별 상품을 백그라운드에서 프리패치
+  // - 요구사항: 객체 추론 직후 요청 가능한 값(상품 리스트)을 미리 로딩
+  const queryClient = useQueryClient();
+  const prefetchedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!activeImageId) return;
+    if (!categories || categories.length === 0) return;
+
+    categories.forEach((category) => {
+      const key = `${activeImageId}:${category.id}`;
+      if (prefetchedRef.current.has(key)) return;
+      prefetchedRef.current.add(key);
+      queryClient.prefetchQuery({
+        queryKey: [
+          QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
+          activeImageId,
+          category.id,
+        ],
+        queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
+        staleTime: 30 * 1000,
+      });
+    });
+  }, [queryClient, activeImageId, categories]);
 
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
@@ -185,7 +214,11 @@ export const CurationSheet = () => {
               categories.map((category) => (
                 <FilterChip
                   key={category.id}
-                  isSelected={selectedCategoryId === category.id}
+                  // 접힘 상태에서는 칩을 항상 비선택(회색)으로 표시
+                  isSelected={
+                    snapState === 'expanded' &&
+                    selectedCategoryId === category.id
+                  }
                   onClick={() => handleCategorySelect(category.id)}
                 >
                   {category.categoryName}
