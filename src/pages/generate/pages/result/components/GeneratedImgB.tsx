@@ -71,7 +71,7 @@ const GeneratedImgB = ({
       <button
         type="button"
         className={styles.tagBtn}
-        onClick={() => openSheet('mid')}
+        onClick={() => openSheet('expanded')}
       >
         <Tag />
       </button>
