@@ -13,7 +13,7 @@ import {
   usePostCarouselLikeMutation,
   usePostCarouselHateMutation,
   useGenerateImageApi,
-  useGenerateImageStatusCheck,
+  useFallbackImage,
 } from '@pages/generate/hooks/useGenerate';
 import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 
@@ -103,7 +103,8 @@ const LoadingPage = () => {
   // 일반 이미지 생성 API(A/B 테스트 분류에 따라 이미지 1장/2장 생성)
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
 
-  useGenerateImageStatusCheck(requestData?.houseId || 0, !isNormalEntry);
+  // 폴백 이미지 생성 API (일반 API 실패 시 사용)
+  useFallbackImage(requestData?.houseId || 0, !isNormalEntry);
 
   // 캐러셀 페이지네이션 (무한 스크롤)
   const [currentPage, setCurrentPage] = useState(0);

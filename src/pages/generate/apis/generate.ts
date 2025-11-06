@@ -137,8 +137,8 @@ export const postGenerateImage = async (
   return await request<GenerateImageBResponse['data']>(config);
 };
 
-// 이미지 생성 폴백 api
-export const getCheckGenerateImageStatus = async (
+// 이미지 생성 폴백 API
+export const getFallbackImage = async (
   houseId: number
 ): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {

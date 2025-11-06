@@ -8,7 +8,7 @@ import { queryClient } from '@/shared/apis/queryClient';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
 
 import {
-  getCheckGenerateImageStatus,
+  getFallbackImage,
   postGenerateImage,
   postGenerateImages,
   getResultData,
@@ -187,18 +187,15 @@ export const useGenerateImageApi = () => {
 };
 
 // 이미지 생성 폴백
-export const useGenerateImageStatusCheck = (
-  houseId: number,
-  shouldStart: boolean
-) => {
+export const useFallbackImage = (houseId: number, enabled: boolean) => {
   const navigate = useNavigate();
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
 
   const query = useQuery({
-    queryKey: ['generateImageStatus', houseId],
-    queryFn: () => getCheckGenerateImageStatus(houseId),
-    enabled: shouldStart,
+    queryKey: ['fallbackImage', houseId],
+    queryFn: () => getFallbackImage(houseId),
+    enabled,
     refetchInterval: 7000, // 7초
     refetchIntervalInBackground: true,
     retry: (failureCount) => {
@@ -207,12 +204,12 @@ export const useGenerateImageStatusCheck = (
         console.error('최대 재시도 횟수 초과');
         return false;
       }
-      console.log(`상태 체크 재시도 ${failureCount + 1}/10`);
+      console.log(`폴백 재시도 ${failureCount + 1}/10`);
       return true;
     },
   });
 
-  // 성공 시 처리, useGenerateImageStatusCheck 커스텀 훅이 LoadingPage에서 호출되면 useEffect()가 계속 상태 체크
+  // 성공 시 처리
   useEffect(() => {
     if (query.isSuccess && query.data) {
       resetGenerate();
@@ -221,7 +218,7 @@ export const useGenerateImageStatusCheck = (
       setNavigationData(query.data);
       setApiCompleted(true);
 
-      console.log('상태 체크 성공:', query.data);
+      console.log('폴백 이미지 생성 성공:', query.data);
       console.log('프로그래스 바 완료 대기 중...');
 
       // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
@@ -233,7 +230,7 @@ export const useGenerateImageStatusCheck = (
   useEffect(() => {
     if (query.isError) {
       navigate(ROUTES.IMAGE_SETUP);
-      console.log('fallback api 이미지 생성 실패');
+      console.log('폴백 API 이미지 생성 실패');
     }
   }, [query.isError, query.error]);
 
