@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 
+import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
+
 import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
 import DetectionHotspots from './DetectionHotspots';
@@ -31,24 +33,6 @@ const GeneratedImgB = ({
   onCurrentImgIdChange,
   shouldInferHotspots = true,
 }: GeneratedImgBProps) => {
-  // currentImgId를 부모에게 전달하는 useEffect
-  useEffect(() => {
-    let imageId = 0;
-
-    // 단일 이미지 데이터에서 imageId 추출
-    if ('imageInfoResponses' in (propResult as UnifiedGenerateImageResult)) {
-      const firstImage = (propResult as UnifiedGenerateImageResult)
-        .imageInfoResponses?.[0];
-      imageId = firstImage?.imageId || 0;
-    } else if ('imageId' in (propResult as GenerateImageData)) {
-      imageId = (propResult as GenerateImageData).imageId;
-    }
-
-    console.log('GeneratedImgB - onCurrentImgIdChange 호출:', imageId);
-    onCurrentImgIdChange?.(imageId);
-  }, [propResult, onCurrentImgIdChange]);
-
-  // 부모로부터 받은 데이터 사용 (필수 prop)
   const result = propResult;
 
   // 단일 이미지 데이터로 정규화
@@ -59,6 +43,17 @@ const GeneratedImgB = ({
     image = result as GenerateImageData;
   }
 
+  const imageId = image?.imageId ?? 0;
+  const openSheet = useOpenCurationSheet();
+
+  // currentImgId를 부모에게 전달하는 useEffect
+  useEffect(() => {
+    console.log('GeneratedImgB - onCurrentImgIdChange 호출:', imageId);
+    if (imageId > 0) {
+      onCurrentImgIdChange?.(imageId);
+    }
+  }, [imageId, onCurrentImgIdChange]);
+
   if (!image) {
     console.error('Single image data could not be resolved');
     return null;
@@ -67,12 +62,17 @@ const GeneratedImgB = ({
   return (
     <div className={styles.container}>
       <DetectionHotspots
+        imageId={image.imageId}
         imageUrl={image.imageUrl}
         mirrored={image.isMirror}
         // 결과 페이지 플래그로 추론 on/off 제어
         shouldInferHotspots={shouldInferHotspots}
       />
-      <button type="button" className={styles.tagBtn}>
+      <button
+        type="button"
+        className={styles.tagBtn}
+        onClick={() => openSheet('mid')}
+      >
         <Tag />
       </button>
     </div>

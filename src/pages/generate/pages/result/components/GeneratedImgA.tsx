@@ -8,6 +8,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
@@ -54,6 +55,7 @@ const GeneratedImgA = ({
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
+  const openSheet = useOpenCurationSheet();
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: userData } = useMyPageUser();
@@ -73,7 +75,7 @@ const GeneratedImgA = ({
       Array.isArray(result.imageInfoResponses)
     ) {
       const newImgId = result.imageInfoResponses[currentSlideIndex]?.imageId;
-      setCurrentImgId(newImgId);
+      setCurrentImgId(newImgId ?? 0);
     }
   }, [currentSlideIndex, result]);
 
@@ -146,6 +148,7 @@ const GeneratedImgA = ({
         {images.map((image, index) => (
           <SwiperSlide key={`${image.imageId}-${index}`}>
             <DetectionHotspots
+              imageId={image.imageId}
               imageUrl={image.imageUrl}
               mirrored={image.isMirror}
               // 결과 페이지 플래그로 추론 on/off 제어
@@ -187,7 +190,11 @@ const GeneratedImgA = ({
             <SlideNext />
           )}
         </button>
-        <button type="button" className={styles.tagBtn}>
+        <button
+          type="button"
+          className={styles.tagBtn}
+          onClick={() => openSheet('mid')}
+        >
           <Tag />
         </button>
       </Swiper>
