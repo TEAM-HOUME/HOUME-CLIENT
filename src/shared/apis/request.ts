@@ -14,10 +14,12 @@ export const HTTPMethod = {
 } as const;
 
 export type HTTPMethodType = (typeof HTTPMethod)[keyof typeof HTTPMethod];
+type QueryValue = string | number | boolean | Array<string | number | boolean>;
+
 export interface RequestConfig {
   method: HTTPMethodType;
   url: string;
-  query?: Record<string, string | number | boolean>;
+  query?: Record<string, QueryValue>;
   body?: Record<string, unknown>;
 }
 
