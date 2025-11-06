@@ -5,7 +5,6 @@
 import { useEffect, useState } from 'react';
 
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
-import { FURNITURE_CATEGORY_LABELS } from '@pages/generate/utils/furnitureCategories';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
 import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 
@@ -52,17 +51,12 @@ const DetectionHotspots = ({
     setSelectedId((prev) => {
       const next = prev === hotspot.id ? null : hotspot.id;
       if (next) {
-        const refinedInfo = hotspot.refinedLabel
-          ? FURNITURE_CATEGORY_LABELS[hotspot.refinedLabel]
-          : null;
         console.info('[DetectionHotspots] 활성 핫스팟(active hotspot)', {
           id: hotspot.id,
           score: hotspot.score,
           confidence: hotspot.confidence,
           label: {
-            ko: hotspot.refinedKoLabel ?? null,
-            en: refinedInfo?.en ?? hotspot.className ?? null,
-            rawEn: hotspot.className ?? null,
+            final: hotspot.finalLabel,
             rawIndex: hotspot.label ?? null,
             refinedKey: hotspot.refinedLabel ?? null,
           },
@@ -111,7 +105,7 @@ const DetectionHotspots = ({
             className={styles.hotspot}
             style={{ left: hotspot.cx, top: hotspot.cy }}
             onClick={() => handleHotspotClick(hotspot)}
-            aria-label={`hotspot ${hotspot.refinedKoLabel ?? 'furniture'}`}
+            aria-label={`hotspot ${hotspot.finalLabel ?? 'furniture'}`}
           >
             {selectedId === hotspot.id ? <HotspotColor /> : <HotspotGray />}
           </button>

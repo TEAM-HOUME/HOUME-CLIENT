@@ -39,7 +39,8 @@ export type FurnitureHotspot = FurnitureDetection & {
   cx: number;
   cy: number;
   refinedLabel?: FurnitureCategory;
-  refinedKoLabel?: string;
+  refinedLabelEn?: string;
+  finalLabel: string | null;
   confidence?: number; // cabinet 리파인 결과에서만 노출되는 신뢰도
 };
 
@@ -129,7 +130,8 @@ const areHotspotsEqual = (
       prevHotspot.score !== nextHotspot.score ||
       prevHotspot.confidence !== nextHotspot.confidence ||
       prevHotspot.refinedLabel !== nextHotspot.refinedLabel ||
-      prevHotspot.refinedKoLabel !== nextHotspot.refinedKoLabel
+      prevHotspot.refinedLabelEn !== nextHotspot.refinedLabelEn ||
+      prevHotspot.finalLabel !== nextHotspot.finalLabel
     ) {
       return false;
     }
@@ -171,20 +173,27 @@ const createHotspotFromDetection = (
   const refinedLabel = isRefinedDetection(detection)
     ? detection.refinedLabel
     : undefined;
-  const refinedKoLabel = isRefinedDetection(detection)
-    ? detection.refinedKoLabel
+  const refinedLabelEn = isRefinedDetection(detection)
+    ? detection.refinedLabelEn
     : undefined;
   const confidence = isRefinedDetection(detection)
     ? detection.confidence
     : undefined;
+  const baseClass =
+    detection.className ??
+    (typeof detection.label === 'number'
+      ? (OBJ365_ALL_CLASSES[detection.label] ?? undefined)
+      : undefined);
+  const finalLabel = refinedLabelEn ?? baseClass ?? null;
 
   return {
     bbox: detection.bbox,
     score: detection.score,
     label: detection.label,
-    className: detection.className,
+    className: finalLabel ?? detection.className,
     refinedLabel,
-    refinedKoLabel,
+    refinedLabelEn,
+    finalLabel,
     confidence,
     id: createHotspotId({
       bbox: detection.bbox,
@@ -392,14 +401,15 @@ export function useFurnitureHotspots(
       );
       const debugItems = hotspotCandidates.map((candidate) => {
         const labelIndex = candidate.label ?? null;
-        const baseClass =
+        const rawLabel =
           labelIndex !== null && OBJ365_ALL_CLASSES[labelIndex]
             ? OBJ365_ALL_CLASSES[labelIndex]
             : null;
         return {
           id: candidate.id,
-          labelKo: candidate.refinedKoLabel ?? null,
-          labelEn: candidate.className ?? baseClass,
+          finalLabel: candidate.finalLabel,
+          refinedKey: candidate.refinedLabel ?? null,
+          rawLabel,
           score: candidate.score ?? null,
           confidence: candidate.confidence ?? null,
           bbox: candidate.bbox,
@@ -413,9 +423,8 @@ export function useFurnitureHotspots(
       // 추론된 레이블 목록만 추출해 로그
       const labelSummary = hotspotCandidates.map((candidate) => ({
         id: candidate.id,
-        refinedKoLabel: candidate.refinedKoLabel ?? null,
+        finalLabel: candidate.finalLabel,
         refinedLabel: candidate.refinedLabel ?? null,
-        className: candidate.className ?? null,
         rawLabelIndex: candidate.label ?? null,
       }));
       console.info(

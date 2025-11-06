@@ -50,7 +50,7 @@ export interface FurnitureRefinementContext {
 
 export interface RefinedFurnitureDetection extends Detection {
   refinedLabel: FurnitureCategory;
-  refinedKoLabel: string;
+  refinedLabelEn: string;
   confidence: number;
   probabilities: Record<FurnitureCategory, number>;
   features: FurnitureFeatures;
@@ -492,8 +492,9 @@ const refineSingle = (
 
   return {
     ...detection,
+    className: FURNITURE_CATEGORY_LABELS[bestLabel].en,
     refinedLabel: bestLabel,
-    refinedKoLabel: FURNITURE_CATEGORY_LABELS[bestLabel].ko,
+    refinedLabelEn: FURNITURE_CATEGORY_LABELS[bestLabel].en,
     confidence,
     probabilities,
     features: furnitureFeatures,
