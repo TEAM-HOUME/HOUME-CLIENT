@@ -54,3 +54,5 @@ node_modules/
 # tasks.json
 # tasks/ 
 AGENTS.md
+
+.pnpm-store/
