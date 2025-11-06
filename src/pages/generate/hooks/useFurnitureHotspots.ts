@@ -85,12 +85,15 @@ const hashString = (input: string) => {
 
 /**
  * 랭크 점수 계산(computeRankScore)
- * - cabinet: 리파인 confidence를 사용
- * - 기타 가구: 모델 score를 그대로 사용
+ * - 표시는 Obj365 모델 score만으로 결정해 리파인 confidence에 의해 숨겨지지 않도록 유지
  * - 목적: 임계값 필터링과 폴백 정렬을 단일 수치 기준으로 수행
  */
-const computeRankScore = (candidate: { confidence?: number; score?: number }) =>
-  candidate.confidence ?? candidate.score ?? 0;
+const computeRankScore = (candidate: {
+  confidence?: number;
+  score?: number;
+}) => {
+  return candidate.score ?? 0;
+};
 
 /**
  * 핫스팟 ID 생성(createHotspotId)
