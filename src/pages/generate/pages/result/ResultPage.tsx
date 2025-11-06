@@ -66,7 +66,6 @@ const ResultPage = () => {
   const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');
   const isFromMypage = from === 'mypage';
-  const shouldUseCuration = !isFromMypage;
   // houseId 파싱 및 검증: 양의 정수 문자열만 허용
   const trimmedHouseId = rawHouseId?.trim() ?? null;
   const parsedHouseId =
@@ -185,8 +184,8 @@ const ResultPage = () => {
   }, [currentImgId]);
 
   useEffect(() => {
-    // 큐레이션 사용 조건 달성 시에만 activeImage 갱신
-    if (!shouldUseCuration || currentImgId <= 0) {
+    // 유효한 이미지 id일 때만 큐레이션 활성화 상태 갱신
+    if (currentImgId <= 0) {
       if (activeImageIdInStore !== null) {
         setActiveImage(null);
       }
@@ -195,7 +194,7 @@ const ResultPage = () => {
     if (activeImageIdInStore !== currentImgId) {
       setActiveImage(currentImgId);
     }
-  }, [shouldUseCuration, currentImgId, activeImageIdInStore, setActiveImage]);
+  }, [currentImgId, activeImageIdInStore, setActiveImage]);
 
   useEffect(() => {
     return () => {
@@ -332,15 +331,11 @@ const ResultPage = () => {
             result={result}
             onSlideChange={handleSlideChange}
             onCurrentImgIdChange={setCurrentImgId}
-            // 마이페이지 경로에서는 추론 비활성 전달
-            shouldInferHotspots={!isFromMypage}
           />
         ) : (
           <GeneratedImgB
             result={result}
             onCurrentImgIdChange={setCurrentImgId}
-            // 마이페이지 경로에서는 추론 비활성 전달
-            shouldInferHotspots={!isFromMypage}
           />
         )}
 
