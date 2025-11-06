@@ -2,7 +2,7 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 로직은 훅으로 이동, 컴포넌트는 표시만 담당
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { FURNITURE_CATEGORY_LABELS } from '@pages/generate/utils/furnitureCategories';
@@ -32,6 +32,21 @@ const DetectionHotspots = ({
   const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
   const hasHotspots = hotspots.length > 0;
+
+  useEffect(() => {
+    // 핫스팟 데이터 갱신 시 기본 선택 상태 보정
+    setSelectedId((prev) => {
+      if (hotspots.length === 0) {
+        return prev === null ? prev : null;
+      }
+      const stillValid =
+        prev !== null && hotspots.some((hotspot) => hotspot.id === prev);
+      if (stillValid) {
+        return prev;
+      }
+      return hotspots[0]?.id ?? null;
+    });
+  }, [hotspots]);
 
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     setSelectedId((prev) => {
