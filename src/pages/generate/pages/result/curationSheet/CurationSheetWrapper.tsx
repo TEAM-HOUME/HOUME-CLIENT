@@ -75,7 +75,7 @@ export const CurationSheetWrapper = ({
           (isDragging || snapState === 'expanded') &&
             commonStyles.backdropVisible
         )}
-        onClick={() => onSnapStateChange('mid')}
+        onClick={() => onSnapStateChange('collapsed')}
       />
 
       <div
@@ -85,7 +85,7 @@ export const CurationSheetWrapper = ({
         <div
           className={commonStyles.contentWrapper({ type: 'curation' })}
           onClick={() => {
-            if (snapState === 'collapsed') onSnapStateChange('mid');
+            if (snapState === 'collapsed') onSnapStateChange('expanded');
           }}
         >
           <div
