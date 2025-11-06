@@ -59,27 +59,6 @@ const isValidPageState = (value: unknown): value is PageState => {
   );
 };
 
-/**
- * LoadingPage: 이미지 생성 대기 페이지
- *
- * 사용자가 ActivityInfo에서 "완료" 버튼을 누른 후 이동하는 페이지
- *
- * 주요 기능:
- * 1. 이미지 생성 요청: ActivityInfo에서 전달받은 데이터로 AI 이미지 생성 API 호출
- *    - A/B 테스트에 따라 POST /api/v3 (다중 이미지) 또는 POST /api/v2 (단일 이미지) 사용
- *
- * 2. 가구 캐러셀: 이미지 생성 대기 중(약 30초) 사용자에게 가구 선호도 수집
- *    - 좋아요/별로예요 선택으로 사용자 취향 파악
- *    - 무한 스크롤 방식으로 여러 페이지의 가구 이미지 제공
- *
- * 3. 프로그래스 바: 이미지 생성 진행 상황 표시
- *    - 완료 시 자동으로 결과 페이지로 이동
- *
- * 4. 폴백 처리: 에러 발생 시 또는 새로고침 시 대체 API로 전환
- *    - 429 에러 (Too Many Requests) 발생 시
- *    - 42900/42901 에러 (서버 가용 한계치 초과) 발생 시
- *    - GET /api/v1/generated-images/generate로 이미지 생성 상태 폴링
- */
 const LoadingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
