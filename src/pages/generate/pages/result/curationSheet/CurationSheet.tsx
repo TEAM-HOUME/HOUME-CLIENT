@@ -81,16 +81,6 @@ export const CurationSheet = () => {
     }
   }, [activeImageId, snapState, setSnapState]);
 
-  const activeHotspotLabel = useMemo(() => {
-    if (!imageState?.hotspots?.length) return null;
-    const targetId = imageState.selectedHotspotId;
-    if (!targetId) return imageState.hotspots[0]?.finalLabel ?? null;
-    return (
-      imageState.hotspots.find((item) => item.id === targetId)?.finalLabel ??
-      null
-    );
-  }, [imageState]);
-
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
@@ -213,7 +203,6 @@ export const CurationSheet = () => {
           >
             <p className={styles.headerText}>
               {headerName}님의 취향에 딱 맞는 가구 추천
-              {activeHotspotLabel ? ` · ${activeHotspotLabel}` : ''}
             </p>
             {/* 그리드 영역 */}
             <div className={styles.curationSection}>
