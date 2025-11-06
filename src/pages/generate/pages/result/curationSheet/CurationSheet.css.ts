@@ -68,3 +68,38 @@ export const gridbox = style({
   columnGap: '1.1rem',
   justifyItems: 'center',
 });
+
+export const statusContainer = style({
+  width: '100%',
+  padding: '4rem 1.6rem',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '0.8rem',
+  textAlign: 'center',
+  color: colorVars.color.gray500,
+});
+
+export const statusMessage = style({
+  ...fontStyle('body_m_14'),
+  color: colorVars.color.gray600,
+});
+
+export const statusSubMessage = style({
+  // 상태 안내 보조 메시지에 캡션_regular 12 적용
+  ...fontStyle('caption_r_12'),
+  color: colorVars.color.gray400,
+});
+
+export const statusButton = style({
+  marginTop: '0.4rem',
+  padding: '0.8rem 1.6rem',
+  borderRadius: '999px',
+  border: '1px solid',
+  borderColor: colorVars.color.gray300,
+  backgroundColor: colorVars.color.gray000,
+  // 상태 안내 버튼 텍스트에 캡션_medium 12 적용
+  ...fontStyle('caption_m_12'),
+  color: colorVars.color.gray600,
+});
