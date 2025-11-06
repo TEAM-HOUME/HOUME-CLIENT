@@ -1,0 +1,230 @@
+// 가구 큐레이션 전역 상태 스토어 정의
+import { create } from 'zustand';
+
+import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
+
+// 바텀시트 스냅 상태 타입 정의
+export type CurationSnapState = 'collapsed' | 'mid' | 'expanded';
+
+// 이미지별 큐레이션 상태 구조 정의
+interface ImageCurationState {
+  hotspots: FurnitureHotspot[];
+  detectedObjects: string[];
+  selectedHotspotId: number | null;
+  selectedCategoryId: number | null;
+}
+
+// 스토어 전체 상태 타입 정의
+interface FurnitureCurationState {
+  activeImageId: number | null;
+  images: Record<number, ImageCurationState>;
+  sheetSnapState: CurationSnapState;
+  setActiveImage: (imageId: number | null) => void;
+  setImageDetection: (
+    imageId: number,
+    payload: {
+      hotspots: FurnitureHotspot[];
+      detectedObjects: string[];
+    }
+  ) => void;
+  selectHotspot: (imageId: number, hotspotId: number | null) => void;
+  selectCategory: (imageId: number, categoryId: number | null) => void;
+  setSheetSnapState: (snap: CurationSnapState) => void;
+  resetImageState: (imageId: number) => void;
+  resetAll: () => void;
+}
+
+// 이미지 상태 기본값 생성 유틸 정의
+const createDefaultImageState = (): ImageCurationState => ({
+  hotspots: [],
+  detectedObjects: [],
+  selectedHotspotId: null,
+  selectedCategoryId: null,
+});
+
+const areStringArraysEqual = (a: string[], b: string[]) => {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+};
+
+const areHotspotsEqual = (
+  prev: FurnitureHotspot[],
+  next: FurnitureHotspot[]
+) => {
+  if (prev === next) return true;
+  if (prev.length !== next.length) return false;
+  for (let i = 0; i < prev.length; i += 1) {
+    const prevHotspot = prev[i];
+    const nextHotspot = next[i];
+    if (
+      prevHotspot.id !== nextHotspot.id ||
+      prevHotspot.cx !== nextHotspot.cx ||
+      prevHotspot.cy !== nextHotspot.cy ||
+      prevHotspot.finalLabel !== nextHotspot.finalLabel ||
+      prevHotspot.score !== nextHotspot.score ||
+      prevHotspot.confidence !== nextHotspot.confidence
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
+  activeImageId: null,
+  images: {},
+  sheetSnapState: 'collapsed',
+  setActiveImage: (imageId) => {
+    const state = get();
+    if (imageId === null) {
+      // 이미 닫힌 상태면 추가 업데이트 생략
+      if (
+        state.activeImageId === null &&
+        state.sheetSnapState === 'collapsed'
+      ) {
+        return;
+      }
+      set(() => ({
+        activeImageId: null,
+        sheetSnapState: 'collapsed',
+      }));
+      return;
+    }
+    const hasImageState = Boolean(state.images[imageId]);
+    const nextImages = hasImageState
+      ? state.images
+      : { ...state.images, [imageId]: createDefaultImageState() };
+    if (
+      state.activeImageId === imageId &&
+      hasImageState &&
+      state.sheetSnapState === 'collapsed'
+    ) {
+      return;
+    }
+    // 신규 이미지 선택 시 기본 상태 생성 및 스냅 접기
+    set(() => ({
+      activeImageId: imageId,
+      images: nextImages,
+      sheetSnapState: 'collapsed',
+    }));
+  },
+  setImageDetection: (imageId, payload) =>
+    set((state) => {
+      const prevImageState = state.images[imageId] ?? createDefaultImageState();
+      const nextHotspots = payload.hotspots;
+      const nextDetectedObjects = payload.detectedObjects;
+      const prevHotspots = prevImageState.hotspots;
+      const prevDetectedObjects = prevImageState.detectedObjects;
+      const hotspotsChanged = !areHotspotsEqual(prevHotspots, nextHotspots);
+      const detectedObjectsChanged = !areStringArraysEqual(
+        prevDetectedObjects,
+        nextDetectedObjects
+      );
+
+      const nextSelectedHotspotId =
+        nextHotspots.length === 0
+          ? null
+          : prevImageState.selectedHotspotId &&
+              nextHotspots.some(
+                (hotspot) => hotspot.id === prevImageState.selectedHotspotId
+              )
+            ? prevImageState.selectedHotspotId
+            : nextHotspots[0].id;
+      const shouldResetCategory = hotspotsChanged || detectedObjectsChanged;
+      const nextSelectedCategoryId = shouldResetCategory
+        ? null
+        : prevImageState.selectedCategoryId;
+
+      if (
+        !hotspotsChanged &&
+        !detectedObjectsChanged &&
+        prevImageState.selectedHotspotId === nextSelectedHotspotId &&
+        prevImageState.selectedCategoryId === nextSelectedCategoryId
+      ) {
+        return state;
+      }
+
+      return {
+        images: {
+          ...state.images,
+          [imageId]: {
+            hotspots: nextHotspots,
+            detectedObjects: nextDetectedObjects,
+            selectedHotspotId: nextSelectedHotspotId,
+            selectedCategoryId: nextSelectedCategoryId,
+          },
+        },
+      };
+    }),
+  selectHotspot: (imageId, hotspotId) =>
+    set((state) => {
+      const prevImageState = state.images[imageId] ?? createDefaultImageState();
+      if (prevImageState.selectedHotspotId === hotspotId) {
+        return state;
+      }
+      return {
+        images: {
+          ...state.images,
+          [imageId]: {
+            ...prevImageState,
+            selectedHotspotId: hotspotId,
+          },
+        },
+      };
+    }),
+  selectCategory: (imageId, categoryId) =>
+    set((state) => {
+      const prevImageState = state.images[imageId] ?? createDefaultImageState();
+      if (prevImageState.selectedCategoryId === categoryId) {
+        return state;
+      }
+      return {
+        images: {
+          ...state.images,
+          [imageId]: {
+            ...prevImageState,
+            selectedCategoryId: categoryId,
+          },
+        },
+      };
+    }),
+  setSheetSnapState: (snap) =>
+    set((state) => {
+      if (state.sheetSnapState === snap) {
+        return state;
+      }
+      return {
+        sheetSnapState: snap,
+      };
+    }),
+  resetImageState: (imageId) =>
+    set((state) => {
+      if (!(imageId in state.images)) {
+        return state;
+      }
+      const nextImages = { ...state.images };
+      nextImages[imageId] = createDefaultImageState();
+      return {
+        images: nextImages,
+        sheetSnapState:
+          state.activeImageId === imageId ? 'collapsed' : state.sheetSnapState,
+      };
+    }),
+  resetAll: () =>
+    set(() => ({
+      activeImageId: null,
+      images: {},
+      sheetSnapState: 'collapsed',
+    })),
+}));
+
+// 활성 이미지 상태 선택 헬퍼 정의
+export const selectActiveImageState = (state: FurnitureCurationState) => {
+  const imageId = state.activeImageId;
+  if (imageId === null) return null;
+  return state.images[imageId] ?? null;
+};
