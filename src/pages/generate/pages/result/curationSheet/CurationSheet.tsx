@@ -50,24 +50,29 @@ export const CurationSheet = () => {
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
 
-  const normalizedProducts = useMemo(
-    () =>
-      (productsData ?? []).map((product, index) => {
-        const derivedId =
-          (product.furnitureProductId && Number(product.furnitureProductId)) ||
-          index + 1;
-        return {
-          id: derivedId,
-          furnitureProductId: derivedId,
-          furnitureProductName: product.furnitureProductName,
-          furnitureProductMallName: product.furnitureProductMallName,
-          furnitureProductImageUrl:
-            product.furnitureProductImageUrl || product.baseFurnitureImageUrl,
-          furnitureProductSiteUrl: product.furnitureProductSiteUrl,
-        };
-      }),
-    [productsData]
-  );
+  const normalizedProducts = useMemo(() => {
+    return (productsData ?? []).map((product, index) => {
+      // recommendFurnitureId 우선 사용, 없으면 furnitureProductId(숫자 변환), 최후에는 index+1
+      const byRecommend = product.recommendFurnitureId;
+      const byProductId = Number(product.furnitureProductId);
+      const derivedId =
+        (typeof byRecommend === 'number' && Number.isFinite(byRecommend)
+          ? byRecommend
+          : Number.isFinite(byProductId)
+            ? byProductId
+            : undefined) ?? index + 1;
+
+      return {
+        id: derivedId, // recommendFurnitureId 기반 ID 유지
+        furnitureProductId: byProductId || derivedId,
+        furnitureProductName: product.furnitureProductName,
+        furnitureProductMallName: product.furnitureProductMallName,
+        furnitureProductImageUrl:
+          product.furnitureProductImageUrl || product.baseFurnitureImageUrl,
+        furnitureProductSiteUrl: product.furnitureProductSiteUrl,
+      };
+    });
+  }, [productsData]);
 
   // 서버 찜 목록 불러오기
   const { data: jjymItems = [] } = useGetJjymListQuery();
