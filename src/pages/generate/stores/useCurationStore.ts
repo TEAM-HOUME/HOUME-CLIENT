@@ -124,6 +124,11 @@ export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
         prevDetectedObjects,
         nextDetectedObjects
       );
+      // 감지된 객체 배열 로깅
+      console.info('[Curation] detectedObjects', {
+        imageId,
+        detectedObjects: nextDetectedObjects,
+      });
 
       const nextSelectedHotspotId =
         nextHotspots.length === 0
