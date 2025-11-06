@@ -2,56 +2,59 @@
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 import type { FurnitureCategoryGroup } from '@pages/generate/types/furniture';
 
-// 기본 매핑 테이블 정의
-const BUILTIN_LABEL_MAP: Record<string, string> = {
-  // BE 제공 매핑 (object365_word → furniture_name_eng)
-  bed: 'DOUBLE',
-  desk: 'DESK',
-  closet: 'CLOSET',
-  dining_table: 'TABLE',
-  table: 'TABLE',
-  one_seater_sofa: 'ONE_SEATER_SOFA',
-  two_seater_sofa: 'TWO_SEATER_SOFA',
-  couch: 'TWO_SEATER_SOFA',
-  sofa: 'TWO_SEATER_SOFA',
-  drawer: 'DRAWER',
-  monitor_tv: 'MOVABLE_TV',
-  monitor: 'MOVABLE_TV',
-  tv: 'MOVABLE_TV',
-  sitting_table: 'SITTING_TABLE',
-  coffee_table: 'SITTING_TABLE',
-  fullbody_mirror: 'FULLBODY_MIRROR',
-  mirror: 'FULLBODY_MIRROR',
-  book_shelf: 'BOOK_SHELF',
-  bookshelf: 'BOOK_SHELF',
-  display_cabinet: 'DISPLAY_CABINET',
-  cabinet: 'DISPLAY_CABINET',
-  // 기존 대응값(테이블에 없는 항목은 기존 코드 유지)
-  chair: 'CHAIR',
-  stool: 'STOOL',
-  bench: 'BENCH',
-  lamp: 'LAMP',
-  side_table: 'SIDE_TABLE',
-  wardrobe: 'WARDROBE',
-  storage_cabinet: 'CABINET',
-  lowercabinet: 'LOWER_CABINET',
-  uppercabinet: 'UPPER_CABINET',
-  built_in_closet: 'BUILT_IN_CLOSET',
-  chest_of_drawers: 'CHEST_OF_DRAWERS',
-  storagebox: 'STORAGE_BOX',
-  refrigerator: 'REFRIGERATOR',
-  sink: 'SINK',
-  faucet: 'FAUCET',
-  bathtub: 'BATHTUB',
-  pillow: 'PILLOW',
-  carpet: 'CARPET',
-  rug: 'RUG',
-  vase: 'VASE',
-  plant: 'PLANT',
-  potted_plant: 'PLANT',
-  air_conditioner: 'AIR_CONDITIONER',
-  speaker: 'SPEAKER',
-  washing_machine: 'WASHING_MACHINE',
+// 기본 매핑 테이블 정의 (OBJ365 라벨 → 백엔드 object365_word)
+const BUILTIN_LABEL_MAP: Record<string, readonly string[]> = {
+  bed: ['Bed', 'DOUBLE'],
+  single_bed: ['Bed', 'SINGLE'],
+  super_single_bed: ['Bed', 'SUPER_SINGLE'],
+  queen_bed: ['Bed', 'QUEEN_OVER'],
+  desk: ['Desk', 'DESK'],
+  closet: ['closet', 'CLOSET'],
+  wardrobe: ['closet', 'CLOSET'],
+  dining_table: ['Dining Table', 'TABLE'],
+  table: ['Dining Table', 'TABLE'],
+  coffee_table: ['sitting table', 'SITTING_TABLE'],
+  side_table: ['sitting table', 'SITTING_TABLE'],
+  sitting_table: ['sitting table', 'SITTING_TABLE'],
+  one_seater_sofa: ['one seater sofa', 'ONE_SEATER_SOFA'],
+  two_seater_sofa: ['two seater sofa', 'TWO_SEATER_SOFA'],
+  sofa: ['two seater sofa', 'TWO_SEATER_SOFA'],
+  couch: ['two seater sofa', 'TWO_SEATER_SOFA'],
+  drawer: ['drawer', 'DRAWER'],
+  dresser: ['drawer', 'DRAWER'],
+  cabinet: ['display cabinet', 'DISPLAY_CABINET'],
+  display_cabinet: ['display cabinet', 'DISPLAY_CABINET'],
+  storage_cabinet: ['display cabinet', 'DISPLAY_CABINET'],
+  lowercabinet: ['display cabinet', 'DISPLAY_CABINET'],
+  uppercabinet: ['display cabinet', 'DISPLAY_CABINET'],
+  monitor_tv: ['Monitor/TV', 'MOVABLE_TV'],
+  monitor: ['Monitor/TV', 'MOVABLE_TV'],
+  tv: ['Monitor/TV', 'MOVABLE_TV'],
+  television: ['Monitor/TV', 'MOVABLE_TV'],
+  fullbody_mirror: ['fullbody mirror', 'FULLBODY_MIRROR'],
+  mirror: ['fullbody mirror', 'FULLBODY_MIRROR'],
+  book_shelf: ['book shelf', 'BOOK_SHELF'],
+  bookshelf: ['book shelf', 'BOOK_SHELF'],
+  chair: ['Chair'],
+  stool: ['Stool'],
+  bench: ['Bench'],
+  lamp: ['Lamp'],
+  built_in_closet: ['closet', 'CLOSET'],
+  chest_of_drawers: ['drawer', 'DRAWER'],
+  storagebox: ['drawer', 'DRAWER'],
+  refrigerator: ['Refrigerator'],
+  sink: ['Sink'],
+  faucet: ['Faucet'],
+  bathtub: ['Bathtub'],
+  pillow: ['Pillow'],
+  carpet: ['Carpet'],
+  rug: ['Carpet'],
+  vase: ['Vase'],
+  plant: ['Plant'],
+  potted_plant: ['Plant'],
+  air_conditioner: ['Air Conditioner'],
+  speaker: ['Speaker'],
+  washing_machine: ['Washing Machine'],
 };
 
 // 문자열 정규화 유틸 정의
@@ -66,18 +69,19 @@ export const buildDashboardLabelMap = (
   groups: FurnitureCategoryGroup[] | undefined
 ) => {
   if (!groups) return {};
-  const map: Record<string, string> = {};
+  const map: Record<string, readonly string[]> = {};
   groups.forEach((group) => {
     const categoryName = group.nameEng?.toLowerCase?.() ?? '';
     if (categoryName) {
-      map[normalizeLabel(categoryName)] = group.nameEng.toUpperCase();
+      map[normalizeLabel(categoryName)] = [group.nameEng.toUpperCase()];
     }
     group.furnitures.forEach((item) => {
       const code = item.code?.toUpperCase?.();
       if (!code) return;
       const labelKey = normalizeLabel(item.label ?? '');
       if (labelKey) {
-        map[labelKey] = code;
+        const list = map[labelKey] ?? [];
+        map[labelKey] = [...list, code];
       }
     });
   });
@@ -87,20 +91,29 @@ export const buildDashboardLabelMap = (
 // 감지된 핫스팟을 API 파라미터 배열로 변환
 export const mapHotspotsToDetectedObjects = (
   hotspots: FurnitureHotspot[],
-  dynamicMap: Record<string, string>
+  dynamicMap: Record<string, readonly string[]>
 ) => {
-  const mergedMap = {
+  const mergedMap: Record<string, readonly string[]> = {
     ...BUILTIN_LABEL_MAP,
     ...dynamicMap,
   };
-  const codes = hotspots
+  const result = new Set<string>();
+  hotspots
     .map((hotspot) => hotspot.finalLabel ?? hotspot.className ?? '')
     .filter((label): label is string => label.trim().length > 0)
-    .map((label) => {
+    .forEach((label) => {
       const normalized = normalizeLabel(label);
       const mapped = mergedMap[normalized];
-      if (mapped) return mapped;
-      return normalized.toUpperCase();
+      if (mapped && mapped.length > 0) {
+        mapped.forEach((value) => result.add(value));
+      } else {
+        const fallback = normalized
+          .split('_')
+          .filter(Boolean)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        if (fallback) result.add(fallback);
+      }
     });
-  return Array.from(new Set(codes));
+  return Array.from(result);
 };
