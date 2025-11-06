@@ -3,9 +3,11 @@ import { create } from 'zustand';
 interface UserStateTypes {
   accessToken: string | null;
   userName: string | null;
+  userId: number | null;
   setAuth: (token: string, name: string) => void;
   setAccessToken: (token: string) => void;
   setUserName: (name: string) => void;
+  setUserId: (userId: number) => void;
   clearUser: () => void;
 }
 
@@ -14,6 +16,12 @@ export const useUserStore = create<UserStateTypes>((set) => ({
     typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
   userName:
     typeof window !== 'undefined' ? localStorage.getItem('userName') : null,
+  userId:
+    typeof window !== 'undefined'
+      ? localStorage.getItem('userId')
+        ? Number(localStorage.getItem('userId'))
+        : null
+      : null,
   setAuth: (token, name) => {
     localStorage.setItem('accessToken', token);
     localStorage.setItem('userName', name);
@@ -27,9 +35,14 @@ export const useUserStore = create<UserStateTypes>((set) => ({
     localStorage.setItem('userName', name);
     set((state) => ({ ...state, userName: name }));
   },
+  setUserId: (userId) => {
+    localStorage.setItem('userId', String(userId));
+    set((state) => ({ ...state, userId }));
+  },
   clearUser: () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userName');
-    set({ accessToken: null, userName: null });
+    localStorage.removeItem('userId');
+    set({ accessToken: null, userName: null, userId: null });
   },
 }));
