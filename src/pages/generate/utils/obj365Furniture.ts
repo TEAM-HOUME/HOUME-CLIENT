@@ -21,16 +21,33 @@ export const OBJ365_FURNITURE_INDEXES = [
   60, // Carpet
   71, // Candle
   75, // Bed
+  76, // Faucet(수도꼭지)
   79, // Mirror
+  81, // Sink(싱크대)
   83, // Air Conditioner
   94, // Clock
   98, // Dining Table
   110, // Fan
   121, // Nightstand
+  133, // Refrigerator(냉장고)
+  134, // Oven(오븐)
+  149, // Gas stove(가스레인지)
+  153, // Toilet(변기)
+  163, // Microwave(전자레인지)
   167, // Coffee Table
   168, // Side Table
   175, // Radiator
   191, // Bathtub
+  201, // Extractor(레인지후드)
+  213, // Coffee Machine(커피머신)
+  220, // Washing Machine/Drying Machine(세탁기)
+  235, // Blender(블렌더)
+  268, // Induction Cooker(인덕션)
+  277, // Toaster(토스터)
+  301, // Showerhead(샤워헤드)
+  310, // Dishwasher(식기세척기)
+  314, // Rice Cooker(밥솥)
+  325, // Urinal(소변기)
 ] as const;
 
 // 선정 기준: 실내 가구 및 필수 소품으로 모델 학습 시 검증된 목록 유지
