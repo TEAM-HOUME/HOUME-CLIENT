@@ -194,9 +194,34 @@ export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
     }),
   setSheetSnapState: (snap) =>
     set((state) => {
+      // 동일 상태면 변경 불필요
       if (state.sheetSnapState === snap) {
         return state;
       }
+
+      // 바텀시트가 닫힐 때(collapsed) 활성 이미지의 선택된 핫스팟 해제
+      // - 요구사항: 시트를 해제하면 선택된 핫스팟도 함께 해제
+      if (snap === 'collapsed') {
+        const activeId = state.activeImageId;
+        if (activeId !== null) {
+          const prev = state.images[activeId] ?? createDefaultImageState();
+          if (prev.selectedHotspotId !== null) {
+            return {
+              sheetSnapState: snap,
+              images: {
+                ...state.images,
+                [activeId]: {
+                  ...prev,
+                  // 선택된 핫스팟 해제
+                  selectedHotspotId: null,
+                },
+              },
+            };
+          }
+        }
+      }
+
+      // 기본: 스냅 상태만 갱신
       return {
         sheetSnapState: snap,
       };
