@@ -130,11 +130,44 @@ const DetectionHotspots = ({
       });
     });
     // 이미지에 실제로 존재하는 카테고리만 허용
-    const allowed = new Set(
-      (categoriesQuery.data?.categories ?? []).map((c) => c.id)
-    );
-    const found = candidates.find((id) => allowed.has(id));
-    return found ?? null;
+    const allowedCategories = categoriesQuery.data?.categories ?? [];
+    const allowedIdSet = new Set(allowedCategories.map((c) => c.id));
+
+    // 1차: group.categoryId 가 allowed 에 존재하는지 검사
+    const foundById = candidates.find((id) => allowedIdSet.has(id));
+    if (foundById) return foundById;
+
+    // 2차: 이름 기반 매칭 — allowed.categoryName 과 group.nameKr/nameEng 비교
+    // allowed 리스트를 빠르게 조회하기 위해 매핑 구성
+    const nameToAllowedId = new Map<string, number>();
+    allowedCategories.forEach((c) => {
+      const n = (c.categoryName ?? '').toString().trim();
+      if (!n) return;
+      nameToAllowedId.set(n.toUpperCase(), c.id);
+      nameToAllowedId.set(n.replaceAll(' ', '_').toUpperCase(), c.id);
+    });
+    for (const g of groups) {
+      // 후보 텍스트가 해당 그룹명과 연관되는지 확인
+      const gEngUpper = g.nameEng?.toUpperCase?.();
+      const gEngUnderscore = gEngUpper?.replaceAll(' ', '_');
+      const gKrUpper = g.nameKr?.toUpperCase?.();
+      const related = [gEngUpper, gEngUnderscore, gKrUpper].filter(
+        Boolean
+      ) as string[];
+      // 후보군 텍스트 일부가 그룹명과 일치할 경우 allowed 에 같은 이름이 있는지 확인
+      const hit = candidatesText.some((t) => {
+        const u = t.toUpperCase();
+        return related.some((r) => u.includes(r));
+      });
+      if (hit) {
+        for (const key of related) {
+          const mapped = nameToAllowedId.get(key);
+          if (mapped) return mapped;
+        }
+      }
+    }
+
+    return null;
   };
 
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
@@ -158,6 +191,24 @@ const DetectionHotspots = ({
       });
       // 요구사항: 해당 핫스팟이 바텀시트 카테고리에 존재하면 선택 + 바텀시트 확장
       const categoryId = resolveCategoryIdForHotspot(hotspot);
+      // 매핑 디버그 로그 항상 출력
+      const allowed = categoriesQuery.data?.categories ?? [];
+      const candidatesText = mapHotspotsToDetectedObjects(
+        [hotspot],
+        dynamicLabelMap
+      );
+      console.info('[DetectionHotspots] mapping debug', {
+        hotspot: {
+          finalLabel: hotspot.finalLabel,
+          className: hotspot.className,
+        },
+        candidatesText,
+        allowedCategories: allowed.map((c) => ({
+          id: c.id,
+          name: c.categoryName,
+        })),
+        resolvedCategoryId: categoryId,
+      });
       if (!categoryId) return;
       const inChips = categoriesQuery.data?.categories?.some(
         (c) => c.id === categoryId

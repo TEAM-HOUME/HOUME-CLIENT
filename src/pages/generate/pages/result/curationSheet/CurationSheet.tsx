@@ -64,6 +64,8 @@ export const CurationSheet = () => {
 
       return {
         id: derivedId, // recommendFurnitureId 기반 ID 유지
+        isRecommendId:
+          typeof byRecommend === 'number' && Number.isFinite(byRecommend),
         furnitureProductId: byProductId || derivedId,
         furnitureProductName: product.furnitureProductName,
         furnitureProductMallName: product.furnitureProductMallName,
