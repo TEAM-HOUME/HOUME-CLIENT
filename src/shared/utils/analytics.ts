@@ -235,28 +235,45 @@ export const logPageView = (
  *
  * 이벤트 정보:
  * - 이벤트명: tag_button_click
- * - 파라미터: ab_variant, tag_type, image_id, timestamp
- * - 목적: Tag 버튼 클릭률 분석 (A/B 그룹별 비교)
+ * - 파라미터: ab_variant, tag_type, image_id, user_id, timestamp
+ * - 목적: Tag 버튼 클릭률 분석 (A/B 그룹별 비교, userId 기반 분석)
  *
  * @param variant - A/B 테스트 그룹 ('single' 또는 'multiple')
- * @param tagType - Tag 타입 (예: 'furniture', 'style', 'color')
+ * @param tagType - Tag 타입 (예: 'furniture', 'style', 'color', 'image_tag')
  * @param imageId - 이미지 ID (선택사항)
+ * @param userId - 사용자 ID (선택사항)
  */
 export const logTagButtonClick = (
   variant: ImageGenerationVariant,
   tagType: string,
-  imageId?: number
+  imageId?: number,
+  userId?: number | null
 ) => {
   if (!analytics) return;
 
   try {
-    logEvent(analytics, 'tag_button_click', {
+    const eventParams: Record<string, unknown> = {
       ab_variant: variant, // A/B 테스트 그룹
       tag_type: tagType, // Tag 타입
-      image_id: imageId, // 이미지 ID
       timestamp: Date.now(), // 클릭 시점
-    });
-    console.log(`[Analytics] Tag 버튼 클릭: ${tagType} (그룹: ${variant})`);
+    };
+
+    // imageId가 있으면 추가
+    if (imageId !== undefined) {
+      eventParams.image_id = imageId;
+    }
+
+    // userId가 있으면 추가
+    if (userId !== null && userId !== undefined) {
+      eventParams.user_id = userId;
+    }
+
+    logEvent(analytics, 'tag_button_click', eventParams);
+    console.log(
+      `[Analytics] Tag 버튼 클릭: ${tagType} (그룹: ${variant}${
+        userId ? `, userId: ${userId}` : ''
+      })`
+    );
   } catch (error) {
     console.error('Analytics logEvent 오류:', error);
   }
