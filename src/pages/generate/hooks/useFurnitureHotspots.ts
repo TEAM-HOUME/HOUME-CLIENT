@@ -410,6 +410,22 @@ export function useFurnitureHotspots(
         total: hotspotCandidates.length,
         items: debugItems,
       });
+      // 추론된 레이블 목록만 추출해 로그
+      const labelSummary = hotspotCandidates.map((candidate) => ({
+        id: candidate.id,
+        refinedKoLabel: candidate.refinedKoLabel ?? null,
+        refinedLabel: candidate.refinedLabel ?? null,
+        className: candidate.className ?? null,
+        rawLabelIndex: candidate.label ?? null,
+      }));
+      console.info(
+        '[useFurnitureHotspots] 추론 레이블 목록(inference labels)',
+        {
+          imageUrl,
+          count: labelSummary.length,
+          labels: labelSummary,
+        }
+      );
       const effective = hotspotCandidates.length
         ? selectEffectiveHotspots(hotspotCandidates)
         : [];
