@@ -1,7 +1,7 @@
 /**
  * Firebase Analytics에 이벤트를 쉽게 보내기 위한 헬퍼 함수 모음
  *
- * 📊 A/B 테스트 이벤트 추적:
+ * A/B 테스트 이벤트 추적:
  * 1. 사용자 그룹 할당 (ab_test_assigned)
  * 2. 이미지 생성 시작 (image_generation_start)
  * 3. 이미지 생성 완료 (image_generation_complete)
@@ -9,7 +9,7 @@
  * 5. 사용자 액션 (user_action)
  * 6. 페이지 뷰 (page_view)
  *
- * 🎯 분석 목적:
+ * 분석 목적:
  * - A/B 테스트 그룹별 사용자 행동 비교
  * - 이미지 생성 완료율 측정
  * - 사용자 선호도 분석
@@ -25,7 +25,7 @@ import type { ImageGenerationVariant } from '@pages/generate/hooks/useABTest';
 /**
  * A/B 테스트 그룹을 Firebase Analytics에 사용자 속성으로 설정
  *
- * 📊 사용자 속성 설정:
+ * 사용자 속성 설정:
  * - ab_image_variant: 'single' 또는 'multiple'
  * - Google Analytics 4에서 사용자 세그먼트 분석 가능
  * - 모든 이벤트에 자동으로 포함되어 그룹별 분석 가능
@@ -51,7 +51,7 @@ export const setABTestGroup = (variant: ImageGenerationVariant) => {
 /**
  * A/B 테스트 그룹 할당 이벤트 로깅
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: ab_test_assigned
  * - 파라미터: variant, is_new_user, timestamp
  * - 목적: A/B 테스트 그룹 할당 시점 추적
@@ -83,7 +83,7 @@ export const logABTestAssignment = (
 /**
  * 이미지 생성 시작 이벤트
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: image_generation_start
  * - 파라미터: ab_variant, image_type, timestamp
  * - 목적: 이미지 생성 시작 시점 추적 (A/B 그룹별 비교)
@@ -111,7 +111,7 @@ export const logImageGenerationStart = (
 /**
  * 이미지 생성 완료 이벤트
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: image_generation_complete
  * - 파라미터: ab_variant, success, duration_seconds, timestamp
  * - 목적: 이미지 생성 완료율 측정 (A/B 그룹별 비교)
@@ -143,7 +143,7 @@ export const logImageGenerationComplete = (
 /**
  * 이미지 좋아요/싫어요 이벤트
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: image_preference
  * - 파라미터: ab_variant, preference, image_id, timestamp
  * - 목적: 사용자 선호도 분석 (A/B 그룹별 비교)
@@ -174,7 +174,7 @@ export const logImagePreference = (
 /**
  * 사용자 액션 이벤트 (범용)
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: user_action
  * - 파라미터: ab_variant, action, ...params, timestamp
  * - 목적: 다양한 사용자 액션 추적 (A/B 그룹별 비교)
@@ -205,7 +205,7 @@ export const logUserAction = (
 /**
  * 페이지 뷰 이벤트
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: page_view
  * - 파라미터: ab_variant, page_name, timestamp
  * - 목적: 페이지 방문 추적 (A/B 그룹별 비교)
@@ -233,7 +233,7 @@ export const logPageView = (
 /**
  * Tag 버튼 클릭 이벤트
  *
- * 📊 이벤트 정보:
+ * 이벤트 정보:
  * - 이벤트명: tag_button_click
  * - 파라미터: ab_variant, tag_type, image_id, timestamp
  * - 목적: Tag 버튼 클릭률 분석 (A/B 그룹별 비교)
