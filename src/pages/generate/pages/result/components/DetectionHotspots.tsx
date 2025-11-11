@@ -4,6 +4,7 @@
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
 import { useEffect, useMemo, useRef } from 'react';
 
+import { toFurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
 import {
   useFurnitureDashboardQuery,
   useGeneratedCategoriesQuery,
@@ -13,6 +14,7 @@ import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
 import {
   buildDashboardLabelMap,
+  filterAllowedDetectedObjects,
   mapHotspotsToDetectedObjects,
 } from '@pages/generate/utils/detectedObjectMapper';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
@@ -66,10 +68,15 @@ const DetectionHotspots = ({
       resetImageState(imageId);
       return;
     }
-    const detectedObjects = mapHotspotsToDetectedObjects(
+    const rawDetectedCodes = mapHotspotsToDetectedObjects(
       hotspots,
       dynamicLabelMap
     );
+    const detectedObjects = filterAllowedDetectedObjects(rawDetectedCodes, {
+      stage: 'image-detection',
+      imageId,
+      hotspotCount: hotspots.length,
+    });
     setImageDetection(imageId, {
       hotspots,
       detectedObjects,
@@ -89,45 +96,24 @@ const DetectionHotspots = ({
   ): number | null => {
     const groups = dashboardData?.categories ?? [];
     if (!groups || groups.length === 0) return null;
-    // 매핑 테이블: code → categoryId, groupNameEng(upper) → categoryId
+    // 매핑 테이블: code → categoryId
     const codeToCategoryId = new Map<string, number>();
-    const nameToCategoryId = new Map<string, number>();
     groups.forEach((g) => {
-      nameToCategoryId.set(g.nameEng.toUpperCase(), g.categoryId);
-      g.furnitures.forEach((f) =>
-        codeToCategoryId.set(f.code.toUpperCase(), g.categoryId)
-      );
+      g.furnitures.forEach((f) => {
+        const code = toFurnitureCategoryCode(f.code);
+        if (!code) return;
+        codeToCategoryId.set(code, g.categoryId);
+      });
     });
     // 후보군: 동적/내장 매퍼를 모두 활용해 후보 문자열 생성
-    const candidatesText = mapHotspotsToDetectedObjects(
+    const candidateCodes = mapHotspotsToDetectedObjects(
       [hotspot],
       dynamicLabelMap
     );
     const candidates: number[] = [];
-    candidatesText.forEach((text) => {
-      const raw = (text ?? '').toString().trim();
-      if (!raw) return;
-      const uppers = [
-        raw.toUpperCase(),
-        raw.replaceAll(' ', '_').toUpperCase(),
-      ];
-      uppers.forEach((upper) => {
-        const byName = nameToCategoryId.get(upper);
-        if (byName) candidates.push(byName);
-        const byCode = codeToCategoryId.get(upper);
-        if (byCode) candidates.push(byCode);
-        // 슬래시 구분자 보조 처리(MONITOR/TV → MONITOR, TV)
-        if (upper.includes('/')) {
-          upper.split('/').forEach((part) => {
-            const p = part.trim();
-            if (!p) return;
-            const byName2 = nameToCategoryId.get(p);
-            if (byName2) candidates.push(byName2);
-            const byCode2 = codeToCategoryId.get(p);
-            if (byCode2) candidates.push(byCode2);
-          });
-        }
-      });
+    candidateCodes.forEach((code) => {
+      const byCode = codeToCategoryId.get(code);
+      if (byCode) candidates.push(byCode);
     });
     // 이미지에 실제로 존재하는 카테고리만 허용
     const allowedCategories = categoriesQuery.data?.categories ?? [];
@@ -137,8 +123,7 @@ const DetectionHotspots = ({
     const foundById = candidates.find((id) => allowedIdSet.has(id));
     if (foundById) return foundById;
 
-    // 2차: 이름 기반 매칭 — allowed.categoryName 과 group.nameKr/nameEng 비교
-    // allowed 리스트를 빠르게 조회하기 위해 매핑 구성
+    // 2차: 레이블 텍스트 기반 매칭 — finalLabel 과 서버 카테고리명 비교
     const nameToAllowedId = new Map<string, number>();
     allowedCategories.forEach((c) => {
       const n = (c.categoryName ?? '').toString().trim();
@@ -146,25 +131,17 @@ const DetectionHotspots = ({
       nameToAllowedId.set(n.toUpperCase(), c.id);
       nameToAllowedId.set(n.replaceAll(' ', '_').toUpperCase(), c.id);
     });
-    for (const g of groups) {
-      // 후보 텍스트가 해당 그룹명과 연관되는지 확인
-      const gEngUpper = g.nameEng?.toUpperCase?.();
-      const gEngUnderscore = gEngUpper?.replaceAll(' ', '_');
-      const gKrUpper = g.nameKr?.toUpperCase?.();
-      const related = [gEngUpper, gEngUnderscore, gKrUpper].filter(
-        Boolean
-      ) as string[];
-      // 후보군 텍스트 일부가 그룹명과 일치할 경우 allowed 에 같은 이름이 있는지 확인
-      const hit = candidatesText.some((t) => {
-        const u = t.toUpperCase();
-        return related.some((r) => u.includes(r));
-      });
-      if (hit) {
-        for (const key of related) {
-          const mapped = nameToAllowedId.get(key);
-          if (mapped) return mapped;
-        }
-      }
+    const fallbackLabels = [hotspot.finalLabel ?? '', hotspot.className ?? '']
+      .flatMap((label) =>
+        label
+          .split('/')
+          .map((part) => part.trim())
+          .filter(Boolean)
+      )
+      .map((label) => label.toUpperCase());
+    for (const label of fallbackLabels) {
+      const direct = nameToAllowedId.get(label);
+      if (direct) return direct;
     }
 
     return null;
@@ -193,7 +170,7 @@ const DetectionHotspots = ({
       const categoryId = resolveCategoryIdForHotspot(hotspot);
       // 매핑 디버그 로그 항상 출력
       const allowed = categoriesQuery.data?.categories ?? [];
-      const candidatesText = mapHotspotsToDetectedObjects(
+      const candidateCodes = mapHotspotsToDetectedObjects(
         [hotspot],
         dynamicLabelMap
       );
@@ -202,7 +179,7 @@ const DetectionHotspots = ({
           finalLabel: hotspot.finalLabel,
           className: hotspot.className,
         },
-        candidatesText,
+        candidateCodes,
         allowedCategories: allowed.map((c) => ({
           id: c.id,
           name: c.categoryName,

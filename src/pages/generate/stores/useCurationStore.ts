@@ -1,6 +1,7 @@
 // 가구 큐레이션 전역 상태 스토어 정의
 import { create } from 'zustand';
 
+import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 
 // 바텀시트 스냅 상태 타입 정의
@@ -9,7 +10,7 @@ export type CurationSnapState = 'collapsed' | 'mid' | 'expanded';
 // 이미지별 큐레이션 상태 구조 정의
 interface ImageCurationState {
   hotspots: FurnitureHotspot[];
-  detectedObjects: string[];
+  detectedObjects: FurnitureCategoryCode[];
   selectedHotspotId: number | null;
   selectedCategoryId: number | null;
 }
@@ -24,7 +25,7 @@ interface FurnitureCurationState {
     imageId: number,
     payload: {
       hotspots: FurnitureHotspot[];
-      detectedObjects: string[];
+      detectedObjects: FurnitureCategoryCode[];
     }
   ) => void;
   selectHotspot: (imageId: number, hotspotId: number | null) => void;
@@ -42,7 +43,10 @@ const createDefaultImageState = (): ImageCurationState => ({
   selectedCategoryId: null,
 });
 
-const areStringArraysEqual = (a: string[], b: string[]) => {
+const areCodeArraysEqual = (
+  a: FurnitureCategoryCode[],
+  b: FurnitureCategoryCode[]
+) => {
   if (a === b) return true;
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i += 1) {
@@ -120,7 +124,7 @@ export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
       const prevHotspots = prevImageState.hotspots;
       const prevDetectedObjects = prevImageState.detectedObjects;
       const hotspotsChanged = !areHotspotsEqual(prevHotspots, nextHotspots);
-      const detectedObjectsChanged = !areStringArraysEqual(
+      const detectedObjectsChanged = !areCodeArraysEqual(
         prevDetectedObjects,
         nextDetectedObjects
       );

@@ -14,7 +14,12 @@ import {
   DETECTION_MIN_CONFIDENCE,
   FALLBACK_MAX_CANDIDATES,
 } from '@pages/generate/constants/detection';
+import {
+  describeObj365Index,
+  hasFurnitureCodeForIndex,
+} from '@pages/generate/constants/furnitureCategoryMapping';
 import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
+import { reportFurniturePipelineWarning } from '@pages/generate/utils/furniturePipelineMonitor';
 import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
 import { OBJ365_ALL_CLASSES } from '@pages/generate/utils/obj365AllClasses';
 import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
@@ -364,17 +369,43 @@ export function useFurnitureHotspots(
         })),
       });
 
-      if (pixelDetections.length === 0) {
+      // 허용 코드 매핑이 없는 감지를 집계
+      const filteredOut: Array<{
+        label: number | null;
+        className: string;
+        score: number;
+      }> = [];
+      const allowedDetections = pixelDetections.filter((det) => {
+        if (!hasFurnitureCodeForIndex(det.label ?? null)) {
+          filteredOut.push({
+            label: det.label ?? null,
+            className: det.className ?? describeObj365Index(det.label),
+            score: det.score,
+          });
+          return false;
+        }
+        return true;
+      });
+
+      if (filteredOut.length > 0) {
+        // 감지 즉시 허용 대상 외 라벨 제거
+        console.info('[useFurnitureHotspots] 허용되지 않은 감지 필터링', {
+          imageUrl,
+          dropped: filteredOut,
+        });
+      }
+
+      if (allowedDetections.length === 0) {
         setHotspots((prev) => (prev.length === 0 ? prev : []));
         return;
       }
 
-      const cabinet = pixelDetections.filter((d) => {
+      const cabinet = allowedDetections.filter((d) => {
         if (!isCabinetShelfIndex(d.label)) return false;
         const [, , w, h] = d.bbox;
         return w >= MIN_BBOX_PIXELS && h >= MIN_BBOX_PIXELS;
       });
-      const others = pixelDetections.filter(
+      const others = allowedDetections.filter(
         (d) => !isCabinetShelfIndex(d.label)
       );
 
@@ -396,9 +427,33 @@ export function useFurnitureHotspots(
         });
       }
 
+      let cabinetPipeline: Array<
+        FurnitureDetection | RefinedFurnitureDetection
+      > = refinedDetections;
+
+      if (cabinet.length > 0 && refinedDetections.length === 0) {
+        // 2차 분류 실패 시 기본 Cabinet 로직으로 되돌림
+        console.warn('[useFurnitureHotspots] 추가 분류 실패 fallback 동작', {
+          imageUrl,
+          cabinetCount: cabinet.length,
+        });
+        reportFurniturePipelineWarning('furniture-cabinet-refine-miss', {
+          imageUrl,
+          cabinetCount: cabinet.length,
+        });
+        cabinetPipeline = cabinet.map((det) => ({
+          ...det,
+          className:
+            det.className ??
+            (typeof det.label === 'number'
+              ? (OBJ365_ALL_CLASSES[det.label] ?? undefined)
+              : undefined),
+        }));
+      }
+
       const combinedDetections: Array<
         FurnitureDetection | RefinedFurnitureDetection
-      > = [...refinedDetections, ...others];
+      > = [...cabinetPipeline, ...others];
       const hotspotCandidates = combinedDetections.map((det) =>
         createHotspotFromDetection(det)
       );

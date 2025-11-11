@@ -3,6 +3,7 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 
+import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
 import type {
   FurnitureAndActivityResponse,
   FurnitureCategoriesResponse,
@@ -12,7 +13,7 @@ import type {
 // 생성 이미지 카테고리 조회 API 호출
 export const getGeneratedImageCategories = async (
   imageId: number,
-  detectedObjects: string[]
+  detectedObjects: FurnitureCategoryCode[]
 ) => {
   return request<FurnitureCategoriesResponse>({
     method: HTTPMethod.GET,
