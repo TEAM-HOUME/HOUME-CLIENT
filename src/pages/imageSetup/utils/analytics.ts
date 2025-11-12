@@ -413,3 +413,71 @@ export const logSelectFloorPlanClickDeemded = () => {
     console.error('Analytics logEvent 오류:', error);
   }
 };
+
+// ============================================================================
+/**
+ * [퍼널 STEP3] 무드보드 선택 페이지 (InteriorStyle) 관련 이벤트
+ *
+ * 이벤트 코드:
+ * - selectMoodboard_click_btnCTA
+ * - selectMoodboard_click_btnCTAInactive
+ */
+// ============================================================================
+
+/**
+ * 무드보드 선택 CTA 버튼 클릭 이벤트 (활성 상태)
+ *
+ * 이벤트 코드: selectMoodboard_click_btnCTA
+ * - Page: selectMoodboard
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: (없음)
+ *
+ * CTA 버튼: "집 구조 선택하기" 버튼 (활성 상태)
+ */
+export const logSelectMoodboardClickBtnCTA = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectMoodboard_click_btnCTA', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectMoodboard_click_btnCTA 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 무드보드 선택 CTA 버튼 클릭 이벤트 (비활성 상태)
+ *
+ * 이벤트 코드: selectMoodboard_click_btnCTAInactive
+ * - Page: selectMoodboard
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: Inactive
+ *
+ * CTA 버튼: "집 구조 선택하기" 버튼 (비활성 상태)
+ */
+export const logSelectMoodboardClickBtnCTAInactive = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectMoodboard_click_btnCTAInactive', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectMoodboard_click_btnCTAInactive 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
