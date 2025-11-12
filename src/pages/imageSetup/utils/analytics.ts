@@ -6,6 +6,15 @@
  * - Action: view, click 등
  * - Component: btnCTA, modal, error 등
  * - Function: Inactive, Exit, Continue 등 (없으면 생략)
+ */
+
+import { logEvent } from 'firebase/analytics';
+
+import { analytics } from '@/shared/config/firebase';
+
+// ============================================================================
+/**
+ * [퍼널 STEP1] 집 구조 선택 페이지 (HouseInfo) 관련 이벤트
  *
  * 이벤트 코드:
  * - selectHouseInfo_click_btnCTA
@@ -15,10 +24,7 @@
  * - selectHouseInfo_click_modalContinue
  * - selectHouseInfo_view_error
  */
-
-import { logEvent } from 'firebase/analytics';
-
-import { analytics } from '@/shared/config/firebase';
+// ============================================================================
 
 /**
  * 집 구조 선택 CTA 버튼 클릭 이벤트 (활성 상태)
@@ -185,6 +191,224 @@ export const logSelectHouseInfoViewError = () => {
       page_path: window.location.pathname,
     });
     console.log('[Firebase Analytics] selectHouseInfo_view_error 이벤트 전송');
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+// ============================================================================
+/**
+ * [퍼널 STEP2] 평면도 선택 페이지 (FloorPlan) 관련 이벤트
+ *
+ * 이벤트 코드:
+ * - selectFloorPlan_click_btnNoPlan
+ * - selectFloorPlan_view_modalNoPlan
+ * - selectFloorPlan_click_btnCTASubmit
+ * - selectFloorPlan_view_modalReversed
+ * - selectFloorPlan_click_btnReversed
+ * - selectFloorPlan_click_btnCTASelect
+ * - selectFloorPlan_click_deemded
+ */
+// ============================================================================
+
+/**
+ * 평면도 선택 NoPlan 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_click_btnNoPlan
+ * - Page: selectFloorPlan
+ * - Action: click
+ * - Component: btn
+ * - Function: NoPlan
+ *
+ * 버튼: "우리 집 구조와 유사한 템플릿이 없어요" 버튼
+ */
+export const logSelectFloorPlanClickBtnNoPlan = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_click_btnNoPlan', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_click_btnNoPlan 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 NoPlan 모달 뷰 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_view_modalNoPlan
+ * - Page: selectFloorPlan
+ * - Action: view
+ * - Component: modal
+ * - Function: NoPlan
+ *
+ * NoMatchSheet 모달이 표시될 때 전송
+ */
+export const logSelectFloorPlanViewModalNoPlan = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_view_modalNoPlan', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_view_modalNoPlan 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 Submit CTA 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_click_btnCTASubmit
+ * - Page: selectFloorPlan
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: Submit
+ *
+ * CTA 버튼: NoMatchSheet의 "제출하기" 버튼
+ */
+export const logSelectFloorPlanClickBtnCTASubmit = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_click_btnCTASubmit', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_click_btnCTASubmit 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 Reversed 모달 뷰 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_view_modalReversed
+ * - Page: selectFloorPlan
+ * - Action: view
+ * - Component: modal
+ * - Function: Reversed
+ *
+ * FlipSheet 모달이 표시될 때 전송
+ */
+export const logSelectFloorPlanViewModalReversed = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_view_modalReversed', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_view_modalReversed 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 Reversed 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_click_btnReversed
+ * - Page: selectFloorPlan
+ * - Action: click
+ * - Component: btn
+ * - Function: Reversed
+ *
+ * 버튼: FlipSheet의 좌우반전 버튼
+ */
+export const logSelectFloorPlanClickBtnReversed = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_click_btnReversed', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_click_btnReversed 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 Select CTA 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_click_btnCTASelect
+ * - Page: selectFloorPlan
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: Select
+ *
+ * CTA 버튼: FlipSheet의 "선택하기" 버튼
+ */
+export const logSelectFloorPlanClickBtnCTASelect = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_click_btnCTASelect', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_click_btnCTASelect 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 평면도 선택 도면 클릭 이벤트
+ *
+ * 이벤트 코드: selectFloorPlan_click_deemded
+ * - Page: selectFloorPlan
+ * - Action: click
+ * - Component: deemded
+ * - Function: (없음)
+ *
+ * 평면도 이미지 클릭 시 전송
+ */
+export const logSelectFloorPlanClickDeemded = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFloorPlan_click_deemded', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFloorPlan_click_deemded 이벤트 전송'
+    );
   } catch (error) {
     console.error('Analytics logEvent 오류:', error);
   }
