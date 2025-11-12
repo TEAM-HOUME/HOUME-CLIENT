@@ -101,11 +101,7 @@ const ButtonGroup = <T = string,>({
 
           return (
             <LargeFilled
-              key={
-                option.id !== undefined
-                  ? String(option.id)
-                  : String(option.code)
-              }
+              key={String(option.code)}
               buttonSize={buttonSize}
               isSelected={isSelected}
               isActive={isActive}
