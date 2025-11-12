@@ -85,11 +85,8 @@ const GeneratedImgA = ({
     images = [result];
   }
 
-  // 두 번째 이미지가 있는 경우 블러 처리된 추가 슬라이드를 생성
-  const shouldAddBlurredSlide = images.length >= 2;
-  const totalSlideCount = shouldAddBlurredSlide
-    ? images.length + 1
-    : images.length;
+  const lastImage = images[images.length - 1];
+  const totalSlideCount = lastImage ? images.length + 1 : images.length;
 
   const handleOpenModal = () => {
     overlay.open(
@@ -141,7 +138,10 @@ const GeneratedImgA = ({
           {currentSlideIndex === 0 ? <SlidePrevDisabled /> : <SlidePrev />}
         </button>
         {images.map((image, index) => (
-          <SwiperSlide key={`${image.imageId}-${index}`}>
+          <SwiperSlide
+            key={`${image.imageId}-${index}`}
+            className={styles.swiperSlide}
+          >
             <img
               src={image.imageUrl}
               alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
@@ -149,14 +149,14 @@ const GeneratedImgA = ({
             />
           </SwiperSlide>
         ))}
-        {shouldAddBlurredSlide && (
-          <SwiperSlide key="blurred-second-image">
+        {lastImage && (
+          <SwiperSlide key="blurred-last-image" className={styles.swiperSlide}>
             <div
               className={styles.imgAreaBlurred({
-                mirrored: images[1].isMirror,
+                mirrored: lastImage.isMirror,
               })}
               style={{
-                background: `url(${images[1].imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
+                background: `url(${lastImage.imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
               }}
             />
             <div className={styles.lockWrapper}>
