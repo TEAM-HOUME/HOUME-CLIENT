@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
@@ -12,15 +14,58 @@ import IntroSection from './components/introSection/IntroSection';
 import ReviewSection from './components/reviewSection/ReviewSection';
 import StepGuideSection from './components/stepGuideSection/StepGuideSection';
 import * as styles from './HomePage.css';
+import {
+  logLandingClickBtnMypage,
+  logLandingScrollDepthTreshold,
+} from './utils/analytics';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
+  const scrollDepth50Sent = useRef(false);
+  const scrollDepth100Sent = useRef(false);
+
   const { data: userData, isLoading: isUserDataLoading } = useMyPageUser({
     enabled: isLoggedIn,
   });
+
+  // 스크롤 깊이 추적
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrollPercentage =
+        scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+
+      // 50% 도달 시 이벤트 전송 (초기 1회)
+      if (scrollPercentage >= 50 && !scrollDepth50Sent.current) {
+        logLandingScrollDepthTreshold(50);
+        scrollDepth50Sent.current = true;
+      }
+
+      // 100% 도달 시 이벤트 전송 (초기 1회)
+      if (
+        (scrollPercentage >= 99.5 ||
+          scrollTop + window.innerHeight >=
+            document.documentElement.scrollHeight - 10) &&
+        !scrollDepth100Sent.current
+      ) {
+        logLandingScrollDepthTreshold(100);
+        scrollDepth100Sent.current = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   /**
    * 크레딧 기반 플로팅 버튼 텍스트 결정
@@ -59,10 +104,21 @@ const HomePage = () => {
     // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
   };
 
+  // 프로필 버튼 클릭 핸들러 (마이페이지 버튼 클릭 이벤트 전송)
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      logLandingClickBtnMypage();
+    }
+    navigate(ROUTES.MYPAGE);
+  };
+
   return (
     <main className={styles.page}>
       <div className={styles.gradFrame}>
-        <LogoNavBar buttonType={isLoggedIn ? 'profile' : 'login'} />
+        <LogoNavBar
+          buttonType={isLoggedIn ? 'profile' : 'login'}
+          onProfileClick={isLoggedIn ? handleProfileClick : undefined}
+        />
         <div className={styles.introSection}>
           <IntroSection />
         </div>
