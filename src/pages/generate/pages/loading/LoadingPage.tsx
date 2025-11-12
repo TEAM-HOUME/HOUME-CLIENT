@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -23,6 +23,7 @@ import ProgressBar from './ProgressBar';
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
 const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
+const SESSION_STORAGE_KEY = 'generate_image_request'; // sessionStorage 키
 
 // LoadingPage의 location.state 타입
 // ActivityInfo에서 navigate로 전달되는 이미지 생성 요청 데이터
@@ -30,18 +31,15 @@ type PageState = {
   generateImageRequest: GenerateImageRequest;
 };
 
-// Type Guard: location.state 검증
-// ActivityInfo에서 전달된 이미지 생성 요청 데이터가 유효한지 확인
-// TODO: Zod로 PageState 타입 검증 로직 구현(타입 하드코딩 제거, 타입 변경 시 검증 로직 자동 업데이트, 코드 더 짧고 직관적)
-const isValidPageState = (value: unknown): value is PageState => {
+// Type Guard: GenerateImageRequest 검증
+// sessionStorage에서 가져온 데이터가 유효한지 확인
+// TODO: Zod로 타입 검증 로직 구현(타입 하드코딩 제거, 타입 변경 시 검증 로직 자동 업데이트, 코드 더 짧고 직관적)
+const isValidGenerateImageRequest = (
+  value: unknown
+): value is GenerateImageRequest => {
   if (!value || typeof value !== 'object') return false;
 
-  const { generateImageRequest } = value as Record<string, unknown>;
-  if (!generateImageRequest || typeof generateImageRequest !== 'object') {
-    return false;
-  }
-
-  const request = generateImageRequest as Record<string, unknown>;
+  const request = value as Record<string, unknown>;
   const floorPlan = request.floorPlan as Record<string, unknown> | undefined;
 
   return (
@@ -60,29 +58,44 @@ const isValidPageState = (value: unknown): value is PageState => {
 };
 
 const LoadingPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
 
   // Zustand store: 이미지 생성 완료 상태 및 결과 데이터
   const { isApiCompleted, navigationData } = useGenerateStore();
 
+  // sessionStorage에서 이미지 생성 요청 데이터 가져오기
+  const requestData: GenerateImageRequest | null = (() => {
+    const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!stored) {
+      console.warn('sessionStorage에 저장된 데이터 없음');
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(stored);
+      if (isValidGenerateImageRequest(parsed)) {
+        console.log('🔥 sessionStorage의 requestData 복원: 🔥', parsed);
+        return parsed;
+      } else {
+        console.error('sessionStorage 데이터가 유효하지 않음');
+        return null;
+      }
+    } catch (error) {
+      console.error('essionStorage 파싱 실패:', error);
+      return null;
+    }
+  })();
+
   // 정상 진입 여부, true: 일반 이미지 생성 API 호출, false: 폴백 이미지 API 호출
   const [isNormalEntry, setIsNormalEntry] = useState(true);
-
-  // useLocation()의 location.state에서 가져온 raw data(unknown 타입)
-  const rawState = location.state;
-
-  // 이미지 생성 요청 데이터 추출
-  // rawState의 타입이 이미지 생성 요청 request body에 적절한 타입인지 확인, 적절하면 값 추출, 틀리면 null 할당
-  const requestData: GenerateImageRequest | null = isValidPageState(rawState)
-    ? rawState.generateImageRequest
-    : null;
 
   // 일반 이미지 생성 API(A/B 테스트 분류에 따라 이미지 1장/2장 생성)
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
 
   // 폴백 이미지 생성 API (일반 API 실패 시 사용)
+  // isNormalEntry가 변경되면 컴포넌트 리렌더링 -> useFallbackImage 호출 -> useQuery가 enabled값 감지 -> true:API요청, false:대기
+  // 계속 true일 시 refetchInterval마다 자동 polling
+  console.log('isNormalEntry: ', isNormalEntry);
   useFallbackImage(requestData?.houseId || 0, !isNormalEntry);
 
   // 캐러셀 페이지네이션 (무한 스크롤)
@@ -96,15 +109,6 @@ const LoadingPage = () => {
   // 애니메이션 타이머 정리용 ref
   const transitionTimeoutRef = useRef<number | null>(null);
 
-  // ============================================================================
-  // Carousel Data Fetching
-  // ============================================================================
-
-  /**
-   * useStackData: 가구 캐러셀 이미지 데이터 페칭
-   * - currentPage에 해당하는 가구 이미지 목록 가져오기
-   * - 페이지 변경 시 currentIndex를 0으로 초기화
-   */
   const {
     data: currentImages,
     isLoading,
@@ -115,11 +119,6 @@ const LoadingPage = () => {
     onError: (err) => handleError(err, 'loading'),
   });
 
-  /**
-   * 다음 페이지 프리페치 (성능 최적화)
-   * - 사용자가 현재 페이지를 보는 동안 다음 페이지 미리 로드
-   * - 마지막 이미지에서 자연스러운 전환 제공
-   */
   const { data: nextImages } = useStackData(currentPage + 1, {
     enabled: !!currentImages && !!requestData,
   });
@@ -127,27 +126,18 @@ const LoadingPage = () => {
   const likeMutation = usePostCarouselLikeMutation();
   const hateMutation = usePostCarouselHateMutation();
 
-  /**
-   * 정상 이미지 생성 API 호출
-   * - ActivityInfo에서 전달받은 requestData로 이미지 생성 요청
-   * - A/B 테스트에 따라 단일/다중 이미지 생성 API 선택
-   *
-   * 성공 시:
-   * - Zustand store에 결과 저장 (useGenerateImageApi 내부)
-   * - 프로그래스 바 완료 후 결과 페이지로 이동
-   *
-   * 실패 시 (429/42900/42901):
-   * - isNormalEntry=false로 설정하여 폴백 API로 전환
-   * - 7초마다 이미지 생성 상태 확인 (GET /api/v1)
-   */
   useEffect(() => {
-    if (!requestData) return;
+    if (!requestData) {
+      console.log('!request === true');
+      return;
+    }
 
-    console.log('✅ 이미지 생성 요청 시작:', requestData);
+    console.log('✅ 이미지 생성 요청 시작 ✅:', requestData);
+    console.log('isNormalEntry: ', isNormalEntry);
 
     mutateGenerateImage(requestData, {
       onSuccess: () => {
-        console.log('✅ 이미지 생성 성공');
+        console.log('🫡 이미지 생성 성공 🫡');
         // 성공 시에는 isNormalEntry 변경 불필요
         // navigationData 설정되고 프로그래스 바 완료 후 페이지 이동
       },
@@ -155,8 +145,17 @@ const LoadingPage = () => {
         const errorCode = error?.response?.data?.code;
         const errorStatus = error?.response?.status;
 
+        console.log('❗️❗️ onError 진입 ❗️❗️');
+        console.log('errorCode: ', errorCode);
+        console.log('errorStatus: ', errorStatus);
+
         // 429 에러 또는 42900/42901 코드: 폴백 API로 전환
-        if (errorStatus === 429 || errorCode === 42900 || errorCode === 42901) {
+        if (
+          errorStatus === 429 ||
+          errorCode === 42900 ||
+          errorCode === 42901 ||
+          errorCode === 40900
+        ) {
           console.log('🚨 에러 발생 → 폴백 API로 전환:', {
             errorStatus,
             errorCode,
@@ -170,12 +169,8 @@ const LoadingPage = () => {
         }
       },
     });
-  }, [mutateGenerateImage, requestData, handleError]);
+  }, []);
 
-  /**
-   * 컴포넌트 언마운트 시 타이머 정리
-   * - 메모리 누수 방지
-   */
   useEffect(() => {
     return () => {
       if (transitionTimeoutRef.current !== null) {
@@ -184,48 +179,16 @@ const LoadingPage = () => {
     };
   }, []);
 
-  // early return
-  // requestData가 없으면 IMAGE_SETUP으로 리다이렉트
-  if (!requestData) {
-    return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
-  }
-
-  // 초기 로딩 중
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  // ============================================================================
-  // Computed Values: 캐러셀 상태
-  // ============================================================================
-
-  /**
-   * 에러 상황 체크
-   * - API 에러 또는 데이터 없음
-   */
   const hasError =
     isError ||
     (!isLoading && !currentImages) ||
     !currentImages ||
     currentImages.length === 0;
 
-  /**
-   * 현재 표시할 이미지 정보
-   * - hasError일 때는 null
-   * - 정상일 때는 currentImages[currentIndex]
-   */
   const currentImage = hasError ? null : currentImages[currentIndex];
 
-  /**
-   * 현재 이미지가 페이지의 마지막인지 여부
-   */
   const isLast = hasError ? false : currentIndex === currentImages.length - 1;
 
-  /**
-   * 다음에 표시할 이미지
-   * - 현재 페이지에 다음 이미지가 있으면 그것 사용
-   * - 마지막 이미지면 다음 페이지의 첫 이미지 사용
-   */
   const nextImage = hasError
     ? null
     : !isLast
@@ -234,19 +197,12 @@ const LoadingPage = () => {
         ? nextImages[0]
         : undefined;
 
-  // ============================================================================
-  // Event Handlers: 프로그래스 바 완료 (페이지 이동)
-  // ============================================================================
-
-  /**
-   * 프로그래스 바 완료 시 결과 페이지로 이동
-   * - navigationData: 생성된 이미지 정보 (Zustand store에서 관리)
-   * - isApiCompleted: API 완료 플래그
-   *
-   * ProgressBar 컴포넌트에서 100% 도달 시 onComplete 콜백 호출
-   */
   const handleProgressComplete = () => {
     if (navigationData && isApiCompleted) {
+      // sessionStorage 정리
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      console.log('🗑️ sessionStorage 정리 완료');
+
       console.log(
         '🎯 프로그래스 바 완료 → 결과 페이지 이동:',
         new Date().toLocaleTimeString()
@@ -260,21 +216,6 @@ const LoadingPage = () => {
     }
   };
 
-  // ============================================================================
-  // Event Handlers: 캐러셀 투표 (좋아요/별로예요)
-  // ============================================================================
-
-  /**
-   * 가구 이미지 투표 처리
-   *
-   * @param isLike - true: 좋아요, false: 별로예요
-   *
-   * 동작 순서:
-   * 1. 선택 상태 업데이트 (버튼 애니메이션)
-   * 2. API 호출 (좋아요/별로예요 전송)
-   * 3. 600ms 후 다음 이미지로 전환
-   * 4. 마지막 이미지면 다음 페이지로 이동
-   */
   const handleVote = (isLike: boolean) => {
     // 로딩 중에는 투표 불가
     if (isLoading) return;
@@ -326,13 +267,19 @@ const LoadingPage = () => {
     }, ANIMATION_DURATION);
   };
 
-  // ============================================================================
-  // Render
-  // ============================================================================
+  // early return
+  // requestData가 없으면 IMAGE_SETUP으로 리다이렉트
+  if (!requestData) {
+    return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
+  }
+
+  // 로딩 스피너
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.wrapper}>
-      {/* ========== 상단: 프로그래스 바 및 안내 메시지 ========== */}
       <section className={styles.infoSection}>
         <ProgressBar onComplete={handleProgressComplete} />
         <p className={styles.infoText}>
@@ -341,7 +288,6 @@ const LoadingPage = () => {
         </p>
       </section>
 
-      {/* ========== 하단: 캐러셀 이미지 및 투표 버튼 ========== */}
       <section className={styles.carouselSection}>
         <div className={styles.imageContainer}>
           {hasError ? (
@@ -352,7 +298,6 @@ const LoadingPage = () => {
           ) : (
             // 정상 상황: 이미지 캐러셀 표시
             <>
-              {/* 다음 이미지 (애니메이션 준비) */}
               {nextImage && (
                 <div
                   key={`next-${currentPage + 1}-${nextImage.carouselId}`}
@@ -368,7 +313,6 @@ const LoadingPage = () => {
                 </div>
               )}
 
-              {/* 현재 이미지 */}
               {currentImage && (
                 <div
                   key={`current-${currentPage}-${currentImage.carouselId}`}
@@ -387,7 +331,6 @@ const LoadingPage = () => {
           )}
         </div>
 
-        {/* 투표 버튼 (에러 상황에서는 숨김) */}
         {!hasError && (
           <div className={styles.buttonGroup}>
             <LikeButton

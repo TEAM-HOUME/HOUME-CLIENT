@@ -196,15 +196,15 @@ export const useFallbackImage = (houseId: number, enabled: boolean) => {
     queryKey: ['fallbackImage', houseId],
     queryFn: () => getFallbackImage(houseId),
     enabled,
-    refetchInterval: 5000, // 7초
+    refetchInterval: 7000,
     refetchIntervalInBackground: true,
     retry: (failureCount) => {
-      // 최대 5번 재시도
-      if (failureCount >= 5) {
+      // 최대 10번 재시도
+      if (failureCount >= 10) {
         console.error('최대 재시도 횟수 초과');
         return false;
       }
-      console.log(`폴백 재시도 ${failureCount + 1}/5`);
+      console.log(`폴백 재시도 ${failureCount + 1}/10`);
       return true;
     },
   });
