@@ -130,12 +130,12 @@ const LoadingPage = () => {
       return;
     }
 
-    console.log('✅ 이미지 생성 요청 시작 ✅:', requestData);
+    console.log('이미지 생성 요청 시작:', requestData);
     console.log('isNormalEntry: ', isNormalEntry);
 
     mutateGenerateImage(requestData, {
       onSuccess: () => {
-        console.log('🫡 이미지 생성 성공 🫡');
+        console.log('이미지 생성 성공');
         // 성공 시에는 isNormalEntry 변경 불필요
         // navigationData 설정되고 프로그래스 바 완료 후 페이지 이동
       },
@@ -143,7 +143,7 @@ const LoadingPage = () => {
         const errorCode = error?.response?.data?.code;
         const errorStatus = error?.response?.status;
 
-        console.log('❗️❗️ onError 진입 ❗️❗️');
+        console.log('onError 진입');
         console.log('errorCode: ', errorCode);
         console.log('errorStatus: ', errorStatus);
 
@@ -154,7 +154,7 @@ const LoadingPage = () => {
           errorCode === 42901 ||
           errorCode === 40900
         ) {
-          console.log('🚨 에러 발생 → 폴백 API로 전환:', {
+          console.log('에러 발생, 폴백 API로 전환:', {
             errorStatus,
             errorCode,
           });
@@ -162,7 +162,7 @@ const LoadingPage = () => {
         }
         // 기타 에러: 일반 에러 처리
         else {
-          console.error('❌ 이미지 생성 실패:', error);
+          console.error('이미지 생성 실패:', error);
           handleError(error, 'loading');
         }
       },

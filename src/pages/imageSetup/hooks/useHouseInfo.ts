@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { queryClient } from '@/shared/apis/queryClient';
+
 import { useHousingSelectionMutation } from '../apis/houseInfo';
 import { useFunnelStore } from '../stores/useFunnelStore';
 import { HOUSE_INFO_VALIDATION } from '../types/funnel/validation';
@@ -114,6 +116,10 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
 
           // Zustand에 저장
           useFunnelStore.getState().setHouseInfo(completedData);
+
+          // @use-funnel의 스텝들은 하나의 페이지 안의 컴포넌트
+          // 뒤로가기, 앞으로가기 시에도 언마운트되지 않으므로, 해당 스텝에 진입할 때마다 실행되어야하는 api는 invalidate 필요
+          queryClient.invalidateQueries({ queryKey: ['floorPlan'] });
 
           onNext(completedData);
         },
