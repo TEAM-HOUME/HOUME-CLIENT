@@ -481,3 +481,71 @@ export const logSelectMoodboardClickBtnCTAInactive = () => {
     console.error('Analytics logEvent 오류:', error);
   }
 };
+
+// ============================================================================
+/**
+ * [퍼널 STEP4] 가구 선택 페이지 (ActivityInfo) 관련 이벤트
+ *
+ * 이벤트 코드:
+ * - selectFurniture_click_btnCTA
+ * - selectFurniture_click_btnCTACreditError
+ */
+// ============================================================================
+
+/**
+ * 가구 선택 CTA 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: selectFurniture_click_btnCTA
+ * - Page: selectFurniture
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: (없음)
+ *
+ * CTA 버튼: "이미지 생성하기" 버튼
+ */
+export const logSelectFurnitureClickBtnCTA = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFurniture_click_btnCTA', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFurniture_click_btnCTA 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * 가구 선택 CTA 버튼 클릭 이벤트 (크레딧 에러)
+ *
+ * 이벤트 코드: selectFurniture_click_btnCTACreditError
+ * - Page: selectFurniture
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: CreditError
+ *
+ * CTA 버튼: "이미지 생성하기" 버튼 (크레딧 부족 시)
+ */
+export const logSelectFurnitureClickBtnCTACreditError = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'selectFurniture_click_btnCTACreditError', {
+      page_path: window.location.pathname,
+    });
+    console.log(
+      '[Firebase Analytics] selectFurniture_click_btnCTACreditError 이벤트 전송'
+    );
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
