@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton.tsx';
 import ErrorMessage from '@/shared/components/button/ErrorButton/ErrorMessage';
 import LargeFilled from '@/shared/components/button/largeFilledButton/LargeFilledButton.tsx';
@@ -8,6 +10,10 @@ import { ERROR_MESSAGES } from '@/shared/constants/clientErrorMessage.ts';
 import { useSignupMutation } from './apis/signup';
 import useSignupForm from './hooks/useSignupForm';
 import * as styles from './SignupPage.css';
+import {
+  logSignupFormClickBtnCTA,
+  logSignupFormViewError,
+} from './utils/analytics';
 
 const SignupPage = () => {
   const {
@@ -32,8 +38,33 @@ const SignupPage = () => {
 
   const { mutate: patchSignup } = useSignupMutation();
 
+  const hasError = Boolean(
+    isNameFormatInvalid ||
+      isNameLengthInvalid ||
+      yearFormatError ||
+      yearAgeError ||
+      monthFieldError ||
+      dayFieldError
+  );
+  const errorSentRef = useRef(false);
+
+  // 에러가 표시될 때 이벤트 전송 (최초 1회)
+  useEffect(() => {
+    if (hasError && !errorSentRef.current) {
+      logSignupFormViewError();
+      errorSentRef.current = true;
+    } else if (!hasError) {
+      // 에러가 사라지면 ref 초기화 (다시 에러가 발생하면 이벤트 전송)
+      errorSentRef.current = false;
+    }
+  }, [hasError]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // CTA 버튼 클릭 시 GA 이벤트 전송
+    logSignupFormClickBtnCTA();
+
     if (!isFormValid || !gender) return;
 
     const formattedBirthday = `${birthYear}-${birthMonth}-${birthDay}`;
