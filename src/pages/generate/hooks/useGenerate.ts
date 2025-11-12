@@ -187,7 +187,11 @@ export const useGenerateImageApi = () => {
 };
 
 // 이미지 생성 폴백
-export const useFallbackImage = (houseId: number, enabled: boolean) => {
+export const useFallbackImage = (
+  houseId: number,
+  enabled: boolean,
+  onError?: (error: unknown) => void // 쿼리문에서 에러 발생 시 전달받은 에러 핸들러(handleError()) 실행
+) => {
   const navigate = useNavigate();
   const { resetGenerate, setApiCompleted, setNavigationData } =
     useGenerateStore();
@@ -196,17 +200,34 @@ export const useFallbackImage = (houseId: number, enabled: boolean) => {
     queryKey: ['fallbackImage', houseId],
     queryFn: () => getFallbackImage(houseId),
     enabled,
-    refetchInterval: 7000,
-    refetchIntervalInBackground: true,
-    retry: (failureCount) => {
-      // 최대 10번 재시도
+    retry: (failureCount, error: any) => {
+      // failureCount는 Tanstack-Query 내부적으로 관리되는 값, retry마다 1씩 증가
+      const status = error?.response?.status;
+      const code = error?.response?.data?.code;
+
+      // 최대 10번까지만 재시도
       if (failureCount >= 10) {
-        console.error('최대 재시도 횟수 초과');
+        console.error('폴백 API 최대 재시도 횟수 초과 (10회)');
         return false;
       }
-      console.log(`폴백 재시도 ${failureCount + 1}/10`);
-      return true;
+
+      if (
+        status === 429 ||
+        code === 40900 ||
+        code === 42900 ||
+        code === 42901
+      ) {
+        console.log(
+          `폴백 API 대기 중 (${status || code}): 재시도 ${failureCount + 1}/10`
+        );
+        return true; // 계속 재시도
+      }
+
+      // 그 외 진짜 에러는 재시도 안 함
+      console.error('폴백 API 진짜 에러 발생:', error);
+      return false;
     },
+    retryDelay: 5000, // 5초 간격 재시도
   });
 
   // 성공 시 처리
@@ -221,7 +242,7 @@ export const useFallbackImage = (houseId: number, enabled: boolean) => {
       console.log('폴백 이미지 생성 성공:', query.data);
       console.log('프로그래스 바 완료 대기 중...');
 
-      // 프로그래스 바 완료 후 이동하도록 변경 (navigate 제거)
+      // 프로그래스 바 완료 후 이동하도록 변경
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     }
   }, [query.isSuccess, query.data]);
@@ -229,10 +250,15 @@ export const useFallbackImage = (houseId: number, enabled: boolean) => {
   // 에러 시 처리
   useEffect(() => {
     if (query.isError) {
-      navigate(ROUTES.IMAGE_SETUP);
-      console.log('폴백 API 이미지 생성 실패');
+      console.log('폴백 API 이미지 생성 실패:', query.error);
+      // 외부에서 전달받은 에러 핸들러 실행 (없으면 기본 동작)
+      if (onError) {
+        onError(query.error);
+      } else {
+        navigate(ROUTES.HOME);
+      }
     }
-  }, [query.isError, query.error]);
+  }, [query.isError, query.error, onError]);
 
   return query;
 };

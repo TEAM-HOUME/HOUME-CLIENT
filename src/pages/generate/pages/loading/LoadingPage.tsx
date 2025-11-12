@@ -25,12 +25,6 @@ import type { GenerateImageRequest } from '@pages/generate/types/generate';
 const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
 const SESSION_STORAGE_KEY = 'generate_image_request'; // sessionStorage 키
 
-// LoadingPage의 location.state 타입
-// ActivityInfo에서 navigate로 전달되는 이미지 생성 요청 데이터
-type PageState = {
-  generateImageRequest: GenerateImageRequest;
-};
-
 // Type Guard: GenerateImageRequest 검증
 // sessionStorage에서 가져온 데이터가 유효한지 확인
 // TODO: Zod로 타입 검증 로직 구현(타입 하드코딩 제거, 타입 변경 시 검증 로직 자동 업데이트, 코드 더 짧고 직관적)
@@ -57,6 +51,7 @@ const isValidGenerateImageRequest = (
   );
 };
 
+// TODO: 커스텀 훅, 유틸함수로 빼기, 기능 별 커스텀 훅 분할 시급
 const LoadingPage = () => {
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
@@ -93,10 +88,13 @@ const LoadingPage = () => {
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
 
   // 폴백 이미지 생성 API (일반 API 실패 시 사용)
-  // isNormalEntry가 변경되면 컴포넌트 리렌더링 -> useFallbackImage 호출 -> useQuery가 enabled값 감지 -> true:API요청, false:대기
-  // 계속 true일 시 refetchInterval마다 자동 polling
+  // isNormalEntry가 변경되면 컴포넌트 리렌더링 -> useFallbackImage 실행 -> useQuery가 enabled값 감지
+  // -> true: 폴백 API 요청, false: 쿼리 실행 X
   console.log('isNormalEntry: ', isNormalEntry);
-  useFallbackImage(requestData?.houseId || 0, !isNormalEntry);
+  useFallbackImage(requestData?.houseId || 0, !isNormalEntry, (error) => {
+    console.log('폴백 API 에러 발생 → handleError 실행');
+    handleError(error, 'loading');
+  });
 
   // 캐러셀 페이지네이션 (무한 스크롤)
   const [currentPage, setCurrentPage] = useState(0);
