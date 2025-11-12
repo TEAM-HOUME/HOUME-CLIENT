@@ -1,7 +1,6 @@
 /**
  * 사용자 ID 기반 A/B Testing으로 사용자를 single 또는 multiple 그룹으로 분리하는 훅
  *
- * 작동 원리:
  * 1. userId를 기반으로 그룹 배정 (홀수: single, 짝수: multiple)
  * 2. 같은 userId는 항상 같은 그룹에 배정 (기기/브라우저와 무관)
  * 3. Firebase Analytics에 A/B 그룹 정보와 이벤트 전송
@@ -9,18 +8,23 @@
 
 import { useEffect, useState } from 'react';
 
-import { useSearchParams } from 'react-router-dom';
-
 import { logABTestAssignment, setABTestGroup } from '@/shared/utils/analytics';
 import { useUserStore } from '@/store/useUserStore';
 
-/** A/B 테스트에서 사용하는 이미지 생성 타입 */
 export type ImageGenerationVariant = 'single' | 'multiple';
+
+/**
+ * 개발 모드에서 A/B 그룹을 고정하기 위한 값
+ * 'single' 또는 'multiple'로 설정하면 개발 모드에서 항상 해당 그룹으로 고정됨
+ * null로 설정하면 userId 기반 로직 사용
+ */
+const DEV_FIXED_VARIANT: ImageGenerationVariant | null = import.meta.env.DEV
+  ? null // 'single' 또는 'multiple'로 변경하여 고정 가능
+  : null;
 
 /**
  * userId 기반으로 A/B 테스트 그룹 결정
  * 홀수: single, 짝수: multiple (50:50 분할)
- *
  * @param userId 사용자 ID
  * @returns 'single' 또는 'multiple'
  */
@@ -40,18 +44,12 @@ const getVariantFromUserId = (userId: number): ImageGenerationVariant => {
  */
 export const useABTest = () => {
   const userId = useUserStore((state) => state.userId);
-  const [searchParams] = useSearchParams();
 
-  /** 초기값 설정: 개발 모드에서 URL 파라미터 우선, 없으면 localStorage, 없으면 'single' */
+  /** 초기값 설정: 개발 모드 하드코딩 값 우선 - 없으면 localStorage - 없으면 'multiple' */
   const getInitialVariant = (): ImageGenerationVariant => {
-    // 개발 모드: URL 파라미터 체크
-    if (import.meta.env.DEV) {
-      const urlOverride = searchParams.get('ab');
-      if (urlOverride === 'single' || urlOverride === 'multiple') {
-        return urlOverride;
-      }
+    if (DEV_FIXED_VARIANT) {
+      return DEV_FIXED_VARIANT;
     }
-    // localStorage 체크
     try {
       const cached = localStorage.getItem('ab_image_variant');
       if (cached === 'single' || cached === 'multiple') {
@@ -60,23 +58,20 @@ export const useABTest = () => {
     } catch {
       // localStorage 접근 실패 시 무시
     }
-    return 'multiple'; // 기본값
+    return 'multiple';
   };
 
   /** 현재 사용자의 A/B 테스트 그룹 */
   const [variant, setVariant] =
     useState<ImageGenerationVariant>(getInitialVariant());
-  /** 그룹 배정 중인지 여부 */
   const [isLoading, setIsLoading] = useState(true);
-  /** 에러 발생 시 에러 메시지 */
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     /**
      * userId 기반으로 A/B 테스트 그룹을 배정하는 함수
      *
-     * 실행 순서:
-     * 1. 개발 모드 URL 파라미터 체크 (최우선)
+     * 1. 개발 모드 하드코딩 값 체크 (최우선)
      * 2. userId 기반으로 그룹 배정
      * 3. Firebase Analytics에 그룹 정보 전송
      * 4. 에러 시 fallback 로직 실행
@@ -86,19 +81,20 @@ export const useABTest = () => {
         setIsLoading(true);
         setError(null);
 
-        // 1. 개발 모드: URL 파라미터로 강제 설정 가능 (최우선 - userId 기반 로직 무시)
-        const urlOverride = import.meta.env.DEV ? searchParams.get('ab') : null;
-        if (urlOverride === 'single' || urlOverride === 'multiple') {
-          console.log('[개발 모드] URL에서 그룹 강제 설정:', urlOverride);
-          setVariant(urlOverride);
-          setABTestGroup(urlOverride);
-          logABTestAssignment(urlOverride, false);
-          // 개발 모드에서는 localStorage에 저장하지 않음 (URL 파라미터 우선)
+        // 1. 개발 모드 하드코딩 값으로 그룹 설정
+        if (DEV_FIXED_VARIANT) {
+          console.log(
+            '[개발 모드] 하드코딩된 A/B 그룹 설정:',
+            DEV_FIXED_VARIANT
+          );
+          setVariant(DEV_FIXED_VARIANT);
+          setABTestGroup(DEV_FIXED_VARIANT);
+          logABTestAssignment(DEV_FIXED_VARIANT, false);
           setIsLoading(false);
-          return; // 여기서 함수 종료 - userId 기반 로직 실행 안 됨
+          return;
         }
 
-        // 2. userId 기반으로 그룹 배정 (URL 파라미터가 없을 때만 실행)
+        // 2. userId 기반으로 그룹 배정
         if (userId !== null && userId !== undefined) {
           const assignedVariant = getVariantFromUserId(userId);
           console.log(
@@ -165,18 +161,13 @@ export const useABTest = () => {
     };
 
     initializeABTest();
-  }, [userId, searchParams]); // userId 또는 URL 파라미터가 변경될 때마다 재실행
+  }, [userId]);
 
   return {
-    /** 현재 사용자의 A/B 테스트 그룹 ('single' | 'multiple') */
     variant,
-    /** 그룹 배정 중인지 여부 */
     isLoading,
-    /** 에러 발생 시 에러 메시지 */
     error,
-    /** variant === 'single'인지 여부 (GeneratedImgB 컴포넌트 표시) */
     isSingleImage: variant === 'single',
-    /** variant === 'multiple'인지 여부 (GeneratedImgA 컴포넌트 표시) */
     isMultipleImages: variant === 'multiple',
   };
 };
