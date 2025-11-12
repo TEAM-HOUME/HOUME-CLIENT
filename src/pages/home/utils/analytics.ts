@@ -7,6 +7,7 @@
  * - Component: page, btn 등
  * - Function: TypeRest, TypeWork, TypeCafe, TypeMovie, Mypage
  *
+ * 이벤트 코드:
  * - landing_view_page
  * - landing_click_btnTypeRest
  * - landing_click_btnTypeWork
