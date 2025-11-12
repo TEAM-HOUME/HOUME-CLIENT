@@ -13,6 +13,7 @@
  * - landing_click_btnTypeCafe
  * - landing_click_btnTypeMovie
  * - landing_click_btnMypage
+ * - landing_click_btnCTA
  * - landing_scroll_depthTreshold50%
  * - landing_scroll_depthTreshold100%
  */
@@ -83,6 +84,33 @@ export const logLandingClickBtnMypage = () => {
       page_path: window.location.pathname,
     });
     console.log('[Firebase Analytics] landing_click_btnMypage 이벤트 전송');
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
+
+/**
+ * CTA 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: landing_click_btnCTA
+ * - Page: landing
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: (없음)
+ *
+ * CTA 버튼: "우리집에 딱 맞는 스타일 만들기" 버튼
+ */
+export const logLandingClickBtnCTA = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'landing_click_btnCTA', {
+      page_path: window.location.pathname,
+    });
+    console.log('[Firebase Analytics] landing_click_btnCTA 이벤트 전송');
   } catch (error) {
     console.error('Analytics logEvent 오류:', error);
   }

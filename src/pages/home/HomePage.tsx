@@ -15,6 +15,7 @@ import ReviewSection from './components/reviewSection/ReviewSection';
 import StepGuideSection from './components/stepGuideSection/StepGuideSection';
 import * as styles from './HomePage.css';
 import {
+  logLandingClickBtnCTA,
   logLandingClickBtnMypage,
   logLandingScrollDepthTreshold,
 } from './utils/analytics';
@@ -90,6 +91,8 @@ const HomePage = () => {
    * - 로그인됨 + 크레딧 없음: 버튼 비활성화로 인해 클릭 불가
    */
   const handleCtaButtonClick = () => {
+    logLandingClickBtnCTA();
+
     if (!isLoggedIn) {
       navigate(ROUTES.LOGIN);
       return;
