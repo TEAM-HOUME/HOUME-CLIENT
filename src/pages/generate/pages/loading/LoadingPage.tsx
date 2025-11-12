@@ -62,21 +62,12 @@ const LoadingPage = () => {
   // sessionStorage에서 이미지 생성 요청 데이터 가져오기
   const requestData: GenerateImageRequest | null = (() => {
     const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
-    if (!stored) {
-      console.warn('sessionStorage에 저장된 데이터 없음');
-      return null;
-    }
+    if (!stored) return null;
+
     try {
       const parsed = JSON.parse(stored);
-      if (isValidGenerateImageRequest(parsed)) {
-        console.log('🔥 sessionStorage의 requestData 복원: 🔥', parsed);
-        return parsed;
-      } else {
-        console.error('sessionStorage 데이터가 유효하지 않음');
-        return null;
-      }
-    } catch (error) {
-      console.error('essionStorage 파싱 실패:', error);
+      return isValidGenerateImageRequest(parsed) ? parsed : null;
+    } catch {
       return null;
     }
   })();
@@ -90,9 +81,7 @@ const LoadingPage = () => {
   // 폴백 이미지 생성 API (일반 API 실패 시 사용)
   // isNormalEntry가 변경되면 컴포넌트 리렌더링 -> useFallbackImage 실행 -> useQuery가 enabled값 감지
   // -> true: 폴백 API 요청, false: 쿼리 실행 X
-  console.log('isNormalEntry: ', isNormalEntry);
   useFallbackImage(requestData?.houseId || 0, !isNormalEntry, (error) => {
-    console.log('폴백 API 에러 발생 → handleError 실행');
     handleError(error, 'loading');
   });
 
@@ -125,39 +114,24 @@ const LoadingPage = () => {
   const hateMutation = usePostCarouselHateMutation();
 
   useEffect(() => {
-    if (!requestData) {
-      console.log('!request === true');
-      return;
-    }
-
-    console.log('이미지 생성 요청 시작:', requestData);
-    console.log('isNormalEntry: ', isNormalEntry);
+    if (!requestData) return;
 
     mutateGenerateImage(requestData, {
       onSuccess: () => {
-        console.log('이미지 생성 성공');
-        // 성공 시에는 isNormalEntry 변경 불필요
-        // navigationData 설정되고 프로그래스 바 완료 후 페이지 이동
+        // 성공 시 navigationData 설정, 프로그래스 바 완료 후 페이지 이동
       },
       onError: (error: any) => {
         const errorCode = error?.response?.data?.code;
         const errorStatus = error?.response?.status;
 
-        console.log('onError 진입');
-        console.log('errorCode: ', errorCode);
-        console.log('errorStatus: ', errorStatus);
-
         // 429 에러 또는 42900/42901 코드: 폴백 API로 전환
+        // 40900: 새로고침 후 일반 이미지 요청 API 요청 시 반환되는 에러코드
         if (
           errorStatus === 429 ||
           errorCode === 42900 ||
           errorCode === 42901 ||
           errorCode === 40900
         ) {
-          console.log('에러 발생, 폴백 API로 전환:', {
-            errorStatus,
-            errorCode,
-          });
           setIsNormalEntry(false); // 폴백 API 활성화
         }
         // 기타 에러: 일반 에러 처리
@@ -197,14 +171,7 @@ const LoadingPage = () => {
 
   const handleProgressComplete = () => {
     if (navigationData && isApiCompleted) {
-      // sessionStorage 정리
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      console.log('🗑️ sessionStorage 정리 완료');
-
-      console.log(
-        '🎯 프로그래스 바 완료 → 결과 페이지 이동:',
-        new Date().toLocaleTimeString()
-      );
       navigate(ROUTES.GENERATE_RESULT, {
         state: {
           result: navigationData,

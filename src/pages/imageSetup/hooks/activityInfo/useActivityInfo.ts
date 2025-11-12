@@ -190,7 +190,7 @@ export const useActivityInfo = (
       'generate_image_request',
       JSON.stringify(generateImageRequest)
     );
-    console.log('💾 ActivityInfo: sessionStorage에 requestData 저장');
+    console.log('ActivityInfo: sessionStorage에 requestData 저장');
 
     // navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
     navigate(ROUTES.GENERATE);
