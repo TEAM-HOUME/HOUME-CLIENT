@@ -27,6 +27,41 @@ import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture'
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
 
+const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
+  SINGLE: ['1인용', '싱글', '슈퍼싱글'],
+  OFFICE_DESK: ['업무용책상', '사무용책상', '오피스책상'],
+  CLOSET: ['붙박이장', '옷장', 'wardrobe', '워드로브'],
+  DINING_TABLE: ['식탁', '다이닝테이블'],
+  SINGLE_SOFA: ['1인소파', '싱글소파', '암체어'],
+  DRAWER: ['서랍장', '수납서랍'],
+  MOVABLE_TV: ['이동식tv', '이동식티비', '무빙tv'],
+  SITTING_TABLE: ['좌식테이블', '좌식탁자', '로우테이블'],
+  MIRROR: ['전신거울', '거울', '미러'],
+  WHITE_BOOKSHELF: ['벽수납장', '벽선반', '상부장', 'wallcabinet'],
+  DISPLAY_CABINET: ['장식장', '하부장', 'displaycabinet', 'storagecabinet'],
+  TWO_SEATER_SOFA: ['2인소파', '2인용소파', '투시터', '러브시트'],
+};
+
+const normalizeCategoryName = (value?: string | null) =>
+  value?.toString().trim().replace(/\s+/g, '').toUpperCase() ?? '';
+
+const matchCodeByCategoryName = (
+  name?: string | null
+): FurnitureCategoryCode | null => {
+  const normalized = normalizeCategoryName(name);
+  if (!normalized) return null;
+  for (const [code, keywords] of Object.entries(CATEGORY_NAME_KEYWORDS)) {
+    if (
+      keywords.some((keyword) =>
+        normalized.includes(normalizeCategoryName(keyword))
+      )
+    ) {
+      return code as FurnitureCategoryCode;
+    }
+  }
+  return null;
+};
+
 const isSameHotspotArray = (
   prev: FurnitureHotspot[] | null,
   next: FurnitureHotspot[]
@@ -112,15 +147,28 @@ const DetectionHotspots = ({
     const map = new Map<FurnitureCategoryCode, number>();
     if (!allowedCategories || allowedCategories.length === 0) return map;
     if (!detectedObjects || detectedObjects.length === 0) return map;
-    const pairCount = Math.min(
-      detectedObjects.length,
-      allowedCategories.length
-    );
-    for (let i = 0; i < pairCount; i += 1) {
+
+    const usedCategoryIds = new Set<number>();
+    allowedCategories.forEach((category) => {
+      const matchedCode = matchCodeByCategoryName(category.categoryName);
+      if (matchedCode && !map.has(matchedCode)) {
+        map.set(matchedCode, category.id);
+        usedCategoryIds.add(category.id);
+      }
+    });
+
+    let fallbackIdx = 0;
+    for (let i = 0; i < detectedObjects.length; i += 1) {
       const code = detectedObjects[i];
-      const category = allowedCategories[i];
-      if (!code || !category) continue;
-      map.set(code, category.id);
+      if (!code || map.has(code)) continue;
+      while (fallbackIdx < allowedCategories.length) {
+        const candidate = allowedCategories[fallbackIdx];
+        fallbackIdx += 1;
+        if (!candidate || usedCategoryIds.has(candidate.id)) continue;
+        map.set(code, candidate.id);
+        usedCategoryIds.add(candidate.id);
+        break;
+      }
     }
     return map;
   }, [allowedCategories, detectedObjects]);
