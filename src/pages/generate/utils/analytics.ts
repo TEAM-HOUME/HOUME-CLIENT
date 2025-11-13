@@ -394,3 +394,30 @@ export const logResultImgClickCurationSheetCard = () => {
     console.error('Analytics logEvent 오류:', error);
   }
 };
+
+/**
+ * 이미지 생성 시작 페이지 CTA 버튼 클릭 이벤트
+ *
+ * 이벤트 코드: generateStart_click_btnCTA
+ * - Page: generateStart
+ * - Action: click
+ * - Component: btnCTA
+ * - Function: (없음)
+ *
+ * CTA 버튼: "이미지 만들러가기" 버튼
+ */
+export const logGenerateStartClickBtnCTA = () => {
+  if (!analytics) {
+    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    return;
+  }
+
+  try {
+    logEvent(analytics, 'generateStart_click_btnCTA', {
+      page_path: window.location.pathname,
+    });
+    console.log('[Firebase Analytics] generateStart_click_btnCTA 이벤트 전송');
+  } catch (error) {
+    console.error('Analytics logEvent 오류:', error);
+  }
+};
