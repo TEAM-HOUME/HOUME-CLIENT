@@ -13,6 +13,11 @@ export const container = style({
   position: 'relative',
 });
 
+export const swiperSlide = style({
+  position: 'relative',
+  overflow: 'hidden',
+});
+
 export const imgArea = recipe({
   base: {
     width: '100%',
