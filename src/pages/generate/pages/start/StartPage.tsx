@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { logSignupSuccessClickBtnCTA } from '@/pages/signup/utils/analytics';
+import { logGenerateStartClickBtnCTA } from '@/pages/generate/utils/analytics';
 import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
@@ -16,8 +16,8 @@ const StartPage = () => {
   const navigate = useNavigate();
 
   const handleGoToImageSetup = () => {
-    // 회원가입 성공 페이지 CTA 버튼 클릭 시 GA 이벤트 전송
-    logSignupSuccessClickBtnCTA();
+    // 이미지 생성 시작 페이지 CTA 버튼 클릭 시 GA 이벤트 전송
+    logGenerateStartClickBtnCTA();
     navigate(ROUTES.IMAGE_SETUP);
   };
 
