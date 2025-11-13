@@ -52,21 +52,20 @@ export const CurationSheet = () => {
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
-      // recommendFurnitureId 우선 사용, 없으면 furnitureProductId(숫자 변환), 최후에는 index+1
       const byRecommend = product.recommendFurnitureId;
-      const byProductId = Number(product.furnitureProductId);
-      const derivedId =
-        (typeof byRecommend === 'number' && Number.isFinite(byRecommend)
+      const recommendId =
+        typeof byRecommend === 'number' && Number.isFinite(byRecommend)
           ? byRecommend
-          : Number.isFinite(byProductId)
-            ? byProductId
-            : undefined) ?? index + 1;
+          : undefined;
+      const byProductId = Number(product.furnitureProductId);
+      const safeProductId = Number.isFinite(byProductId)
+        ? byProductId
+        : index + 1;
 
       return {
-        id: derivedId, // recommendFurnitureId 기반 ID 유지
-        isRecommendId:
-          typeof byRecommend === 'number' && Number.isFinite(byRecommend),
-        furnitureProductId: byProductId || derivedId,
+        id: recommendId,
+        isRecommendId: Boolean(recommendId),
+        furnitureProductId: safeProductId,
         furnitureProductName: product.furnitureProductName,
         furnitureProductMallName: product.furnitureProductMallName,
         furnitureProductImageUrl:
