@@ -25,6 +25,35 @@ import * as styles from './DetectionHotspots.css.ts';
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture';
 
+const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
+
+const isSameHotspotArray = (
+  prev: FurnitureHotspot[] | null,
+  next: FurnitureHotspot[]
+) => {
+  if (!prev) return false;
+  if (prev === next) return true;
+  if (prev.length !== next.length) return false;
+  for (let i = 0; i < prev.length; i += 1) {
+    const a = prev[i];
+    const b = next[i];
+    if (
+      a.id !== b.id ||
+      a.cx !== b.cx ||
+      a.cy !== b.cy ||
+      a.score !== b.score ||
+      a.confidence !== b.confidence ||
+      a.label !== b.label ||
+      a.className !== b.className ||
+      a.finalLabel !== b.finalLabel ||
+      a.refinedLabel !== b.refinedLabel
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
 interface DetectionHotspotsProps {
   imageId: number | null;
   imageUrl: string;
@@ -48,11 +77,14 @@ const DetectionHotspots = ({
     imageId !== null ? (state.images[imageId]?.selectedHotspotId ?? null) : null
   );
   const detectedObjects = useCurationStore((state) =>
-    imageId !== null ? (state.images[imageId]?.detectedObjects ?? []) : []
+    imageId !== null
+      ? (state.images[imageId]?.detectedObjects ?? EMPTY_DETECTED_CODES)
+      : EMPTY_DETECTED_CODES
   );
   const openSheet = useOpenCurationSheet();
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
+  const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -168,9 +200,14 @@ const DetectionHotspots = ({
   useEffect(() => {
     if (imageId === null) return;
     if (!shouldInferHotspots) {
+      lastSyncedHotspotsRef.current = null;
       resetImageState(imageId);
       return;
     }
+    if (isSameHotspotArray(lastSyncedHotspotsRef.current, hotspots)) {
+      return;
+    }
+    lastSyncedHotspotsRef.current = hotspots;
     const rawDetectedCodes = mapHotspotsToDetectedObjects(hotspots);
     const detectedObjects = filterAllowedDetectedObjects(rawDetectedCodes, {
       stage: 'image-detection',
@@ -188,6 +225,10 @@ const DetectionHotspots = ({
     resetImageState,
     shouldInferHotspots,
   ]);
+
+  useEffect(() => {
+    lastSyncedHotspotsRef.current = null;
+  }, [imageId]);
 
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     if (imageId === null) return;
