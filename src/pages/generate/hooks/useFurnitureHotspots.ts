@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 
 // 가구 핫스팟 생성 파이프라인 설명
 // - Obj365 추론 → 가구만 선별(useOnnxModel에서 처리) → Cabinet/Shelf만 추가 리파인 → 가구 전체 핫스팟 렌더
@@ -9,214 +9,27 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 //   - 기준: cabinet은 refine confidence, 그 외는 모델 score 사용(단일 랭크 스코어로 비교)
 //   - 방식: 신뢰도/점수 상위 K개만 노출, K는 FALLBACK_MAX_CANDIDATES
 
-import {
-  OBJ365_MODEL_PATH,
-  DETECTION_MIN_CONFIDENCE,
-  FALLBACK_MAX_CANDIDATES,
-} from '@pages/generate/constants/detection';
-import {
-  describeObj365Index,
-  hasFurnitureCodeForIndex,
-} from '@pages/generate/constants/furnitureCategoryMapping';
+import { OBJ365_MODEL_PATH } from '@pages/generate/constants/detection';
 import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
 import {
   logFurniturePipelineEvent,
   reportFurniturePipelineWarning,
 } from '@pages/generate/utils/furniturePipelineMonitor';
-import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
-import { OBJ365_ALL_CLASSES } from '@pages/generate/utils/obj365AllClasses';
-import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
+
 import {
-  refineFurnitureDetections,
-  type FurnitureCategory,
-  type RefinedFurnitureDetection,
-} from '@pages/generate/utils/refineFurnitureDetections';
+  buildHotspotsPipeline,
+  computeRenderMetrics,
+  projectHotspots,
+} from './furnitureHotspotPipeline';
+import {
+  createLoggedPipelineDispatch,
+  furnitureHotspotInitialState,
+  furnitureHotspotReducer,
+} from './furnitureHotspotState';
 
-import type {
-  Detection as FurnitureDetection,
-  ProcessedDetections,
-} from '@pages/generate/types/detection';
+import type { ProcessedDetections } from '@pages/generate/types/detection';
 
-/**
- * 가구 핫스팟(FurnitureHotspot)
- * - 대상: 원시 감지(FurnitureDetection) + cabinet 리파인 결과
- * - 목적: 렌더 계층에서 좌표(cx, cy)와 ID, 리파인 정보를 한 번에 소비하도록 통합
- */
-export type FurnitureHotspot = FurnitureDetection & {
-  id: number;
-  cx: number;
-  cy: number;
-  refinedLabel?: FurnitureCategory;
-  refinedLabelEn?: string;
-  finalLabel: string | null;
-  confidence?: number; // cabinet 리파인 결과에서만 노출되는 신뢰도
-};
-
-type DebugRect = {
-  id: number;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  label: string | null;
-};
-
-// ID 생성 시 bbox 좌표 정규화를 위한 소수점 자릿수
-const HOTSPOT_ID_PRECISION = 3;
-const MIN_BBOX_PIXELS = 8;
-
-type RenderMetrics = {
-  offsetX: number;
-  offsetY: number;
-  scaleX: number;
-  scaleY: number;
-  width: number;
-  height: number;
-};
-
-const formatKeyPart = (value: number) =>
-  Number.isFinite(value) ? value.toFixed(HOTSPOT_ID_PRECISION) : 'NaN';
-
-/**
- * 문자열 해시 함수(hashString)
- * - 목적: 디텍션 고유 값 조합을 32비트 정수로 압축해 안정적인 key로 사용
- * - 설명: 단순 다항 해시(Polynomial rolling hash)로, 동일 입력에 항상 동일 ID가 생성
- */
-const hashString = (input: string) => {
-  let hash = 0;
-  for (let i = 0; i < input.length; i += 1) {
-    hash = Math.imul(31, hash) + input.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash >>> 0;
-};
-
-/**
- * 랭크 점수 계산(computeRankScore)
- * - 표시는 Obj365 모델 score만으로 결정해 리파인 confidence에 의해 숨겨지지 않도록 유지
- * - 목적: 임계값 필터링과 폴백 정렬을 단일 수치 기준으로 수행
- */
-const computeRankScore = (candidate: {
-  confidence?: number;
-  score?: number;
-}) => {
-  return candidate.score ?? 0;
-};
-
-/**
- * 핫스팟 ID 생성(createHotspotId)
- * - bbox/label/refinedLabel/score를 결합하여 해시
- * - 설명: 인덱스 기반 ID로 발생하던 키 변동 문제(렌더 재생성)를 차단
- */
-const createHotspotId = (input: {
-  bbox: [number, number, number, number];
-  label?: number;
-  refinedLabel?: string;
-  confidence?: number;
-  score?: number;
-}) => {
-  const identity = [
-    input.label ?? 'none',
-    input.refinedLabel ?? 'none',
-    ...input.bbox.map((value) => formatKeyPart(value)),
-    formatKeyPart(input.confidence ?? input.score ?? 0),
-  ].join('|');
-  return hashString(identity);
-};
-
-/**
- * 핫스팟 배열 비교(areHotspotsEqual)
- * - 목적: 상태값이 실질적으로 동일할 때 setState를 생략해 리렌더를 방지
- */
-const areHotspotsEqual = (
-  prev: FurnitureHotspot[],
-  next: FurnitureHotspot[]
-) => {
-  if (prev.length !== next.length) return false;
-  for (let i = 0; i < next.length; i += 1) {
-    const prevHotspot = prev[i];
-    const nextHotspot = next[i];
-    if (
-      prevHotspot.id !== nextHotspot.id ||
-      prevHotspot.score !== nextHotspot.score ||
-      prevHotspot.confidence !== nextHotspot.confidence ||
-      prevHotspot.refinedLabel !== nextHotspot.refinedLabel ||
-      prevHotspot.refinedLabelEn !== nextHotspot.refinedLabelEn ||
-      prevHotspot.finalLabel !== nextHotspot.finalLabel
-    ) {
-      return false;
-    }
-  }
-  return true;
-};
-
-/**
- * 폴백 포함 유효 핫스팟 선택(selectEffectiveHotspots)
- * - 1차: 임계값 이상 항목만 반환
- * - 2차: 모두 미달 시 상위 K개만 노출하여 빈 결과를 방지
- */
-const selectEffectiveHotspots = (candidates: FurnitureHotspot[]) => {
-  const passing = candidates.filter(
-    (candidate) => computeRankScore(candidate) >= DETECTION_MIN_CONFIDENCE
-  );
-  if (passing.length > 0) return passing;
-  return [...candidates]
-    .sort((a, b) => computeRankScore(b) - computeRankScore(a))
-    .slice(0, Math.min(FALLBACK_MAX_CANDIDATES, candidates.length));
-};
-
-/**
- * Refine 결과 판별(isRefinedDetection)
- * - 목적: type guard로서 리파인 필드 접근 시 타입 안전성 확보
- */
-const isRefinedDetection = (
-  detection: FurnitureDetection | RefinedFurnitureDetection
-): detection is RefinedFurnitureDetection =>
-  'refinedLabel' in detection && 'confidence' in detection;
-
-/**
- * 디텍션을 핫스팟 도메인 모델로 변환(createHotspotFromDetection)
- * - 역할: 좌표/라벨/점수를 유지하면서 안정 ID 부여 및 좌표(cx, cy) 초기화
- */
-const createHotspotFromDetection = (
-  detection: FurnitureDetection | RefinedFurnitureDetection
-): FurnitureHotspot => {
-  const refinedLabel = isRefinedDetection(detection)
-    ? detection.refinedLabel
-    : undefined;
-  const refinedLabelEn = isRefinedDetection(detection)
-    ? detection.refinedLabelEn
-    : undefined;
-  const confidence = isRefinedDetection(detection)
-    ? detection.confidence
-    : undefined;
-  const baseClass =
-    detection.className ??
-    (typeof detection.label === 'number'
-      ? (OBJ365_ALL_CLASSES[detection.label] ?? undefined)
-      : undefined);
-  const finalLabel = refinedLabelEn ?? baseClass ?? null;
-
-  return {
-    bbox: detection.bbox,
-    score: detection.score,
-    label: detection.label,
-    className: finalLabel ?? detection.className,
-    refinedLabel,
-    refinedLabelEn,
-    finalLabel,
-    confidence,
-    id: createHotspotId({
-      bbox: detection.bbox,
-      label: detection.label,
-      refinedLabel,
-      confidence,
-      score: detection.score,
-    }),
-    cx: 0,
-    cy: 0,
-  };
-};
+export type { FurnitureHotspot } from './furnitureHotspotState';
 
 /**
  * CORS 이미지 로더(loadCorsImage)
@@ -274,42 +87,23 @@ async function loadCorsImage(
 }
 
 // 가구 전반 핫스팟 훅
-// - 1) 모델 추론(가구만) 2) cabinet만 리파인 3) 임계값 필터/폴백 4) 좌표 보정
+// - reducer 상태 기계로 파이프라인 단계를 가시화하고 액션 기반으로 전이 제어
 export function useFurnitureHotspots(
   imageUrl: string,
   mirrored = false,
   enabled = true
 ) {
-  /**
-   * useFurnitureHotspots
-   * - 입력: 이미지 URL + 좌우반전 여부
-   * - 동작:
-   *   1. Obj365 모델 추론(runInference)
-   *   2. cabinet 감지만 리파인(refineFurnitureDetections)
-   *   3. 임계값/폴백 기반 후보 선택(selectEffectiveHotspots)
-   *   4. coverProjection으로 좌표(cx, cy) 투영
-   * - 출력: 이미지/컨테이너 ref, 렌더링용 핫스팟, 로딩/에러 상태
-   */
   const imgRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const corsAbortRef = useRef<AbortController | null>(null);
   const isRunningRef = useRef(false);
   const hasRunRef = useRef(false);
 
-  const [hotspots, setHotspots] = useState<FurnitureHotspot[]>([]);
-  const [imageMeta, setImageMeta] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
-  const [containerSize, setContainerSize] = useState<{
-    width: number;
-    height: number;
-  }>({ width: 0, height: 0 });
-  const [renderMetrics, setRenderMetrics] = useState<RenderMetrics | null>(
-    null
-  );
-
-  const { runInference, isLoading, error } = useONNXModel(OBJ365_MODEL_PATH);
+  const {
+    runInference,
+    isLoading,
+    error: modelError,
+  } = useONNXModel(OBJ365_MODEL_PATH);
 
   const logHotspotEvent = useCallback(
     (
@@ -326,63 +120,36 @@ export function useFurnitureHotspots(
     [imageUrl, mirrored]
   );
 
-  const measureRenderMetrics = useCallback(() => {
-    const imgEl = imgRef.current;
-    const containerEl = containerRef.current;
-    if (!imgEl || !containerEl) return null;
-    const imgRect = imgEl.getBoundingClientRect();
-    const containerRect = containerEl.getBoundingClientRect();
-    const naturalWidth = imgEl.naturalWidth || imgEl.width;
-    const naturalHeight = imgEl.naturalHeight || imgEl.height;
-    if (
-      !naturalWidth ||
-      !naturalHeight ||
-      imgRect.width === 0 ||
-      imgRect.height === 0
-    ) {
-      return null;
-    }
-    const metrics: RenderMetrics = {
-      offsetX: imgRect.left - containerRect.left,
-      offsetY: imgRect.top - containerRect.top,
-      scaleX: imgRect.width / naturalWidth,
-      scaleY: imgRect.height / naturalHeight,
-      width: imgRect.width,
-      height: imgRect.height,
-    };
-    setRenderMetrics(metrics);
+  const [state, baseDispatch] = useReducer(
+    furnitureHotspotReducer,
+    furnitureHotspotInitialState
+  );
+
+  const dispatch = useMemo(
+    () =>
+      createLoggedPipelineDispatch(baseDispatch, (event, payload) =>
+        logHotspotEvent(event, payload)
+      ),
+    [baseDispatch, logHotspotEvent]
+  );
+
+  const resetPipeline = useCallback(() => {
+    dispatch({ type: 'PIPELINE_RESET' });
+  }, [dispatch]);
+
+  const updateRenderMetrics = useCallback(() => {
+    const metrics = computeRenderMetrics(imgRef.current, containerRef.current);
+    dispatch({ type: 'SET_RENDER_METRICS', payload: metrics });
     return metrics;
-  }, []);
+  }, [dispatch]);
 
   const processDetections = useCallback(
     (imageEl: HTMLImageElement, inference: ProcessedDetections) => {
-      /**
-       * processDetections
-       * - 픽셀 좌표 변환 → cabinet 리파인 → 안정 ID 부여 → 임계값/폴백 적용
-       * - 설명: setState 최소화를 위해 이전 상태와 비교 후 변경 시에만 갱신
-       */
-      const natW = imageEl.naturalWidth || imageEl.width;
-      const natH = imageEl.naturalHeight || imageEl.height;
-
-      logHotspotEvent('raw-detections', {
-        totalDetections: inference.detections.length,
-        samples: inference.detections.slice(0, 5),
-      });
-
-      const pixelDetections: FurnitureDetection[] = inference.detections.map(
-        (det) => {
-          const { x, y, w, h } = toImageSpaceBBox(imageEl, det.bbox);
-          return {
-            ...det,
-            bbox: [x, y, w, h] as [number, number, number, number],
-          };
-        }
-      );
-      setImageMeta({ width: natW, height: natH });
+      const result = buildHotspotsPipeline(imageEl, inference);
 
       logHotspotEvent('pixel-detections', {
-        totalDetections: pixelDetections.length,
-        samples: pixelDetections.slice(0, 5).map((det) => ({
+        totalDetections: result.debug.pixelDetections.length,
+        samples: result.debug.pixelDetections.slice(0, 5).map((det) => ({
           id: det.label ?? null,
           bbox: det.bbox,
           score: det.score,
@@ -390,54 +157,17 @@ export function useFurnitureHotspots(
         })),
       });
 
-      // 허용 코드 매핑이 없는 감지를 집계
-      const filteredOut: Array<{
-        label: number | null;
-        className: string;
-        score: number;
-      }> = [];
-      const allowedDetections = pixelDetections.filter((det) => {
-        if (!hasFurnitureCodeForIndex(det.label ?? null)) {
-          filteredOut.push({
-            label: det.label ?? null,
-            className: det.className ?? describeObj365Index(det.label),
-            score: det.score,
-          });
-          return false;
-        }
-        return true;
-      });
-
-      if (filteredOut.length > 0) {
-        // 감지 즉시 허용 대상 외 라벨 제거
+      if (result.debug.filteredOut.length > 0) {
         logHotspotEvent('filtered-out-labels', {
-          dropped: filteredOut,
-          allowedCount: allowedDetections.length,
+          dropped: result.debug.filteredOut,
+          allowedCount: result.hotspotCandidates.length,
         });
       }
 
-      if (allowedDetections.length === 0) {
-        setHotspots((prev) => (prev.length === 0 ? prev : []));
-        return;
-      }
-
-      const cabinet = allowedDetections.filter((d) => {
-        if (!isCabinetShelfIndex(d.label)) return false;
-        const [, , w, h] = d.bbox;
-        return w >= MIN_BBOX_PIXELS && h >= MIN_BBOX_PIXELS;
-      });
-      const others = allowedDetections.filter(
-        (d) => !isCabinetShelfIndex(d.label)
-      );
-
-      const { refinedDetections } = cabinet.length
-        ? refineFurnitureDetections(cabinet, { width: natW, height: natH })
-        : { refinedDetections: [] as RefinedFurnitureDetection[] };
-
-      if (refinedDetections.length > 0) {
+      if (result.debug.refinedDetections.length > 0) {
         logHotspotEvent('refine-detections', {
-          totalDetections: refinedDetections.length,
-          samples: refinedDetections.slice(0, 5).map((det) => ({
+          totalDetections: result.debug.refinedDetections.length,
+          samples: result.debug.refinedDetections.slice(0, 5).map((det) => ({
             id: det.label ?? null,
             refinedLabel: det.refinedLabel ?? null,
             confidence: det.confidence ?? null,
@@ -446,113 +176,87 @@ export function useFurnitureHotspots(
         });
       }
 
-      let cabinetPipeline: Array<
-        FurnitureDetection | RefinedFurnitureDetection
-      > = refinedDetections;
-
-      if (cabinet.length > 0 && refinedDetections.length === 0) {
-        // 2차 분류 실패 시 기본 Cabinet 로직으로 되돌림
+      if (result.fallbackTriggered) {
         reportFurniturePipelineWarning('furniture-cabinet-refine-miss', {
           imageUrl,
-          cabinetCount: cabinet.length,
+          cabinetCount: result.cabinetCount,
         });
-        cabinetPipeline = cabinet.map((det) => ({
-          ...det,
-          className:
-            det.className ??
-            (typeof det.label === 'number'
-              ? (OBJ365_ALL_CLASSES[det.label] ?? undefined)
-              : undefined),
-        }));
       }
 
-      const combinedDetections: Array<
-        FurnitureDetection | RefinedFurnitureDetection
-      > = [...cabinetPipeline, ...others];
-      const hotspotCandidates = combinedDetections.map((det) =>
-        createHotspotFromDetection(det)
-      );
-      const debugItems = hotspotCandidates.map((candidate) => {
-        const labelIndex = candidate.label ?? null;
-        const rawLabel =
-          labelIndex !== null && OBJ365_ALL_CLASSES[labelIndex]
-            ? OBJ365_ALL_CLASSES[labelIndex]
-            : null;
-        return {
-          id: candidate.id,
-          finalLabel: candidate.finalLabel,
-          refinedKey: candidate.refinedLabel ?? null,
-          rawLabel,
-          score: candidate.score ?? null,
-          confidence: candidate.confidence ?? null,
-          bbox: candidate.bbox,
-        };
-      });
       logHotspotEvent('hotspot-candidates', {
-        totalCandidates: hotspotCandidates.length,
-        items: debugItems,
+        totalCandidates: result.hotspotCandidates.length,
+        items: result.debug.debugCandidates,
       });
-      // 추론된 레이블 목록만 추출해 로그
-      const labelSummary = hotspotCandidates.map((candidate) => ({
-        id: candidate.id,
-        finalLabel: candidate.finalLabel,
-        refinedLabel: candidate.refinedLabel ?? null,
-        rawLabelIndex: candidate.label ?? null,
-      }));
-      logHotspotEvent('label-summary', {
-        count: labelSummary.length,
-        labels: labelSummary,
-      });
-      const effective = hotspotCandidates.length
-        ? selectEffectiveHotspots(hotspotCandidates)
-        : [];
 
-      setHotspots((prev) =>
-        areHotspotsEqual(prev, effective) ? prev : effective
-      );
+      logHotspotEvent('label-summary', {
+        count: result.debug.labelSummary.length,
+        labels: result.debug.labelSummary,
+      });
+
+      dispatch({
+        type: 'HOTSPOTS_READY',
+        payload: {
+          hotspots: result.hotspots,
+          imageMeta: result.imageMeta,
+        },
+      });
     },
-    [logHotspotEvent]
+    [dispatch, imageUrl, logHotspotEvent]
   );
 
+  const toError = (value: unknown): Error =>
+    value instanceof Error ? value : new Error(String(value));
+
   const run = useCallback(async () => {
-    /**
-     * run
-     * - 역할: 원본 이미지 추론을 수행하고, 실패 시 CORS 재시도를 트리거
-     * - 예외 처리: Abort/SecurityError 이외에는 경고 로그를 남겨 디버깅 용이성 확보
-     */
     if (!enabled) {
-      setHotspots((prev) => (prev.length === 0 ? prev : []));
+      resetPipeline();
       return;
     }
-    // 모델 로딩 또는 에러 상태면 추론 실행 보류
-    if (isLoading || error) return;
+    if (isLoading || modelError) return;
     if (!imgRef.current || !containerRef.current) return;
-    if (hasRunRef.current) return;
-    if (isRunningRef.current) return;
-    isRunningRef.current = true;
-    try {
-      const imageEl = imgRef.current;
+    if (hasRunRef.current || isRunningRef.current) return;
+
+    const executeInference = async (
+      imageEl: HTMLImageElement,
+      event: 'inference-start' | 'cors-inference-start'
+    ) => {
       const naturalWidth = imageEl.naturalWidth || imageEl.width;
       const naturalHeight = imageEl.naturalHeight || imageEl.height;
-      logHotspotEvent('inference-start', {
+      logHotspotEvent(event, {
         naturalWidth,
         naturalHeight,
       });
-      measureRenderMetrics();
+      updateRenderMetrics();
       const result = await runInference(imageEl);
+      logHotspotEvent('raw-detections', {
+        totalDetections: result.detections.length,
+        samples: result.detections.slice(0, 5),
+      });
       processDetections(imageEl, result);
       hasRunRef.current = true;
+    };
+
+    const isAbortError = (value: unknown) =>
+      value instanceof DOMException && value.name === 'AbortError';
+
+    isRunningRef.current = true;
+    dispatch({ type: 'INFERENCE_STARTED' });
+
+    try {
+      const imageEl = imgRef.current;
+      if (!imageEl) return;
+      await executeInference(imageEl, 'inference-start');
     } catch (error) {
-      if (error instanceof Error) {
-        logHotspotEvent(
-          'inference-error-detail',
-          {
-            name: error.name,
-            message: error.message,
-          },
-          'warn'
-        );
-      }
+      const err = toError(error);
+      logHotspotEvent(
+        'inference-error-detail',
+        {
+          name: err.name,
+          message: err.message,
+        },
+        'warn'
+      );
+
       if (error instanceof DOMException && error.name === 'SecurityError') {
         corsAbortRef.current?.abort();
         const controller = new AbortController();
@@ -561,24 +265,10 @@ export function useFurnitureHotspots(
           const corsImg = await loadCorsImage(imageUrl, controller.signal);
           if (corsImg) {
             try {
-              const naturalWidth = corsImg.naturalWidth || corsImg.width;
-              const naturalHeight = corsImg.naturalHeight || corsImg.height;
-              logHotspotEvent('cors-inference-start', {
-                naturalWidth,
-                naturalHeight,
-              });
-              const result = await runInference(corsImg);
-              const targetEl = imgRef.current ?? corsImg;
-              processDetections(targetEl, result);
-              hasRunRef.current = true;
+              await executeInference(corsImg, 'cors-inference-start');
               return;
             } catch (retryError) {
-              if (
-                !(
-                  retryError instanceof DOMException &&
-                  retryError.name === 'AbortError'
-                )
-              ) {
+              if (!isAbortError(retryError)) {
                 logHotspotEvent(
                   'inference-retry-failed',
                   {
@@ -589,18 +279,17 @@ export function useFurnitureHotspots(
                   },
                   'warn'
                 );
+                dispatch({
+                  type: 'PIPELINE_ERROR',
+                  payload: { error: toError(retryError) },
+                });
               }
             }
           } else {
             logHotspotEvent('cors-image-unavailable', undefined, 'warn');
           }
         } catch (retrySetupError) {
-          if (
-            !(
-              retrySetupError instanceof DOMException &&
-              retrySetupError.name === 'AbortError'
-            )
-          ) {
+          if (!isAbortError(retrySetupError)) {
             logHotspotEvent(
               'cors-retry-setup-failed',
               {
@@ -615,52 +304,42 @@ export function useFurnitureHotspots(
         } finally {
           corsAbortRef.current = null;
         }
-      } else if (
-        !(error instanceof DOMException && error.name === 'AbortError')
-      ) {
-        logHotspotEvent(
-          'inference-failed',
-          {
-            error: error instanceof Error ? error.message : String(error),
-          },
-          'warn'
-        );
+      } else if (!isAbortError(error)) {
+        logHotspotEvent('inference-failed', { error: err.message }, 'warn');
+        dispatch({ type: 'PIPELINE_ERROR', payload: { error: err } });
       }
-      setHotspots((prev) => (prev.length === 0 ? prev : []));
     } finally {
       isRunningRef.current = false;
       corsAbortRef.current = null;
     }
   }, [
-    processDetections,
-    runInference,
+    dispatch,
+    enabled,
     imageUrl,
     isLoading,
-    error,
-    mirrored,
-    enabled,
+    modelError,
+    processDetections,
+    runInference,
     logHotspotEvent,
+    updateRenderMetrics,
+    resetPipeline,
   ]);
 
-  // 이미지 onload
   useEffect(() => {
     const img = imgRef.current;
     if (!img) return;
-    // 모델 준비 이후에만 이미지 onload 콜백 등록
-    if (isLoading || error || !enabled) return;
     const onLoad = () => {
-      measureRenderMetrics();
-      if (hasRunRef.current) return;
-      run();
+      updateRenderMetrics();
+      if (!hasRunRef.current) run();
     };
     if (img.complete) {
-      measureRenderMetrics();
+      updateRenderMetrics();
       if (!hasRunRef.current) run();
     } else {
       img.addEventListener('load', onLoad);
     }
     return () => img.removeEventListener('load', onLoad);
-  }, [imageUrl, run, isLoading, error, enabled, measureRenderMetrics]);
+  }, [imageUrl, run, isLoading, modelError, enabled, updateRenderMetrics]);
 
   useEffect(
     () => () => {
@@ -671,20 +350,22 @@ export function useFurnitureHotspots(
 
   useEffect(() => {
     hasRunRef.current = false;
-    setRenderMetrics(null);
-  }, [imageUrl, mirrored]);
+    resetPipeline();
+  }, [imageUrl, mirrored, resetPipeline]);
 
-  // 컨테이너 크기 관찰
+  const updateContainerSize = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    dispatch({
+      type: 'SET_CONTAINER_SIZE',
+      payload: { width: container.clientWidth, height: container.clientHeight },
+    });
+  }, [dispatch]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const update = () => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      setContainerSize((prev) =>
-        prev.width === w && prev.height === h ? prev : { width: w, height: h }
-      );
-    };
+    const update = () => updateContainerSize();
     update();
     if (typeof ResizeObserver !== 'undefined') {
       const observer = new ResizeObserver(() => update());
@@ -694,85 +375,41 @@ export function useFurnitureHotspots(
     const onResize = () => update();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, []);
+  }, [updateContainerSize]);
 
   useEffect(() => {
     if (!enabled) return;
     const raf = requestAnimationFrame(() => {
-      measureRenderMetrics();
+      updateRenderMetrics();
     });
     return () => cancelAnimationFrame(raf);
   }, [
     enabled,
-    measureRenderMetrics,
-    containerSize.width,
-    containerSize.height,
+    updateRenderMetrics,
+    state.containerSize.width,
+    state.containerSize.height,
   ]);
 
-  // 좌표 보정
-  const { projectedHotspots, debugRects } = useMemo(() => {
-    if (!renderMetrics || !imageMeta) {
-      return {
-        projectedHotspots: [] as FurnitureHotspot[],
-        debugRects: [] as DebugRect[],
-      };
+  useEffect(() => {
+    if (!state.imageMeta || !state.renderMetrics) {
+      dispatch({
+        type: 'PROJECTED_READY',
+        payload: { projectedHotspots: [], debugRects: [] },
+      });
+      return;
     }
-    const {
-      offsetX,
-      offsetY,
-      scaleX,
-      scaleY,
-      width: renderW,
-      height: renderH,
-    } = renderMetrics;
-    if (scaleX === 0 || scaleY === 0) {
-      return {
-        projectedHotspots: [] as FurnitureHotspot[],
-        debugRects: [] as DebugRect[],
-      };
-    }
-
-    const containerW = containerSize.width || renderW;
-    const containerH = containerSize.height || renderH;
-
-    const rects = hotspots.map((det) => {
-      const [x, y, w, h] = det.bbox;
-      let left = offsetX + x * scaleX;
-      if (mirrored) {
-        left = offsetX + renderW - (x + w) * scaleX;
-      }
-      const top = offsetY + y * scaleY;
-      const width = w * scaleX;
-      const height = h * scaleY;
-      return {
-        id: det.id,
-        left: Math.min(containerW, Math.max(0, left)),
-        top: Math.min(containerH, Math.max(0, top)),
-        width: Math.max(1, Math.min(width, containerW)),
-        height: Math.max(1, Math.min(height, containerH)),
-        label: det.className ?? null,
-      };
-    });
-
-    const projected = hotspots.map((det) => {
-      const [x, y, w, h] = det.bbox;
-      const centerX = x + w / 2;
-      const centerY = y + h / 2;
-      let cx = offsetX + centerX * scaleX;
-      if (mirrored) {
-        cx = offsetX + renderW - centerX * scaleX;
-      }
-      const cy = offsetY + centerY * scaleY;
-      const clampedCx = Math.min(containerW, Math.max(0, cx));
-      const clampedCy = Math.min(containerH, Math.max(0, cy));
-      return { ...det, cx: clampedCx, cy: clampedCy };
-    });
-    if (projected.length > 0) {
+    const projection = projectHotspots(
+      state.hotspots,
+      state.renderMetrics,
+      state.containerSize,
+      mirrored
+    );
+    if (projection.projectedHotspots.length > 0) {
       logHotspotEvent('projected-hotspots', {
-        containerSize,
-        imageMeta,
-        renderMetrics,
-        samples: projected.slice(0, 5).map((item) => ({
+        containerSize: state.containerSize,
+        imageMeta: state.imageMeta,
+        renderMetrics: state.renderMetrics,
+        samples: projection.projectedHotspots.slice(0, 5).map((item) => ({
           id: item.id,
           cx: item.cx,
           cy: item.cy,
@@ -780,23 +417,34 @@ export function useFurnitureHotspots(
         })),
       });
     }
-    return { projectedHotspots: projected, debugRects: rects };
+    dispatch({
+      type: 'PROJECTED_READY',
+      payload: projection,
+    });
   }, [
-    hotspots,
-    imageMeta,
-    containerSize,
-    mirrored,
-    renderMetrics,
-    imageUrl,
+    dispatch,
     logHotspotEvent,
+    mirrored,
+    state.containerSize,
+    state.hotspots,
+    state.imageMeta,
+    state.renderMetrics,
   ]);
+
+  useEffect(() => {
+    if (!enabled) {
+      hasRunRef.current = false;
+      resetPipeline();
+    }
+  }, [enabled, resetPipeline]);
 
   return {
     imgRef,
     containerRef,
-    hotspots: projectedHotspots,
-    debugRects,
-    isLoading,
-    error,
+    hotspots: state.projectedHotspots,
+    debugRects: state.debugRects,
+    isLoading:
+      isLoading || state.status === 'loading' || state.status === 'processing',
+    error: modelError ?? state.error,
   } as const;
 }
