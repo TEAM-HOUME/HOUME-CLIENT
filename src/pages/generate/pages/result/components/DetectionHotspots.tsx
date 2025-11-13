@@ -2,7 +2,7 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import {
   resolveFurnitureCode,
@@ -27,6 +27,7 @@ import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
+import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture';
 
 interface DetectionHotspotsProps {
   imageId: number | null;
@@ -74,7 +75,37 @@ const DetectionHotspots = ({
   // 페이지 시나리오별로 추론 사용 여부 제어
   const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
-  const hasHotspots = hotspots.length > 0;
+  const allowedCategories = categoriesQuery.data?.categories;
+
+  type DisplayHotspot = {
+    hotspot: FurnitureHotspot;
+    resolvedCode: FurnitureCategoryCode | null;
+  };
+
+  const displayHotspots: DisplayHotspot[] = useMemo(() => {
+    if (!allowedCategories || allowedCategories.length === 0) {
+      return [];
+    }
+    return hotspots
+      .map((hotspot) => {
+        const resolvedCode = resolveFurnitureCode({
+          finalLabel: hotspot.finalLabel,
+          obj365Label: hotspot.label ?? null,
+          refinedLabel: hotspot.refinedLabel,
+          refinedConfidence: hotspot.confidence,
+        });
+        const categoryId = resolveCategoryIdForHotspot(
+          hotspot,
+          resolvedCode,
+          allowedCategories
+        );
+        if (!categoryId) return null;
+        return { hotspot, resolvedCode };
+      })
+      .filter((item): item is DisplayHotspot => Boolean(item));
+  }, [hotspots, allowedCategories, dashboardData?.categories]);
+
+  const hasHotspots = displayHotspots.length > 0;
 
   useEffect(() => {
     if (imageId === null) return;
@@ -103,7 +134,8 @@ const DetectionHotspots = ({
   // 핫스팟 라벨 → 카테고리 ID 해석 유틸
   const resolveCategoryIdForHotspot = (
     hotspot: FurnitureHotspot,
-    resolvedCode: FurnitureCategoryCode | null
+    resolvedCode: FurnitureCategoryCode | null,
+    allowedCategories: FurnitureCategoryResponse[] | undefined
   ): number | null => {
     const groups = dashboardData?.categories ?? [];
     if (!groups || groups.length === 0) return null;
@@ -117,8 +149,7 @@ const DetectionHotspots = ({
       });
     });
     // 이미지에 실제로 존재하는 카테고리만 허용
-    const allowedCategories = categoriesQuery.data?.categories ?? [];
-    const allowedIdSet = new Set(allowedCategories.map((c) => c.id));
+    const allowedIdSet = new Set(allowedCategories?.map((c) => c.id));
 
     // 후보군: Obj365/리파인 조합으로 확정된 단일 코드만 사용
     if (resolvedCode) {
@@ -131,7 +162,7 @@ const DetectionHotspots = ({
     // 1차: group.categoryId 가 allowed 에 존재하는지 검사
     // 2차: 레이블 텍스트 기반 매칭 — finalLabel 과 서버 카테고리명 비교
     const nameToAllowedId = new Map<string, number>();
-    allowedCategories.forEach((c) => {
+    (allowedCategories ?? []).forEach((c) => {
       const n = (c.categoryName ?? '').toString().trim();
       if (!n) return;
       nameToAllowedId.set(n.toUpperCase(), c.id);
@@ -179,7 +210,11 @@ const DetectionHotspots = ({
         refinedLabel: hotspot.refinedLabel,
         refinedConfidence: hotspot.confidence,
       });
-      const categoryId = resolveCategoryIdForHotspot(hotspot, resolvedCode);
+      const categoryId = resolveCategoryIdForHotspot(
+        hotspot,
+        resolvedCode,
+        allowedCategories
+      );
       // 매핑 디버그 로그 항상 출력
       const allowed = categoriesQuery.data?.categories ?? [];
       logDetectionEvent('hotspot-mapping', {
@@ -265,7 +300,7 @@ const DetectionHotspots = ({
         className={styles.image({ mirrored })}
       />
       <div className={styles.overlay({ visible: hasHotspots })}>
-        {hotspots.map((hotspot: FurnitureHotspot) => (
+        {displayHotspots.map(({ hotspot }) => (
           <button
             key={hotspot.id}
             className={styles.hotspot}
