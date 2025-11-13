@@ -111,13 +111,14 @@ export function useFurnitureHotspots(
       payload?: Record<string, unknown>,
       level: 'info' | 'warn' = 'info'
     ) => {
-      logFurniturePipelineEvent(
-        event,
-        { imageUrl, mirrored, ...payload },
-        { level }
-      );
+      const { imageUrl: _omitted, ...restPayload } = payload ?? {};
+      const hasRestPayload = Object.keys(restPayload).length > 0;
+      const enrichedPayload = hasRestPayload
+        ? { mirrored, ...restPayload }
+        : { mirrored };
+      logFurniturePipelineEvent(event, enrichedPayload, { level });
     },
-    [imageUrl, mirrored]
+    [mirrored]
   );
 
   const [state, baseDispatch] = useReducer(
@@ -178,7 +179,6 @@ export function useFurnitureHotspots(
 
       if (result.fallbackTriggered) {
         reportFurniturePipelineWarning('furniture-cabinet-refine-miss', {
-          imageUrl,
           cabinetCount: result.cabinetCount,
         });
       }
