@@ -29,7 +29,7 @@ const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
 
 const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
   SINGLE: ['1인용', '싱글', '슈퍼싱글'],
-  OFFICE_DESK: ['업무용책상', '사무용책상', '오피스책상'],
+  OFFICE_DESK: ['업무용 책상', '사무용책상', '오피스책상'],
   CLOSET: ['붙박이장', '옷장', 'wardrobe', '워드로브'],
   DINING_TABLE: ['식탁', '다이닝테이블'],
   SINGLE_SOFA: ['1인소파', '싱글소파', '암체어'],
@@ -157,19 +157,6 @@ const DetectionHotspots = ({
       }
     });
 
-    let fallbackIdx = 0;
-    for (let i = 0; i < detectedObjects.length; i += 1) {
-      const code = detectedObjects[i];
-      if (!code || map.has(code)) continue;
-      while (fallbackIdx < allowedCategories.length) {
-        const candidate = allowedCategories[fallbackIdx];
-        fallbackIdx += 1;
-        if (!candidate || usedCategoryIds.has(candidate.id)) continue;
-        map.set(code, candidate.id);
-        usedCategoryIds.add(candidate.id);
-        break;
-      }
-    }
     return map;
   }, [allowedCategories, detectedObjects]);
 
