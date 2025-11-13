@@ -57,6 +57,8 @@ const loadOnnxModel = async (
   const ort = await import('onnxruntime-web');
   onProgress?.(20);
   ort.env.wasm.wasmPaths = WASM_ASSET_BASE;
+  // onnxruntime 경고 숨길 때 배포 직전에 주석 해제하고 사용
+  // ort.env.logLevel = 'error';
 
   const response = await fetch(modelPath);
   if (!response.ok) {
