@@ -174,7 +174,7 @@ const DetectionHotspots = ({
       .flatMap((label) =>
         label
           .split('/')
-          .map((part) => part.trim())
+          .map((part: string) => part.trim())
           .filter(Boolean)
       )
       .map((label) => label.toUpperCase());

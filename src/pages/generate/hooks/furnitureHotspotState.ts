@@ -1,6 +1,6 @@
 import type { Dispatch } from 'react';
 
-import type { FurnitureDetection } from '@pages/generate/types/detection';
+import type { Detection as FurnitureDetection } from '@pages/generate/types/detection';
 import type { FurnitureCategory } from '@pages/generate/utils/refineFurnitureDetections';
 
 // 가구 핫스팟 상태 타입과 reducer 정의
@@ -157,7 +157,7 @@ export const furnitureHotspotReducer = (
     }
     case 'PROJECTED_READY': {
       const { projectedHotspots, debugRects } = action.payload;
-      const nextState = {
+      const nextState: FurnitureHotspotState = {
         ...state,
         projectedHotspots,
         debugRects,
