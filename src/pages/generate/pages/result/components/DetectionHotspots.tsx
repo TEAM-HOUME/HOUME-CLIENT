@@ -83,6 +83,7 @@ const DetectionHotspots = ({
   };
 
   const displayHotspots: DisplayHotspot[] = useMemo(() => {
+    // 서버가 허용한 카테고리와 매칭되는 핫스팟만 유지
     if (!allowedCategories || allowedCategories.length === 0) {
       return [];
     }
@@ -137,6 +138,7 @@ const DetectionHotspots = ({
     resolvedCode: FurnitureCategoryCode | null,
     allowedCategories: FurnitureCategoryResponse[] | undefined
   ): number | null => {
+    // 대시보드 코드 테이블과 서버 응답 ID를 동시에 교차 확인
     const groups = dashboardData?.categories ?? [];
     if (!groups || groups.length === 0) return null;
     // 매핑 테이블: code → categoryId
