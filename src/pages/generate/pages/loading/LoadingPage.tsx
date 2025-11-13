@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Navigate, useNavigate } from 'react-router-dom';
 
@@ -59,7 +59,8 @@ const LoadingPage = () => {
   const { isApiCompleted, navigationData } = useGenerateStore();
 
   // sessionStorage에서 이미지 생성 요청 데이터 가져오기
-  const requestData: GenerateImageRequest | null = (() => {
+  const requestData: GenerateImageRequest | null = useMemo(() => {
+    // useMemo로 파싱 결과 참조 고정해 렌더 시 불필요한 API 재호출 차단
     const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (!stored) return null;
 
@@ -69,7 +70,7 @@ const LoadingPage = () => {
     } catch {
       return null;
     }
-  })();
+  }, []);
 
   // 정상 진입 여부, true: 일반 이미지 생성 API 호출, false: 폴백 이미지 API 호출
   const [isNormalEntry, setIsNormalEntry] = useState(true);
