@@ -223,6 +223,7 @@ const DetectionHotspots = ({
       );
       // 매핑 디버그 로그 항상 출력
       const allowed = categoriesQuery.data?.categories ?? [];
+      const resolvedCategory = allowed.find((c) => c.id === categoryId);
       logDetectionEvent('hotspot-mapping', {
         hotspot: {
           finalLabel: hotspot.finalLabel,
@@ -234,6 +235,7 @@ const DetectionHotspots = ({
           name: c.categoryName,
         })),
         resolvedCategoryId: categoryId,
+        resolvedCategoryName: resolvedCategory?.categoryName ?? null,
       });
       if (!categoryId) return;
       const inChips = categoriesQuery.data?.categories?.some(
