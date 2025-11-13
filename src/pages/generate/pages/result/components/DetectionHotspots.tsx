@@ -6,13 +6,9 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import {
   resolveFurnitureCode,
-  toFurnitureCategoryCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
-import {
-  useFurnitureDashboardQuery,
-  useGeneratedCategoriesQuery,
-} from '@pages/generate/hooks/useFurnitureCuration';
+import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureCuration';
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
@@ -51,7 +47,9 @@ const DetectionHotspots = ({
   const selectedHotspotId = useCurationStore((state) =>
     imageId !== null ? (state.images[imageId]?.selectedHotspotId ?? null) : null
   );
-  const { data: dashboardData } = useFurnitureDashboardQuery();
+  const detectedObjects = useCurationStore((state) =>
+    imageId !== null ? (state.images[imageId]?.detectedObjects ?? []) : []
+  );
   const openSheet = useOpenCurationSheet();
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
@@ -77,6 +75,24 @@ const DetectionHotspots = ({
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
   const allowedCategories = categoriesQuery.data?.categories;
 
+  // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭
+  const detectedCodeToCategoryId = useMemo(() => {
+    const map = new Map<FurnitureCategoryCode, number>();
+    if (!allowedCategories || allowedCategories.length === 0) return map;
+    if (!detectedObjects || detectedObjects.length === 0) return map;
+    const pairCount = Math.min(
+      detectedObjects.length,
+      allowedCategories.length
+    );
+    for (let i = 0; i < pairCount; i += 1) {
+      const code = detectedObjects[i];
+      const category = allowedCategories[i];
+      if (!code || !category) continue;
+      map.set(code, category.id);
+    }
+    return map;
+  }, [allowedCategories, detectedObjects]);
+
   type DisplayHotspot = {
     hotspot: FurnitureHotspot;
     resolvedCode: FurnitureCategoryCode | null;
@@ -86,33 +102,19 @@ const DetectionHotspots = ({
   const resolveCategoryIdForHotspot = (
     hotspot: FurnitureHotspot,
     resolvedCode: FurnitureCategoryCode | null,
-    allowedCategories: FurnitureCategoryResponse[] | undefined
+    allowedCategories: FurnitureCategoryResponse[] | undefined,
+    codeMap: Map<FurnitureCategoryCode, number>
   ): number | null => {
-    // 대시보드 코드 테이블과 서버 응답 ID를 동시에 교차 확인
-    const groups = dashboardData?.categories ?? [];
-    if (!groups || groups.length === 0) return null;
-    // 매핑 테이블: code → categoryId
-    const codeToCategoryId = new Map<string, number>();
-    groups.forEach((g) => {
-      g.furnitures.forEach((f) => {
-        const code = toFurnitureCategoryCode(f.code);
-        if (!code) return;
-        codeToCategoryId.set(code, g.categoryId);
-      });
-    });
-    // 이미지에 실제로 존재하는 카테고리만 허용
     const allowedIdSet = new Set(allowedCategories?.map((c) => c.id));
 
-    // 후보군: Obj365/리파인 조합으로 확정된 단일 코드만 사용
     if (resolvedCode) {
-      const byCode = codeToCategoryId.get(resolvedCode);
+      const byCode = codeMap.get(resolvedCode);
       if (byCode && allowedIdSet.has(byCode)) {
         return byCode;
       }
     }
 
-    // 1차: group.categoryId 가 allowed 에 존재하는지 검사
-    // 2차: 레이블 텍스트 기반 매칭 — finalLabel 과 서버 카테고리명 비교
+    // 후순위: 서버 카테고리 이름과 핫스팟 라벨 문자열 비교
     const nameToAllowedId = new Map<string, number>();
     (allowedCategories ?? []).forEach((c) => {
       const n = (c.categoryName ?? '').toString().trim();
@@ -152,13 +154,14 @@ const DetectionHotspots = ({
         const categoryId = resolveCategoryIdForHotspot(
           hotspot,
           resolvedCode,
-          allowedCategories
+          allowedCategories,
+          detectedCodeToCategoryId
         );
         if (!categoryId) return null;
         return { hotspot, resolvedCode };
       })
       .filter((item): item is DisplayHotspot => Boolean(item));
-  }, [hotspots, allowedCategories, dashboardData?.categories]);
+  }, [hotspots, allowedCategories, detectedCodeToCategoryId]);
 
   const hasHotspots = displayHotspots.length > 0;
 
@@ -215,7 +218,8 @@ const DetectionHotspots = ({
       const categoryId = resolveCategoryIdForHotspot(
         hotspot,
         resolvedCode,
-        allowedCategories
+        allowedCategories,
+        detectedCodeToCategoryId
       );
       // 매핑 디버그 로그 항상 출력
       const allowed = categoriesQuery.data?.categories ?? [];
