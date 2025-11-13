@@ -17,6 +17,7 @@ import {
   filterAllowedDetectedObjects,
   mapHotspotsToDetectedObjects,
 } from '@pages/generate/utils/detectedObjectMapper';
+import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
 import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 
@@ -50,6 +51,21 @@ const DetectionHotspots = ({
   const openSheet = useOpenCurationSheet();
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
+  const logDetectionEvent = (
+    event: string,
+    payload?: Record<string, unknown>,
+    level: 'info' | 'warn' = 'info'
+  ) => {
+    logFurniturePipelineEvent(
+      event,
+      {
+        imageId,
+        imageUrl,
+        ...payload,
+      },
+      { level }
+    );
+  };
 
   const dynamicLabelMap = useMemo(
     () => buildDashboardLabelMap(dashboardData?.categories),
@@ -155,8 +171,8 @@ const DetectionHotspots = ({
         : hotspot.id;
     selectHotspot(imageId, next);
     if (next) {
-      console.info('[DetectionHotspots] 활성 핫스팟(active hotspot)', {
-        id: hotspot.id,
+      logDetectionEvent('hotspot-selected', {
+        hotspotId: hotspot.id,
         score: hotspot.score,
         confidence: hotspot.confidence,
         label: {
@@ -174,7 +190,7 @@ const DetectionHotspots = ({
         [hotspot],
         dynamicLabelMap
       );
-      console.info('[DetectionHotspots] mapping debug', {
+      logDetectionEvent('hotspot-mapping', {
         hotspot: {
           finalLabel: hotspot.finalLabel,
           className: hotspot.className,
@@ -202,9 +218,7 @@ const DetectionHotspots = ({
         }
       }
     } else {
-      console.info('[DetectionHotspots] 핫스팟 선택 해제(clear hotspot)', {
-        id: hotspot.id,
-      });
+      logDetectionEvent('hotspot-cleared', { hotspotId: hotspot.id });
     }
   };
 
@@ -224,7 +238,16 @@ const DetectionHotspots = ({
 
   if (error) {
     // 모델 로드 실패 시에도 이미지 자체는 보여주도록
-    console.warn('[Detection] model error:', error);
+    logDetectionEvent(
+      'detection-model-error',
+      {
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message }
+            : error,
+      },
+      'warn'
+    );
   }
   if (isLoading) {
     return (

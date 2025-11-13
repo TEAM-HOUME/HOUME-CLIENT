@@ -19,7 +19,10 @@ import {
   hasFurnitureCodeForIndex,
 } from '@pages/generate/constants/furnitureCategoryMapping';
 import { useONNXModel } from '@pages/generate/hooks/useOnnxModel';
-import { reportFurniturePipelineWarning } from '@pages/generate/utils/furniturePipelineMonitor';
+import {
+  logFurniturePipelineEvent,
+  reportFurniturePipelineWarning,
+} from '@pages/generate/utils/furniturePipelineMonitor';
 import { toImageSpaceBBox } from '@pages/generate/utils/imageProcessing';
 import { OBJ365_ALL_CLASSES } from '@pages/generate/utils/obj365AllClasses';
 import { isCabinetShelfIndex } from '@pages/generate/utils/obj365Furniture';
@@ -257,7 +260,14 @@ async function loadCorsImage(
   } catch (error) {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     if (!(error instanceof DOMException && error.name === 'AbortError')) {
-      console.warn('[useFurnitureHotspots] cors image load failed', error);
+      logFurniturePipelineEvent(
+        'cors-image-load-failed',
+        {
+          url,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        { level: 'warn' }
+      );
     }
     return null;
   }
@@ -301,6 +311,21 @@ export function useFurnitureHotspots(
 
   const { runInference, isLoading, error } = useONNXModel(OBJ365_MODEL_PATH);
 
+  const logHotspotEvent = useCallback(
+    (
+      event: string,
+      payload?: Record<string, unknown>,
+      level: 'info' | 'warn' = 'info'
+    ) => {
+      logFurniturePipelineEvent(
+        event,
+        { imageUrl, mirrored, ...payload },
+        { level }
+      );
+    },
+    [imageUrl, mirrored]
+  );
+
   const measureRenderMetrics = useCallback(() => {
     const imgEl = imgRef.current;
     const containerEl = containerRef.current;
@@ -339,10 +364,8 @@ export function useFurnitureHotspots(
       const natW = imageEl.naturalWidth || imageEl.width;
       const natH = imageEl.naturalHeight || imageEl.height;
 
-      console.info('[useFurnitureHotspots] 원시 감지(raw detections)', {
-        imageUrl,
-        mirrored,
-        total: inference.detections.length,
+      logHotspotEvent('raw-detections', {
+        totalDetections: inference.detections.length,
         samples: inference.detections.slice(0, 5),
       });
 
@@ -357,10 +380,8 @@ export function useFurnitureHotspots(
       );
       setImageMeta({ width: natW, height: natH });
 
-      console.info('[useFurnitureHotspots] 픽셀 변환 감지(pixel detections)', {
-        imageUrl,
-        mirrored,
-        total: pixelDetections.length,
+      logHotspotEvent('pixel-detections', {
+        totalDetections: pixelDetections.length,
         samples: pixelDetections.slice(0, 5).map((det) => ({
           id: det.label ?? null,
           bbox: det.bbox,
@@ -389,9 +410,9 @@ export function useFurnitureHotspots(
 
       if (filteredOut.length > 0) {
         // 감지 즉시 허용 대상 외 라벨 제거
-        console.info('[useFurnitureHotspots] 허용되지 않은 감지 필터링', {
-          imageUrl,
+        logHotspotEvent('filtered-out-labels', {
           dropped: filteredOut,
+          allowedCount: allowedDetections.length,
         });
       }
 
@@ -414,10 +435,8 @@ export function useFurnitureHotspots(
         : { refinedDetections: [] as RefinedFurnitureDetection[] };
 
       if (refinedDetections.length > 0) {
-        console.info('[useFurnitureHotspots] 리파인 감지(refined detections)', {
-          imageUrl,
-          mirrored,
-          total: refinedDetections.length,
+        logHotspotEvent('refine-detections', {
+          totalDetections: refinedDetections.length,
           samples: refinedDetections.slice(0, 5).map((det) => ({
             id: det.label ?? null,
             refinedLabel: det.refinedLabel ?? null,
@@ -433,10 +452,6 @@ export function useFurnitureHotspots(
 
       if (cabinet.length > 0 && refinedDetections.length === 0) {
         // 2차 분류 실패 시 기본 Cabinet 로직으로 되돌림
-        console.warn('[useFurnitureHotspots] 추가 분류 실패 fallback 동작', {
-          imageUrl,
-          cabinetCount: cabinet.length,
-        });
         reportFurniturePipelineWarning('furniture-cabinet-refine-miss', {
           imageUrl,
           cabinetCount: cabinet.length,
@@ -473,9 +488,8 @@ export function useFurnitureHotspots(
           bbox: candidate.bbox,
         };
       });
-      console.info('[useFurnitureHotspots] 추론 결과(inference result)', {
-        imageUrl,
-        total: hotspotCandidates.length,
+      logHotspotEvent('hotspot-candidates', {
+        totalCandidates: hotspotCandidates.length,
         items: debugItems,
       });
       // 추론된 레이블 목록만 추출해 로그
@@ -485,14 +499,10 @@ export function useFurnitureHotspots(
         refinedLabel: candidate.refinedLabel ?? null,
         rawLabelIndex: candidate.label ?? null,
       }));
-      console.info(
-        '[useFurnitureHotspots] 추론 레이블 목록(inference labels)',
-        {
-          imageUrl,
-          count: labelSummary.length,
-          labels: labelSummary,
-        }
-      );
+      logHotspotEvent('label-summary', {
+        count: labelSummary.length,
+        labels: labelSummary,
+      });
       const effective = hotspotCandidates.length
         ? selectEffectiveHotspots(hotspotCandidates)
         : [];
@@ -501,7 +511,7 @@ export function useFurnitureHotspots(
         areHotspotsEqual(prev, effective) ? prev : effective
       );
     },
-    []
+    [logHotspotEvent]
   );
 
   const run = useCallback(async () => {
@@ -524,11 +534,9 @@ export function useFurnitureHotspots(
       const imageEl = imgRef.current;
       const naturalWidth = imageEl.naturalWidth || imageEl.width;
       const naturalHeight = imageEl.naturalHeight || imageEl.height;
-      console.info('[useFurnitureHotspots] 추론 시작(inference start)', {
-        imageUrl,
+      logHotspotEvent('inference-start', {
         naturalWidth,
         naturalHeight,
-        mirrored,
       });
       measureRenderMetrics();
       const result = await runInference(imageEl);
@@ -536,11 +544,14 @@ export function useFurnitureHotspots(
       hasRunRef.current = true;
     } catch (error) {
       if (error instanceof Error) {
-        console.warn('[useFurnitureHotspots] inference failed detail', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
+        logHotspotEvent(
+          'inference-error-detail',
+          {
+            name: error.name,
+            message: error.message,
+          },
+          'warn'
+        );
       }
       if (error instanceof DOMException && error.name === 'SecurityError') {
         corsAbortRef.current?.abort();
@@ -552,15 +563,10 @@ export function useFurnitureHotspots(
             try {
               const naturalWidth = corsImg.naturalWidth || corsImg.width;
               const naturalHeight = corsImg.naturalHeight || corsImg.height;
-              console.info(
-                '[useFurnitureHotspots] CORS 추론 시작(cors inference start)',
-                {
-                  imageUrl,
-                  naturalWidth,
-                  naturalHeight,
-                  mirrored,
-                }
-              );
+              logHotspotEvent('cors-inference-start', {
+                naturalWidth,
+                naturalHeight,
+              });
               const result = await runInference(corsImg);
               const targetEl = imgRef.current ?? corsImg;
               processDetections(targetEl, result);
@@ -573,16 +579,20 @@ export function useFurnitureHotspots(
                   retryError.name === 'AbortError'
                 )
               ) {
-                console.warn(
-                  '[useFurnitureHotspots] inference retry failed',
-                  retryError
+                logHotspotEvent(
+                  'inference-retry-failed',
+                  {
+                    error:
+                      retryError instanceof Error
+                        ? retryError.message
+                        : String(retryError),
+                  },
+                  'warn'
                 );
               }
             }
           } else {
-            console.warn(
-              '[useFurnitureHotspots] cors image unavailable, falling back to empty hotspots'
-            );
+            logHotspotEvent('cors-image-unavailable', undefined, 'warn');
           }
         } catch (retrySetupError) {
           if (
@@ -591,9 +601,15 @@ export function useFurnitureHotspots(
               retrySetupError.name === 'AbortError'
             )
           ) {
-            console.warn(
-              '[useFurnitureHotspots] cors retry setup failed',
-              retrySetupError
+            logHotspotEvent(
+              'cors-retry-setup-failed',
+              {
+                error:
+                  retrySetupError instanceof Error
+                    ? retrySetupError.message
+                    : String(retrySetupError),
+              },
+              'warn'
             );
           }
         } finally {
@@ -602,7 +618,13 @@ export function useFurnitureHotspots(
       } else if (
         !(error instanceof DOMException && error.name === 'AbortError')
       ) {
-        console.warn('[useFurnitureHotspots] inference failed', error);
+        logHotspotEvent(
+          'inference-failed',
+          {
+            error: error instanceof Error ? error.message : String(error),
+          },
+          'warn'
+        );
       }
       setHotspots((prev) => (prev.length === 0 ? prev : []));
     } finally {
@@ -617,6 +639,7 @@ export function useFurnitureHotspots(
     error,
     mirrored,
     enabled,
+    logHotspotEvent,
   ]);
 
   // 이미지 onload
@@ -745,9 +768,7 @@ export function useFurnitureHotspots(
       return { ...det, cx: clampedCx, cy: clampedCy };
     });
     if (projected.length > 0) {
-      console.info('[useFurnitureHotspots] 좌표 보정(projected hotspots)', {
-        imageUrl,
-        mirrored,
+      logHotspotEvent('projected-hotspots', {
         containerSize,
         imageMeta,
         renderMetrics,
@@ -760,7 +781,15 @@ export function useFurnitureHotspots(
       });
     }
     return { projectedHotspots: projected, debugRects: rects };
-  }, [hotspots, imageMeta, containerSize, mirrored, renderMetrics, imageUrl]);
+  }, [
+    hotspots,
+    imageMeta,
+    containerSize,
+    mirrored,
+    renderMetrics,
+    imageUrl,
+    logHotspotEvent,
+  ]);
 
   return {
     imgRef,

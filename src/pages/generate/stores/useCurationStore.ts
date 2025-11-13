@@ -1,6 +1,8 @@
 // 가구 큐레이션 전역 상태 스토어 정의
 import { create } from 'zustand';
 
+import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
+
 import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 
@@ -129,8 +131,9 @@ export const useCurationStore = create<FurnitureCurationState>((set, get) => ({
         nextDetectedObjects
       );
       // 감지된 객체 배열 로깅
-      console.info('[Curation] detectedObjects', {
+      logFurniturePipelineEvent('detected-objects-store', {
         imageId,
+        hotspotCount: nextHotspots.length,
         detectedObjects: nextDetectedObjects,
       });
 

@@ -6,7 +6,7 @@ import {
   toFurnitureCategoryCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
-import { reportFurniturePipelineWarning } from '@pages/generate/utils/furniturePipelineMonitor';
+import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 import type { FurnitureCategoryGroup } from '@pages/generate/types/furniture';
@@ -78,14 +78,20 @@ export const mapHotspotsToDetectedObjects = (
     resolved.forEach((code) => result.add(code));
   });
   if (dropped.length > 0) {
-    console.warn('[DetectedObjectMapper] 허용되지 않은 finalLabel 제외', {
-      dropped,
-    });
-    reportFurniturePipelineWarning('furniture-final-label-drop', { dropped });
+    logFurniturePipelineEvent(
+      'furniture-final-label-drop',
+      { dropped },
+      { level: 'warn' }
+    );
   }
   const allowed = filterAllowedDetectedObjects(Array.from(result), {
     stage: 'mapHotspots',
     hotspotCount: hotspots.length,
+  });
+  logFurniturePipelineEvent('detected-object-map', {
+    stage: 'mapHotspots',
+    hotspotCount: hotspots.length,
+    detectedCodes: allowed,
   });
   return allowed;
 };
@@ -101,18 +107,17 @@ export const filterAllowedDetectedObjects = (
 ) => {
   const filtered = filterAllowedFurnitureCodes(codes);
   if (filtered.length !== codes.length) {
-    console.warn('[DetectedObjectMapper] 허용 코드 필터 적용', {
-      stage: context?.stage ?? 'unknown',
-      imageId: context?.imageId ?? null,
-      hotspotCount: context?.hotspotCount ?? 0,
-      before: codes,
-      after: filtered,
-    });
-    reportFurniturePipelineWarning('furniture-allowed-code-filter', {
-      stage: context?.stage ?? 'unknown',
-      before: codes,
-      after: filtered,
-    });
+    logFurniturePipelineEvent(
+      'furniture-allowed-code-filter',
+      {
+        stage: context?.stage ?? 'unknown',
+        imageId: context?.imageId ?? null,
+        hotspotCount: context?.hotspotCount ?? 0,
+        before: codes,
+        after: filtered,
+      },
+      { level: 'warn' }
+    );
   }
   return filtered;
 };
