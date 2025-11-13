@@ -1,81 +1,36 @@
 // 감지 레이블을 API 파라미터 값으로 매핑하는 유틸
 import {
   filterAllowedFurnitureCodes,
-  normalizeFurnitureLabelForMap,
-  resolveFurnitureCodes,
-  toFurnitureCategoryCode,
+  resolveFurnitureCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
 import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
-import type { FurnitureCategoryGroup } from '@pages/generate/types/furniture';
-
-type FurnitureLabelMap = Record<string, FurnitureCategoryCode[]>;
-
-// 대시보드 응답을 매핑 테이블로 변환
-// 대시보드가 내려주는 라벨과 서버 코드를 연결
-export const buildDashboardLabelMap = (
-  groups: FurnitureCategoryGroup[] | undefined
-) => {
-  if (!groups) return {};
-  const map: FurnitureLabelMap = {};
-  groups.forEach((group) => {
-    group.furnitures.forEach((item) => {
-      const code = toFurnitureCategoryCode(item.code);
-      if (!code) return;
-      const labelKey = normalizeFurnitureLabelForMap(item.label);
-      if (!labelKey) return;
-      const existing = map[labelKey] ?? [];
-      map[labelKey] = filterAllowedFurnitureCodes([...existing, code]);
-    });
-    const groupKeys = [
-      normalizeFurnitureLabelForMap(group.nameEng),
-      normalizeFurnitureLabelForMap(group.nameKr),
-    ].filter(Boolean) as string[];
-    const groupCodes = filterAllowedFurnitureCodes(
-      group.furnitures
-        .map((item) => toFurnitureCategoryCode(item.code))
-        .filter((code): code is FurnitureCategoryCode => Boolean(code))
-    );
-    if (groupCodes.length === 0) return;
-    groupKeys.forEach((key) => {
-      const existing = map[key] ?? [];
-      map[key] = filterAllowedFurnitureCodes([...existing, ...groupCodes]);
-    });
-  });
-  return map;
-};
 
 // 감지된 핫스팟을 API 파라미터 배열로 변환
 // 핫스팟 라벨을 허용 FurnitureCategoryCode 배열로 변환
-export const mapHotspotsToDetectedObjects = (
-  hotspots: FurnitureHotspot[],
-  dynamicMap: FurnitureLabelMap
-) => {
+export const mapHotspotsToDetectedObjects = (hotspots: FurnitureHotspot[]) => {
   const result = new Set<FurnitureCategoryCode>();
   const dropped: Array<{
     hotspotId: number;
     finalLabel: string | null;
   }> = [];
   hotspots.forEach((hotspot) => {
-    const normalized = normalizeFurnitureLabelForMap(hotspot.finalLabel);
-    const dynamicCodes =
-      (normalized ? dynamicMap[normalized] : undefined) ?? [];
-    const resolved = resolveFurnitureCodes({
+    const code = resolveFurnitureCode({
       finalLabel: hotspot.finalLabel,
       obj365Label: hotspot.label ?? null,
       refinedLabel: hotspot.refinedLabel,
-      dynamicCodes,
+      refinedConfidence: hotspot.confidence,
     });
-    if (resolved.length === 0) {
+    if (!code) {
       dropped.push({
         hotspotId: hotspot.id,
         finalLabel: hotspot.finalLabel ?? null,
       });
       return;
     }
-    resolved.forEach((code) => result.add(code));
+    result.add(code);
   });
   if (dropped.length > 0) {
     logFurniturePipelineEvent(

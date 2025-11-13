@@ -113,36 +113,56 @@ const CABINET_CATEGORY_TO_CODE: Record<
   chestOfDrawers: 'DRAWER',
 };
 
-const getCodesFromFinalLabel = (label: string | null | undefined) => {
+const getCodeFromFinalLabel = (
+  label: string | null | undefined
+): FurnitureCategoryCode | null => {
   const key = normalizeFurnitureLabelKey(label);
-  return key ? (FINAL_LABEL_MAP[key] ?? []) : [];
+  if (!key) return null;
+  const codes = FINAL_LABEL_MAP[key] ?? [];
+  return codes[0] ?? null;
 };
 
-const getCodesFromObj365Label = (label: number | null | undefined) => {
-  if (typeof label !== 'number') return [];
+const getCodeFromObj365Label = (
+  label: number | null | undefined
+): FurnitureCategoryCode | null => {
+  if (typeof label !== 'number') return null;
   const codes = OBJ365_TO_CODE[label];
-  return codes ?? [];
+  return codes?.[0] ?? null;
 };
 
-const getCodesFromRefinedLabel = (refined: FurnitureCategory | undefined) => {
-  if (!refined) return [];
-  const code = CABINET_CATEGORY_TO_CODE[refined];
-  return code ? [code] : [];
+const getCodeFromRefinedLabel = (
+  refined: FurnitureCategory | undefined
+): FurnitureCategoryCode | null => {
+  if (!refined) return null;
+  return CABINET_CATEGORY_TO_CODE[refined] ?? null;
 };
 
 export const resolveFurnitureCodes = (input: {
   finalLabel?: string | null;
   obj365Label?: number | null;
   refinedLabel?: FurnitureCategory;
-  dynamicCodes?: FurnitureCategoryCode[];
+  refinedConfidence?: number;
 }): FurnitureCategoryCode[] => {
-  const combined = [
-    ...getCodesFromRefinedLabel(input.refinedLabel),
-    ...getCodesFromFinalLabel(input.finalLabel),
-    ...getCodesFromObj365Label(input.obj365Label),
-    ...(input.dynamicCodes ?? []),
-  ];
-  return uniqueCodes(combined);
+  const code = resolveFurnitureCode(input);
+  return code ? [code] : [];
+};
+
+export const resolveFurnitureCode = (input: {
+  finalLabel?: string | null;
+  obj365Label?: number | null;
+  refinedLabel?: FurnitureCategory;
+  refinedConfidence?: number;
+}): FurnitureCategoryCode | null => {
+  const refinedCode = getCodeFromRefinedLabel(input.refinedLabel);
+  if (refinedCode) return refinedCode;
+
+  const finalCode = getCodeFromFinalLabel(input.finalLabel);
+  if (finalCode) return finalCode;
+
+  const objCode = getCodeFromObj365Label(input.obj365Label);
+  if (objCode) return objCode;
+
+  return null;
 };
 
 export const hasFurnitureCodeForIndex = (
@@ -158,10 +178,6 @@ export const filterAllowedFurnitureCodes = (
 ): FurnitureCategoryCode[] => {
   return uniqueCodes(Array.from(codes));
 };
-
-export const normalizeFurnitureLabelForMap = (
-  label: string | null | undefined
-) => normalizeFurnitureLabelKey(label);
 
 export const toFurnitureCategoryCode = (
   raw: string | null | undefined

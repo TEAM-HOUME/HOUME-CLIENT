@@ -2,9 +2,13 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { toFurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
+import {
+  resolveFurnitureCode,
+  toFurnitureCategoryCode,
+  type FurnitureCategoryCode,
+} from '@pages/generate/constants/furnitureCategoryMapping';
 import {
   useFurnitureDashboardQuery,
   useGeneratedCategoriesQuery,
@@ -13,7 +17,6 @@ import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
 import {
-  buildDashboardLabelMap,
   filterAllowedDetectedObjects,
   mapHotspotsToDetectedObjects,
 } from '@pages/generate/utils/detectedObjectMapper';
@@ -67,11 +70,6 @@ const DetectionHotspots = ({
     );
   };
 
-  const dynamicLabelMap = useMemo(
-    () => buildDashboardLabelMap(dashboardData?.categories),
-    [dashboardData?.categories]
-  );
-
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   // 페이지 시나리오별로 추론 사용 여부 제어
   const { imgRef, containerRef, hotspots, isLoading, error } =
@@ -84,10 +82,7 @@ const DetectionHotspots = ({
       resetImageState(imageId);
       return;
     }
-    const rawDetectedCodes = mapHotspotsToDetectedObjects(
-      hotspots,
-      dynamicLabelMap
-    );
+    const rawDetectedCodes = mapHotspotsToDetectedObjects(hotspots);
     const detectedObjects = filterAllowedDetectedObjects(rawDetectedCodes, {
       stage: 'image-detection',
       imageId,
@@ -100,7 +95,6 @@ const DetectionHotspots = ({
   }, [
     imageId,
     hotspots,
-    dynamicLabelMap,
     setImageDetection,
     resetImageState,
     shouldInferHotspots,
@@ -108,7 +102,8 @@ const DetectionHotspots = ({
 
   // 핫스팟 라벨 → 카테고리 ID 해석 유틸
   const resolveCategoryIdForHotspot = (
-    hotspot: FurnitureHotspot
+    hotspot: FurnitureHotspot,
+    resolvedCode: FurnitureCategoryCode | null
   ): number | null => {
     const groups = dashboardData?.categories ?? [];
     if (!groups || groups.length === 0) return null;
@@ -121,24 +116,19 @@ const DetectionHotspots = ({
         codeToCategoryId.set(code, g.categoryId);
       });
     });
-    // 후보군: 동적/내장 매퍼를 모두 활용해 후보 문자열 생성
-    const candidateCodes = mapHotspotsToDetectedObjects(
-      [hotspot],
-      dynamicLabelMap
-    );
-    const candidates: number[] = [];
-    candidateCodes.forEach((code) => {
-      const byCode = codeToCategoryId.get(code);
-      if (byCode) candidates.push(byCode);
-    });
     // 이미지에 실제로 존재하는 카테고리만 허용
     const allowedCategories = categoriesQuery.data?.categories ?? [];
     const allowedIdSet = new Set(allowedCategories.map((c) => c.id));
 
-    // 1차: group.categoryId 가 allowed 에 존재하는지 검사
-    const foundById = candidates.find((id) => allowedIdSet.has(id));
-    if (foundById) return foundById;
+    // 후보군: Obj365/리파인 조합으로 확정된 단일 코드만 사용
+    if (resolvedCode) {
+      const byCode = codeToCategoryId.get(resolvedCode);
+      if (byCode && allowedIdSet.has(byCode)) {
+        return byCode;
+      }
+    }
 
+    // 1차: group.categoryId 가 allowed 에 존재하는지 검사
     // 2차: 레이블 텍스트 기반 매칭 — finalLabel 과 서버 카테고리명 비교
     const nameToAllowedId = new Map<string, number>();
     allowedCategories.forEach((c) => {
@@ -183,19 +173,21 @@ const DetectionHotspots = ({
         coords: { cx: hotspot.cx, cy: hotspot.cy },
       });
       // 요구사항: 해당 핫스팟이 바텀시트 카테고리에 존재하면 선택 + 바텀시트 확장
-      const categoryId = resolveCategoryIdForHotspot(hotspot);
+      const resolvedCode = resolveFurnitureCode({
+        finalLabel: hotspot.finalLabel,
+        obj365Label: hotspot.label ?? null,
+        refinedLabel: hotspot.refinedLabel,
+        refinedConfidence: hotspot.confidence,
+      });
+      const categoryId = resolveCategoryIdForHotspot(hotspot, resolvedCode);
       // 매핑 디버그 로그 항상 출력
       const allowed = categoriesQuery.data?.categories ?? [];
-      const candidateCodes = mapHotspotsToDetectedObjects(
-        [hotspot],
-        dynamicLabelMap
-      );
       logDetectionEvent('hotspot-mapping', {
         hotspot: {
           finalLabel: hotspot.finalLabel,
           className: hotspot.className,
         },
-        candidateCodes,
+        resolvedCode,
         allowedCategories: allowed.map((c) => ({
           id: c.id,
           name: c.categoryName,
