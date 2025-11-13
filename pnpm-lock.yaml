@@ -41,8 +41,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       onnxruntime-web:
-        specifier: ^1.23.0
-        version: 1.23.0
+        specifier: ^1.23.2
+        version: 1.23.2
       overlay-kit:
         specifier: ^1.8.4
         version: 1.8.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -4567,16 +4567,16 @@ packages:
       }
     engines: { node: '>=18' }
 
-  onnxruntime-common@1.23.0:
+  onnxruntime-common@1.23.2:
     resolution:
       {
-        integrity: sha512-Auz8S9D7vpF8ok7fzTobvD1XdQDftRf/S7pHmjeCr3Xdymi4z1C7zx4vnT6nnUjbpelZdGwda0BmWHCCTMKUTg==,
+        integrity: sha512-5LFsC9Dukzp2WV6kNHYLNzp8sT6V02IubLCbzw2Xd6X5GOlr65gAX6xiJwyi2URJol/s71gaQLC5F2C25AAR2w==,
       }
 
-  onnxruntime-web@1.23.0:
+  onnxruntime-web@1.23.2:
     resolution:
       {
-        integrity: sha512-w0bvC2RwDxphOUFF8jFGZ/dYw+duaX20jM6V4BIZJPCfK4QuCpB/pVREV+hjYbT3x4hyfa2ZbTaWx4e1Vot0fQ==,
+        integrity: sha512-T09JUtMn+CZLk3mFwqiH0lgQf+4S7+oYHHtk6uhaYAAJI95bTcKi5bOOZYwORXfS/RLZCjDDEXGWIuOCAFlEjg==,
       }
 
   open@8.4.2:
@@ -8863,14 +8863,14 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
-  onnxruntime-common@1.23.0: {}
+  onnxruntime-common@1.23.2: {}
 
-  onnxruntime-web@1.23.0:
+  onnxruntime-web@1.23.2:
     dependencies:
       flatbuffers: 25.9.23
       guid-typescript: 1.0.9
       long: 5.3.2
-      onnxruntime-common: 1.23.0
+      onnxruntime-common: 1.23.2
       platform: 1.3.6
       protobufjs: 7.5.4
 
