@@ -56,3 +56,4 @@ node_modules/
 AGENTS.md
 
 .pnpm-store/
+.serena/
