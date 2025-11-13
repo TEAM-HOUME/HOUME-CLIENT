@@ -82,56 +82,6 @@ const DetectionHotspots = ({
     resolvedCode: FurnitureCategoryCode | null;
   };
 
-  const displayHotspots: DisplayHotspot[] = useMemo(() => {
-    // 서버가 허용한 카테고리와 매칭되는 핫스팟만 유지
-    if (!allowedCategories || allowedCategories.length === 0) {
-      return [];
-    }
-    return hotspots
-      .map((hotspot) => {
-        const resolvedCode = resolveFurnitureCode({
-          finalLabel: hotspot.finalLabel,
-          obj365Label: hotspot.label ?? null,
-          refinedLabel: hotspot.refinedLabel,
-          refinedConfidence: hotspot.confidence,
-        });
-        const categoryId = resolveCategoryIdForHotspot(
-          hotspot,
-          resolvedCode,
-          allowedCategories
-        );
-        if (!categoryId) return null;
-        return { hotspot, resolvedCode };
-      })
-      .filter((item): item is DisplayHotspot => Boolean(item));
-  }, [hotspots, allowedCategories, dashboardData?.categories]);
-
-  const hasHotspots = displayHotspots.length > 0;
-
-  useEffect(() => {
-    if (imageId === null) return;
-    if (!shouldInferHotspots) {
-      resetImageState(imageId);
-      return;
-    }
-    const rawDetectedCodes = mapHotspotsToDetectedObjects(hotspots);
-    const detectedObjects = filterAllowedDetectedObjects(rawDetectedCodes, {
-      stage: 'image-detection',
-      imageId,
-      hotspotCount: hotspots.length,
-    });
-    setImageDetection(imageId, {
-      hotspots,
-      detectedObjects,
-    });
-  }, [
-    imageId,
-    hotspots,
-    setImageDetection,
-    resetImageState,
-    shouldInferHotspots,
-  ]);
-
   // 핫스팟 라벨 → 카테고리 ID 해석 유틸
   const resolveCategoryIdForHotspot = (
     hotspot: FurnitureHotspot,
@@ -185,6 +135,56 @@ const DetectionHotspots = ({
 
     return null;
   };
+
+  const displayHotspots: DisplayHotspot[] = useMemo(() => {
+    // 서버가 허용한 카테고리와 매칭되는 핫스팟만 유지
+    if (!allowedCategories || allowedCategories.length === 0) {
+      return [];
+    }
+    return hotspots
+      .map((hotspot) => {
+        const resolvedCode = resolveFurnitureCode({
+          finalLabel: hotspot.finalLabel,
+          obj365Label: hotspot.label ?? null,
+          refinedLabel: hotspot.refinedLabel,
+          refinedConfidence: hotspot.confidence,
+        });
+        const categoryId = resolveCategoryIdForHotspot(
+          hotspot,
+          resolvedCode,
+          allowedCategories
+        );
+        if (!categoryId) return null;
+        return { hotspot, resolvedCode };
+      })
+      .filter((item): item is DisplayHotspot => Boolean(item));
+  }, [hotspots, allowedCategories, dashboardData?.categories]);
+
+  const hasHotspots = displayHotspots.length > 0;
+
+  useEffect(() => {
+    if (imageId === null) return;
+    if (!shouldInferHotspots) {
+      resetImageState(imageId);
+      return;
+    }
+    const rawDetectedCodes = mapHotspotsToDetectedObjects(hotspots);
+    const detectedObjects = filterAllowedDetectedObjects(rawDetectedCodes, {
+      stage: 'image-detection',
+      imageId,
+      hotspotCount: hotspots.length,
+    });
+    setImageDetection(imageId, {
+      hotspots,
+      detectedObjects,
+    });
+  }, [
+    imageId,
+    hotspots,
+    setImageDetection,
+    resetImageState,
+    shouldInferHotspots,
+  ]);
 
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     if (imageId === null) return;
