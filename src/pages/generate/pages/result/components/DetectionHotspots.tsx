@@ -38,7 +38,13 @@ const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
   SITTING_TABLE: ['좌식테이블', '좌식탁자', '로우테이블'],
   MIRROR: ['전신거울', '거울', '미러'],
   WHITE_BOOKSHELF: ['벽수납장', '벽선반', '상부장', 'wallcabinet'],
-  DISPLAY_CABINET: ['장식장', '하부장', 'displaycabinet', 'storagecabinet'],
+  DISPLAY_CABINET: [
+    '장식장',
+    '하부장',
+    '수납장',
+    'displaycabinet',
+    'storagecabinet',
+  ],
   TWO_SEATER_SOFA: ['2인소파', '2인용소파', '투시터', '러브시트'],
 };
 
