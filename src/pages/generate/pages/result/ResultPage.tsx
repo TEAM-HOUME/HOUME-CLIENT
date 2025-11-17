@@ -15,9 +15,11 @@ import {
   useFactorPreferenceMutation,
   useGetResultDataQuery,
 } from '@pages/generate/hooks/useGenerate';
+import { useCurationStore } from '@pages/generate/stores/useCurationStore';
 
 import GeneratedImgA from './components/GeneratedImgA.tsx';
 import GeneratedImgB from './components/GeneratedImgB.tsx';
+import { CurationSheet } from './curationSheet/CurationSheet';
 import * as styles from './ResultPage.css.ts';
 
 import type {
@@ -46,6 +48,9 @@ const ResultPage = () => {
   const [imageFactorStates, setImageFactorStates] = useState<{
     [imageId: number]: number | null;
   }>({});
+  const setActiveImage = useCurationStore((state) => state.setActiveImage);
+  const resetCuration = useCurationStore((state) => state.resetAll);
+  const activeImageIdInStore = useCurationStore((state) => state.activeImageId);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
   let result = (
@@ -177,6 +182,25 @@ const ResultPage = () => {
   useEffect(() => {
     console.log('currentImgId 변경됨:', currentImgId);
   }, [currentImgId]);
+
+  useEffect(() => {
+    // 유효한 이미지 id일 때만 큐레이션 활성화 상태 갱신
+    if (currentImgId <= 0) {
+      if (activeImageIdInStore !== null) {
+        setActiveImage(null);
+      }
+      return;
+    }
+    if (activeImageIdInStore !== currentImgId) {
+      setActiveImage(currentImgId);
+    }
+  }, [currentImgId, activeImageIdInStore, setActiveImage]);
+
+  useEffect(() => {
+    return () => {
+      resetCuration();
+    };
+  }, [resetCuration]);
 
   // 로딩 중이면 로딩 표시
   if (!result && (isLoading || mypageLoading)) {
@@ -413,6 +437,7 @@ const ResultPage = () => {
           </div>
         </div>
       </section>
+      <CurationSheet />
     </div>
   );
 };

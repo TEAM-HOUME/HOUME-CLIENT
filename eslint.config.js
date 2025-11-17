@@ -15,7 +15,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   {
-    ignores: ['dist', 'node_modules/', '*.js', '*.d.ts'],
+    ignores: ['dist', 'storybook-static/**', 'node_modules/', '*.js', '*.d.ts'],
   },
   {
     files: ['**/*.{ts,tsx}'],

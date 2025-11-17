@@ -1,10 +1,4 @@
-import {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  type ReactNode,
-} from 'react';
+import { useRef, useCallback, useEffect, type ReactNode } from 'react';
 
 import clsx from 'clsx';
 
@@ -19,22 +13,22 @@ const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
 interface CurationSheetWrapperProps {
+  snapState: 'collapsed' | 'mid' | 'expanded';
+  onSnapStateChange: (next: 'collapsed' | 'mid' | 'expanded') => void;
   children: (snapState: 'collapsed' | 'mid' | 'expanded') => ReactNode;
 }
 
 export const CurationSheetWrapper = ({
+  snapState,
+  onSnapStateChange,
   children,
 }: CurationSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
-  // 3단계(collapsed, mid, expanded) 상태 관리
-  const [snapState, setSnapState] = useState<'collapsed' | 'mid' | 'expanded'>(
-    'collapsed'
-  );
 
   const handleDragUp = useCallback(() => {
-    if (snapState === 'collapsed') setSnapState('mid');
-    else if (snapState === 'mid') setSnapState('expanded');
-  }, [snapState]);
+    if (snapState === 'collapsed') onSnapStateChange('mid');
+    else if (snapState === 'mid') onSnapStateChange('expanded');
+  }, [snapState, onSnapStateChange]);
 
   const handleDragDown = useCallback(
     (delta?: number) => {
@@ -43,15 +37,15 @@ export const CurationSheetWrapper = ({
       if (snapState === 'expanded') {
         // 2단계 한 번에 (바로 닫힘)
         if (move >= THRESHOLD_JUMP) {
-          setSnapState('collapsed');
+          onSnapStateChange('collapsed');
         } else {
-          setSnapState('mid');
+          onSnapStateChange('mid');
         }
       } else if (snapState === 'mid') {
-        setSnapState('collapsed');
+        onSnapStateChange('collapsed');
       }
     },
-    [snapState]
+    [snapState, onSnapStateChange]
   );
 
   const { isDragging, onHandlePointerDown } = useBottomSheetDrag({
@@ -81,7 +75,7 @@ export const CurationSheetWrapper = ({
           (isDragging || snapState === 'expanded') &&
             commonStyles.backdropVisible
         )}
-        onClick={() => setSnapState('mid')}
+        onClick={() => onSnapStateChange('collapsed')}
       />
 
       <div
@@ -91,7 +85,7 @@ export const CurationSheetWrapper = ({
         <div
           className={commonStyles.contentWrapper({ type: 'curation' })}
           onClick={() => {
-            if (snapState === 'collapsed') setSnapState('mid');
+            if (snapState === 'collapsed') onSnapStateChange('expanded');
           }}
         >
           <div

@@ -14,21 +14,34 @@ export const HTTPMethod = {
 } as const;
 
 export type HTTPMethodType = (typeof HTTPMethod)[keyof typeof HTTPMethod];
+type QueryValue = string | number | boolean | Array<string | number | boolean>;
+
 export interface RequestConfig {
   method: HTTPMethodType;
   url: string;
-  query?: Record<string, string | number | boolean>;
+  query?: Record<string, QueryValue>;
   body?: Record<string, unknown>;
 }
 
 export const request = async <T>(config: RequestConfig): Promise<T> => {
   const { method, url, query, body } = config;
+  let params: URLSearchParams | undefined;
+  if (query) {
+    params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item) => params!.append(key, String(item)));
+      } else {
+        params!.append(key, String(value));
+      }
+    });
+  }
 
   try {
     const response = await axiosInstance.request<BaseResponse<T>>({
       method,
       url,
-      params: query,
+      params,
       data: body,
     });
 

@@ -12,8 +12,7 @@ export const useFloorPlan = (
   context: ImageSetupSteps['FloorPlan'],
   onNext: (data: CompletedFloorPlan) => void
 ) => {
-  // FloorPlan 컴포넌트 렌더링 -> useFloorPlan 훅 실행
-  // -> useFloorPlanQuery 실행 -> 데이터 fetching
+  // FloorPlan 컴포넌트 렌더링 -> useFloorPlan 훅 실행 -> 서버가 사용자 선택 정보 기반으로 도면 반환
   const { data, isLoading, error, isError } = useFloorPlanQuery();
   console.log('도면 데이터: ', data);
 
