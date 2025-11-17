@@ -1,90 +1,167 @@
-// Remote Config 값을 읽어 사용자를 single 또는 multiple 그룹으로 분리하는 커스텀 훅
+/**
+ * 사용자 ID 기반 A/B Testing으로 사용자를 single 또는 multiple 그룹으로 분리하는 훅
+ *
+ * 1. userId를 기반으로 그룹 배정 (홀수: single, 짝수: multiple)
+ * 2. 같은 userId는 항상 같은 그룹에 배정 (기기/브라우저와 무관)
+ * 3. Firebase Analytics에 A/B 그룹 정보와 이벤트 전송
+ */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { fetchAndActivate, getValue } from 'firebase/remote-config';
-
-import { remoteConfig } from '@/shared/config/firebase';
+import { logABTestAssignment, setABTestGroup } from '@/shared/utils/analytics';
+import { useUserStore } from '@/store/useUserStore';
 
 export type ImageGenerationVariant = 'single' | 'multiple';
 
-// 동기적으로 URL/로컬스토리지 오버라이드를 읽는 유틸 (개발 모드에서만 작동)
-const readLocalOverride = (): ImageGenerationVariant | null => {
-  try {
-    const isDev = import.meta.env.DEV;
-    if (!isDev) return null;
+/**
+ * 개발 모드에서 A/B 그룹을 고정하기 위한 값
+ * 'single' 또는 'multiple'로 설정하면 개발 모드에서 항상 해당 그룹으로 고정됨
+ * null로 설정하면 userId 기반 로직 사용
+ */
+const DEV_FIXED_VARIANT: ImageGenerationVariant | null = import.meta.env.DEV
+  ? null // 'single' 또는 'multiple'로 변경하여 고정 가능
+  : null;
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const urlOverride = searchParams.get('ab');
-    const lsOverride = localStorage.getItem('ab_image_variant');
-
-    if (urlOverride === 'single' || urlOverride === 'multiple') {
-      localStorage.setItem('ab_image_variant', urlOverride);
-      return urlOverride;
-    }
-    if (lsOverride === 'single' || lsOverride === 'multiple') {
-      return lsOverride;
-    }
-  } catch {
-    console.error('Local override error');
-  }
-  return null;
+/**
+ * userId 기반으로 A/B 테스트 그룹 결정
+ * 홀수: single, 짝수: multiple (50:50 분할)
+ * @param userId 사용자 ID
+ * @returns 'single' 또는 'multiple'
+ */
+const getVariantFromUserId = (userId: number): ImageGenerationVariant => {
+  return userId % 2 === 1 ? 'single' : 'multiple';
 };
 
+/**
+ * 사용자 ID 기반 A/B 테스트 훅
+ *
+ * @returns {Object} A/B 테스트 관련 상태와 헬퍼 함수들
+ * @returns {ImageGenerationVariant} variant - 현재 사용자의 A/B 그룹 ('single' | 'multiple')
+ * @returns {boolean} isLoading - 그룹 배정 중인지 여부
+ * @returns {string | null} error - 에러 발생 시 에러 메시지
+ * @returns {boolean} isSingleImage - variant === 'single'인지 여부
+ * @returns {boolean} isMultipleImages - variant === 'multiple'인지 여부
+ */
 export const useABTest = () => {
-  // 초기 렌더 전에 오버라이드 반영
-  const localOverride = useMemo(readLocalOverride, []);
+  const userId = useUserStore((state) => state.userId);
 
-  const [variant, setVariant] = useState<ImageGenerationVariant>(
-    localOverride ?? 'single'
-  );
-  const [isLoading, setIsLoading] = useState(localOverride ? false : true);
+  /** 초기값 설정: 개발 모드 하드코딩 값 우선 - 없으면 localStorage - 없으면 'multiple' */
+  const getInitialVariant = (): ImageGenerationVariant => {
+    if (DEV_FIXED_VARIANT) {
+      return DEV_FIXED_VARIANT;
+    }
+    try {
+      const cached = localStorage.getItem('ab_image_variant');
+      if (cached === 'single' || cached === 'multiple') {
+        return cached;
+      }
+    } catch {
+      // localStorage 접근 실패 시 무시
+    }
+    return 'multiple';
+  };
+
+  /** 현재 사용자의 A/B 테스트 그룹 */
+  const [variant, setVariant] =
+    useState<ImageGenerationVariant>(getInitialVariant());
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 로컬 오버라이드가 있으면 Remote Config를 건너뜀
-    if (localOverride) return;
-
-    const initializeABTest = async () => {
+    /**
+     * userId 기반으로 A/B 테스트 그룹을 배정하는 함수
+     *
+     * 1. 개발 모드 하드코딩 값 체크 (최우선)
+     * 2. userId 기반으로 그룹 배정
+     * 3. Firebase Analytics에 그룹 정보 전송
+     * 4. 에러 시 fallback 로직 실행
+     */
+    const initializeABTest = () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        // Firebase Remote Config가 제대로 설정되었는지 확인
-        if (!remoteConfig) {
-          throw new Error('Firebase Remote Config is not initialized');
+        // 1. 개발 모드 하드코딩 값으로 그룹 설정
+        if (DEV_FIXED_VARIANT) {
+          console.log(
+            '[개발 모드] 하드코딩된 A/B 그룹 설정:',
+            DEV_FIXED_VARIANT
+          );
+          setVariant(DEV_FIXED_VARIANT);
+          setABTestGroup(DEV_FIXED_VARIANT);
+          logABTestAssignment(DEV_FIXED_VARIANT, false);
+          setIsLoading(false);
+          return;
         }
 
-        // Remote Config에서 최신 설정 가져오기
-        await fetchAndActivate(remoteConfig);
+        // 2. userId 기반으로 그룹 배정
+        if (userId !== null && userId !== undefined) {
+          const assignedVariant = getVariantFromUserId(userId);
+          console.log(
+            `[userId 기반] 그룹 배정: userId=${userId} → ${assignedVariant}`
+          );
 
-        // A/B 테스트 변수 가져오기
-        const configValue = getValue(remoteConfig, 'image_generation_variant');
-        const variantValue = configValue.asString() as ImageGenerationVariant;
+          // localStorage에 저장된 값과 비교하여 중복 Analytics 이벤트 방지
+          const cachedVariant = localStorage.getItem('ab_image_variant');
+          const isNewAssignment = cachedVariant !== assignedVariant;
 
-        // 유효한 값인지 확인
-        if (variantValue === 'multiple' || variantValue === 'single') {
-          setVariant(variantValue);
-          localStorage.setItem('ab_image_variant', variantValue);
-          console.log('A/B 테스트 그룹:', variantValue);
+          setVariant(assignedVariant);
+
+          // Firebase Analytics에 A/B 그룹 정보 전송
+          setABTestGroup(assignedVariant);
+          if (isNewAssignment) {
+            logABTestAssignment(assignedVariant, true);
+            console.log('[userId 기반] 새로운 A/B 그룹 할당:', assignedVariant);
+          } else {
+            console.log('[userId 기반] 기존 그룹 유지:', assignedVariant);
+          }
+
+          // localStorage에 저장 (fallback용)
+          try {
+            localStorage.setItem('ab_image_variant', assignedVariant);
+          } catch {
+            console.warn('localStorage 저장 실패');
+          }
         } else {
-          console.warn('잘못된 A/B 테스트 값:', variantValue, '기본값 사용');
-          setVariant('single');
-          localStorage.setItem('ab_image_variant', 'single');
+          // userId가 없는 경우 (비로그인 사용자)
+          console.warn('userId가 없어 기본 그룹(multiple) 사용');
+          const defaultVariant: ImageGenerationVariant = 'multiple';
+          setVariant(defaultVariant);
+          setABTestGroup(defaultVariant);
+          try {
+            localStorage.setItem('ab_image_variant', defaultVariant);
+          } catch {
+            console.warn('localStorage 저장 실패');
+          }
         }
       } catch (err) {
         console.error('A/B 테스트 초기화 실패:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
-        setVariant('single'); // 에러 시 기본값 사용
-        localStorage.setItem('ab_image_variant', 'single');
-        console.log('기본값으로 설정: single (단일 이미지)');
+
+        // Fallback 로직
+        try {
+          const cachedVariant = localStorage.getItem('ab_image_variant');
+          if (cachedVariant === 'single' || cachedVariant === 'multiple') {
+            console.log('Fallback: 캐시된 그룹 사용:', cachedVariant);
+            setVariant(cachedVariant);
+            setABTestGroup(cachedVariant);
+          } else {
+            console.log('Fallback: 기본 그룹(multiple) 사용');
+            const defaultVariant: ImageGenerationVariant = 'multiple';
+            setVariant(defaultVariant);
+            setABTestGroup(defaultVariant);
+            localStorage.setItem('ab_image_variant', defaultVariant);
+          }
+        } catch {
+          console.error('Fallback 실패, 기본값 사용');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeABTest();
-  }, [localOverride]);
+  }, [userId]);
 
   return {
     variant,
