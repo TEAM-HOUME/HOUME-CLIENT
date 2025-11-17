@@ -1,9 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import FloorCard from '@/shared/components/card/floorCard/FloorCard';
+import FloorPlanItem from '@/shared/components/card/floorCard/FloorCard';
 
-const meta: Meta<typeof FloorCard> = {
+import type { Meta, StoryObj } from '@storybook/react-vite';
+
+const meta: Meta<typeof FloorPlanItem> = {
   title: 'Components/FloorCard',
-  component: FloorCard,
+  component: FloorPlanItem,
   argTypes: {
     src: {
       control: 'text',
@@ -13,7 +14,7 @@ const meta: Meta<typeof FloorCard> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof FloorCard>;
+type Story = StoryObj<typeof FloorPlanItem>;
 
 export const Default: Story = {
   args: {

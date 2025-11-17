@@ -7,20 +7,26 @@
 // 3) ProtectedRoute   : 인증이 필요한 하위 라우트 묶음
 //    - 인증 실패 시 ROUTES.LOGIN 으로 리다이렉트
 // ------------------------------
+
+// TODO(지성): 컴포넌트 lazy load 적용하기
 import { createBrowserRouter } from 'react-router-dom';
-import { ROUTES } from '@/routes/paths';
+
 import RootLayout from '@/layout/RootLayout';
-import ProtectedRoute from '@/routes/ProtectedRoute';
-import HomePage from '@/pages/home/HomePage';
-import LoginPage from '@/pages/login/LoginPage';
-import SignupPage from '@/pages/signup/SignupPage';
 import GeneratePage from '@/pages/generate/GeneratePage';
-import { ImageGenerationFunnel } from '@/pages/onboarding/ImageGenerationFunnel';
-import MyPage from '@/pages/mypage/MyPage';
+import LoadingPage from '@/pages/generate/pages/loading/LoadingPage';
+import ResultPage from '@/pages/generate/pages/result/ResultPage';
+import StartPage from '@/pages/generate/pages/start/StartPage';
+import HomePage from '@/pages/home/HomePage';
+import { ImageSetup } from '@/pages/imageSetup/ImageSetup';
 import KakaoCallback from '@/pages/login/KakaoCallback';
-import SignupCompletePage from '@/pages/signup/SignupCompletePage';
-import LoadingPage from '@/pages/generate/components/loading/LoadingPage';
-import ResultPage from '@/pages/generate/components/result/ResultPage';
+import LoginPage from '@/pages/login/LoginPage';
+import MyPage from '@/pages/mypage/MyPage';
+import PrivacyPolicy from '@/pages/mypage/pages/setting/PrivacyPolicyPage';
+import ServicePolicy from '@/pages/mypage/pages/setting/ServicePolicyPage';
+import Setting from '@/pages/mypage/pages/setting/SettingPage';
+import SignupPage from '@/pages/signup/SignupPage';
+import { ROUTES } from '@/routes/paths';
+import ProtectedRoute from '@/routes/ProtectedRoute';
 
 // 공개 라우트 그룹 (인증 불필요)
 const publicRoutes = [
@@ -47,8 +53,8 @@ const publicRoutes = [
 // 보호된 라우트 그룹 (인증 필요)
 const protectedRoutes = [
   {
-    path: ROUTES.ONBOARDING,
-    element: <ImageGenerationFunnel />,
+    path: ROUTES.IMAGE_SETUP,
+    element: <ImageSetup />,
   },
   {
     path: ROUTES.GENERATE,
@@ -69,8 +75,20 @@ const protectedRoutes = [
     element: <MyPage />,
   },
   {
-    path: ROUTES.SIGNUPCOMPLETE,
-    element: <SignupCompletePage />,
+    path: ROUTES.SETTING,
+    element: <Setting />,
+  },
+  {
+    path: ROUTES.SETTING_SERVICE,
+    element: <ServicePolicy />,
+  },
+  {
+    path: ROUTES.SETTING_PRIVACY,
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: ROUTES.GENERATE_START,
+    element: <StartPage />,
   },
 ];
 
@@ -85,6 +103,15 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: protectedRoutes,
+      },
+      {
+        path: '*',
+        lazy: async () => {
+          const { default: Error404Page } = await import(
+            '@/pages/Error404Page/Error404Page'
+          );
+          return { Component: Error404Page };
+        },
       },
     ],
   },

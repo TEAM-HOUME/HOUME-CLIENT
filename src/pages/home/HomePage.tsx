@@ -1,14 +1,17 @@
-import LogoNavBar from '@shared/components/navBar/LogoNavBar';
 import { useNavigate } from 'react-router-dom';
-import IntroSection from './components/introSection/IntroSection';
-import StepGuideSection from './components/stepGuideSection/StepGuideSection';
-import ReviewSection from './components/reviewSection/ReviewSection';
-import { AnimatedSection } from './components/AnimatedSection';
-import * as styles from './HomePage.css';
-import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
-import { useUserStore } from '@/store/useUserStore';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { ROUTES } from '@/routes/paths';
+import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
+import { useUserStore } from '@/store/useUserStore';
+
+import LogoNavBar from '@shared/components/navBar/LogoNavBar';
+
+import { AnimatedSection } from './components/AnimatedSection';
+import IntroSection from './components/introSection/IntroSection';
+import ReviewSection from './components/reviewSection/ReviewSection';
+import StepGuideSection from './components/stepGuideSection/StepGuideSection';
+import * as styles from './HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -38,7 +41,7 @@ const HomePage = () => {
   /**
    * 플로팅 버튼 클릭 핸들러
    * - 로그인 안됨: 로그인 페이지로 이동
-   * - 로그인됨 + 크레딧 있음: onboarding 이미지 생성 플로우로 이동
+   * - 로그인됨 + 크레딧 있음: imageSetup 이미지 생성 플로우로 이동
    * - 로그인됨 + 크레딧 없음: 버튼 비활성화로 인해 클릭 불가
    */
   const handleCtaButtonClick = () => {
@@ -49,9 +52,9 @@ const HomePage = () => {
 
     if (isUserDataLoading) return;
 
-    // 크레딧이 있으면 onboarding으로 이동
+    // 크레딧이 있으면 imageSetup 이동
     if (userData?.CreditCount && userData.CreditCount > 0) {
-      navigate(ROUTES.ONBOARDING);
+      navigate(ROUTES.IMAGE_SETUP);
     }
     // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
   };

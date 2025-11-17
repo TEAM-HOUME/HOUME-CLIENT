@@ -1,6 +1,9 @@
 import { useCallback, useState } from 'react';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { useToast } from '@/shared/components/toast/useToast';
+
+import { TOAST_TYPE } from '../types/toast';
 
 interface CreditGuardReturn {
   checkCredit: () => Promise<boolean>;
@@ -58,7 +61,7 @@ export const useCreditGuard = (
       if (!latestUserData) {
         notify({
           text: '정보를 불러올 수 없습니다.',
-          type: 'warning',
+          type: TOAST_TYPE.WARNING,
         });
         return false;
       }
@@ -71,7 +74,7 @@ export const useCreditGuard = (
         // 크레딧 부족 시 토스트 알림
         notify({
           text: `크레딧이 부족합니다.`,
-          type: 'warning',
+          type: TOAST_TYPE.WARNING,
         });
         return false;
       }
@@ -79,7 +82,7 @@ export const useCreditGuard = (
       console.error('[useCreditGuard] 크레딧 확인 실패:', error);
       notify({
         text: '크레딧 확인에 실패했습니다.',
-        type: 'warning',
+        type: TOAST_TYPE.WARNING,
       });
       return false;
     } finally {

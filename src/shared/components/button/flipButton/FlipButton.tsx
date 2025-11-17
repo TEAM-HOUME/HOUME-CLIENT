@@ -1,5 +1,7 @@
-import Horizontal from '@assets/icons/horizontal.svg?react';
 import clsx from 'clsx';
+
+import Horizontal from '@assets/icons/horizontal.svg?react';
+
 import * as styles from './FlipButton.css';
 
 interface FlipProps extends React.ComponentProps<'button'> {

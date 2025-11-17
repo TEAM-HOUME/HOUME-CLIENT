@@ -4,7 +4,7 @@ export type ErrorType = 'loading' | 'api' | 'auth' | 'network' | 'validation';
 // 페이지 컨텍스트 정의
 export type PageContext =
   | 'home'
-  | 'onboarding'
+  | 'imageSetup'
   | 'generate'
   | 'mypage'
   | 'login';

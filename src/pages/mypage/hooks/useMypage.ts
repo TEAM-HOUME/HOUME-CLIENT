@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+
+import { QUERY_KEY } from '@/shared/constants/queryKey';
+
 import {
   getMyPageUser,
   getMyPageImages,
   getMyPageImageDetail,
 } from '../apis/mypage';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
 
 /**
  * 마이페이지 사용자 정보 조회 훅
@@ -33,12 +35,12 @@ export const useMyPageImages = () => {
  * 마이페이지 이미지 상세 조회 훅
  */
 export const useMyPageImageDetail = (
-  imageId: number,
+  houseId: number,
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, imageId],
-    queryFn: () => getMyPageImageDetail(imageId),
+    queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, houseId],
+    queryFn: () => getMyPageImageDetail(houseId),
     staleTime: 0,
     ...options,
   });

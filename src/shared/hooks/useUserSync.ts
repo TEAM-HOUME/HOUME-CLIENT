@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useUserStore } from '@/store/useUserStore';
+
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import { useUserStore } from '@/store/useUserStore';
 
 /**
  * 사용자 정보를 전역 상태와 동기화하는 훅
@@ -9,18 +10,22 @@ import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 export const useUserSync = () => {
   const accessToken = useUserStore((state) => state.accessToken);
   const setUserName = useUserStore((state) => state.setUserName);
+  const setUserId = useUserStore((state) => state.setUserId);
   const isLoggedIn = !!accessToken;
 
   const { data: userData } = useMyPageUser({
     enabled: isLoggedIn,
   });
 
-  // API에서 사용자 정보를 가져올 때 전역 상태에 userName 동기화
+  // API에서 사용자 정보를 가져올 때 전역 상태에 userName, userId 동기화
   useEffect(() => {
     if (userData?.name) {
       setUserName(userData.name);
     }
-  }, [userData?.name, setUserName]);
+    if (userData?.userId) {
+      setUserId(userData.userId);
+    }
+  }, [userData?.name, userData?.userId, setUserName, setUserId]);
 
   return {
     userData,

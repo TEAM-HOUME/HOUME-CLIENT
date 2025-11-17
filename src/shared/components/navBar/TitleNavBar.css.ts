@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
@@ -44,7 +45,6 @@ export const rightdiv = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  width: '8rem',
   height: '4.8rem',
   padding: '1.2rem 1.6rem',
   ...fontStyle('body_r_14'),

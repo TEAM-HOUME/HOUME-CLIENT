@@ -2,10 +2,13 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { patchSignup } from '../apis/signup';
-import type { SignupRequest, SignupResponse } from '../types/apis/signup';
+
 import { ROUTES } from '@/routes/paths';
 import { useUserStore } from '@/store/useUserStore';
+
+import { patchSignup } from '../apis/signup';
+
+import type { SignupRequest, SignupResponse } from '../types/apis/signup';
 
 export const usePatchSignup = () => {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ export const usePatchSignup = () => {
       console.log(response.data);
       setUserName(response.data); // userName 전역 저장
       // 회원가입 완료 페이지 이동
-      navigate(ROUTES.SIGNUPCOMPLETE);
+      navigate(ROUTES.GENERATE_START);
     },
     // 회원가입 실패 시 실행되는 함수
     onError: (error) => {

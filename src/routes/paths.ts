@@ -5,10 +5,14 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   SIGNUP: '/signup',
-  SIGNUPCOMPLETE: '/signup/complete',
-  ONBOARDING: '/onboarding',
+  GENERATE_START: '/generate/start',
+  IMAGE_SETUP: '/imageSetup',
   GENERATE: '/generate',
+  GENERATE_RESULT: '/generate/result',
   MYPAGE: '/mypage',
+  SETTING: '/mypage/setting',
+  SETTING_SERVICE: '/mypage/setting/service',
+  SETTING_PRIVACY: '/mypage/setting/privacy',
   OAUTH: '/oauth/kakao/callback',
 } as const;
 

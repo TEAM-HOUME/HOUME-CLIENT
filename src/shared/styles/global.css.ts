@@ -1,4 +1,5 @@
 import { globalStyle, createGlobalTheme } from '@vanilla-extract/css';
+
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
 import '@styles/reset.css.ts';
@@ -50,6 +51,7 @@ globalStyle('#root', {
 globalStyle('html', {
   height: '100%',
   scrollbarWidth: 'none', // Firefox 스크롤바 숨김
+  backgroundColor: colorVars.color.gray100,
 });
 
 /**
@@ -98,9 +100,15 @@ globalStyle('body', {
 
   // 시각적 효과
   backgroundColor: colorVars.color.gray000,
-  // boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.25)', // 그림자 제거
+  boxShadow: 'none',
   scrollBehavior: 'smooth', // 부드러운 스크롤
   scrollbarWidth: 'none', // Firefox 스크롤바 숨김
+  transition: 'box-shadow 0.3s ease',
+  '@media': {
+    '(min-width: 440px)': {
+      boxShadow: '0px 32px 84px rgba(16, 18, 24, 0.22)',
+    },
+  },
 });
 
 /**
@@ -132,4 +140,32 @@ globalStyle('img', {
 
   // 이미지 하이라이트 방지
   WebkitTapHighlightColor: 'transparent',
+});
+
+/* ===== iOS Safari 터치 하이라이트 제거 ===== */
+/**
+ * iOS Safari에서 터치 시 나타나는 회색 하이라이트 박스 제거
+ * 모든 인터랙티브 요소에 적용하여 네이티브 앱과 같은 UX 제공
+ *
+ * Best Practice:
+ * - transparent 또는 rgba(0,0,0,0) 사용
+ * - :focus 내부가 아닌 요소에 직접 적용
+ * - 버튼, 링크, 터치 가능한 div 등 모든 인터랙티브 요소에 적용
+ */
+globalStyle(
+  'a, button, input, textarea, select, div[onclick], div[role="button"], [tabindex]',
+  {
+    WebkitTapHighlightColor: 'transparent',
+    // 필요 시 아웃라인도 제거 (접근성 고려하여 신중히 결정)
+    // outline: 'none',
+  }
+);
+
+/* ===== 추가 터치 최적화 ===== */
+/**
+ * 터치 장치에서의 사용자 경험 향상을 위한 추가 설정
+ */
+globalStyle('*', {
+  // 터치 지연 제거 (300ms 탭 지연 방지)
+  touchAction: 'manipulation',
 });

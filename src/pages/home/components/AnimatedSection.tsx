@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
+
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 interface AnimatedSectionProps {

@@ -5,6 +5,7 @@ export const colorVars = createGlobalTheme(':root', {
     // Grayscale
     gray999_50: 'rgba(0, 0, 0, 0.5)',
     gray999_04: 'rgba(0, 0, 0, 0.04)',
+    gray999_30: 'rgba(0, 0, 0, 0.3)',
     gray999: '#000000',
     gray900: '#1B1E22',
     gray800: '#31373F',
@@ -17,6 +18,7 @@ export const colorVars = createGlobalTheme(':root', {
     gray100: '#F3F4F7',
     gray050: '#F9FAFB',
     gray000: '#FFFFFF',
+    gray000_30: 'rgba(255, 255, 255, 0.3)',
 
     // Brand Colors
     primary: '#6F00FF',

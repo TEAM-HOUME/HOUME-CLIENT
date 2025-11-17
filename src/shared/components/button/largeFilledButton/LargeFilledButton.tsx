@@ -4,7 +4,7 @@ interface LargeFilledProps extends React.ComponentProps<'button'> {
   children: React.ReactNode;
   isActive?: boolean;
   isError?: boolean;
-  buttonSize?: 'medium' | 'large';
+  buttonSize?: 'xsmall' | 'small' | 'medium' | 'large';
   isSelected?: boolean;
 }
 

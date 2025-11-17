@@ -15,7 +15,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   {
-    ignores: ['dist', 'node_modules/', '*.js', '*.d.ts'],
+    ignores: ['dist', 'storybook-static/**', 'node_modules/', '*.js', '*.d.ts'],
   },
   {
     files: ['**/*.{ts,tsx}'],
@@ -31,6 +31,16 @@ export default [
       },
     },
     settings: {
+      // @/ 경로 인식
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.app.json',
+          alwaysTryTypes: true,
+        },
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        },
+      },
       react: {
         version: 'detect',
       },
@@ -64,10 +74,11 @@ export default [
       '@typescript-eslint/strict-boolean-expressions': 'off', // 엄격한 boolean 표현 사용 X
       '@typescript-eslint/no-confusing-void-expression': 'off', // void 표현 규칙 무시
       '@typescript-eslint/no-unused-vars': 'warn', // 사용되지 않는 변수 경고
+
       '@tanstack/query/exhaustive-deps': 'error', // 의존성 배열이 완전한지 검사
       '@tanstack/query/no-rest-destructuring': 'warn', // REST 매개변수 해체 사용 경고
       '@tanstack/query/stable-query-client': 'error', // 안정적인 쿼리 클라이언트 사용 강제
-      // 'prettier/prettier': 'error', // Prettier 규칙 적용
+
       // import 순서 규칙
       'import/order': [
         'error',
@@ -77,14 +88,23 @@ export default [
             'external',
             'internal',
             ['parent', 'sibling', 'index'],
-            'object',
             'type',
+            'object',
           ],
           pathGroups: [
-            { pattern: 'react', group: 'builtin', position: 'before' },
+            // react를 external 최상단에
+            { pattern: 'react', group: 'external', position: 'before' },
+
+            // @/** 를 internal 최상단으로
+            { pattern: '@/**', group: 'internal', position: 'before' },
           ],
           pathGroupsExcludedImportTypes: ['react'],
-          'newlines-between': 'never', // Import 사이에 새로운 줄 없음
+
+          // 그룹 사이 빈줄
+          'newlines-between': 'always',
+
+          // 그룹 내 알파벳 정렬
+          alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
     },

@@ -1,12 +1,13 @@
 /// <reference types="vitest/config" />
-import path from 'path';
 import { fileURLToPath } from 'node:url';
+import path from 'path';
+
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
-import react from '@vitejs/plugin-react';
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 // https://vite.dev/config/
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 const dirname =
   typeof __dirname !== 'undefined'
     ? __dirname
@@ -57,6 +58,13 @@ export default defineConfig({
             ],
           },
           setupFiles: ['.storybook/vitest.setup.ts'],
+        },
+      },
+      {
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+          environment: 'node',
         },
       },
     ],

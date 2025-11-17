@@ -35,11 +35,13 @@ dist-ssr
 *storybook.log
 storybook-static
 
+.pnpm-store/
+
 # Others
 .claude
 CLAUDE.md
-.taskmaster
 .cursor
+docs/
 
 dev-debug.log
 # Dependency directories
@@ -51,3 +53,7 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
+AGENTS.md
+
+.pnpm-store/
+.serena/

@@ -1,5 +1,6 @@
+import Caption from '@/pages/imageSetup/components/caption/Caption';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import Caption from '@/shared/components/text/Caption';
 
 const meta = {
   title: 'Common/Text/Caption',
@@ -13,6 +14,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     code: '휴식형',
-    option: '소파',
+    option: ['소파'],
   },
 };

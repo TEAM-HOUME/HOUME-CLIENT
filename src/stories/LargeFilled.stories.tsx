@@ -1,4 +1,5 @@
 import LargeFilled from '@components/button/largeFilledButton/LargeFilledButton';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof LargeFilled> = {
@@ -32,9 +33,37 @@ export const Disabled: Story = {
   },
 };
 
+export const Selected: Story = {
+  args: {
+    children: '버튼 이름',
+    isSelected: true,
+  },
+};
+
 export const Error: Story = {
   args: {
     children: '버튼 이름',
     isError: true,
+  },
+};
+
+export const ButtonSizeSmall: Story = {
+  args: {
+    children: '슈퍼싱글',
+    buttonSize: 'small',
+  },
+};
+
+export const ButtonSizeMedium: Story = {
+  args: {
+    children: '버튼 이름',
+    buttonSize: 'medium',
+  },
+};
+
+export const ButtonLarge: Story = {
+  args: {
+    children: '버튼 이름',
+    buttonSize: 'large',
   },
 };

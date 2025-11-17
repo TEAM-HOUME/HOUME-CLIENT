@@ -1,5 +1,6 @@
+import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import DragHandle from '@/shared/components/dragHandle/DragHandle';
 
 const meta = {
   title: 'Shared/DragHandle',
