@@ -48,7 +48,6 @@ export const CurationSheet = () => {
 
   const categories = categoriesQuery.data?.categories ?? [];
   const productsData = productsQuery.data?.products;
-  console.log('productsData', productsData);
   const headerName = productsQuery.data?.userName ?? displayName;
 
   const normalizedProducts = useMemo(() => {
