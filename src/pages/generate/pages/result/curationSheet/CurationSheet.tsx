@@ -48,11 +48,12 @@ export const CurationSheet = () => {
 
   const categories = categoriesQuery.data?.categories ?? [];
   const productsData = productsQuery.data?.products;
+  console.log('productsData', productsData);
   const headerName = productsQuery.data?.userName ?? displayName;
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
-      const byRecommend = product.recommendFurnitureId;
+      const byRecommend = product.id;
       const recommendId =
         typeof byRecommend === 'number' && Number.isFinite(byRecommend)
           ? byRecommend

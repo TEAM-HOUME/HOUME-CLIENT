@@ -13,9 +13,9 @@ export interface FurnitureCategoriesResponse {
 
 // 생성 이미지 추천 상품 항목 정의
 export interface FurnitureProductInfo {
-  // 추천 식별자(recommendFurnitureId) - 찜(jjym) API 경로 파라미터로 사용
+  // 추천 식별자(idx) - 찜(jjym) API 경로 파라미터로 사용
   // 서버 스키마에 따라 옵션일 수 있어 optional 처리
-  recommendFurnitureId?: number;
+  id?: number;
   baseFurnitureImageUrl: string;
   furnitureProductImageUrl: string;
   furnitureProductSiteUrl: string;
