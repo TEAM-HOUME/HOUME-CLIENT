@@ -1,5 +1,4 @@
 import { getActivityOptions } from '@/pages/imageSetup/apis/activityInfo';
-import { getFloorPlan } from '@/pages/imageSetup/apis/floorPlan';
 import { getHousingOptions } from '@/pages/imageSetup/apis/houseInfo';
 import { getMoodBoardImage } from '@/pages/imageSetup/apis/interiorStyle';
 import { MOOD_BOARD_CONSTANTS } from '@/pages/imageSetup/types/apis/interiorStyle';
@@ -26,13 +25,8 @@ export const prefetchStaticData = (queryClient: QueryClient) => {
     gcTime: 1000 * 60 * 60 * 24,
   });
 
-  // 도면 이미지 데이터
-  queryClient.prefetchQuery({
-    queryKey: ['floorPlan'],
-    queryFn: getFloorPlan,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60 * 24,
-  });
+  // 도면 이미지 데이터: roomType에 따라 다르므로 prefetch하지 않음
+  // FloorPlan 컴포넌트에서 도면 요청
 
   // 무드보드 이미지 데이터
   queryClient.prefetchQuery({

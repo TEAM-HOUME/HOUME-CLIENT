@@ -14,16 +14,16 @@ export const HOUSE_INFO_VALIDATION = {
 export const MAIN_ACTIVITY_VALIDATION = {
   combinationRules: {
     REMOTE_WORK: {
-      requiredFurnitures: ['DESK'],
+      requiredFurnitures: ['OFFICE_DESK'],
     },
     READING: {
-      requiredFurnitures: ['BOOK_SHELF'],
+      requiredFurnitures: ['WHITE_BOOKSHELF'],
     },
     FLOOR_LIVING: {
       requiredFurnitures: ['SITTING_TABLE'],
     },
     HOME_CAFE: {
-      requiredFurnitures: ['TABLE'],
+      requiredFurnitures: ['DINING_TABLE'],
     },
   },
 } as const;

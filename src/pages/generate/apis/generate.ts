@@ -137,8 +137,10 @@ export const postGenerateImage = async (
   return await request<GenerateImageBResponse['data']>(config);
 };
 
-// 이미지 생성 폴백 api
-export const getCheckGenerateImageStatus = async (
+// 이미지 생성 폴백 API
+// 이미지 생성 폴백 API는 항상 이미지 1개를 반환함
+// ResultPage는 이미지가 1개인 경우, 여러 개인 경우 모두 처리 가능하므로 문제 X
+export const getFallbackImage = async (
   houseId: number
 ): Promise<GenerateImageBResponse['data']> => {
   const config: RequestConfig = {

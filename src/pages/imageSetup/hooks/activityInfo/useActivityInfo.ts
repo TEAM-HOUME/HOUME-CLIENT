@@ -194,7 +194,15 @@ export const useActivityInfo = (
       selectiveIds: formData.selectiveIds!,
     };
 
-    navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
+    // sessionStorage에 저장
+    sessionStorage.setItem(
+      'generate_image_request',
+      JSON.stringify(generateImageRequest)
+    );
+    console.log('ActivityInfo: sessionStorage에 requestData 저장');
+
+    // navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
+    navigate(ROUTES.GENERATE);
 
     // 퍼널 완료 후 Zustand 초기화
     useFunnelStore.getState().reset();

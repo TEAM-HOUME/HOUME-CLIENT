@@ -8,6 +8,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
@@ -19,6 +20,7 @@ import SlidePrev from '@shared/assets/icons/prevAbled.svg?react';
 import SlidePrevDisabled from '@shared/assets/icons/prevDisabled.svg?react';
 import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
+import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
 import type {
@@ -40,17 +42,20 @@ interface GeneratedImgAProps {
     | GenerateImageBResponse['data'];
   onSlideChange?: (currentIndex: number, totalCount: number) => void;
   onCurrentImgIdChange?: (currentImgId: number) => void;
+  shouldInferHotspots?: boolean;
 }
 
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
   onCurrentImgIdChange,
+  shouldInferHotspots = true,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
+  const openSheet = useOpenCurationSheet();
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: userData } = useMyPageUser();
@@ -70,7 +75,7 @@ const GeneratedImgA = ({
       Array.isArray(result.imageInfoResponses)
     ) {
       const newImgId = result.imageInfoResponses[currentSlideIndex]?.imageId;
-      setCurrentImgId(newImgId);
+      setCurrentImgId(newImgId ?? 0);
     }
   }, [currentSlideIndex, result]);
 
@@ -85,11 +90,8 @@ const GeneratedImgA = ({
     images = [result];
   }
 
-  // 두 번째 이미지가 있는 경우 블러 처리된 추가 슬라이드를 생성
-  const shouldAddBlurredSlide = images.length >= 2;
-  const totalSlideCount = shouldAddBlurredSlide
-    ? images.length + 1
-    : images.length;
+  const lastImage = images[images.length - 1];
+  const totalSlideCount = lastImage ? images.length + 1 : images.length;
 
   const handleOpenModal = () => {
     overlay.open(
@@ -141,22 +143,27 @@ const GeneratedImgA = ({
           {currentSlideIndex === 0 ? <SlidePrevDisabled /> : <SlidePrev />}
         </button>
         {images.map((image, index) => (
-          <SwiperSlide key={`${image.imageId}-${index}`}>
-            <img
-              src={image.imageUrl}
-              alt={`${image.name}님을 위한 맞춤 인테리어 스타일링`}
-              className={styles.imgArea({ mirrored: image.isMirror })}
+          <SwiperSlide
+            key={`${image.imageId}-${index}`}
+            className={styles.swiperSlide}
+          >
+            <DetectionHotspots
+              imageId={image.imageId}
+              imageUrl={image.imageUrl}
+              mirrored={image.isMirror}
+              // 결과 페이지 플래그로 추론 on/off 제어
+              shouldInferHotspots={shouldInferHotspots}
             />
           </SwiperSlide>
         ))}
-        {shouldAddBlurredSlide && (
-          <SwiperSlide key="blurred-second-image">
+        {lastImage && (
+          <SwiperSlide key="blurred-last-image" className={styles.swiperSlide}>
             <div
               className={styles.imgAreaBlurred({
-                mirrored: images[1].isMirror,
+                mirrored: lastImage.isMirror,
               })}
               style={{
-                background: `url(${images[1].imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
+                background: `url(${lastImage.imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
               }}
             />
             <div className={styles.lockWrapper}>
@@ -183,7 +190,11 @@ const GeneratedImgA = ({
             <SlideNext />
           )}
         </button>
-        <button type="button" className={styles.tagBtn}>
+        <button
+          type="button"
+          className={styles.tagBtn}
+          onClick={() => openSheet('expanded')}
+        >
           <Tag />
         </button>
       </Swiper>

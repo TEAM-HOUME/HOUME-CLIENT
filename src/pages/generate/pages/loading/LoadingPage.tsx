@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
@@ -13,7 +13,7 @@ import {
   usePostCarouselLikeMutation,
   usePostCarouselHateMutation,
   useGenerateImageApi,
-  useGenerateImageStatusCheck,
+  useFallbackImage,
 } from '@pages/generate/hooks/useGenerate';
 import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 
@@ -22,23 +22,17 @@ import ProgressBar from './ProgressBar';
 
 import type { GenerateImageRequest } from '@pages/generate/types/generate';
 
-const ANIMATION_DURATION = 600;
+const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
+const SESSION_STORAGE_KEY = 'generate_image_request'; // sessionStorage 키
 
-type GenerateLocationState = {
-  generateImageRequest: GenerateImageRequest;
-};
-
-const isGenerateLocationState = (
+// Type Guard: GenerateImageRequest 검증
+// sessionStorage에서 가져온 데이터 검증
+const isValidGenerateImageRequest = (
   value: unknown
-): value is GenerateLocationState => {
+): value is GenerateImageRequest => {
   if (!value || typeof value !== 'object') return false;
 
-  const { generateImageRequest } = value as Record<string, unknown>;
-  if (!generateImageRequest || typeof generateImageRequest !== 'object') {
-    return false;
-  }
-
-  const request = generateImageRequest as Record<string, unknown>;
+  const request = value as Record<string, unknown>;
   const floorPlan = request.floorPlan as Record<string, unknown> | undefined;
 
   return (
@@ -56,65 +50,98 @@ const isGenerateLocationState = (
   );
 };
 
+// TODO: 커스텀 훅, 유틸함수로 빼기, 기능 별 커스텀 훅 분할 시급
 const LoadingPage = () => {
-  // 이미지 생성 api 코드 ...
-  const location = useLocation();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler('generate');
-  const { isApiCompleted, navigationData } = useGenerateStore();
-  const [shouldCheckStatus, setShouldCheckStatus] = useState(false); // shouldCheckStatus==true일 때 이미지 Fallback api 요청
 
-  const rawState = location.state;
-  const hasInvalidState =
-    rawState != null && !isGenerateLocationState(rawState);
-  const requestData: GenerateImageRequest | null = isGenerateLocationState(
-    rawState
-  )
-    ? rawState.generateImageRequest
-    : null;
+  // Zustand store: 이미지 생성 완료 상태 및 결과 데이터
+  const { isApiCompleted, navigationData } = useGenerateStore();
+
+  // sessionStorage에서 이미지 생성 요청 데이터 가져오기
+  const requestData: GenerateImageRequest | null = useMemo(() => {
+    // useMemo로 파싱 결과 참조 고정해 렌더 시 불필요한 API 재호출 차단
+    const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!stored) return null;
+
+    try {
+      const parsed = JSON.parse(stored);
+      return isValidGenerateImageRequest(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // 정상 진입 여부, true: 일반 이미지 생성 API 호출, false: 폴백 이미지 API 호출
+  const [isNormalEntry, setIsNormalEntry] = useState(true);
+
+  // 일반 이미지 생성 API(A/B 테스트 분류에 따라 이미지 1장/2장 생성)
   const { mutate: mutateGenerateImage } = useGenerateImageApi();
-  // 브라우저 환경에 맞춰 setTimeout 반환을 number로 정규화
+
+  // 폴백 이미지 생성 API (일반 API 실패 시 사용)
+  // isNormalEntry가 변경되면 컴포넌트 리렌더링 -> useFallbackImage 실행 -> useQuery가 enabled값 감지
+  // -> true: 폴백 API 요청, false: 쿼리 실행 X
+  useFallbackImage(requestData?.houseId || 0, !isNormalEntry, (error) => {
+    handleError(error, 'loading');
+  });
+
+  // 캐러셀 페이지네이션 (무한 스크롤)
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // 캐러셀 애니메이션 상태
+  const [animating, setAnimating] = useState(false);
+  const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
+
+  // 애니메이션 타이머 정리용 ref
   const transitionTimeoutRef = useRef<number | null>(null);
 
-  // 폴백 API는 42900/42901 에러 발생 시 또는 새로고침 시에만 실행
-  // requestData가 있으면 새로고침이거나 이미 폴백이 시작된 상황
-  const shouldRunFallback = shouldCheckStatus || !!requestData;
-  useGenerateImageStatusCheck(requestData?.houseId || 0, shouldRunFallback);
+  const {
+    data: currentImages,
+    isLoading,
+    isError,
+  } = useStackData(currentPage, {
+    enabled: !!requestData, // requestData가 있을 때만 활성화
+    onSuccess: () => setCurrentIndex(0), // 새 페이지 로드 시 첫 이미지부터 시작
+    onError: (err) => handleError(err, 'loading'),
+  });
 
-  useEffect(() => {
-    if (hasInvalidState) {
-      console.warn('잘못된 generate 페이지 진입 - requestData 누락');
-    }
-  }, [hasInvalidState]);
+  const { data: nextImages } = useStackData(currentPage + 1, {
+    enabled: !!currentImages && !!requestData,
+  });
+
+  const likeMutation = usePostCarouselLikeMutation();
+  const hateMutation = usePostCarouselHateMutation();
 
   useEffect(() => {
     if (!requestData) return;
 
-    console.log('이미지 생성 요청 시작:', requestData);
     mutateGenerateImage(requestData, {
+      onSuccess: () => {
+        // 성공 시 navigationData 설정, 프로그래스 바 완료 후 페이지 이동
+      },
       onError: (error: any) => {
-        // 일반 429 에러 처리 (Too Many Requests)
-        if (error?.response?.status === 429) {
-          console.log('요청 과다, 폴백 API 시작');
-          setShouldCheckStatus(true);
+        const errorCode = error?.response?.data?.code;
+        const errorStatus = error?.response?.status;
+
+        // 429 에러 또는 42900/42901 코드: 폴백 API로 전환
+        // 40900: 새로고침 후 일반 이미지 요청 API 요청 시 반환되는 에러코드
+        if (
+          errorStatus === 429 ||
+          errorCode === 42900 ||
+          errorCode === 42901 ||
+          errorCode === 40900
+        ) {
+          setIsNormalEntry(false); // 폴백 API 활성화
         }
-        // 42900 에러 처리 (단일 이미지 생성 시 재요청 필요)
-        else if (error?.response?.data?.code === 42900) {
-          console.log('단일 이미지 생성 재요청 필요, 폴백 API 시작');
-          setShouldCheckStatus(true);
-        }
-        // 42901 에러 처리 (다중 이미지 생성 시 서버 가용 한계치 초과)
-        else if (error?.response?.data?.code === 42901) {
-          console.log('다중 이미지 생성 요청 과다, 폴백 API 시작');
-          setShouldCheckStatus(true);
-        }
-        // 기타 에러 처리
+        // 기타 에러: 일반 에러 처리
         else {
           console.error('이미지 생성 실패:', error);
+          handleError(error, 'loading');
         }
       },
     });
-  }, [mutateGenerateImage, requestData, handleError]);
+  }, [handleError, mutateGenerateImage, requestData]);
 
   useEffect(() => {
     return () => {
@@ -124,43 +151,17 @@ const LoadingPage = () => {
     };
   }, []);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const {
-    data: currentImages,
-    isLoading,
-    isError,
-  } = useStackData(currentPage, {
-    enabled: !!requestData,
-    onSuccess: () => setCurrentIndex(0),
-    onError: (err) => handleError(err, 'loading'),
-  });
-  const { data: nextImages } = useStackData(currentPage + 1, {
-    enabled: !!currentImages && !!requestData, // next prefetch
-  });
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [animating, setAnimating] = useState(false);
-  const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
-
-  const likeMutation = usePostCarouselLikeMutation();
-  const hateMutation = usePostCarouselHateMutation();
-
-  // currentImages 변화에 따른 인덱스 초기화와 에러 처리는
-  // useStackData의 onSuccess/onError 콜백으로 이관
-
-  if (!requestData) return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
-  if (isLoading) return <Loading />;
-
-  // 에러 상황 체크
   const hasError =
     isError ||
     (!isLoading && !currentImages) ||
     !currentImages ||
     currentImages.length === 0;
 
-  // 정상 데이터가 있을 때만 현재 이미지 정보 계산
+  // 정상 데이터(normal data)일 때 현재/다음 이미지 계산
   const currentImage = hasError ? null : currentImages[currentIndex];
+
   const isLast = hasError ? false : currentIndex === currentImages.length - 1;
+
   const nextImage = hasError
     ? null
     : !isLast
@@ -169,13 +170,9 @@ const LoadingPage = () => {
         ? nextImages[0]
         : undefined;
 
-  // 프로그래스 바 완료 시 페이지 이동 처리
   const handleProgressComplete = () => {
     if (navigationData && isApiCompleted) {
-      console.log(
-        '🎯 프로그래스 바 완료 후 페이지 이동:',
-        new Date().toLocaleTimeString()
-      );
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
       navigate(ROUTES.GENERATE_RESULT, {
         state: {
           result: navigationData,
@@ -186,11 +183,14 @@ const LoadingPage = () => {
   };
 
   const handleVote = (isLike: boolean) => {
+    // 로딩 중에는 투표(vote) 불가
     if (isLoading) return;
 
+    // 선택 상태 업데이트 (버튼 하이라이트)
     setSelected(isLike ? 'like' : 'dislike');
     setAnimating(true);
 
+    // API 호출: 좋아요/별로예요 전송
     if (isLike && currentImage) {
       likeMutation.mutate(currentImage.carouselId, {
         onError: () => {
@@ -205,27 +205,44 @@ const LoadingPage = () => {
       });
     }
 
+    // 기존 타이머 정리
     if (transitionTimeoutRef.current !== null) {
       window.clearTimeout(transitionTimeoutRef.current);
     }
 
+    // 600ms 후 다음 이미지로 전환
     transitionTimeoutRef.current = window.setTimeout(() => {
+      // 현재 페이지에 다음 이미지가 있으면 인덱스 증가
       if (!isLast) {
         setSelected(null);
         setCurrentIndex((prev) => prev + 1);
-      } else {
+      }
+      // 마지막 이미지면 다음 페이지로 이동
+      else {
         if (nextImages && nextImages.length > 0) {
           setSelected(null);
           setCurrentPage((prev) => prev + 1);
           setCurrentIndex(0);
         } else {
-          console.log('마지막 페이지');
+          console.log('마지막 페이지 도달');
         }
       }
+
       setAnimating(false);
       transitionTimeoutRef.current = null;
     }, ANIMATION_DURATION);
   };
+
+  // early return
+  // requestData가 없으면 IMAGE_SETUP으로 리다이렉트
+  if (!requestData) {
+    return <Navigate to={ROUTES.IMAGE_SETUP} replace />;
+  }
+
+  // 로딩 스피너
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -236,6 +253,7 @@ const LoadingPage = () => {
           하우미가 사용자님의 취향을 더 잘 이해할 수 있어요!
         </p>
       </section>
+
       <section className={styles.carouselSection}>
         <div className={styles.imageContainer}>
           {hasError ? (
@@ -246,11 +264,12 @@ const LoadingPage = () => {
           ) : (
             // 정상 상황: 이미지 캐러셀 표시
             <>
-              {/* 다음 이미지 영역 */}
               {nextImage && (
                 <div
                   key={`next-${currentPage + 1}-${nextImage.carouselId}`}
-                  className={`${styles.nextImageArea} ${animating ? styles.nextImageAreaActive : ''}`}
+                  className={`${styles.nextImageArea} ${
+                    animating ? styles.nextImageAreaActive : ''
+                  }`}
                 >
                   <img
                     src={nextImage.url}
@@ -260,11 +279,12 @@ const LoadingPage = () => {
                 </div>
               )}
 
-              {/* 현재 이미지 영역 */}
               {currentImage && (
                 <div
                   key={`current-${currentPage}-${currentImage.carouselId}`}
-                  className={`${styles.currentImageArea} ${animating ? styles.currentImageAreaOut : ''}`}
+                  className={`${styles.currentImageArea} ${
+                    animating ? styles.currentImageAreaOut : ''
+                  }`}
                 >
                   <img
                     src={currentImage.url}

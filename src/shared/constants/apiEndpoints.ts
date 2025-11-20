@@ -31,6 +31,11 @@ export const API_ENDPOINT = {
     FACTORS: '/api/v1/factors',
     FACTOR_PREFERENCE: (imageId: number, factorId: number) =>
       `/api/v1/generated-images/${imageId}/preference/factors/${factorId}`,
+    CURATION_CATEGORIES: (imageId: number) =>
+      `/api/v1/generated-images/${imageId}/curations/categories`,
+    CURATION_PRODUCTS: (imageId: number, categoryId: number) =>
+      `/api/v1/generated-images/${imageId}/curations/products/${categoryId}`,
+    CURATION_DASHBOARD: '/api/v1/dashboard-info',
     JJYM: (recommendFurnitureId: number) =>
       `/api/v1/recommend-furnitures/${recommendFurnitureId}/jjym`, // 찜하기 토글
     MYPAGE_JJYM_LIST: '/api/v1/jjyms', // 찜한 가구 조회

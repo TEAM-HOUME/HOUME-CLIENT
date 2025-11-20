@@ -11,7 +11,7 @@ import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 
 interface CardProductItemProps {
   product: {
-    id: number; // recommendFurnitureId
+    id?: number; // recommendFurnitureId
     furnitureProductId: number;
     furnitureProductName: string;
     furnitureProductMallName: string;
@@ -23,11 +23,14 @@ interface CardProductItemProps {
 
 const CardProductItem = memo(
   ({ product, onGotoMypage }: CardProductItemProps) => {
-    const recommendId = product.id;
+    const recommendId =
+      typeof product.id === 'number' && Number.isFinite(product.id)
+        ? product.id
+        : null;
+    const hasRecommendId = recommendId !== null;
 
-    const isSaved = useSavedItemsStore((s) =>
-      s.savedProductIds.has(recommendId)
-    );
+    const savedProductIds = useSavedItemsStore((s) => s.savedProductIds);
+    const isSaved = hasRecommendId ? savedProductIds.has(recommendId) : false;
 
     const { mutate: toggleJjym } = usePostJjymMutation();
     const { notify } = useToast();
@@ -36,10 +39,11 @@ const CardProductItem = memo(
       useIsMutating({
         predicate: (mutation) =>
           mutation.options.mutationKey?.[0] === 'jjym' &&
-          mutation.state.variables === recommendId, // 이 카드 id만 추적
+          mutation.state.variables === (recommendId ?? undefined), // 이 카드 id만 추적
       }) > 0;
 
     const handleNavigateAndFocus = () => {
+      if (recommendId === null) return;
       sessionStorage.setItem(
         SESSION_STORAGE_KEYS.FOCUS_ITEM_ID,
         String(recommendId)
@@ -49,6 +53,13 @@ const CardProductItem = memo(
     };
 
     const handleToggle = () => {
+      if (recommendId === null) {
+        notify({
+          text: '추천 ID가 없는 상품이라 찜할 수 없어요',
+          type: TOAST_TYPE.INFO,
+        });
+        return;
+      }
       if (isMutating) return;
       const wasSaved = isSaved;
 
@@ -75,7 +86,7 @@ const CardProductItem = memo(
         linkHref={product.furnitureProductSiteUrl}
         isSaved={isSaved}
         onToggleSave={handleToggle}
-        disabled={isMutating}
+        disabled={isMutating || !hasRecommendId}
       />
     );
   }
