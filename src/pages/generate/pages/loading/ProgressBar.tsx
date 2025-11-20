@@ -8,9 +8,18 @@ interface ProgressLoadingBarProps {
   onComplete?: () => void;
 }
 
+// 로테이션할 안내 문구 배열
+const LOADING_MESSAGES = [
+  '이미지를 생성하는 중이에요',
+  '새로고침이나 페이지 이동 시, 이미지 생성이 중단돼요',
+] as const;
+
+const MESSAGE_ROTATION_INTERVAL = 2000; // 2초
+
 const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
+  const [messageIndex, setMessageIndex] = useState(0);
   const { isApiCompleted } = useGenerateStore();
 
   // 90%까지 천천히 증가
@@ -76,13 +85,22 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
     }
   }, [isApiCompleted, isDone]);
 
+  // 문구 로테이션 효과 (2초마다 즉시 변경)
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, MESSAGE_ROTATION_INTERVAL);
+
+    return () => clearInterval(messageInterval);
+  }, []);
+
   return (
     <div className={styles.progressBarBox}>
       <div className={styles.progressBack}>
         <div className={styles.progressBar} style={{ width: `${progress}%` }} />
       </div>
       <p className={styles.loadText}>
-        이미지를 생성하는 중이에요 ({Math.floor(progress)}%)
+        {LOADING_MESSAGES[messageIndex]} ({Math.floor(progress)}%)
       </p>
     </div>
   );
