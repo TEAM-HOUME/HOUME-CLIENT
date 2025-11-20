@@ -4,6 +4,8 @@ import { logEvent, setUserProperties } from 'firebase/analytics';
 
 import { analytics } from '@/shared/config/firebase';
 
+import type { ImageGenerationVariant } from '@pages/generate/hooks/useABTest';
+
 /**
  * 공통 Analytics 이벤트 로깅 헬퍼 함수
  *
@@ -37,8 +39,6 @@ export const logAnalyticsEvent = (
     console.error('Analytics logEvent 오류:', error);
   }
 };
-
-import type { ImageGenerationVariant } from '@pages/generate/hooks/useABTest';
 
 /**
  * A/B 테스트 그룹을 Firebase Analytics에 사용자 속성으로 설정
