@@ -160,7 +160,7 @@ export const logResultImgSwipeCurationSheetDown = (
 /**
  * ResultImg 큐레이션 시트 가구 필터 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetFilterFurniture
+ * 이벤트 코드: resultImg_click_curationSheetFilter
  * - Page: resultImg
  * - Action: click
  * - Component: curationSheet
@@ -168,10 +168,10 @@ export const logResultImgSwipeCurationSheetDown = (
  *
  * 큐레이션 시트에서 가구 필터 클릭 시 전송
  */
-export const logResultImgClickCurationSheetFilterFurniture = (
+export const logResultImgClickCurationSheetFilter = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetFilterFurniture', {
+  logAnalyticsEvent('resultImg_click_curationSheetFilter', {
     ab_variant: variant,
   });
 };
