@@ -23,8 +23,14 @@ interface HouseInfoProps {
 }
 
 const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
-  const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
-    useHouseInfo(context);
+  const {
+    formData,
+    setFormData,
+    errors,
+    handleSubmit,
+    isFormCompleted,
+    hasError,
+  } = useHouseInfo(context);
 
   const { data: housingOptions } = useHousingOptionsQuery();
 
@@ -33,9 +39,6 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
   const areaTypeOptions = housingOptions?.areaTypes || [];
 
   // 에러 상태 추적을 위한 ref
-  const hasError = Boolean(
-    errors.houseType || errors.roomType || errors.areaType
-  );
   const errorSentRef = useRef(false);
 
   // 에러가 표시될 때 이벤트 전송 (최초 1회)

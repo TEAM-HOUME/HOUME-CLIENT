@@ -90,6 +90,11 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
   const isFormCompleted =
     isCompleteHouseInfo(formData) && Object.values(errors).length === 0;
 
+  // 에러가 있는지 확인
+  const hasError = Boolean(
+    errors.houseType || errors.roomType || errors.areaType
+  );
+
   // isFormCompleted == true일 때 버튼 enable, handleSubmit 실행
   const handleSubmit = (onNext: (data: CompletedHouseInfo) => void) => {
     if (!isFormCompleted) return;
@@ -127,5 +132,6 @@ export const useHouseInfo = (context: ImageSetupSteps['HouseInfo']) => {
     errors,
     handleSubmit,
     isFormCompleted,
+    hasError,
   };
 };

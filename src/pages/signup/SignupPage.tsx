@@ -34,18 +34,11 @@ const SignupPage = () => {
     monthFieldError,
     dayFieldError,
     isFormValid,
+    hasError,
   } = useSignupForm();
 
   const { mutate: patchSignup } = useSignupMutation();
 
-  const hasError = Boolean(
-    isNameFormatInvalid ||
-      isNameLengthInvalid ||
-      yearFormatError ||
-      yearAgeError ||
-      monthFieldError ||
-      dayFieldError
-  );
   const errorSentRef = useRef(false);
 
   // 에러가 표시될 때 이벤트 전송 (최초 1회)
