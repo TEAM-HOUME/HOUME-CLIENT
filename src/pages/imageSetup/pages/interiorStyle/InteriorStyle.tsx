@@ -36,7 +36,7 @@ const InteriorStyle = ({ context, onNext }: InteriorStyleProps) => {
       />
       <div className={styles.buttonWrapper}>
         <CtaButton isActive={isDataComplete} onClick={handleNext}>
-          집 구조 선택하기
+          주요 활동 선택하기
         </CtaButton>
       </div>
     </div>
