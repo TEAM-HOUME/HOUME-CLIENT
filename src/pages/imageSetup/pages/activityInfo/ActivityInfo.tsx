@@ -1,6 +1,7 @@
 import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/activityInfo/useActivityInfo';
+import { useCreditCheck } from '@/pages/imageSetup/hooks/useCreditCheck';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Loading from '@/shared/components/loading/Loading';
 
@@ -33,6 +34,18 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     activitySelection,
     categorySelections,
   } = useActivityInfo(context, activityOptionsData);
+
+  // 크레딧 체크 훅
+  const { hasCredit, isCreditChecked, checkCredit } = useCreditCheck();
+
+  // 이미지 생성 핸들러
+  const handleImageGeneration = () => {
+    const isValid = checkCredit(); // 크레딧 확인 및 CTA 버튼 상태 관리
+
+    if (isValid) {
+      handleSubmit();
+    }
+  };
 
   // 에러 처리
   if (error) {
@@ -169,7 +182,10 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         </div>
 
         <div>
-          <CtaButton isActive={isFormCompleted} onClick={() => handleSubmit()}>
+          <CtaButton
+            isActive={isFormCompleted && (!isCreditChecked || hasCredit)}
+            onClick={handleImageGeneration}
+          >
             이미지 생성하기
           </CtaButton>
         </div>
