@@ -51,6 +51,14 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const tableOptions = activityOptionsData.categories[3];
   const selectiveOptions = activityOptionsData.categories[4];
 
+  // 선택된 가구 총 개수 계산
+  const totalSelectedFurniture =
+    categorySelections.bed.selectedValues.length +
+    categorySelections.sofa.selectedValues.length +
+    categorySelections.storage.selectedValues.length +
+    categorySelections.table.selectedValues.length +
+    categorySelections.selective.selectedValues.length;
+
   return (
     <div className={styles.container}>
       <FunnelHeader
@@ -90,7 +98,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         <div className={styles.furnitures}>
           <HeadingText
             title="가구"
-            subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
+            subtitle={`선택한 가구들로 이미지를 생성해드려요. (${totalSelectedFurniture}/6)`}
           />
           <ButtonGroup<number>
             title={bedOptions.nameKr}
