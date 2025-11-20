@@ -2,11 +2,19 @@ import * as styles from './Popup.css';
 
 interface PopupProps {
   onClose: () => void;
+  onExit?: () => void;
   title: string;
   detail: string;
 }
 
-const Popup = ({ onClose, title, detail }: PopupProps) => {
+const Popup = ({ onClose, onExit, title, detail }: PopupProps) => {
+  const handleExit = () => {
+    onClose();
+    if (onExit) {
+      onExit();
+    }
+  };
+
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <dialog
@@ -21,11 +29,11 @@ const Popup = ({ onClose, title, detail }: PopupProps) => {
         </div>
 
         <div className={styles.buttonBox}>
-          <button type="button" className={styles.exit} onClick={onClose}>
+          <button type="button" className={styles.exit} onClick={handleExit}>
             나가기
           </button>
           <button type="button" className={styles.cancel} onClick={onClose}>
-            취소
+            계속 입력하기
           </button>
         </div>
       </dialog>
