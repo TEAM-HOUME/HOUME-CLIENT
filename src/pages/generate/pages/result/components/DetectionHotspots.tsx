@@ -324,7 +324,7 @@ const DetectionHotspots = ({
         (c) => c.id === categoryId
       );
       if (inChips) {
-        openSheet('expanded');
+        openSheet('mid');
         selectCategory(imageId, categoryId);
         pendingCategoryIdRef.current = null;
       } else {
@@ -347,7 +347,7 @@ const DetectionHotspots = ({
     if (!pending) return;
     const has = categoriesQuery.data?.categories?.some((c) => c.id === pending);
     if (has) {
-      openSheet('expanded');
+      openSheet('mid');
       selectCategory(imageIdVal, pending);
       pendingCategoryIdRef.current = null;
     }
