@@ -14,7 +14,7 @@ const LOADING_MESSAGES = [
   '새로고침이나 페이지 이동 시, 이미지 생성이 중단돼요',
 ] as const;
 
-const MESSAGE_ROTATION_INTERVAL = 2000; // 2초
+const MESSAGE_ROTATION_INTERVAL = 3000; // 3초 (코드 리뷰 반영)
 
 const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
   const [progress, setProgress] = useState(0);
@@ -85,7 +85,7 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
     }
   }, [isApiCompleted, isDone]);
 
-  // 문구 로테이션 효과 (2초마다 즉시 변경)
+  // 문구 로테이션 효과 (3초마다 변경)
   useEffect(() => {
     const messageInterval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
@@ -99,9 +99,39 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
       <div className={styles.progressBack}>
         <div className={styles.progressBar} style={{ width: `${progress}%` }} />
       </div>
-      <p className={styles.loadText}>
-        {LOADING_MESSAGES[messageIndex]} ({Math.floor(progress)}%)
-      </p>
+
+      {/* 메시지 컨테이너 - overflow hidden으로 위로 사라지는 효과 */}
+      <div
+        style={{
+          overflow: 'hidden',
+          position: 'relative',
+          height: '2.4rem',
+        }}
+      >
+        <p
+          key={messageIndex}
+          className={styles.loadText}
+          style={{
+            animation: 'slideUp 0.4s ease-out',
+            margin: 0,
+          }}
+        >
+          {LOADING_MESSAGES[messageIndex]} ({Math.floor(progress)}%)
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
