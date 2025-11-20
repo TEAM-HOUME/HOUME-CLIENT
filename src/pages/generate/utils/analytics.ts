@@ -2,6 +2,8 @@
 
 import { logAnalyticsEvent } from '@/shared/utils/analytics';
 
+import type { ImageGenerationVariant } from '../hooks/useABTest';
+
 /**
  * ResultImg 슬라이드 왼쪽 스와이프 이벤트
  *
@@ -12,9 +14,11 @@ import { logAnalyticsEvent } from '@/shared/utils/analytics';
  * - Function: Left
  *
  * 이미지 슬라이드를 왼쪽으로 스와이프할 때 전송
+ *
+ * @param variant - A/B 테스트 그룹 ('single' | 'multiple')
  */
-export const logResultImgSwipeSlideLeft = () => {
-  logAnalyticsEvent('resultImg_swipe_slideLeft');
+export const logResultImgSwipeSlideLeft = (variant: ImageGenerationVariant) => {
+  logAnalyticsEvent('resultImg_swipe_slideLeft', { ab_variant: variant });
 };
 
 /**
@@ -28,8 +32,10 @@ export const logResultImgSwipeSlideLeft = () => {
  *
  * 이미지 슬라이드를 오른쪽으로 스와이프할 때 전송
  */
-export const logResultImgSwipeSlideRight = () => {
-  logAnalyticsEvent('resultImg_swipe_slideRight');
+export const logResultImgSwipeSlideRight = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_swipe_slideRight', { ab_variant: variant });
 };
 
 /**
@@ -43,8 +49,8 @@ export const logResultImgSwipeSlideRight = () => {
  *
  * 스팟 버튼 클릭 시 전송
  */
-export const logResultImgClickBtnSpot = () => {
-  logAnalyticsEvent('resultImg_click_btnSpot');
+export const logResultImgClickBtnSpot = (variant: ImageGenerationVariant) => {
+  logAnalyticsEvent('resultImg_click_btnSpot', { ab_variant: variant });
 };
 
 /**
@@ -58,8 +64,10 @@ export const logResultImgClickBtnSpot = () => {
  *
  * 더보기 버튼 클릭 시 전송
  */
-export const logResultImgClickBtnMoreImg = () => {
-  logAnalyticsEvent('resultImg_click_btnMoreImg');
+export const logResultImgClickBtnMoreImg = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_btnMoreImg', { ab_variant: variant });
 };
 
 /**
@@ -73,8 +81,10 @@ export const logResultImgClickBtnMoreImg = () => {
  *
  * 더보기 모달에서 뒤로가기 버튼 클릭 시 전송
  */
-export const logResultImgClickMoreModalBack = () => {
-  logAnalyticsEvent('resultImg_click_moreModalBack');
+export const logResultImgClickMoreModalBack = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_moreModalBack', { ab_variant: variant });
 };
 
 /**
@@ -88,8 +98,12 @@ export const logResultImgClickMoreModalBack = () => {
  *
  * 더보기 모달에서 새로 만들기 버튼 클릭 시 전송
  */
-export const logResultImgClickMoreModalMakeNew = () => {
-  logAnalyticsEvent('resultImg_click_moreModalMakeNew');
+export const logResultImgClickMoreModalMakeNew = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_moreModalMakeNew', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -103,8 +117,8 @@ export const logResultImgClickMoreModalMakeNew = () => {
  *
  * 태그 버튼 클릭 시 전송
  */
-export const logResultImgClickBtnTag = () => {
-  logAnalyticsEvent('resultImg_click_btnTag');
+export const logResultImgClickBtnTag = (variant: ImageGenerationVariant) => {
+  logAnalyticsEvent('resultImg_click_btnTag', { ab_variant: variant });
 };
 
 /**
@@ -118,8 +132,10 @@ export const logResultImgClickBtnTag = () => {
  *
  * 큐레이션 시트를 위로 스와이프할 때 전송
  */
-export const logResultImgSwipeCurationSheetUp = () => {
-  logAnalyticsEvent('resultImg_swipe_curationSheetUp');
+export const logResultImgSwipeCurationSheetUp = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_swipe_curationSheetUp', { ab_variant: variant });
 };
 
 /**
@@ -133,8 +149,12 @@ export const logResultImgSwipeCurationSheetUp = () => {
  *
  * 큐레이션 시트를 아래로 스와이프할 때 전송
  */
-export const logResultImgSwipeCurationSheetDown = () => {
-  logAnalyticsEvent('resultImg_swipe_curationSheetDown');
+export const logResultImgSwipeCurationSheetDown = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_swipe_curationSheetDown', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -148,8 +168,12 @@ export const logResultImgSwipeCurationSheetDown = () => {
  *
  * 큐레이션 시트에서 가구 필터 클릭 시 전송
  */
-export const logResultImgClickCurationSheetFilterFurniture = () => {
-  logAnalyticsEvent('resultImg_click_curationSheetFilterFurniture');
+export const logResultImgClickCurationSheetFilterFurniture = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_curationSheetFilterFurniture', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -163,8 +187,12 @@ export const logResultImgClickCurationSheetFilterFurniture = () => {
  *
  * 큐레이션 시트에서 사이트 이동 버튼 클릭 시 전송
  */
-export const logResultImgClickCurationSheetBtnGoSite = () => {
-  logAnalyticsEvent('resultImg_click_curationSheetBtnGoSite');
+export const logResultImgClickCurationSheetBtnGoSite = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_curationSheetBtnGoSite', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -178,8 +206,12 @@ export const logResultImgClickCurationSheetBtnGoSite = () => {
  *
  * 큐레이션 시트에서 저장 버튼 클릭 시 전송
  */
-export const logResultImgClickCurationSheetBtnSave = () => {
-  logAnalyticsEvent('resultImg_click_curationSheetBtnSave');
+export const logResultImgClickCurationSheetBtnSave = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_curationSheetBtnSave', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -193,8 +225,12 @@ export const logResultImgClickCurationSheetBtnSave = () => {
  *
  * 큐레이션 시트에서 카드 클릭 시 전송
  */
-export const logResultImgClickCurationSheetCard = () => {
-  logAnalyticsEvent('resultImg_click_curationSheetCard');
+export const logResultImgClickCurationSheetCard = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('resultImg_click_curationSheetCard', {
+    ab_variant: variant,
+  });
 };
 
 /**
@@ -208,6 +244,8 @@ export const logResultImgClickCurationSheetCard = () => {
  *
  * CTA 버튼: "이미지 만들러가기" 버튼
  */
-export const logGenerateStartClickBtnCTA = () => {
-  logAnalyticsEvent('generateStart_click_btnCTA');
+export const logGenerateStartClickBtnCTA = (
+  variant: ImageGenerationVariant
+) => {
+  logAnalyticsEvent('generateStart_click_btnCTA', { ab_variant: variant });
 };

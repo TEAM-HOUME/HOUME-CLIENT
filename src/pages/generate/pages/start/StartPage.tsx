@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import { logGenerateStartClickBtnCTA } from '@/pages/generate/utils/analytics';
 import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
@@ -14,10 +15,11 @@ const StartPage = () => {
   // zustand에서 userName 가져오기
   const userName = useUserStore((state) => state.userName);
   const navigate = useNavigate();
+  const { variant } = useABTest();
 
   const handleGoToImageSetup = () => {
     // 이미지 생성 시작 페이지 CTA 버튼 클릭 시 GA 이벤트 전송
-    logGenerateStartClickBtnCTA();
+    logGenerateStartClickBtnCTA(variant);
     navigate(ROUTES.IMAGE_SETUP);
   };
 
