@@ -18,7 +18,7 @@ const HomePage = () => {
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const { data: userData, isLoading: isUserDataLoading } = useMyPageUser({
+  const { isLoading: isUserDataLoading } = useMyPageUser({
     enabled: isLoggedIn,
   });
 
