@@ -1,32 +1,6 @@
-/**
- * ResultImg 페이지 관련 Firebase Analytics 이벤트
- *
- * 이벤트 코드 규칙: {Page}_{Action}_{Component}_{Function}
- * - Page: resultImg
- * - Action: click, swipe 등
- * - Component: slide, btn, moreModal, curationSheet 등
- * - Function: Left, Right, Spot, MoreImg, Back, MakeNew, Tag, Up, Down, FilterFurniture, BtnGoSite, BtnSave, Card 등
- *
- * 이벤트 코드:
- * - resultImg_swipe_slideLeft
- * - resultImg_swipe_slideRight
- * - resultImg_click_btnSpot
- * - resultImg_click_btnMoreImg
- * - resultImg_click_moreModalBack
- * - resultImg_click_moreModalMakeNew
- * - resultImg_click_btnTag
- * - resultImg_swipe_curationSheetUp
- * - resultImg_swipe_curationSheetDown
- * - resultImg_click_curationSheetFilterFurniture
- * - resultImg_click_curationSheetBtnGoSite
- * - resultImg_click_curationSheetBtnSave
- * - resultImg_click_curationSheetCard
- *
- */
+// ResultImg 페이지 관련 Firebase Analytics 이벤트
 
-import { logEvent } from 'firebase/analytics';
-
-import { analytics } from '@/shared/config/firebase';
+import { logAnalyticsEvent } from '@/shared/utils/analytics';
 
 /**
  * ResultImg 슬라이드 왼쪽 스와이프 이벤트
@@ -40,19 +14,7 @@ import { analytics } from '@/shared/config/firebase';
  * 이미지 슬라이드를 왼쪽으로 스와이프할 때 전송
  */
 export const logResultImgSwipeSlideLeft = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_swipe_slideLeft', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] resultImg_swipe_slideLeft 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_swipe_slideLeft');
 };
 
 /**
@@ -67,19 +29,7 @@ export const logResultImgSwipeSlideLeft = () => {
  * 이미지 슬라이드를 오른쪽으로 스와이프할 때 전송
  */
 export const logResultImgSwipeSlideRight = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_swipe_slideRight', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] resultImg_swipe_slideRight 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_swipe_slideRight');
 };
 
 /**
@@ -94,19 +44,7 @@ export const logResultImgSwipeSlideRight = () => {
  * 스팟 버튼 클릭 시 전송
  */
 export const logResultImgClickBtnSpot = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_btnSpot', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] resultImg_click_btnSpot 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_btnSpot');
 };
 
 /**
@@ -121,19 +59,7 @@ export const logResultImgClickBtnSpot = () => {
  * 더보기 버튼 클릭 시 전송
  */
 export const logResultImgClickBtnMoreImg = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_btnMoreImg', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] resultImg_click_btnMoreImg 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_btnMoreImg');
 };
 
 /**
@@ -148,21 +74,7 @@ export const logResultImgClickBtnMoreImg = () => {
  * 더보기 모달에서 뒤로가기 버튼 클릭 시 전송
  */
 export const logResultImgClickMoreModalBack = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_moreModalBack', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_moreModalBack 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_moreModalBack');
 };
 
 /**
@@ -177,21 +89,7 @@ export const logResultImgClickMoreModalBack = () => {
  * 더보기 모달에서 새로 만들기 버튼 클릭 시 전송
  */
 export const logResultImgClickMoreModalMakeNew = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_moreModalMakeNew', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_moreModalMakeNew 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_moreModalMakeNew');
 };
 
 /**
@@ -206,19 +104,7 @@ export const logResultImgClickMoreModalMakeNew = () => {
  * 태그 버튼 클릭 시 전송
  */
 export const logResultImgClickBtnTag = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_btnTag', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] resultImg_click_btnTag 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_btnTag');
 };
 
 /**
@@ -233,21 +119,7 @@ export const logResultImgClickBtnTag = () => {
  * 큐레이션 시트를 위로 스와이프할 때 전송
  */
 export const logResultImgSwipeCurationSheetUp = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_swipe_curationSheetUp', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_swipe_curationSheetUp 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_swipe_curationSheetUp');
 };
 
 /**
@@ -262,21 +134,7 @@ export const logResultImgSwipeCurationSheetUp = () => {
  * 큐레이션 시트를 아래로 스와이프할 때 전송
  */
 export const logResultImgSwipeCurationSheetDown = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_swipe_curationSheetDown', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_swipe_curationSheetDown 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_swipe_curationSheetDown');
 };
 
 /**
@@ -291,21 +149,7 @@ export const logResultImgSwipeCurationSheetDown = () => {
  * 큐레이션 시트에서 가구 필터 클릭 시 전송
  */
 export const logResultImgClickCurationSheetFilterFurniture = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_curationSheetFilterFurniture', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_curationSheetFilterFurniture 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_curationSheetFilterFurniture');
 };
 
 /**
@@ -320,21 +164,7 @@ export const logResultImgClickCurationSheetFilterFurniture = () => {
  * 큐레이션 시트에서 사이트 이동 버튼 클릭 시 전송
  */
 export const logResultImgClickCurationSheetBtnGoSite = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_curationSheetBtnGoSite', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_curationSheetBtnGoSite 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_curationSheetBtnGoSite');
 };
 
 /**
@@ -349,21 +179,7 @@ export const logResultImgClickCurationSheetBtnGoSite = () => {
  * 큐레이션 시트에서 저장 버튼 클릭 시 전송
  */
 export const logResultImgClickCurationSheetBtnSave = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_curationSheetBtnSave', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_curationSheetBtnSave 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_curationSheetBtnSave');
 };
 
 /**
@@ -378,21 +194,7 @@ export const logResultImgClickCurationSheetBtnSave = () => {
  * 큐레이션 시트에서 카드 클릭 시 전송
  */
 export const logResultImgClickCurationSheetCard = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'resultImg_click_curationSheetCard', {
-      page_path: window.location.pathname,
-    });
-    console.log(
-      '[Firebase Analytics] resultImg_click_curationSheetCard 이벤트 전송'
-    );
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('resultImg_click_curationSheetCard');
 };
 
 /**
@@ -407,17 +209,5 @@ export const logResultImgClickCurationSheetCard = () => {
  * CTA 버튼: "이미지 만들러가기" 버튼
  */
 export const logGenerateStartClickBtnCTA = () => {
-  if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
-    return;
-  }
-
-  try {
-    logEvent(analytics, 'generateStart_click_btnCTA', {
-      page_path: window.location.pathname,
-    });
-    console.log('[Firebase Analytics] generateStart_click_btnCTA 이벤트 전송');
-  } catch (error) {
-    console.error('Analytics logEvent 오류:', error);
-  }
+  logAnalyticsEvent('generateStart_click_btnCTA');
 };
