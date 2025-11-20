@@ -44,8 +44,8 @@ export const scrollContentBase = style({
 });
 
 export const scrollContentArea = styleVariants({
-  mid: { maxHeight: '29rem' },
-  expanded: { maxHeight: '52rem' },
+  mid: { height: '29rem' },
+  expanded: { height: '52rem' },
 });
 
 export const headerText = style({
