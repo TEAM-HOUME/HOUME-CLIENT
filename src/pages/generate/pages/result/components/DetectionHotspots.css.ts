@@ -6,6 +6,7 @@ import { zIndex } from '@shared/styles/tokens/zIndex';
 export const container = style({
   position: 'relative',
   width: '100%',
+  minHeight: '26rem',
   aspectRatio: '3 / 2',
   overflow: 'hidden',
 });
