@@ -2,7 +2,13 @@ import { memo } from 'react';
 
 import { useIsMutating } from '@tanstack/react-query';
 
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
+import {
+  logResultImgClickCurationSheetBtnGoSite,
+  logResultImgClickCurationSheetBtnSave,
+  logResultImgClickCurationSheetCard,
+} from '@/pages/generate/utils/analytics';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { useToast } from '@/shared/components/toast/useToast';
 import { SESSION_STORAGE_KEYS } from '@/shared/constants/bottomSheet';
@@ -28,6 +34,7 @@ const CardProductItem = memo(
         ? product.id
         : null;
     const hasRecommendId = recommendId !== null;
+    const { variant } = useABTest();
 
     const savedProductIds = useSavedItemsStore((s) => s.savedProductIds);
     const isSaved = hasRecommendId ? savedProductIds.has(recommendId) : false;
@@ -63,6 +70,9 @@ const CardProductItem = memo(
       if (isMutating) return;
       const wasSaved = isSaved;
 
+      // 저장 버튼 클릭 이벤트 전송
+      logResultImgClickCurationSheetBtnSave(variant);
+
       toggleJjym(recommendId, {
         onSuccess: (data) => {
           if (!wasSaved && data.favorited) {
@@ -87,6 +97,12 @@ const CardProductItem = memo(
         isSaved={isSaved}
         onToggleSave={handleToggle}
         disabled={isMutating || !hasRecommendId}
+        onLinkClick={() => {
+          logResultImgClickCurationSheetBtnGoSite(variant);
+        }}
+        onCardClick={() => {
+          logResultImgClickCurationSheetCard(variant);
+        }}
       />
     );
   }

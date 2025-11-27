@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
+import { logResultImgClickBtnTag } from '@/pages/generate/utils/analytics';
 
 import Tag from '@shared/assets/icons/tagIcon.svg?react';
 
@@ -45,6 +47,7 @@ const GeneratedImgB = ({
 
   const imageId = image?.imageId ?? 0;
   const openSheet = useOpenCurationSheet();
+  const { variant } = useABTest();
 
   // currentImgId를 부모에게 전달하는 useEffect
   useEffect(() => {
@@ -71,7 +74,10 @@ const GeneratedImgB = ({
       <button
         type="button"
         className={styles.tagBtn}
-        onClick={() => openSheet('expanded')}
+        onClick={() => {
+          logResultImgClickBtnTag(variant);
+          openSheet('expanded');
+        }}
       >
         <Tag />
       </button>

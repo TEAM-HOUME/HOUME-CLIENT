@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 
 import FilterChip from '@/pages/generate/components/filterChip/FilterChip';
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import {
   useActiveImageCurationState,
   useActiveImageId,
@@ -13,6 +14,7 @@ import {
   useSheetSnapState,
 } from '@/pages/generate/hooks/useFurnitureCuration';
 import { useCurationStore } from '@/pages/generate/stores/useCurationStore';
+import { logResultImgClickCurationSheetFilter } from '@/pages/generate/utils/analytics';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
@@ -35,6 +37,7 @@ export const CurationSheet = () => {
   const { snapState, setSnapState } = useSheetSnapState();
 
   const navigate = useNavigate();
+  const { variant } = useABTest();
 
   const handleGotoMypage = () => {
     navigate(ROUTES.MYPAGE);
@@ -119,6 +122,7 @@ export const CurationSheet = () => {
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
+    logResultImgClickCurationSheetFilter(variant);
     selectCategory(activeImageId, categoryId);
   };
 
