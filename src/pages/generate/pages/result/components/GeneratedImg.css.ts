@@ -8,6 +8,7 @@ import { colorVars } from '@styles/tokens/color.css';
 
 export const container = style({
   width: '100%',
+  minHeight: '26rem',
   aspectRatio: '3 / 2',
   overflow: 'hidden',
   position: 'relative',

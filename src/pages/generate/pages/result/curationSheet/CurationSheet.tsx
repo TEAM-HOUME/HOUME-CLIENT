@@ -52,7 +52,7 @@ export const CurationSheet = () => {
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
-      const byRecommend = product.recommendFurnitureId;
+      const byRecommend = product.id;
       const recommendId =
         typeof byRecommend === 'number' && Number.isFinite(byRecommend)
           ? byRecommend
@@ -222,7 +222,7 @@ export const CurationSheet = () => {
                   key={category.id}
                   // 접힘 상태에서는 칩을 항상 비선택(회색)으로 표시
                   isSelected={
-                    snapState === 'expanded' &&
+                    (snapState === 'expanded' || snapState === 'mid') &&
                     selectedCategoryId === category.id
                   }
                   onClick={() => handleCategorySelect(category.id)}
