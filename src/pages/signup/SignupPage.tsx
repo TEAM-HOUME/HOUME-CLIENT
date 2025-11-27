@@ -119,21 +119,21 @@ const SignupPage = () => {
           <h2 className={styles.fieldtitle}>성별</h2>
           <div className={styles.flexbox}>
             <LargeFilled
-              buttonSize="medium"
+              buttonSize="small"
               isSelected={gender?.value === 'MALE'}
               onClick={() => setGender({ value: 'MALE', label: '남성' })}
             >
               남성
             </LargeFilled>
             <LargeFilled
-              buttonSize="medium"
+              buttonSize="small"
               isSelected={gender?.value === 'FEMALE'}
               onClick={() => setGender({ value: 'FEMALE', label: '여성' })}
             >
               여성
             </LargeFilled>
             <LargeFilled
-              buttonSize="medium"
+              buttonSize="small"
               isSelected={gender?.value === 'NONBINARY'}
               onClick={() =>
                 setGender({ value: 'NONBINARY', label: '논바이너리' })

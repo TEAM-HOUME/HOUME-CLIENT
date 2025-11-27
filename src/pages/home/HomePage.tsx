@@ -18,31 +18,26 @@ const HomePage = () => {
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const { data: userData, isLoading: isUserDataLoading } = useMyPageUser({
+  const { isLoading: isUserDataLoading } = useMyPageUser({
     enabled: isLoggedIn,
   });
 
   /**
-   * 크레딧 기반 플로팅 버튼 텍스트 결정
+   * 플로팅 버튼 텍스트 결정
    * - 로그인 안됨: "우리집에 딱 맞는 스타일 만들기"
    * - 로그인됨 + 로딩중: "로딩중..."
-   * - 로그인됨 + 크레딧 있음: "우리집에 딱 맞는 스타일 만들기"
-   * - 로그인됨 + 크레딧 없음: "무료 이미지 생성은 1번만 가능해요"
+   * - 로그인됨: "우리집에 딱 맞는 스타일 만들기"
    */
   const getButtonText = () => {
     if (!isLoggedIn) return '우리집에 딱 맞는 스타일 만들기';
     if (isUserDataLoading) return '로딩중...';
-    if (userData?.CreditCount && userData.CreditCount > 0) {
-      return '우리집에 딱 맞는 스타일 만들기';
-    }
-    return '무료 이미지 생성은 1번만 가능해요';
+    return '우리집에 딱 맞는 스타일 만들기';
   };
 
   /**
    * 플로팅 버튼 클릭 핸들러
    * - 로그인 안됨: 로그인 페이지로 이동
-   * - 로그인됨 + 크레딧 있음: imageSetup 이미지 생성 플로우로 이동
-   * - 로그인됨 + 크레딧 없음: 버튼 비활성화로 인해 클릭 불가
+   * - 로그인됨: imageSetup 이미지 생성 플로우로 이동 (크레딧 체크는 ActivityInfo에서 수행)
    */
   const handleCtaButtonClick = () => {
     if (!isLoggedIn) {
@@ -52,11 +47,8 @@ const HomePage = () => {
 
     if (isUserDataLoading) return;
 
-    // 크레딧이 있으면 imageSetup 이동
-    if (userData?.CreditCount && userData.CreditCount > 0) {
-      navigate(ROUTES.IMAGE_SETUP);
-    }
-    // 크레딧이 없으면 아무 동작 안 함 (버튼이 비활성화됨)
+    // 크레딧 체크 없이 무조건 퍼널 진입 허용
+    navigate(ROUTES.IMAGE_SETUP);
   };
 
   return (
@@ -74,13 +66,8 @@ const HomePage = () => {
         </AnimatedSection>
       </div>
       <div className={styles.buttonContainer}>
-        {/* 로그인 상태와 크레딧에 따라 하단 플로팅 버튼 동적 변경 */}
-        <CtaButton
-          onClick={handleCtaButtonClick}
-          isActive={
-            !isLoggedIn || isUserDataLoading || (userData?.CreditCount ?? 0) > 0
-          }
-        >
+        {/* 로그인 상태에 따라 하단 플로팅 버튼 동적 변경 */}
+        <CtaButton onClick={handleCtaButtonClick} isActive={!isUserDataLoading}>
           {getButtonText()}
         </CtaButton>
       </div>

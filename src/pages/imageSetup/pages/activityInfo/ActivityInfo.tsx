@@ -1,6 +1,7 @@
 import { useActivityOptionsQuery } from '@/pages/imageSetup/apis/activityInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useActivityInfo } from '@/pages/imageSetup/hooks/activityInfo/useActivityInfo';
+import { useCreditCheck } from '@/pages/imageSetup/hooks/useCreditCheck';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import Loading from '@/shared/components/loading/Loading';
 
@@ -34,6 +35,18 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     categorySelections,
   } = useActivityInfo(context, activityOptionsData);
 
+  // 크레딧 체크 훅
+  const { hasCredit, isCreditChecked, checkCredit } = useCreditCheck();
+
+  // 이미지 생성 핸들러
+  const handleImageGeneration = () => {
+    const isValid = checkCredit(); // 크레딧 확인 및 CTA 버튼 상태 관리
+
+    if (isValid) {
+      handleSubmit();
+    }
+  };
+
   // 에러 처리
   if (error) {
     return <div>데이터를 불러올 수 없습니다.</div>;
@@ -50,6 +63,14 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
   const storageOptions = activityOptionsData.categories[2];
   const tableOptions = activityOptionsData.categories[3];
   const selectiveOptions = activityOptionsData.categories[4];
+
+  // 선택된 가구 총 개수 계산
+  const totalSelectedFurniture =
+    categorySelections.bed.selectedValues.length +
+    categorySelections.sofa.selectedValues.length +
+    categorySelections.storage.selectedValues.length +
+    categorySelections.table.selectedValues.length +
+    categorySelections.selective.selectedValues.length;
 
   return (
     <div className={styles.container}>
@@ -90,7 +111,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         <div className={styles.furnitures}>
           <HeadingText
             title="가구"
-            subtitle="선택한 가구들로 이미지를 생성해드려요. (최대 6개)"
+            subtitle={`선택한 가구들로 이미지를 생성해드려요. (${totalSelectedFurniture}/6)`}
           />
           <ButtonGroup<number>
             title={bedOptions.nameKr}
@@ -161,7 +182,10 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
         </div>
 
         <div>
-          <CtaButton isActive={isFormCompleted} onClick={() => handleSubmit()}>
+          <CtaButton
+            isActive={isFormCompleted && (!isCreditChecked || hasCredit)}
+            onClick={handleImageGeneration}
+          >
             이미지 생성하기
           </CtaButton>
         </div>
