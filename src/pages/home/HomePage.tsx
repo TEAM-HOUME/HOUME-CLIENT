@@ -28,7 +28,7 @@ const HomePage = () => {
   const scrollDepth50Sent = useRef(false);
   const scrollDepth100Sent = useRef(false);
 
-  const { data: userData, isLoading: isUserDataLoading } = useMyPageUser({
+  const { isLoading: isUserDataLoading } = useMyPageUser({
     enabled: isLoggedIn,
   });
 
