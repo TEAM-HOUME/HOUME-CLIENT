@@ -17,6 +17,7 @@ interface CardProductProps {
   linkLabel?: string;
   disabled?: boolean;
   onLinkClick?: () => void;
+  onCardClick?: () => void;
 }
 
 const CardProduct = ({
@@ -30,11 +31,12 @@ const CardProduct = ({
   linkLabel = '사이트',
   disabled = false,
   onLinkClick,
+  onCardClick,
 }: CardProductProps) => {
   const isLarge = size === 'large';
 
   return (
-    <div className={styles.wrapper({ size })}>
+    <div className={styles.wrapper({ size })} onClick={onCardClick}>
       <section className={styles.imgSection({ size })}>
         <img
           className={styles.cardImage}
