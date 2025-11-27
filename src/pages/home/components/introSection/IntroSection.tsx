@@ -8,12 +8,15 @@ import {
   INTERIOR_OPTIONS,
   type InteriorOption,
 } from '../../types/options';
+import { logLandingClickBtnType } from '../../utils/analytics';
 
 const IntroSection = () => {
   const [selected, setSelected] = useState<InteriorOption>('휴식형');
 
   const handleOptionChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelected(e.target.value as InteriorOption);
+    const newOption = e.target.value as InteriorOption;
+    setSelected(newOption);
+    logLandingClickBtnType(newOption);
   };
 
   return (

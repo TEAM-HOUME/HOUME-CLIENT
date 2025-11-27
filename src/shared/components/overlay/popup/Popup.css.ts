@@ -63,6 +63,6 @@ export const exit = style({
 export const cancel = style({
   flex: 1,
   padding: '10px 0',
-  ...fontStyle('title_sb_16'),
+  ...fontStyle('body_m_14'),
   color: colorVars.color.primary,
 });

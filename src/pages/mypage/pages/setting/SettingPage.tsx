@@ -5,6 +5,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { useDeleteUserMutation } from '@/pages/login/apis/deleteUser';
 import { useLogoutMutation } from '@/pages/login/apis/logout';
+import {
+  logMyPageClickBtnLogout,
+  logMyPageClickBtnSuccession,
+  logMyPageClickSuccessionModalCancel,
+  logMyPageClickSuccessionModalOut,
+} from '@/pages/mypage/utils/analytics';
 import { ROUTES } from '@/routes/paths';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
@@ -29,6 +35,7 @@ const SettingPage = () => {
   };
 
   const handleLogout = () => {
+    logMyPageClickBtnLogout();
     // 1) 토스트 표시 (2.5초 유지)
     notify({
       text: '로그아웃 되었습니다',
@@ -53,6 +60,7 @@ const SettingPage = () => {
   };
 
   const handleWithdraw = () => {
+    logMyPageClickBtnSuccession();
     overlay.open(({ unmount }) => (
       <GeneralModal
         title="하우미 탈퇴 전 확인하세요"
@@ -64,11 +72,15 @@ const SettingPage = () => {
         cancelVariant="default"
         confirmVariant="default"
         onCancel={() => {
+          logMyPageClickSuccessionModalOut();
           // 모달 닫기
           unmount();
           deleteUser();
         }}
-        onConfirm={unmount}
+        onConfirm={() => {
+          logMyPageClickSuccessionModalCancel();
+          unmount();
+        }}
         onClose={unmount}
       />
     ));

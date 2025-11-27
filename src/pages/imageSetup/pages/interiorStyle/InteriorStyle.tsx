@@ -1,6 +1,10 @@
 // Step 3
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useInteriorStyle } from '@/pages/imageSetup/hooks/useInteriorStyle';
+import {
+  logSelectMoodboardClickBtnCTA,
+  logSelectMoodboardClickBtnCTAInactive,
+} from '@/pages/imageSetup/utils/analytics';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 
 import * as styles from './InteriorStyle.css';
@@ -21,6 +25,18 @@ const InteriorStyle = ({ context, onNext }: InteriorStyleProps) => {
   const { selectedImages, handleImageSelect, handleNext, isDataComplete } =
     useInteriorStyle(context, onNext);
 
+  // CTA 버튼 클릭 핸들러
+  const handleCtaButtonClick = () => {
+    if (isDataComplete) {
+      // 활성 상태 버튼 클릭
+      logSelectMoodboardClickBtnCTA();
+      handleNext();
+    } else {
+      // 비활성 상태 버튼 클릭
+      logSelectMoodboardClickBtnCTAInactive();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <FunnelHeader
@@ -35,8 +51,8 @@ const InteriorStyle = ({ context, onNext }: InteriorStyleProps) => {
         onImageSelect={handleImageSelect}
       />
       <div className={styles.buttonWrapper}>
-        <CtaButton isActive={isDataComplete} onClick={handleNext}>
-          집 구조 선택하기
+        <CtaButton isActive={isDataComplete} onClick={handleCtaButtonClick}>
+          주요 활동 선택하기
         </CtaButton>
       </div>
     </div>

@@ -5,11 +5,17 @@ import LoginBeforeImage from '@assets/icons/loginBefore.png';
 
 import { KAKAO_AUTH_URL } from './constants/kakaoLoginPath';
 import * as styles from './loginPage.css';
+import { logLoginSocialClickBtnCTA } from './utils/analytics';
 
 const LoginPage = () => {
   const handleKakaoLogin = () => {
-    // 외부 URL로 리다이렉트하기 위해 window.location.href 사용
-    window.location.href = KAKAO_AUTH_URL;
+    // CTA 버튼 클릭 시 GA 이벤트 전송
+    logLoginSocialClickBtnCTA();
+
+    // Firebase Analytics 이벤트 전송을 위한 지연 후 리다이렉트
+    setTimeout(() => {
+      window.location.href = KAKAO_AUTH_URL;
+    }, 200);
   };
 
   return (

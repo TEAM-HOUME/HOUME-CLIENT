@@ -1,4 +1,6 @@
 // Step 1
+import { useEffect, useRef } from 'react';
+
 import { useHousingOptionsQuery } from '@/pages/imageSetup/apis/houseInfo';
 import { FUNNELHEADER_IMAGES } from '@/pages/imageSetup/constants/headerImages';
 import { useHouseInfo } from '@/pages/imageSetup/hooks/useHouseInfo';
@@ -9,6 +11,11 @@ import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import * as styles from './HouseInfo.css';
 import ButtonGroup from '../../components/buttonGroup/ButtonGroup';
 import FunnelHeader from '../../components/header/FunnelHeader';
+import {
+  logSelectHouseInfoClickBtnCTA,
+  logSelectHouseInfoClickBtnCTAInactive,
+  logSelectHouseInfoViewError,
+} from '../../utils/analytics';
 
 interface HouseInfoProps {
   context: ImageSetupSteps['HouseInfo'];
@@ -16,14 +23,46 @@ interface HouseInfoProps {
 }
 
 const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
-  const { formData, setFormData, errors, handleSubmit, isFormCompleted } =
-    useHouseInfo(context);
+  const {
+    formData,
+    setFormData,
+    errors,
+    handleSubmit,
+    isFormCompleted,
+    hasError,
+  } = useHouseInfo(context);
 
   const { data: housingOptions } = useHousingOptionsQuery();
 
   const houseTypeOptions = housingOptions?.houseTypes || [];
   const roomTypeOptions = housingOptions?.roomTypes || [];
   const areaTypeOptions = housingOptions?.areaTypes || [];
+
+  // 에러 상태 추적을 위한 ref
+  const errorSentRef = useRef(false);
+
+  // 에러가 표시될 때 이벤트 전송 (최초 1회)
+  useEffect(() => {
+    if (hasError && !errorSentRef.current) {
+      logSelectHouseInfoViewError();
+      errorSentRef.current = true;
+    } else if (!hasError) {
+      // 에러가 사라지면 ref 초기화 (다시 에러가 발생하면 이벤트 전송)
+      errorSentRef.current = false;
+    }
+  }, [hasError]);
+
+  // CTA 버튼 클릭 핸들러
+  const handleCtaButtonClick = () => {
+    if (isFormCompleted) {
+      // 활성 상태 버튼 클릭
+      logSelectHouseInfoClickBtnCTA();
+      handleSubmit(onNext);
+    } else {
+      // 비활성 상태 버튼 클릭
+      logSelectHouseInfoClickBtnCTAInactive();
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -87,10 +126,7 @@ const HouseInfo = ({ context, onNext }: HouseInfoProps) => {
         />
 
         <div>
-          <CtaButton
-            isActive={isFormCompleted}
-            onClick={() => handleSubmit(onNext)}
-          >
+          <CtaButton isActive={isFormCompleted} onClick={handleCtaButtonClick}>
             집 구조 선택하기
           </CtaButton>
         </div>

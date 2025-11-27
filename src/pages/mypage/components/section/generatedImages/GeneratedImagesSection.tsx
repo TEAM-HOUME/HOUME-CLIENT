@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
 import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+import { logMyPageClickBtnImgCard } from '@/pages/mypage/utils/analytics';
 import { ROUTES } from '@/routes/paths.ts';
 import Loading from '@/shared/components/loading/Loading';
 
@@ -13,6 +14,7 @@ const GeneratedImagesSection = () => {
   const { data: imagesData, isLoading, isError } = useMyPageImages();
 
   const handleViewResult = (houseId: number) => {
+    logMyPageClickBtnImgCard();
     const params = new URLSearchParams({
       from: 'mypage',
       houseId: String(houseId),

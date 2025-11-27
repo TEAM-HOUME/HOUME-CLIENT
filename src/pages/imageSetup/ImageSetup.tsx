@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageGeneration';
@@ -14,8 +14,25 @@ import {
 
 import type { CompletedHouseInfo } from './types/funnel/houseInfo';
 
+type StepType = 'HouseInfo' | 'FloorPlan' | 'InteriorStyle' | 'ActivityInfo';
+
+interface StepWrapperProps {
+  step: StepType;
+  onMount: (step: StepType) => void;
+  children: React.ReactNode;
+}
+
+const StepWrapper = ({ step, onMount, children }: StepWrapperProps) => {
+  useEffect(() => {
+    onMount(step);
+  }, [step, onMount]);
+
+  return <>{children}</>;
+};
+
 export const ImageSetup = () => {
   const funnel = useImageSetup();
+  const [currentStep, setCurrentStep] = useState<StepType>('HouseInfo');
 
   // 퍼널 전체가 unmount될 때 (퍼널 벗어날 때) 데이터 초기화
   useEffect(() => {
@@ -25,7 +42,7 @@ export const ImageSetup = () => {
   }, []);
 
   return (
-    <FunnelLayout>
+    <FunnelLayout currentStep={currentStep}>
       <funnel.Render
         HouseInfo={funnel.Render.with({
           events: {
@@ -35,10 +52,12 @@ export const ImageSetup = () => {
           },
           render({ dispatch, context }) {
             return (
-              <HouseInfo
-                context={context}
-                onNext={(data) => dispatch('selectHouseInfo', data)}
-              />
+              <StepWrapper step="HouseInfo" onMount={setCurrentStep}>
+                <HouseInfo
+                  context={context}
+                  onNext={(data) => dispatch('selectHouseInfo', data)}
+                />
+              </StepWrapper>
             );
           },
         })}
@@ -50,10 +69,12 @@ export const ImageSetup = () => {
           },
           render({ dispatch, context }) {
             return (
-              <FloorPlan
-                context={context}
-                onNext={(data) => dispatch('selectedFloorPlan', data)}
-              />
+              <StepWrapper step="FloorPlan" onMount={setCurrentStep}>
+                <FloorPlan
+                  context={context}
+                  onNext={(data) => dispatch('selectedFloorPlan', data)}
+                />
+              </StepWrapper>
             );
           },
         })}
@@ -68,17 +89,23 @@ export const ImageSetup = () => {
           },
           render({ dispatch, context }) {
             return (
-              <InteriorStyle
-                context={context}
-                onNext={(data) => dispatch('selectInteriorStyle', data)}
-              />
+              <StepWrapper step="InteriorStyle" onMount={setCurrentStep}>
+                <InteriorStyle
+                  context={context}
+                  onNext={(data) => dispatch('selectInteriorStyle', data)}
+                />
+              </StepWrapper>
             );
           },
         })}
         ActivityInfo={funnel.Render.with({
           events: {},
           render({ context }) {
-            return <ActivityInfo context={context} />;
+            return (
+              <StepWrapper step="ActivityInfo" onMount={setCurrentStep}>
+                <ActivityInfo context={context} />
+              </StepWrapper>
+            );
           },
         })}
       />
