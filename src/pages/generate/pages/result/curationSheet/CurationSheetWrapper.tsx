@@ -2,6 +2,11 @@ import { useRef, useCallback, useEffect, type ReactNode } from 'react';
 
 import clsx from 'clsx';
 
+import { useABTest } from '@/pages/generate/hooks/useABTest';
+import {
+  logResultImgSwipeCurationSheetDown,
+  logResultImgSwipeCurationSheetUp,
+} from '@/pages/generate/utils/analytics';
 import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 import { useBottomSheetDrag } from '@/shared/hooks/useBottomSheetDrag';
 
@@ -24,11 +29,17 @@ export const CurationSheetWrapper = ({
   children,
 }: CurationSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
+  const { variant } = useABTest();
 
   const handleDragUp = useCallback(() => {
-    if (snapState === 'collapsed') onSnapStateChange('mid');
-    else if (snapState === 'mid') onSnapStateChange('expanded');
-  }, [snapState, onSnapStateChange]);
+    if (snapState === 'collapsed') {
+      onSnapStateChange('mid');
+      logResultImgSwipeCurationSheetUp(variant);
+    } else if (snapState === 'mid') {
+      onSnapStateChange('expanded');
+      logResultImgSwipeCurationSheetUp(variant);
+    }
+  }, [snapState, onSnapStateChange, variant]);
 
   const handleDragDown = useCallback(
     (delta?: number) => {
@@ -38,14 +49,17 @@ export const CurationSheetWrapper = ({
         // 2단계 한 번에 (바로 닫힘)
         if (move >= THRESHOLD_JUMP) {
           onSnapStateChange('collapsed');
+          logResultImgSwipeCurationSheetDown(variant);
         } else {
           onSnapStateChange('mid');
+          logResultImgSwipeCurationSheetDown(variant);
         }
       } else if (snapState === 'mid') {
         onSnapStateChange('collapsed');
+        logResultImgSwipeCurationSheetDown(variant);
       }
     },
-    [snapState, onSnapStateChange]
+    [snapState, onSnapStateChange, variant]
   );
 
   const { isDragging, onHandlePointerDown } = useBottomSheetDrag({
