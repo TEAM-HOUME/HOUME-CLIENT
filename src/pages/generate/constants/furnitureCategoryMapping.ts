@@ -1,5 +1,8 @@
 import { OBJ365_ALL_CLASSES } from '../utils/obj365AllClasses';
-import { OBJ365_FURNITURE_INDEX_SET } from '../utils/obj365Furniture';
+import {
+  isCabinetShelfIndex,
+  OBJ365_FURNITURE_INDEX_SET,
+} from '../utils/obj365Furniture';
 
 import type { FurnitureCategory } from '../utils/furnitureCategories';
 
@@ -42,34 +45,23 @@ const uniqueCodes = (codes: FurnitureCategoryCode[]) => {
   return Array.from(seen);
 };
 
+// 모델 최종 라벨을 12개 코드로 단일화하는 매핑(정리본 기반, 불필요 단어 제거)
 const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
   const entries: Array<[string, FurnitureCategoryCode[]]> = [
-    ['Bed', ['SINGLE']],
-    ['Single Bed', ['SINGLE']],
-    ['Desk', ['OFFICE_DESK']],
-    ['Cabinet/shelf', ['DISPLAY_CABINET']],
-    ['Dining Table', ['DINING_TABLE']],
-    ['Chair', ['SINGLE_SOFA']],
-    ['Bench', ['SINGLE_SOFA']],
-    ['Stool', ['SINGLE_SOFA']],
-    ['one seater sofa', ['SINGLE_SOFA']],
-    ['Storage box', ['DRAWER']],
-    ['Nightstand', ['DRAWER']],
-    ['drawer', ['DRAWER']],
-    ['Monitor/TV', ['MOVABLE_TV']],
-    ['Coffee Table', ['SITTING_TABLE']],
-    ['Side Table', ['SITTING_TABLE']],
-    ['Mirror', ['MIRROR']],
-    ['Couch', ['TWO_SEATER_SOFA']],
-    ['Sofa', ['TWO_SEATER_SOFA']],
-    ['two seater sofa', ['TWO_SEATER_SOFA']],
-    ['base cabinet', ['DISPLAY_CABINET']],
-    ['wall cabinet', ['WHITE_BOOKSHELF']],
-    ['wardrobe', ['CLOSET']],
-    ['built-in closet', ['CLOSET']],
-    ['built in closet', ['CLOSET']],
-    ['storage cabinet', ['DISPLAY_CABINET']],
-    ['chest of drawers', ['DRAWER']],
+    ['Cabinet/shelf', ['DISPLAY_CABINET']], // 12번 기본값, 리파인 실패 시 사용
+    ['Chair', ['SINGLE_SOFA']], // 2
+    ['Desk', ['OFFICE_DESK']], // 9
+    ['Storage box', ['DRAWER']], // 20
+    ['Bench', ['SINGLE_SOFA']], // 24
+    ['Monitor/TV', ['MOVABLE_TV']], // 37
+    ['Stool', ['SINGLE_SOFA']], // 47
+    ['Couch', ['TWO_SEATER_SOFA']], // 50
+    ['Bed', ['SINGLE']], // 75
+    ['Mirror', ['MIRROR']], // 79
+    ['Dining Table', ['DINING_TABLE']], // 98
+    ['Nightstand', ['DRAWER']], // 121
+    ['Coffee Table', ['SITTING_TABLE']], // 167
+    ['Side Table', ['SITTING_TABLE']], // 168
   ];
   return entries.reduce<Record<string, FurnitureCategoryCode[]>>(
     (acc, [label, codes]) => {
@@ -85,22 +77,23 @@ const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
 const FINAL_LABEL_MAP = defineLabelMap();
 
 const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
-  75: ['SINGLE'],
-  9: ['OFFICE_DESK'],
-  12: ['CLOSET', 'WHITE_BOOKSHELF', 'DISPLAY_CABINET'],
-  98: ['DINING_TABLE'],
   2: ['SINGLE_SOFA'],
-  24: ['SINGLE_SOFA'],
-  47: ['SINGLE_SOFA'],
+  9: ['OFFICE_DESK'],
+  12: ['DISPLAY_CABINET'],
   20: ['DRAWER'],
-  121: ['DRAWER'],
+  24: ['SINGLE_SOFA'],
   37: ['MOVABLE_TV'],
+  47: ['SINGLE_SOFA'],
+  50: ['TWO_SEATER_SOFA'],
+  75: ['SINGLE'],
+  79: ['MIRROR'],
+  98: ['DINING_TABLE'],
+  121: ['DRAWER'],
   167: ['SITTING_TABLE'],
   168: ['SITTING_TABLE'],
-  79: ['MIRROR'],
-  50: ['TWO_SEATER_SOFA'],
 } as const;
 
+// cabinet 2차 분류 결과 → 12개 코드 매핑
 const CABINET_CATEGORY_TO_CODE: Record<
   FurnitureCategory,
   FurnitureCategoryCode
@@ -153,6 +146,11 @@ export const resolveFurnitureCode = (input: {
   refinedLabel?: FurnitureCategory;
   refinedConfidence?: number;
 }): FurnitureCategoryCode | null => {
+  // Cabinet/shelf 인데 2차 리파인 결과가 없으면 감지 실패로 간주
+  if (isCabinetShelfIndex(input.obj365Label) && !input.refinedLabel) {
+    return null;
+  }
+
   const refinedCode = getCodeFromRefinedLabel(input.refinedLabel);
   if (refinedCode) return refinedCode;
 

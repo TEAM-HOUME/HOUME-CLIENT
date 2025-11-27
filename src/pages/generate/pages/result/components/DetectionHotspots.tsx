@@ -27,25 +27,20 @@ import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture'
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
 
+// 카테고리 API 응답(categoryName)을 12개 코드로 역매핑하기 위한 키워드 집합(요청 단어만 사용)
 const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
-  SINGLE: ['1인용', '싱글', '슈퍼싱글'],
-  OFFICE_DESK: ['업무용 책상', '사무용책상', '오피스책상'],
-  CLOSET: ['붙박이장', '옷장', 'wardrobe', '워드로브'],
-  DINING_TABLE: ['식탁', '다이닝테이블'],
-  SINGLE_SOFA: ['1인소파', '싱글소파', '암체어'],
-  DRAWER: ['서랍장', '수납서랍'],
-  MOVABLE_TV: ['이동식tv', '이동식티비', '무빙tv'],
-  SITTING_TABLE: ['좌식테이블', '좌식탁자', '로우테이블'],
-  MIRROR: ['전신거울', '거울', '미러'],
-  WHITE_BOOKSHELF: ['벽수납장', '벽선반', '상부장', 'wallcabinet'],
-  DISPLAY_CABINET: [
-    '장식장',
-    '하부장',
-    '수납장',
-    'displaycabinet',
-    'storagecabinet',
-  ],
-  TWO_SEATER_SOFA: ['2인소파', '2인용소파', '투시터', '러브시트'],
+  SINGLE: ['싱글', '슈퍼싱글', '더블', '퀸 이상'],
+  OFFICE_DESK: ['업무용 책상'],
+  CLOSET: ['옷장'],
+  DINING_TABLE: ['식탁'],
+  SINGLE_SOFA: ['1인용'],
+  DRAWER: ['수납장'],
+  MOVABLE_TV: ['이동식 TV'],
+  SITTING_TABLE: ['좌식 테이블'],
+  MIRROR: ['전신 거울'],
+  WHITE_BOOKSHELF: ['책 선반'],
+  DISPLAY_CABINET: ['장식장'],
+  TWO_SEATER_SOFA: ['2인용'],
 };
 
 const normalizeCategoryName = (value?: string | null) =>
