@@ -12,10 +12,23 @@ type ButtonType = 'login' | 'profile' | null;
 
 interface LogoNavBarProps extends React.ComponentProps<'nav'> {
   buttonType?: ButtonType;
+  onProfileClick?: () => void; // 프로필 버튼 클릭 시 실행할 콜백 (선택적)
 }
 
-const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
+const LogoNavBar = ({
+  buttonType = null,
+  onProfileClick,
+  ...props
+}: LogoNavBarProps) => {
   const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    if (onProfileClick) {
+      onProfileClick();
+    } else {
+      navigate(ROUTES.MYPAGE);
+    }
+  };
 
   const handleRenderBtn = () => {
     switch (buttonType) {
@@ -35,7 +48,7 @@ const LogoNavBar = ({ buttonType = null, ...props }: LogoNavBarProps) => {
         return (
           <button
             type="button"
-            onClick={() => navigate(ROUTES.MYPAGE)}
+            onClick={handleProfileClick}
             className={styles.profileicon}
           >
             <ProfileIcon />

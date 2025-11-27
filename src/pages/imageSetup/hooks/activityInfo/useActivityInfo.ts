@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { GenerateImageRequest } from '@/pages/generate/types/generate';
+import {
+  logSelectFurnitureClickBtnCTA,
+  logSelectFurnitureClickBtnCTACreditError,
+} from '@/pages/imageSetup/utils/analytics';
 import { ROUTES } from '@/routes/paths';
 import { useCreditGuard } from '@/shared/hooks/useCreditGuard';
 
@@ -164,9 +168,14 @@ export const useActivityInfo = (
     // 중복 클릭 방지 (CreditBox 패턴)
     if (isChecking || isButtonDisabled) return;
 
+    // CTA 버튼 클릭 시 GA 이벤트 전송
+    logSelectFurnitureClickBtnCTA();
+
     // 이미지 생성 전 크레딧 확인
     const hasCredit = await checkCredit();
     if (!hasCredit) {
+      // 크레딧 부족 시 CreditError 이벤트 전송
+      logSelectFurnitureClickBtnCTACreditError();
       console.log('크레딧이 부족하여 이미지 생성을 중단합니다');
       setIsButtonDisabled(true); // 크레딧 부족 시 버튼 비활성화
       return;

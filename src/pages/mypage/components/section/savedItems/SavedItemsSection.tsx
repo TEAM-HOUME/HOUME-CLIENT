@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
+import { logMyPageClickBtnFurnitureCard } from '@/pages/mypage/utils/analytics';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { SESSION_STORAGE_KEYS } from '@/shared/constants/bottomSheet';
 
@@ -67,6 +68,7 @@ const SavedItemsSection = () => {
                 linkHref={item.furnitureProductSiteUrl}
                 isSaved={true}
                 onToggleSave={() => handleToggleSave(item.id)}
+                onLinkClick={logMyPageClickBtnFurnitureCard}
               />
             </div>
           );

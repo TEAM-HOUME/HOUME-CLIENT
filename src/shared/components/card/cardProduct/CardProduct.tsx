@@ -16,6 +16,7 @@ interface CardProductProps {
   linkHref?: string;
   linkLabel?: string;
   disabled?: boolean;
+  onLinkClick?: () => void;
 }
 
 const CardProduct = ({
@@ -28,6 +29,7 @@ const CardProduct = ({
   linkHref,
   linkLabel = '사이트',
   disabled = false,
+  onLinkClick,
 }: CardProductProps) => {
   const isLarge = size === 'large';
 
@@ -45,6 +47,7 @@ const CardProduct = ({
               href={linkHref}
               typeVariant={isLarge ? 'withText' : 'onlyIcon'}
               aria-label={isLarge ? undefined : '공식 사이트로 이동'}
+              onClick={onLinkClick}
             >
               {isLarge && linkLabel}
             </LinkButton>
