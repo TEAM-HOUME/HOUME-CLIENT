@@ -9,7 +9,7 @@ interface DislikeButtonProps extends React.ComponentProps<'button'> {
   children?: React.ReactNode;
   typeVariant?: 'withText' | 'onlyIcon';
   isSelected?: boolean;
-  disabledd?: boolean;
+  disabled?: boolean;
 }
 
 const DislikeButton = ({
@@ -26,7 +26,7 @@ const DislikeButton = ({
       className={styles.likeButton({
         selected: isSelected,
         type: typeVariant,
-        disabled: disabled,
+        disabled,
       })}
       {...props}
     >

@@ -23,7 +23,7 @@ const LikeButton = ({
       className={styles.likeButton({
         type: typeVariant,
         selected: isSelected,
-        disabled: disabled,
+        disabled,
       })}
       {...props}
     >

@@ -195,10 +195,10 @@ const LoadingPage = () => {
     // 선택 상태 업데이트 (버튼 하이라이트)
     setSelected(isLike ? 'like' : 'dislike');
 
-    const voteType = isLike ? likeMutation.mutate : hateMutation.mutate;
-
     // API 호출: 좋아요/별로예요 전송
-    voteType(currentImage.carouselId, {
+    const mutation = isLike ? likeMutation.mutate : hateMutation.mutate;
+
+    mutation(currentImage.carouselId, {
       onSuccess: () => {
         setAnimating(true);
 
