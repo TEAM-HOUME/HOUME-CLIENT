@@ -46,6 +46,7 @@ export const likeButton = recipe({
     disabled: {
       true: {
         cursor: 'not-allowed',
+        pointerEvents: 'none',
       },
       false: {},
     },
