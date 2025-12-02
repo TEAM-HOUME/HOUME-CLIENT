@@ -6,12 +6,14 @@ interface LikeButtonProps extends React.ComponentProps<'button'> {
   children?: React.ReactNode;
   typeVariant?: 'withText' | 'onlyIcon';
   isSelected?: boolean;
+  disabled?: boolean;
 }
 
 const LikeButton = ({
   children,
   typeVariant = 'withText',
   isSelected = false,
+  disabled = false,
   ...props
 }: LikeButtonProps) => {
   return (
@@ -21,6 +23,7 @@ const LikeButton = ({
       className={styles.likeButton({
         type: typeVariant,
         selected: isSelected,
+        disabled: disabled,
       })}
       {...props}
     >

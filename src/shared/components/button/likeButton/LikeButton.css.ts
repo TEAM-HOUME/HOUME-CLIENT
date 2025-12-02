@@ -43,6 +43,12 @@ export const likeButton = recipe({
       true: {},
       false: {},
     },
+    disabled: {
+      true: {
+        cursor: 'not-allowed',
+      },
+      false: {},
+    },
   },
   compoundVariants: [
     // withText + selected
@@ -58,5 +64,6 @@ export const likeButton = recipe({
   defaultVariants: {
     selected: false,
     type: 'withText',
+    disabled: false,
   },
 });
