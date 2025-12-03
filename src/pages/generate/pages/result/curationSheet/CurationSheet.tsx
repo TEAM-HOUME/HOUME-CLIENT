@@ -122,13 +122,13 @@ export const CurationSheet = () => {
     selectCategory(activeImageId, categoryId);
   };
 
-  const LoadingDots = () => (
-    <span className={styles.loadingDots}>
-      <span className={styles.dot} />
-      <span className={styles.dot} />
-      <span className={styles.dot} />
-    </span>
-  );
+  // const LoadingDots = () => (
+  //   <span className={styles.loadingDots}>
+  //     <span className={styles.dot} />
+  //     <span className={styles.dot} />
+  //     <span className={styles.dot} />
+  //   </span>
+  // );
 
   const renderStatus = (
     message: string,
