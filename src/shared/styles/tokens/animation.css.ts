@@ -34,4 +34,8 @@ export const animationTokens = {
   skeletonWave: keyframes({
     to: { backgroundPositionX: '-200%' },
   }),
+  dotsBounce: keyframes({
+    '0%, 80%, 100%': { opacity: 0 },
+    '40%': { opacity: 1 },
+  }),
 } as const;

@@ -122,13 +122,29 @@ export const CurationSheet = () => {
     selectCategory(activeImageId, categoryId);
   };
 
+  const LoadingDots = () => (
+    <span className={styles.loadingDots}>
+      <span className={styles.dot} />
+      <span className={styles.dot} />
+      <span className={styles.dot} />
+    </span>
+  );
+
   const renderStatus = (
     message: string,
     description?: string,
-    action?: { label: string; onClick: () => void }
+    action?: { label: string; onClick: () => void },
+    isLoading?: boolean
   ) => (
     <div className={styles.statusContainer}>
-      <p className={styles.statusMessage}>{message}</p>
+      <p
+        className={
+          isLoading ? styles.statusMessageShimmer : styles.statusMessage
+        }
+      >
+        {message}
+        {isLoading && <LoadingDots />}
+      </p>
       {description && <p className={styles.statusSubMessage}>{description}</p>}
       {action && (
         <button
@@ -152,7 +168,9 @@ export const CurationSheet = () => {
     if (categoriesQuery.isLoading) {
       return renderStatus(
         '감지된 가구를 분석 중이에요',
-        '잠시만 기다려 주세요'
+        '잠시만 기다려 주세요',
+        undefined,
+        true
       );
     }
     if (categoriesQuery.isError) {
@@ -177,7 +195,9 @@ export const CurationSheet = () => {
     if (productsQuery.isLoading) {
       return renderStatus(
         '선택한 가구에 맞는 상품을 찾는 중이에요',
-        '곧 추천을 보여드릴게요'
+        '곧 추천을 보여드릴게요',
+        undefined,
+        true
       );
     }
     if (productsQuery.isError) {
