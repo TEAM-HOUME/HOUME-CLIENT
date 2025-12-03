@@ -31,4 +31,7 @@ export const animationTokens = {
     '0%': { transform: 'translateX(-100%)' },
     '100%': { transform: 'translateX(100%)' },
   }),
+  skeletonWave: keyframes({
+    to: { backgroundPositionX: '-200%' },
+  }),
 } as const;

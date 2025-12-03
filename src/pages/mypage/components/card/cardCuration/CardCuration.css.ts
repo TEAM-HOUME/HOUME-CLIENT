@@ -2,7 +2,6 @@ import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 import { animationTokens } from '@/shared/styles/tokens/animation.css';
-import { colorVars } from '@/shared/styles/tokens/color.css';
 
 export const cardCurationContainer = style({
   display: 'flex',
@@ -45,22 +44,9 @@ export const image = recipe({
 
 export const skeleton = style({
   position: 'absolute',
-  inset: 0, // 부모 영역 전체 덮음
+  inset: 0,
   borderRadius: '0.8rem',
-  backgroundColor: colorVars.color.gray100,
-  overflow: 'hidden',
-
-  selectors: {
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      height: '100%',
-      width: '60%',
-      background:
-        'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-      animation: `${animationTokens.shimmer} 1.2s infinite`,
-    },
-  },
+  background: 'linear-gradient(90deg, #ececec 8%, #f0f0f0 18%, #ececec 33%)',
+  backgroundSize: '200% 100%',
+  animation: `${animationTokens.skeletonWave} 2s linear infinite`,
 });
