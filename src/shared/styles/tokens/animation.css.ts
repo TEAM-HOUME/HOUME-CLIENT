@@ -27,4 +27,8 @@ export const animationTokens = {
   fadeInUpSlow: `${fadeInUp} 1.2s ease-out forwards`,
   fadeInUpFast: `${fadeInUp} 0.8s ease-out forwards`,
   slideLeft: `${slideLeft} 1.2s ease-out forwards`,
+  shimmer: keyframes({
+    '0%': { transform: 'translateX(-100%)' },
+    '100%': { transform: 'translateX(100%)' },
+  }),
 } as const;

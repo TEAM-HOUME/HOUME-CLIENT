@@ -1,6 +1,9 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
+import { colorVars } from '@/shared/styles/tokens/color.css';
+
 import { zIndex } from '@shared/styles/tokens/zIndex';
 
 export const container = style({
@@ -17,7 +20,7 @@ export const image = recipe({
     height: '100%',
     objectFit: 'cover',
     objectPosition: 'center',
-    transition: 'transform 0.2s ease-out',
+    transition: 'transform 0.2s ease-out, opacity 0.3s ease-in-out',
   },
   variants: {
     mirrored: {
@@ -28,9 +31,14 @@ export const image = recipe({
         transform: 'none',
       },
     },
+    loaded: {
+      true: { opacity: 1 },
+      false: { opacity: 0 },
+    },
   },
   defaultVariants: {
     mirrored: false,
+    loaded: false,
   },
 });
 
@@ -68,4 +76,26 @@ export const hotspot = style({
   width: '24px',
   height: '24px',
   cursor: 'pointer',
+});
+
+export const skeleton = style({
+  position: 'absolute',
+  inset: 0, // 부모 영역 전체 차지
+  backgroundColor: colorVars.color.gray100,
+  overflow: 'hidden',
+  zIndex: zIndex.base,
+
+  selectors: {
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '60%',
+      background:
+        'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+      animation: `${animationTokens.shimmer} 1.2s infinite`,
+    },
+  },
 });

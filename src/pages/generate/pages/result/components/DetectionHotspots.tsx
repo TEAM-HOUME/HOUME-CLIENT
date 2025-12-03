@@ -2,7 +2,7 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   resolveFurnitureCode,
@@ -108,6 +108,7 @@ const DetectionHotspots = ({
   mirrored = false,
   shouldInferHotspots = true,
 }: DetectionHotspotsProps) => {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const setImageDetection = useCurationStore(
     (state) => state.setImageDetection
   );
@@ -271,6 +272,11 @@ const DetectionHotspots = ({
     lastSyncedHotspotsRef.current = null;
   }, [imageId]);
 
+  // 이미지 URL이 변경되면 로드 상태 리셋
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [imageUrl]);
+
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     if (imageId === null) return;
     const next =
@@ -369,12 +375,14 @@ const DetectionHotspots = ({
   if (isLoading) {
     return (
       <div ref={containerRef} className={styles.container}>
+        {!isImageLoaded && <div className={styles.skeleton} />}
         <img
           ref={imgRef}
           crossOrigin="anonymous"
           src={imageUrl}
           alt="generated"
-          className={styles.image({ mirrored })}
+          className={styles.image({ mirrored, loaded: isImageLoaded })}
+          onLoad={() => setIsImageLoaded(true)}
         />
       </div>
     );
@@ -382,12 +390,14 @@ const DetectionHotspots = ({
 
   return (
     <div ref={containerRef} className={styles.container}>
+      {!isImageLoaded && <div className={styles.skeleton} />}
       <img
         ref={imgRef}
         crossOrigin="anonymous"
         src={imageUrl}
         alt="generated"
-        className={styles.image({ mirrored })}
+        className={styles.image({ mirrored, loaded: isImageLoaded })}
+        onLoad={() => setIsImageLoaded(true)}
       />
       <div className={styles.overlay({ visible: hasHotspots })}>
         {displayHotspots.map(({ hotspot }) => (
