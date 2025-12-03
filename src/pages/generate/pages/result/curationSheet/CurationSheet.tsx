@@ -143,7 +143,7 @@ export const CurationSheet = () => {
         }
       >
         {message}
-        {isLoading && <LoadingDots />}
+        {/* {isLoading && <LoadingDots />} */}
       </p>
       {description && <p className={styles.statusSubMessage}>{description}</p>}
       {action && (
