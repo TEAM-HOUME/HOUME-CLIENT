@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import CardImage from '@assets/images/cardExImg.svg?url';
 import LinkButton from '@components/button/linkButton/LinkButton';
 import SaveButton from '@components/button/saveButton/SaveButton';
@@ -17,6 +19,7 @@ interface CardProductProps {
   linkLabel?: string;
   disabled?: boolean;
   onLinkClick?: () => void;
+  onCardClick?: () => void;
 }
 
 const CardProduct = ({
@@ -30,16 +33,20 @@ const CardProduct = ({
   linkLabel = '사이트',
   disabled = false,
   onLinkClick,
+  onCardClick,
 }: CardProductProps) => {
   const isLarge = size === 'large';
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className={styles.wrapper({ size })}>
+    <div className={styles.wrapper({ size })} onClick={onCardClick}>
       <section className={styles.imgSection({ size })}>
+        {!isLoaded && <div className={styles.skeleton} />}
         <img
-          className={styles.cardImage}
+          className={styles.cardImage({ loaded: isLoaded })}
           src={imageUrl || CardImage}
           alt="카드 이미지"
+          onLoad={() => setIsLoaded(true)}
         />
         <div className={styles.linkBtnContainer}>
           {linkHref && (

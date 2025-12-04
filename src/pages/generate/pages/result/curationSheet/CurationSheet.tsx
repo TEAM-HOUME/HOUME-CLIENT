@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 
 import FilterChip from '@/pages/generate/components/filterChip/FilterChip';
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import {
   useActiveImageCurationState,
   useActiveImageId,
@@ -13,6 +14,7 @@ import {
   useSheetSnapState,
 } from '@/pages/generate/hooks/useFurnitureCuration';
 import { useCurationStore } from '@/pages/generate/stores/useCurationStore';
+import { logResultImgClickCurationSheetFilter } from '@/pages/generate/utils/analytics';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
@@ -20,6 +22,10 @@ import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
 
 import { getGeneratedImageProducts } from '@pages/generate/apis/furniture';
+import {
+  buildDetectedCodeToCategoryId,
+  pickHotspotIdByCategory,
+} from '@pages/generate/utils/hotspotCategoryResolver';
 
 import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
@@ -32,9 +38,13 @@ export const CurationSheet = () => {
   const imageState = useActiveImageCurationState();
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;
   const selectCategory = useCurationStore((state) => state.selectCategory);
+  const selectHotspot = useCurationStore((state) => state.selectHotspot);
+  const hotspots = imageState?.hotspots ?? [];
+  const detectedObjects = imageState?.detectedObjects ?? [];
   const { snapState, setSnapState } = useSheetSnapState();
 
   const navigate = useNavigate();
+  const { variant } = useABTest();
 
   const handleGotoMypage = () => {
     navigate(ROUTES.MYPAGE);
@@ -49,6 +59,10 @@ export const CurationSheet = () => {
   const categories = categoriesQuery.data?.categories ?? [];
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
+  const detectedCodeToCategoryId = useMemo(
+    () => buildDetectedCodeToCategoryId(categories, detectedObjects),
+    [categories, detectedObjects]
+  );
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
@@ -119,16 +133,44 @@ export const CurationSheet = () => {
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
+    logResultImgClickCurationSheetFilter(variant);
     selectCategory(activeImageId, categoryId);
+    const hotspotId =
+      pickHotspotIdByCategory(
+        categoryId,
+        hotspots,
+        categories,
+        detectedCodeToCategoryId
+      ) ?? null;
+    selectHotspot(activeImageId, hotspotId);
+    if (snapState === 'collapsed') {
+      setSnapState('mid');
+    }
   };
+
+  // const LoadingDots = () => (
+  //   <span className={styles.loadingDots}>
+  //     <span className={styles.dot} />
+  //     <span className={styles.dot} />
+  //     <span className={styles.dot} />
+  //   </span>
+  // );
 
   const renderStatus = (
     message: string,
     description?: string,
-    action?: { label: string; onClick: () => void }
+    action?: { label: string; onClick: () => void },
+    isLoading?: boolean
   ) => (
     <div className={styles.statusContainer}>
-      <p className={styles.statusMessage}>{message}</p>
+      <p
+        className={
+          isLoading ? styles.statusMessageShimmer : styles.statusMessage
+        }
+      >
+        {message}
+        {/* {isLoading && <LoadingDots />} */}
+      </p>
       {description && <p className={styles.statusSubMessage}>{description}</p>}
       {action && (
         <button
@@ -152,7 +194,9 @@ export const CurationSheet = () => {
     if (categoriesQuery.isLoading) {
       return renderStatus(
         '감지된 가구를 분석 중이에요',
-        '잠시만 기다려 주세요'
+        '잠시만 기다려 주세요',
+        undefined,
+        true
       );
     }
     if (categoriesQuery.isError) {
@@ -177,7 +221,9 @@ export const CurationSheet = () => {
     if (productsQuery.isLoading) {
       return renderStatus(
         '선택한 가구에 맞는 상품을 찾는 중이에요',
-        '곧 추천을 보여드릴게요'
+        '곧 추천을 보여드릴게요',
+        undefined,
+        true
       );
     }
     if (productsQuery.isError) {
@@ -210,6 +256,12 @@ export const CurationSheet = () => {
     <CurationSheetWrapper
       snapState={snapState}
       onSnapStateChange={setSnapState}
+      onCollapsed={() => {
+        if (activeImageId === null) return;
+        // 시트 완전히 닫힌 뒤에만 선택 상태 해제해 목록이 사라지는 시점을 늦춤
+        selectCategory(activeImageId, null);
+        selectHotspot(activeImageId, null);
+      }}
     >
       {(snapState) => (
         <>

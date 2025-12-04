@@ -59,9 +59,9 @@ const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
     ['Bed', ['SINGLE']], // 75
     ['Mirror', ['MIRROR']], // 79
     ['Dining Table', ['DINING_TABLE']], // 98
-    ['Nightstand', ['DRAWER']], // 121
     ['Coffee Table', ['SITTING_TABLE']], // 167
     ['Side Table', ['SITTING_TABLE']], // 168
+    // ['Nightstand', ['DRAWER']], // 121 (미지원 가구로 비활성화)
   ];
   return entries.reduce<Record<string, FurnitureCategoryCode[]>>(
     (acc, [label, codes]) => {
@@ -88,9 +88,9 @@ const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
   75: ['SINGLE'],
   79: ['MIRROR'],
   98: ['DINING_TABLE'],
-  121: ['DRAWER'],
   167: ['SITTING_TABLE'],
   168: ['SITTING_TABLE'],
+  // 121: ['DRAWER'], // Nightstand 미지원으로 비활성화
 } as const;
 
 // cabinet 2차 분류 결과 → 12개 코드 매핑

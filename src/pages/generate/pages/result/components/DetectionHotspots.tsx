@@ -2,66 +2,35 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   resolveFurnitureCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
+import { useABTest } from '@pages/generate/hooks/useABTest';
 import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureCuration';
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
+import { logResultImgClickBtnSpot } from '@pages/generate/utils/analytics';
 import {
   filterAllowedDetectedObjects,
   mapHotspotsToDetectedObjects,
 } from '@pages/generate/utils/detectedObjectMapper';
 import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
+import {
+  buildDetectedCodeToCategoryId,
+  resolveCategoryIdForHotspot,
+} from '@pages/generate/utils/hotspotCategoryResolver';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
 import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
-import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture';
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
-
-// 카테고리 API 응답(categoryName)을 12개 코드로 역매핑하기 위한 키워드 집합(요청 단어만 사용)
-const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
-  SINGLE: ['싱글', '슈퍼싱글', '더블', '퀸 이상'],
-  OFFICE_DESK: ['업무용 책상'],
-  CLOSET: ['옷장'],
-  DINING_TABLE: ['식탁'],
-  SINGLE_SOFA: ['1인용'],
-  DRAWER: ['수납장'],
-  MOVABLE_TV: ['이동식 TV'],
-  SITTING_TABLE: ['좌식 테이블'],
-  MIRROR: ['전신 거울'],
-  WHITE_BOOKSHELF: ['책 선반'],
-  DISPLAY_CABINET: ['장식장'],
-  TWO_SEATER_SOFA: ['2인용'],
-};
-
-const normalizeCategoryName = (value?: string | null) =>
-  value?.toString().trim().replace(/\s+/g, '').toUpperCase() ?? '';
-
-const matchCodeByCategoryName = (
-  name?: string | null
-): FurnitureCategoryCode | null => {
-  const normalized = normalizeCategoryName(name);
-  if (!normalized) return null;
-  for (const [code, keywords] of Object.entries(CATEGORY_NAME_KEYWORDS)) {
-    if (
-      keywords.some((keyword) =>
-        normalized.includes(normalizeCategoryName(keyword))
-      )
-    ) {
-      return code as FurnitureCategoryCode;
-    }
-  }
-  return null;
-};
 
 const isSameHotspotArray = (
   prev: FurnitureHotspot[] | null,
@@ -103,6 +72,7 @@ const DetectionHotspots = ({
   mirrored = false,
   shouldInferHotspots = true,
 }: DetectionHotspotsProps) => {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const setImageDetection = useCurationStore(
     (state) => state.setImageDetection
   );
@@ -121,6 +91,7 @@ const DetectionHotspots = ({
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
+  const { variant } = useABTest();
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -145,65 +116,12 @@ const DetectionHotspots = ({
 
   // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭
   const detectedCodeToCategoryId = useMemo(() => {
-    const map = new Map<FurnitureCategoryCode, number>();
-    if (!allowedCategories || allowedCategories.length === 0) return map;
-    if (!detectedObjects || detectedObjects.length === 0) return map;
-
-    const usedCategoryIds = new Set<number>();
-    allowedCategories.forEach((category) => {
-      const matchedCode = matchCodeByCategoryName(category.categoryName);
-      if (matchedCode && !map.has(matchedCode)) {
-        map.set(matchedCode, category.id);
-        usedCategoryIds.add(category.id);
-      }
-    });
-
-    return map;
+    return buildDetectedCodeToCategoryId(allowedCategories, detectedObjects);
   }, [allowedCategories, detectedObjects]);
 
   type DisplayHotspot = {
     hotspot: FurnitureHotspot;
     resolvedCode: FurnitureCategoryCode | null;
-  };
-
-  // 핫스팟 라벨 → 카테고리 ID 해석 유틸
-  const resolveCategoryIdForHotspot = (
-    hotspot: FurnitureHotspot,
-    resolvedCode: FurnitureCategoryCode | null,
-    allowedCategories: FurnitureCategoryResponse[] | undefined,
-    codeMap: Map<FurnitureCategoryCode, number>
-  ): number | null => {
-    const allowedIdSet = new Set(allowedCategories?.map((c) => c.id));
-
-    if (resolvedCode) {
-      const byCode = codeMap.get(resolvedCode);
-      if (byCode && allowedIdSet.has(byCode)) {
-        return byCode;
-      }
-    }
-
-    // 후순위: 서버 카테고리 이름과 핫스팟 라벨 문자열 비교
-    const nameToAllowedId = new Map<string, number>();
-    (allowedCategories ?? []).forEach((c) => {
-      const n = (c.categoryName ?? '').toString().trim();
-      if (!n) return;
-      nameToAllowedId.set(n.toUpperCase(), c.id);
-      nameToAllowedId.set(n.replaceAll(' ', '_').toUpperCase(), c.id);
-    });
-    const fallbackLabels = [hotspot.finalLabel ?? '', hotspot.className ?? '']
-      .flatMap((label) =>
-        label
-          .split('/')
-          .map((part: string) => part.trim())
-          .filter(Boolean)
-      )
-      .map((label) => label.toUpperCase());
-    for (const label of fallbackLabels) {
-      const direct = nameToAllowedId.get(label);
-      if (direct) return direct;
-    }
-
-    return null;
   };
 
   const displayHotspots: DisplayHotspot[] = useMemo(() => {
@@ -266,6 +184,11 @@ const DetectionHotspots = ({
     lastSyncedHotspotsRef.current = null;
   }, [imageId]);
 
+  // 이미지 URL이 변경되면 로드 상태 리셋
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [imageUrl]);
+
   const handleHotspotClick = (hotspot: FurnitureHotspot) => {
     if (imageId === null) return;
     const next =
@@ -274,6 +197,7 @@ const DetectionHotspots = ({
         : hotspot.id;
     selectHotspot(imageId, next);
     if (next) {
+      logResultImgClickBtnSpot(variant);
       logDetectionEvent('hotspot-selected', {
         hotspotId: hotspot.id,
         score: hotspot.score,
@@ -330,6 +254,7 @@ const DetectionHotspots = ({
         }
       }
     } else {
+      openSheet('collapsed');
       logDetectionEvent('hotspot-cleared', { hotspotId: hotspot.id });
     }
   };
@@ -364,12 +289,14 @@ const DetectionHotspots = ({
   if (isLoading) {
     return (
       <div ref={containerRef} className={styles.container}>
+        {!isImageLoaded && <div className={styles.skeleton} />}
         <img
           ref={imgRef}
           crossOrigin="anonymous"
           src={imageUrl}
           alt="generated"
-          className={styles.image({ mirrored })}
+          className={styles.image({ mirrored, loaded: isImageLoaded })}
+          onLoad={() => setIsImageLoaded(true)}
         />
       </div>
     );
@@ -377,12 +304,14 @@ const DetectionHotspots = ({
 
   return (
     <div ref={containerRef} className={styles.container}>
+      {!isImageLoaded && <div className={styles.skeleton} />}
       <img
         ref={imgRef}
         crossOrigin="anonymous"
         src={imageUrl}
         alt="generated"
-        className={styles.image({ mirrored })}
+        className={styles.image({ mirrored, loaded: isImageLoaded })}
+        onLoad={() => setIsImageLoaded(true)}
       />
       <div className={styles.overlay({ visible: hasHotspots })}>
         {displayHotspots.map(({ hotspot }) => (

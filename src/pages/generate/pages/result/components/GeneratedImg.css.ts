@@ -110,6 +110,7 @@ export const imgAreaBlurred = recipe({
     objectFit: 'cover',
     objectPosition: 'center',
     filter: 'blur(15px)',
+    backgroundColor: 'lightgray',
   },
   variants: {
     mirrored: {

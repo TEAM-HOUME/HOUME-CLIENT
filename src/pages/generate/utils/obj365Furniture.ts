@@ -28,7 +28,7 @@ export const OBJ365_FURNITURE_INDEXES = [
   94, // Clock
   98, // Dining Table ✓ mapped in CURATION_MAPPING
   110, // Fan
-  121, // Nightstand ✓ mapped in CURATION_MAPPING
+  // 121, // Nightstand 미지원 → 비활성화
   133, // Refrigerator(냉장고)
   134, // Oven(오븐)
   149, // Gas stove(가스레인지)
