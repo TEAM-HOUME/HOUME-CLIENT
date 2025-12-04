@@ -244,8 +244,6 @@ const DetectionHotspots = ({
         }
       }
     } else {
-      selectCategory(imageId, null);
-      pendingCategoryIdRef.current = null;
       openSheet('collapsed');
       logDetectionEvent('hotspot-cleared', { hotspotId: hotspot.id });
     }

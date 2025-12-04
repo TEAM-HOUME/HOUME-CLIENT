@@ -232,6 +232,12 @@ export const CurationSheet = () => {
     <CurationSheetWrapper
       snapState={snapState}
       onSnapStateChange={setSnapState}
+      onCollapsed={() => {
+        if (activeImageId === null) return;
+        // 시트 완전히 닫힌 뒤에만 선택 상태 해제해 목록이 사라지는 시점을 늦춤
+        selectCategory(activeImageId, null);
+        selectHotspot(activeImageId, null);
+      }}
     >
       {(snapState) => (
         <>
