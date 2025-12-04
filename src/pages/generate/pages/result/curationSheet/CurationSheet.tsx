@@ -20,6 +20,10 @@ import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
 
 import { getGeneratedImageProducts } from '@pages/generate/apis/furniture';
+import {
+  buildDetectedCodeToCategoryId,
+  pickHotspotIdByCategory,
+} from '@pages/generate/utils/hotspotCategoryResolver';
 
 import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
@@ -32,6 +36,9 @@ export const CurationSheet = () => {
   const imageState = useActiveImageCurationState();
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;
   const selectCategory = useCurationStore((state) => state.selectCategory);
+  const selectHotspot = useCurationStore((state) => state.selectHotspot);
+  const hotspots = imageState?.hotspots ?? [];
+  const detectedObjects = imageState?.detectedObjects ?? [];
   const { snapState, setSnapState } = useSheetSnapState();
 
   const navigate = useNavigate();
@@ -49,6 +56,10 @@ export const CurationSheet = () => {
   const categories = categoriesQuery.data?.categories ?? [];
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
+  const detectedCodeToCategoryId = useMemo(
+    () => buildDetectedCodeToCategoryId(categories, detectedObjects),
+    [categories, detectedObjects]
+  );
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
@@ -120,6 +131,17 @@ export const CurationSheet = () => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
     selectCategory(activeImageId, categoryId);
+    const hotspotId =
+      pickHotspotIdByCategory(
+        categoryId,
+        hotspots,
+        categories,
+        detectedCodeToCategoryId
+      ) ?? null;
+    selectHotspot(activeImageId, hotspotId);
+    if (snapState === 'collapsed') {
+      setSnapState('mid');
+    }
   };
 
   const renderStatus = (
