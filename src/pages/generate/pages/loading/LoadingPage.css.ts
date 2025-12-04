@@ -55,14 +55,6 @@ export const loadText = style({
   ...fontStyle('caption_r_12'),
   color: colorVars.color.gray500,
   textAlign: 'center',
-
-  '@media': {
-    '(max-width: 375px)': {
-      whiteSpace: 'normal',
-      wordBreak: 'keep-all',
-      fontSize: '1.1rem',
-    },
-  },
 });
 
 export const infoText = style({
