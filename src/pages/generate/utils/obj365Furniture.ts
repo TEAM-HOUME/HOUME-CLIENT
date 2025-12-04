@@ -4,38 +4,38 @@
 
 // 가구 관련 0‑based 인덱스는 튜플로 고정
 export const OBJ365_FURNITURE_INDEXES = [
-  2, // Chair
+  2, // Chair ✓ mapped in CURATION_MAPPING
   6, // Lamp
-  9, // Desk
-  12, // Cabinet/shelf
+  9, // Desk ✓ mapped in CURATION_MAPPING
+  12, // Cabinet/shelf ✓ mapped in CURATION_MAPPING
   16, // Picture/Frame
-  20, // Storage box
-  24, // Bench
+  20, // Storage box ✓ mapped in CURATION_MAPPING
+  24, // Bench ✓ mapped in CURATION_MAPPING
   25, // Potted Plant
   28, // Pillow
   30, // Vase
-  37, // Monitor/TV
+  37, // Monitor/TV ✓ mapped in CURATION_MAPPING
   41, // Speaker
-  47, // Stool
-  50, // Couch
+  47, // Stool ✓ mapped in CURATION_MAPPING
+  50, // Couch ✓ mapped in CURATION_MAPPING
   60, // Carpet
   71, // Candle
-  75, // Bed
+  75, // Bed ✓ mapped in CURATION_MAPPING
   76, // Faucet(수도꼭지)
-  79, // Mirror
+  79, // Mirror ✓ mapped in CURATION_MAPPING
   81, // Sink(싱크대)
   83, // Air Conditioner
   94, // Clock
-  98, // Dining Table
+  98, // Dining Table ✓ mapped in CURATION_MAPPING
   110, // Fan
-  121, // Nightstand
+  // 121, // Nightstand 미지원 → 비활성화
   133, // Refrigerator(냉장고)
   134, // Oven(오븐)
   149, // Gas stove(가스레인지)
   153, // Toilet(변기)
   163, // Microwave(전자레인지)
-  167, // Coffee Table
-  168, // Side Table
+  167, // Coffee Table ✓ mapped in CURATION_MAPPING
+  168, // Side Table ✓ mapped in CURATION_MAPPING
   175, // Radiator
   191, // Bathtub
   201, // Extractor(레인지후드)

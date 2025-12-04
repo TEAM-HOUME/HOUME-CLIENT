@@ -22,6 +22,10 @@ import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { useUserStore } from '@/store/useUserStore';
 
 import { getGeneratedImageProducts } from '@pages/generate/apis/furniture';
+import {
+  buildDetectedCodeToCategoryId,
+  pickHotspotIdByCategory,
+} from '@pages/generate/utils/hotspotCategoryResolver';
 
 import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
@@ -34,6 +38,9 @@ export const CurationSheet = () => {
   const imageState = useActiveImageCurationState();
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;
   const selectCategory = useCurationStore((state) => state.selectCategory);
+  const selectHotspot = useCurationStore((state) => state.selectHotspot);
+  const hotspots = imageState?.hotspots ?? [];
+  const detectedObjects = imageState?.detectedObjects ?? [];
   const { snapState, setSnapState } = useSheetSnapState();
 
   const navigate = useNavigate();
@@ -52,6 +59,10 @@ export const CurationSheet = () => {
   const categories = categoriesQuery.data?.categories ?? [];
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
+  const detectedCodeToCategoryId = useMemo(
+    () => buildDetectedCodeToCategoryId(categories, detectedObjects),
+    [categories, detectedObjects]
+  );
 
   const normalizedProducts = useMemo(() => {
     return (productsData ?? []).map((product, index) => {
@@ -124,6 +135,17 @@ export const CurationSheet = () => {
     if (selectedCategoryId === categoryId) return;
     logResultImgClickCurationSheetFilter(variant);
     selectCategory(activeImageId, categoryId);
+    const hotspotId =
+      pickHotspotIdByCategory(
+        categoryId,
+        hotspots,
+        categories,
+        detectedCodeToCategoryId
+      ) ?? null;
+    selectHotspot(activeImageId, hotspotId);
+    if (snapState === 'collapsed') {
+      setSnapState('mid');
+    }
   };
 
   // const LoadingDots = () => (
@@ -234,6 +256,12 @@ export const CurationSheet = () => {
     <CurationSheetWrapper
       snapState={snapState}
       onSnapStateChange={setSnapState}
+      onCollapsed={() => {
+        if (activeImageId === null) return;
+        // 시트 완전히 닫힌 뒤에만 선택 상태 해제해 목록이 사라지는 시점을 늦춤
+        selectCategory(activeImageId, null);
+        selectHotspot(activeImageId, null);
+      }}
     >
       {(snapState) => (
         <>

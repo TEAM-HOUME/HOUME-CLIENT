@@ -19,56 +19,18 @@ import {
   mapHotspotsToDetectedObjects,
 } from '@pages/generate/utils/detectedObjectMapper';
 import { logFurniturePipelineEvent } from '@pages/generate/utils/furniturePipelineMonitor';
+import {
+  buildDetectedCodeToCategoryId,
+  resolveCategoryIdForHotspot,
+} from '@pages/generate/utils/hotspotCategoryResolver';
 import HotspotColor from '@shared/assets/icons/icnHotspotColor.svg?react';
 import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
-import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture';
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
-
-const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
-  SINGLE: ['1인용', '싱글', '슈퍼싱글'],
-  OFFICE_DESK: ['업무용 책상', '사무용책상', '오피스책상'],
-  CLOSET: ['붙박이장', '옷장', 'wardrobe', '워드로브'],
-  DINING_TABLE: ['식탁', '다이닝테이블'],
-  SINGLE_SOFA: ['1인소파', '싱글소파', '암체어'],
-  DRAWER: ['서랍장', '수납서랍'],
-  MOVABLE_TV: ['이동식tv', '이동식티비', '무빙tv'],
-  SITTING_TABLE: ['좌식테이블', '좌식탁자', '로우테이블'],
-  MIRROR: ['전신거울', '거울', '미러'],
-  WHITE_BOOKSHELF: ['벽수납장', '벽선반', '상부장', 'wallcabinet'],
-  DISPLAY_CABINET: [
-    '장식장',
-    '하부장',
-    '수납장',
-    'displaycabinet',
-    'storagecabinet',
-  ],
-  TWO_SEATER_SOFA: ['2인소파', '2인용소파', '투시터', '러브시트'],
-};
-
-const normalizeCategoryName = (value?: string | null) =>
-  value?.toString().trim().replace(/\s+/g, '').toUpperCase() ?? '';
-
-const matchCodeByCategoryName = (
-  name?: string | null
-): FurnitureCategoryCode | null => {
-  const normalized = normalizeCategoryName(name);
-  if (!normalized) return null;
-  for (const [code, keywords] of Object.entries(CATEGORY_NAME_KEYWORDS)) {
-    if (
-      keywords.some((keyword) =>
-        normalized.includes(normalizeCategoryName(keyword))
-      )
-    ) {
-      return code as FurnitureCategoryCode;
-    }
-  }
-  return null;
-};
 
 const isSameHotspotArray = (
   prev: FurnitureHotspot[] | null,
@@ -154,65 +116,12 @@ const DetectionHotspots = ({
 
   // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭
   const detectedCodeToCategoryId = useMemo(() => {
-    const map = new Map<FurnitureCategoryCode, number>();
-    if (!allowedCategories || allowedCategories.length === 0) return map;
-    if (!detectedObjects || detectedObjects.length === 0) return map;
-
-    const usedCategoryIds = new Set<number>();
-    allowedCategories.forEach((category) => {
-      const matchedCode = matchCodeByCategoryName(category.categoryName);
-      if (matchedCode && !map.has(matchedCode)) {
-        map.set(matchedCode, category.id);
-        usedCategoryIds.add(category.id);
-      }
-    });
-
-    return map;
+    return buildDetectedCodeToCategoryId(allowedCategories, detectedObjects);
   }, [allowedCategories, detectedObjects]);
 
   type DisplayHotspot = {
     hotspot: FurnitureHotspot;
     resolvedCode: FurnitureCategoryCode | null;
-  };
-
-  // 핫스팟 라벨 → 카테고리 ID 해석 유틸
-  const resolveCategoryIdForHotspot = (
-    hotspot: FurnitureHotspot,
-    resolvedCode: FurnitureCategoryCode | null,
-    allowedCategories: FurnitureCategoryResponse[] | undefined,
-    codeMap: Map<FurnitureCategoryCode, number>
-  ): number | null => {
-    const allowedIdSet = new Set(allowedCategories?.map((c) => c.id));
-
-    if (resolvedCode) {
-      const byCode = codeMap.get(resolvedCode);
-      if (byCode && allowedIdSet.has(byCode)) {
-        return byCode;
-      }
-    }
-
-    // 후순위: 서버 카테고리 이름과 핫스팟 라벨 문자열 비교
-    const nameToAllowedId = new Map<string, number>();
-    (allowedCategories ?? []).forEach((c) => {
-      const n = (c.categoryName ?? '').toString().trim();
-      if (!n) return;
-      nameToAllowedId.set(n.toUpperCase(), c.id);
-      nameToAllowedId.set(n.replaceAll(' ', '_').toUpperCase(), c.id);
-    });
-    const fallbackLabels = [hotspot.finalLabel ?? '', hotspot.className ?? '']
-      .flatMap((label) =>
-        label
-          .split('/')
-          .map((part: string) => part.trim())
-          .filter(Boolean)
-      )
-      .map((label) => label.toUpperCase());
-    for (const label of fallbackLabels) {
-      const direct = nameToAllowedId.get(label);
-      if (direct) return direct;
-    }
-
-    return null;
   };
 
   const displayHotspots: DisplayHotspot[] = useMemo(() => {
@@ -345,6 +254,7 @@ const DetectionHotspots = ({
         }
       }
     } else {
+      openSheet('collapsed');
       logDetectionEvent('hotspot-cleared', { hotspotId: hotspot.id });
     }
   };

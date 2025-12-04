@@ -20,12 +20,14 @@ const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 interface CurationSheetWrapperProps {
   snapState: 'collapsed' | 'mid' | 'expanded';
   onSnapStateChange: (next: 'collapsed' | 'mid' | 'expanded') => void;
+  onCollapsed?: () => void;
   children: (snapState: 'collapsed' | 'mid' | 'expanded') => ReactNode;
 }
 
 export const CurationSheetWrapper = ({
   snapState,
   onSnapStateChange,
+  onCollapsed,
   children,
 }: CurationSheetWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -95,6 +97,13 @@ export const CurationSheetWrapper = ({
       <div
         ref={sheetRef}
         className={clsx(styles.sheetWrapper, styles.snapStyles[snapState])}
+        onTransitionEnd={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.propertyName !== 'transform') return;
+          if (snapState === 'collapsed') {
+            onCollapsed?.();
+          }
+        }}
       >
         <div
           className={commonStyles.contentWrapper({ type: 'curation' })}
