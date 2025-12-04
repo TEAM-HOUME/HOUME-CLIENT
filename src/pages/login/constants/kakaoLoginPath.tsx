@@ -8,4 +8,6 @@ kakaoAuthUrl.searchParams.set('client_id', clientId);
 kakaoAuthUrl.searchParams.set('redirect_uri', redirectUrl);
 kakaoAuthUrl.searchParams.set('response_type', 'code');
 kakaoAuthUrl.searchParams.set('scope', 'profile_nickname,account_email');
+// prompt=login: 항상 로그인 화면을 보여줌 (기존 카카오 세션 무시)
+kakaoAuthUrl.searchParams.set('prompt', 'login');
 export const KAKAO_AUTH_URL = kakaoAuthUrl.toString();

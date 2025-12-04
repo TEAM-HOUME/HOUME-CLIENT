@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
+import { queryClient } from '@/shared/apis/queryClient';
 import { HTTPMethod, request } from '@/shared/apis/request';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -49,6 +50,8 @@ export const useLogoutMutation = () => {
     onSettled: () => {
       // 에러가 발생해도 로컬 토큰은 제거하고 홈페이지로 이동
       useUserStore.getState().clearUser();
+      // React Query 캐시 전체 정리
+      queryClient.clear();
       navigate(ROUTES.HOME, { replace: true });
     },
   });
