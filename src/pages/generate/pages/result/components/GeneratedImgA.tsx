@@ -158,13 +158,13 @@ const GeneratedImgA = ({
         ))}
         {lastImage && (
           <SwiperSlide key="blurred-last-image" className={styles.swiperSlide}>
-            <div
+            <img
+              crossOrigin="anonymous"
+              src={lastImage.imageUrl}
+              alt="이미지 더보기"
               className={styles.imgAreaBlurred({
                 mirrored: lastImage.isMirror,
               })}
-              style={{
-                background: `url(${lastImage.imageUrl}) lightgray 9.175px 11.881px / 96.774% 93.052% no-repeat`,
-              }}
             />
             <div className={styles.lockWrapper}>
               <LockIcon />
