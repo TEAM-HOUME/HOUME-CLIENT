@@ -8,10 +8,12 @@ import {
   resolveFurnitureCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
+import { useABTest } from '@pages/generate/hooks/useABTest';
 import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureCuration';
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
+import { logResultImgClickBtnSpot } from '@pages/generate/utils/analytics';
 import {
   filterAllowedDetectedObjects,
   mapHotspotsToDetectedObjects,
@@ -127,6 +129,7 @@ const DetectionHotspots = ({
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
+  const { variant } = useABTest();
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -285,6 +288,7 @@ const DetectionHotspots = ({
         : hotspot.id;
     selectHotspot(imageId, next);
     if (next) {
+      logResultImgClickBtnSpot(variant);
       logDetectionEvent('hotspot-selected', {
         hotspotId: hotspot.id,
         score: hotspot.score,

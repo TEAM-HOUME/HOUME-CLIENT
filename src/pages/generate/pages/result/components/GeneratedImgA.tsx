@@ -8,7 +8,16 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import { useABTest } from '@/pages/generate/hooks/useABTest';
 import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
+import {
+  logResultImgClickBtnMoreImg,
+  logResultImgClickBtnTag,
+  logResultImgClickMoreModalBack,
+  logResultImgClickMoreModalMakeNew,
+  logResultImgSwipeSlideLeft,
+  logResultImgSwipeSlideRight,
+} from '@/pages/generate/utils/analytics';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
 import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
@@ -56,6 +65,7 @@ const GeneratedImgA = ({
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
   const openSheet = useOpenCurationSheet();
+  const { variant } = useABTest();
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: userData } = useMyPageUser();
@@ -94,6 +104,7 @@ const GeneratedImgA = ({
   const totalSlideCount = lastImage ? images.length + 1 : images.length;
 
   const handleOpenModal = () => {
+    logResultImgClickBtnMoreImg(variant);
     overlay.open(
       (
         { unmount } // @toss/overlay-kit 사용
@@ -108,12 +119,19 @@ const GeneratedImgA = ({
           showCreditChip={true}
           creditCount={userData?.CreditCount || 0}
           maxCredit={5}
-          onCancel={unmount}
+          onCancel={() => {
+            logResultImgClickMoreModalBack(variant);
+            unmount();
+          }}
           onConfirm={() => {
+            logResultImgClickMoreModalMakeNew(variant);
             unmount();
             navigate(ROUTES.GENERATE_START);
           }}
-          onClose={unmount}
+          onClose={() => {
+            logResultImgClickMoreModalBack(variant);
+            unmount();
+          }}
         />
       )
     );
@@ -124,8 +142,17 @@ const GeneratedImgA = ({
       <Swiper
         slidesPerView={1}
         onSlideChange={(swiper) => {
-          setCurrentSlideIndex(swiper.activeIndex);
-          onSlideChange?.(swiper.activeIndex, totalSlideCount);
+          const prevIndex = currentSlideIndex;
+          const newIndex = swiper.activeIndex;
+          setCurrentSlideIndex(newIndex);
+          onSlideChange?.(newIndex, totalSlideCount);
+
+          // 슬라이드 스와이프 이벤트 전송
+          if (newIndex > prevIndex) {
+            logResultImgSwipeSlideRight(variant);
+          } else if (newIndex < prevIndex) {
+            logResultImgSwipeSlideLeft(variant);
+          }
         }}
         onSwiper={setSwiper}
       >
@@ -193,7 +220,10 @@ const GeneratedImgA = ({
         <button
           type="button"
           className={styles.tagBtn}
-          onClick={() => openSheet('expanded')}
+          onClick={() => {
+            logResultImgClickBtnTag(variant);
+            openSheet('expanded');
+          }}
         >
           <Tag />
         </button>
