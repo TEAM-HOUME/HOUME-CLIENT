@@ -10,6 +10,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { queryClient } from '@/shared/apis/queryClient';
 import { useUserStore } from '@/store/useUserStore';
 
 import { postLogout } from '../apis/logout';
@@ -27,6 +28,8 @@ export const useLogout = () => {
 
       // 액세스 토큰 제거
       useUserStore.getState().clearUser();
+      // React Query 캐시 전체 정리
+      queryClient.clear();
 
       navigate('/');
     },
@@ -36,6 +39,8 @@ export const useLogout = () => {
 
       // 에러가 발생해도 로컬 토큰은 제거하고 로그인 페이지로 이동
       useUserStore.getState().clearUser();
+      // React Query 캐시 전체 정리
+      queryClient.clear();
       navigate('/');
     },
   });
