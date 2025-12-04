@@ -19,6 +19,7 @@ export const toastStyle = {
   boxShadow: 'none',
   display: 'flex',
   justifyContent: 'center',
+  width: 'auto',
 };
 
 export const toastConfig: ToastContainerProps = {
