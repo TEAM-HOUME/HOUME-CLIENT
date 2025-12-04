@@ -105,7 +105,8 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
         style={{
           overflow: 'hidden',
           position: 'relative',
-          height: '2.4rem',
+          minHeight: '2.4rem',
+          padding: '0 2rem',
         }}
       >
         <p
@@ -114,6 +115,8 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
           style={{
             animation: 'slideUp 0.4s ease-out',
             margin: 0,
+            whiteSpace: 'nowrap',
+            lineHeight: '1.6',
           }}
         >
           {LOADING_MESSAGES[messageIndex]} ({Math.floor(progress)}%)
