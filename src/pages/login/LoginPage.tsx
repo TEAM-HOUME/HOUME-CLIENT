@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom';
+
+import { ROUTES } from '@/routes/paths';
 import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
@@ -46,23 +49,13 @@ const LoginPage = () => {
         </CtaButton>
         <aside className={styles.aside}>
           가입 시{' '}
-          <a
-            href=""
-            className={styles.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link to={ROUTES.SETTING_SERVICE} className={styles.link}>
             서비스 약관
-          </a>{' '}
+          </Link>{' '}
           및{' '}
-          <a
-            href=""
-            className={styles.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link to={ROUTES.SETTING_PRIVACY} className={styles.link}>
             개인정보처리방침
-          </a>
+          </Link>
           에 동의한 것으로 간주합니다.
         </aside>
       </div>
