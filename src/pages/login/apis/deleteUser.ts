@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@/routes/paths';
+import { queryClient } from '@/shared/apis/queryClient';
 import { HTTPMethod, request } from '@/shared/apis/request';
 import { useToast } from '@/shared/components/toast/useToast';
 import { TOAST_TYPE } from '@/shared/types/toast';
@@ -86,9 +87,11 @@ export const useDeleteUserMutation = () => {
       // 홈으로 이동
       navigate(ROUTES.HOME, { replace: true });
 
-      // 네비게이션 완료 후 토큰 삭제 (100ms 지연)
+      // 네비게이션 완료 후 토큰 삭제 및 React Query 캐시 정리 (100ms 지연)
       setTimeout(() => {
         useUserStore.getState().clearUser();
+        // React Query 캐시 전체 정리
+        queryClient.clear();
       }, 100);
     },
     onError: (error) => {
