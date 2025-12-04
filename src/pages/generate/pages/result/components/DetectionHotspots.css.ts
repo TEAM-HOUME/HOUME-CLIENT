@@ -1,6 +1,8 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
+
 import { zIndex } from '@shared/styles/tokens/zIndex';
 
 export const container = style({
@@ -17,7 +19,7 @@ export const image = recipe({
     height: '100%',
     objectFit: 'cover',
     objectPosition: 'center',
-    transition: 'transform 0.2s ease-out',
+    transition: 'transform 0.2s ease-out, opacity 0.3s ease-in-out',
   },
   variants: {
     mirrored: {
@@ -28,9 +30,14 @@ export const image = recipe({
         transform: 'none',
       },
     },
+    loaded: {
+      true: { opacity: 1 },
+      false: { opacity: 0 },
+    },
   },
   defaultVariants: {
     mirrored: false,
+    loaded: false,
   },
 });
 
@@ -68,4 +75,13 @@ export const hotspot = style({
   width: '24px',
   height: '24px',
   cursor: 'pointer',
+});
+
+export const skeleton = style({
+  position: 'absolute',
+  inset: 0,
+  background: 'linear-gradient(90deg, #ececec 8%, #f0f0f0 18%, #ececec 33%)',
+  backgroundSize: '200% 100%',
+  zIndex: zIndex.base,
+  animation: `${animationTokens.skeletonWave} 2s linear infinite`,
 });

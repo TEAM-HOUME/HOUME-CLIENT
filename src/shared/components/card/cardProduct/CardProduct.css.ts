@@ -2,6 +2,7 @@ import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
 
@@ -37,13 +38,33 @@ export const imgSection = recipe({
   },
 });
 
-export const cardImage = style({
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  objectPosition: 'center',
-  display: 'block',
-  boxSizing: 'border-box',
+export const cardImage = recipe({
+  base: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    display: 'block',
+    boxSizing: 'border-box',
+    transition: 'opacity 0.3s ease-in-out',
+  },
+  variants: {
+    loaded: {
+      true: { opacity: 1 },
+      false: { opacity: 0 },
+    },
+  },
+  defaultVariants: {
+    loaded: false,
+  },
+});
+
+export const skeleton = style({
+  position: 'absolute',
+  inset: 0,
+  background: 'linear-gradient(90deg, #ececec 8%, #f0f0f0 18%, #ececec 33%)',
+  backgroundSize: '200% 100%',
+  animation: `${animationTokens.skeletonWave} 2s linear infinite`,
 });
 
 export const linkBtnContainer = style({
