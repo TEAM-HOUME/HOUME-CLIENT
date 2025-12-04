@@ -114,20 +114,33 @@ export const CurationSheet = () => {
     if (!activeImageId) return;
     if (!categories || categories.length === 0) return;
 
-    categories.forEach((category) => {
-      const key = `${activeImageId}:${category.id}`;
-      if (prefetchedRef.current.has(key)) return;
-      prefetchedRef.current.add(key);
-      queryClient.prefetchQuery({
-        queryKey: [
-          QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
-          activeImageId,
-          category.id,
-        ],
-        queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
-        staleTime: 30 * 1000,
-      });
-    });
+    let isCancelled = false;
+    // 카테고리별 상품을 순차 프리패치
+    const prefetchSequentially = async () => {
+      for (const category of categories) {
+        if (isCancelled) break;
+        const key = `${activeImageId}:${category.id}`;
+        if (prefetchedRef.current.has(key)) continue;
+        prefetchedRef.current.add(key);
+        // 한 번에 하나씩 순서대로 호출해 서버 부하 완화
+
+        await queryClient.prefetchQuery({
+          queryKey: [
+            QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
+            activeImageId,
+            category.id,
+          ],
+          queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
+          staleTime: 30 * 1000,
+        });
+      }
+    };
+
+    void prefetchSequentially();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [queryClient, activeImageId, categories]);
 
   const handleCategorySelect = (categoryId: number) => {
