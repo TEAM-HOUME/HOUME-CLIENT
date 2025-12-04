@@ -85,11 +85,14 @@ const LoadingPage = () => {
     handleError(error, 'loading');
   });
 
-  // 캐러셀 페이지네이션 (무한 스크롤)
+  // 캐러셀 페이지네이션 (무한 스크롤) - 스택 UI
   const [currentPage, setCurrentPage] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 캐러셀 애니메이션 상태
+  // 스택 UI 투표 중 상태
+  const [isVoting, setIsVoting] = useState(false);
+
+  // 캐러셀 애니메이션 상태 - 스택 UI
   const [animating, setAnimating] = useState(false);
   const [selected, setSelected] = useState<'like' | 'dislike' | null>(null);
 
@@ -183,54 +186,56 @@ const LoadingPage = () => {
   };
 
   const handleVote = (isLike: boolean) => {
-    // 로딩 중에는 투표(vote) 불가
-    if (isLoading) return;
+    // 로딩 중 or 투표 중에는 투표(vote) 불가
+    if (isLoading || isVoting) return;
+
+    if (!currentImage) return;
+    setIsVoting(true);
 
     // 선택 상태 업데이트 (버튼 하이라이트)
     setSelected(isLike ? 'like' : 'dislike');
-    setAnimating(true);
 
     // API 호출: 좋아요/별로예요 전송
-    if (isLike && currentImage) {
-      likeMutation.mutate(currentImage.carouselId, {
-        onError: () => {
-          alert('좋아요 실패');
-        },
-      });
-    } else if (!isLike && currentImage) {
-      hateMutation.mutate(currentImage.carouselId, {
-        onError: () => {
-          alert('싫어요 실패');
-        },
-      });
-    }
+    const mutation = isLike ? likeMutation.mutate : hateMutation.mutate;
 
-    // 기존 타이머 정리
-    if (transitionTimeoutRef.current !== null) {
-      window.clearTimeout(transitionTimeoutRef.current);
-    }
+    mutation(currentImage.carouselId, {
+      onSuccess: () => {
+        setAnimating(true);
 
-    // 600ms 후 다음 이미지로 전환
-    transitionTimeoutRef.current = window.setTimeout(() => {
-      // 현재 페이지에 다음 이미지가 있으면 인덱스 증가
-      if (!isLast) {
-        setSelected(null);
-        setCurrentIndex((prev) => prev + 1);
-      }
-      // 마지막 이미지면 다음 페이지로 이동
-      else {
-        if (nextImages && nextImages.length > 0) {
-          setSelected(null);
-          setCurrentPage((prev) => prev + 1);
-          setCurrentIndex(0);
-        } else {
-          console.log('마지막 페이지 도달');
+        // 기존 타이머 정리
+        if (transitionTimeoutRef.current !== null) {
+          window.clearTimeout(transitionTimeoutRef.current);
         }
-      }
 
-      setAnimating(false);
-      transitionTimeoutRef.current = null;
-    }, ANIMATION_DURATION);
+        // 600ms 후 다음 이미지로 전환
+        transitionTimeoutRef.current = window.setTimeout(() => {
+          // 현재 페이지에 다음 이미지가 있으면 인덱스 증가
+          if (!isLast) {
+            setSelected(null);
+            setCurrentIndex((prev) => prev + 1);
+          }
+          // 마지막 이미지면 다음 페이지로 이동
+          else {
+            if (nextImages && nextImages.length > 0) {
+              setSelected(null);
+              setCurrentPage((prev) => prev + 1);
+              setCurrentIndex(0);
+            } else {
+              console.log('마지막 페이지 도달');
+            }
+          }
+
+          setAnimating(false);
+          setIsVoting(false);
+          transitionTimeoutRef.current = null;
+        }, ANIMATION_DURATION);
+      },
+      onError: () => {
+        alert(isLike ? '좋아요 실패' : '싫어요 실패');
+        setSelected(null);
+        setIsVoting(false);
+      },
+    });
   };
 
   // early return
@@ -302,12 +307,14 @@ const LoadingPage = () => {
             <LikeButton
               onClick={() => handleVote(true)}
               isSelected={selected === 'like'}
+              disabled={isVoting || animating}
             >
               좋아요
             </LikeButton>
             <DislikeButton
               onClick={() => handleVote(false)}
               isSelected={selected === 'dislike'}
+              disabled={isVoting || animating}
             >
               별로예요
             </DislikeButton>
