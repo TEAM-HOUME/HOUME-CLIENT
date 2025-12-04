@@ -10,6 +10,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { ROUTES } from '@/routes/paths';
 import { queryClient } from '@/shared/apis/queryClient';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -31,7 +32,7 @@ export const useLogout = () => {
       // React Query 캐시 전체 정리
       queryClient.clear();
 
-      navigate('/');
+      navigate(ROUTES.HOME, { replace: true });
     },
     // 로그아웃 실패 시 실행되는 함수
     onError: (error) => {
@@ -41,7 +42,7 @@ export const useLogout = () => {
       useUserStore.getState().clearUser();
       // React Query 캐시 전체 정리
       queryClient.clear();
-      navigate('/');
+      navigate(ROUTES.HOME, { replace: true });
     },
   });
 };
