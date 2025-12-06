@@ -176,7 +176,7 @@ export const useActivityInfo = (
     if (!hasCredit) {
       // 크레딧 부족 시 CreditError 이벤트 전송
       logSelectFurnitureClickBtnCTACreditError();
-      console.log('크레딧이 부족하여 이미지 생성을 중단합니다');
+      // console.log('크레딧이 부족하여 이미지 생성을 중단합니다');
       setIsButtonDisabled(true); // 크레딧 부족 시 버튼 비활성화
       return;
     }
@@ -199,7 +199,7 @@ export const useActivityInfo = (
       'generate_image_request',
       JSON.stringify(generateImageRequest)
     );
-    console.log('ActivityInfo: sessionStorage에 requestData 저장');
+    // console.log('ActivityInfo: sessionStorage에 requestData 저장');
 
     // navigate(ROUTES.GENERATE, { state: { generateImageRequest } });
     navigate(ROUTES.GENERATE);

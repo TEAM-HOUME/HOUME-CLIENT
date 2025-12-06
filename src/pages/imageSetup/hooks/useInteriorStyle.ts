@@ -54,7 +54,7 @@ export const useInteriorStyle = (
       moodBoardIds: selectedImages,
     };
 
-    console.log('선택된 퍼널 페이로드:', payload);
+    // console.log('선택된 퍼널 페이로드:', payload);
 
     onNext(payload);
   };

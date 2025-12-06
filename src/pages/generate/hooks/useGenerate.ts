@@ -92,12 +92,12 @@ export const useResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: ({ imageId, isLike }: { imageId: number; isLike: boolean }) =>
       postResultPreference(imageId, isLike),
-    onSuccess: (data) => {
-      console.log('sendPreference 성공:', data);
+    onSuccess: () => {
+      // console.log('sendPreference 성공');
     },
-    onError: (error) => {
-      console.error('sendPreference 실패:', error);
-    },
+    // onError: (error) => {
+    //   console.log('sendPreference 실패:', error);
+    // },
   });
 };
 
@@ -105,12 +105,12 @@ export const useResultPreferenceMutation = () => {
 export const useDeleteResultPreferenceMutation = () => {
   return useMutation({
     mutationFn: (imageId: number) => deleteResultPreference(imageId),
-    onSuccess: (data) => {
-      console.log('deletePreference 성공:', data);
+    onSuccess: () => {
+      // console.log('deletePreference 성공');
     },
-    onError: (error) => {
-      console.error('deletePreference 실패:', error);
-    },
+    // onError: (error) => {
+    //   console.log('deletePreference 실패:', error);
+    // },
   });
 };
 
@@ -145,7 +145,7 @@ export const useCreditLogMutation = () => {
 export const useGenerateImageApi = () => {
   const { setApiCompleted, setNavigationData, resetGenerate } =
     useGenerateStore();
-  const { variant, isMultipleImages } = useABTest();
+  const { isMultipleImages } = useABTest();
 
   const generateImageRequest = useMutation<
     { imageInfoResponses: GenerateImageData[] },
@@ -153,32 +153,32 @@ export const useGenerateImageApi = () => {
     GenerateImageRequest
   >({
     mutationFn: async (userInfo: GenerateImageRequest) => {
-      console.log('이미지 제작 시작:', new Date().toLocaleTimeString());
-      console.log('A/B 테스트 그룹:', variant);
+      // console.log('이미지 제작 시작:', new Date().toLocaleTimeString());
+      // console.log('A/B 테스트 그룹:', variant);
 
       if (isMultipleImages) {
-        console.log('다중 이미지 생성 API 호출');
+        // console.log('다중 이미지 생성 API 호출');
         const res = await postGenerateImages(userInfo);
         return res; // 이미 { imageInfoResponses: [...] } 형태
       } else {
-        console.log('단일 이미지 생성 API 호출');
+        // console.log('단일 이미지 생성 API 호출');
         const res = await postGenerateImage(userInfo);
         // 단일 이미지를 배열로 감싸 통일
         return { imageInfoResponses: [res] };
       }
     },
     onSuccess: (data) => {
-      console.log('이미지 제작 완료:', new Date().toLocaleTimeString());
-      console.log('생성된 이미지 데이터 보기', data);
-      const derivedType =
-        (data?.imageInfoResponses?.length ?? 0) > 1 ? 'multiple' : 'single';
-      console.log('생성된 이미지 타입:', derivedType);
+      // console.log('이미지 제작 완료:', new Date().toLocaleTimeString());
+      // console.log('생성된 이미지 데이터 보기', data);
+      // const derivedType =
+      //   (data?.imageInfoResponses?.length ?? 0) > 1 ? 'multiple' : 'single';
+      // console.log('생성된 이미지 타입:', derivedType);
       resetGenerate();
 
       setNavigationData(data);
       setApiCompleted(true);
 
-      console.log('프로그래스 바 완료 대기 중...');
+      // console.log('프로그래스 바 완료 대기 중...');
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
     },
   });
@@ -217,14 +217,14 @@ export const useFallbackImage = (
         code === 42900 ||
         code === 42901
       ) {
-        console.log(
-          `폴백 API 대기 중 (${status || code}): 재시도 ${failureCount + 1}/10`
-        );
+        // console.log(
+        //   `폴백 API 대기 중 (${status || code}): 재시도 ${failureCount + 1}/10`
+        // );
         return true; // 계속 재시도
       }
 
       // 그 외 진짜 에러는 재시도 안 함
-      console.error('폴백 API 진짜 에러 발생:', error);
+      // console.error('폴백 API 진짜 에러 발생:', error);
       return false;
     },
     retryDelay: 5000, // 5초 간격 재시도
@@ -239,8 +239,8 @@ export const useFallbackImage = (
       setNavigationData(query.data);
       setApiCompleted(true);
 
-      console.log('폴백 이미지 생성 성공:', query.data);
-      console.log('프로그래스 바 완료 대기 중...');
+      // console.log('폴백 이미지 생성 성공:', query.data);
+      // console.log('프로그래스 바 완료 대기 중...');
 
       // 프로그래스 바 완료 후 이동하도록 변경
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
@@ -250,7 +250,7 @@ export const useFallbackImage = (
   // 에러 시 처리
   useEffect(() => {
     if (query.isError) {
-      console.log('폴백 API 이미지 생성 실패:', query.error);
+      // console.log('폴백 API 이미지 생성 실패:', query.error);
       // 외부에서 전달받은 에러 핸들러 실행 (없으면 기본 동작)
       if (onError) {
         onError(query.error);
@@ -273,11 +273,11 @@ export const useFactorPreferenceMutation = () => {
       imageId: number;
       factorId: number;
     }) => postFactorPreference(imageId, factorId),
-    onSuccess: (data) => {
-      console.log('sendFactorPreference 성공:', data);
+    onSuccess: () => {
+      // console.log('sendFactorPreference 성공');
     },
-    onError: (error) => {
-      console.error('sendFactorPreference 실패:', error);
+    onError: () => {
+      // console.error('sendFactorPreference 실패:', error);
     },
   });
 };

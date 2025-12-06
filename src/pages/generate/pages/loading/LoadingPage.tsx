@@ -229,7 +229,7 @@ const LoadingPage = () => {
               setCurrentPage((prev) => prev + 1);
               setCurrentIndex(0);
             } else {
-              console.log('마지막 페이지 도달');
+              // console.log('마지막 페이지 도달');
             }
           }
 

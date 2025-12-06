@@ -25,7 +25,7 @@ export const useLogout = () => {
     mutationFn: postLogout, // 로그아웃 API 호출 함수
     // 로그아웃 성공 시 실행되는 함수
     onSuccess: () => {
-      console.log('[useLogout] 로그아웃 성공');
+      // console.log('[useLogout] 로그아웃 성공');
 
       // 액세스 토큰 제거
       useUserStore.getState().clearUser();

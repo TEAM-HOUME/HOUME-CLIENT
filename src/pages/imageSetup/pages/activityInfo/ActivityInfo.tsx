@@ -24,7 +24,7 @@ const ActivityInfo = ({ context }: ActivityInfoProps) => {
     error,
   } = useActivityOptionsQuery();
 
-  console.log(activityOptionsData);
+  // console.log(activityOptionsData);
 
   const {
     handleSubmit,

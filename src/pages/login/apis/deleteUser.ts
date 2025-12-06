@@ -74,8 +74,8 @@ export const useDeleteUserMutation = () => {
   return useMutation<DeleteUserResponse, Error, void>({
     mutationFn: deleteUser,
     retry: false,
-    onSuccess: (data) => {
-      console.log('회원탈퇴 성공:', data);
+    onSuccess: () => {
+      // console.log('회원탈퇴 성공');
 
       // 성공 토스트 표시
       notify({
