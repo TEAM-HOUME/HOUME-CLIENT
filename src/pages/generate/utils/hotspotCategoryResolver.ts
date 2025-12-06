@@ -8,7 +8,7 @@ import type { FurnitureCategoryResponse } from '@pages/generate/types/furniture'
 
 // 서버 카테고리명 → 내부 코드 역매핑 키워드 목록(한글 변경 시 이곳 업데이트)
 export const CATEGORY_NAME_KEYWORDS: Record<FurnitureCategoryCode, string[]> = {
-  SINGLE: ['싱글', '슈퍼싱글', '더블', '퀸 이상'],
+  SINGLE: ['싱글 침대', '슈퍼싱글 침대', '더블 침대', '퀸 침대 이상'],
   OFFICE_DESK: ['업무용 책상'],
   CLOSET: ['옷장'],
   DINING_TABLE: ['식탁'],
