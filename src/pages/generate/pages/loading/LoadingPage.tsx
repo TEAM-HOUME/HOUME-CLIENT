@@ -56,7 +56,15 @@ const LoadingPage = () => {
   const { handleError } = useErrorHandler('generate');
 
   // Zustand store: 이미지 생성 완료 상태 및 결과 데이터
-  const { isApiCompleted, navigationData } = useGenerateStore();
+  const { isApiCompleted, navigationData, resetGenerate } = useGenerateStore();
+
+  // 페이지 진입 시 이전 생성 상태 초기화 (재생성 시 이전 데이터로 이동하는 버그 방지)
+  // useRef로 첫 렌더링 시 동기적으로 실행하여 ProgressBar보다 먼저 초기화
+  const hasResetRef = useRef(false);
+  if (!hasResetRef.current) {
+    resetGenerate();
+    hasResetRef.current = true;
+  }
 
   // sessionStorage에서 이미지 생성 요청 데이터 가져오기
   const requestData: GenerateImageRequest | null = useMemo(() => {
@@ -280,6 +288,7 @@ const LoadingPage = () => {
                     src={nextImage.url}
                     alt={`다음 가구 이미지 ${nextImage.carouselId}`}
                     className={styles.imageStyle}
+                    crossOrigin="anonymous"
                   />
                 </div>
               )}
@@ -295,6 +304,7 @@ const LoadingPage = () => {
                     src={currentImage.url}
                     alt={`현재 가구 이미지 ${currentImage.carouselId}`}
                     className={styles.imageStyle}
+                    crossOrigin="anonymous"
                   />
                 </div>
               )}
