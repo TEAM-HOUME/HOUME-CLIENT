@@ -51,7 +51,7 @@ const GeneratedImgB = ({
 
   // currentImgId를 부모에게 전달하는 useEffect
   useEffect(() => {
-    console.log('GeneratedImgB - onCurrentImgIdChange 호출:', imageId);
+    // console.log('GeneratedImgB - onCurrentImgIdChange 호출:', imageId);
     if (imageId > 0) {
       onCurrentImgIdChange?.(imageId);
     }

@@ -37,6 +37,7 @@ export const FlipSheet = ({
                 ? styles.imageVariants.flipped
                 : styles.imageVariants.normal
             }
+            crossOrigin="anonymous"
           />
         </div>
       </div>

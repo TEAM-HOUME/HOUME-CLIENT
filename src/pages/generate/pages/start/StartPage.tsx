@@ -23,8 +23,8 @@ const StartPage = () => {
 
   useEffect(() => {
     // 이미지 생성 플로우 진입 시 모델 선로딩
-    preloadONNXModel(OBJ365_MODEL_PATH).catch((err) => {
-      console.warn('[StartPage] preload model failed', err);
+    preloadONNXModel(OBJ365_MODEL_PATH).catch(() => {
+      // console.warn('[StartPage] preload model failed');
     });
   }, []);
 

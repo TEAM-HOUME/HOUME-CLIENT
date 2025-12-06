@@ -54,7 +54,7 @@ export const buttonBox = style({
 
 export const exit = style({
   flex: 1,
-  padding: '10px 0',
+  padding: '1.2rem 0',
   ...fontStyle('body_r_14'),
   color: colorVars.color.gray700,
   borderRight: `1px solid ${colorVars.color.gray200}`,
@@ -62,7 +62,7 @@ export const exit = style({
 
 export const cancel = style({
   flex: 1,
-  padding: '10px 0',
+  padding: '1.2rem 0',
   ...fontStyle('body_m_14'),
   color: colorVars.color.primary,
 });

@@ -9,9 +9,10 @@ import { colorVars } from '@styles/tokens/color.css';
 export const filterSection = style({
   display: 'flex',
   gap: '0.4rem',
-  padding: '0.8rem 0',
+  padding: '0.8rem 1.6rem',
+  margin: '0 -1.6rem',
   alignItems: 'center',
-  width: '100%',
+  width: 'calc(100% + 3.2rem)',
   minWidth: '34.3rem',
   backgroundColor: colorVars.color.gray000,
   overflow: 'hidden',

@@ -58,10 +58,10 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
             }, PROGRESS_CONFIG.DELAY_BEFORE_COMPLETE_MS);
           }
 
-          console.log(
-            '📊 프로그레스 바 100% 완료:',
-            new Date().toLocaleTimeString()
-          );
+          // console.log(
+          //   '📊 프로그레스 바 100% 완료:',
+          //   new Date().toLocaleTimeString()
+          // );
 
           return PROGRESS_CONFIG.FAST_PHASE_END;
         }

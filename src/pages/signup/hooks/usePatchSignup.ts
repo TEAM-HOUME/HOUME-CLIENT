@@ -19,8 +19,8 @@ export const usePatchSignup = () => {
     retry: 3,
     // 회원가입 성공 시 실행되는 함수
     onSuccess: (response) => {
-      console.log('[usePatchSignup] 회원가입 성공:', response);
-      console.log(response.data);
+      // console.log('[usePatchSignup] 회원가입 성공:', response);
+      // console.log(response.data);
       setUserName(response.data); // userName 전역 저장
       // 회원가입 완료 페이지 이동
       navigate(ROUTES.GENERATE_START);

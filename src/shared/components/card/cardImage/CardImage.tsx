@@ -55,6 +55,7 @@ const CardImage = ({
         src={src}
         className={disabled ? styles.disabledcardimg : styles.cardimg}
         alt="카드 이미지"
+        crossOrigin="anonymous"
       />
       {visualState !== 'disabled' && (
         <button

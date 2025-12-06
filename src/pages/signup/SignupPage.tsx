@@ -62,7 +62,7 @@ const SignupPage = () => {
 
     const formattedBirthday = `${birthYear}-${birthMonth}-${birthDay}`;
 
-    console.log(name, gender.value, formattedBirthday);
+    // console.log(name, gender.value, formattedBirthday);
 
     patchSignup({
       name,

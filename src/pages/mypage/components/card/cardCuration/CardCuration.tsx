@@ -28,6 +28,7 @@ const CardCurationSection = ({
           alt={imageUrl ? '생성된 이미지' : '기본 이미지'}
           className={styles.image({ loaded: isLoaded })}
           onLoad={() => setIsLoaded(true)}
+          crossOrigin="anonymous"
         />
       </div>
       <CurationButton onClick={onCurationClick} />

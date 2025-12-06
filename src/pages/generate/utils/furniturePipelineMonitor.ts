@@ -8,18 +8,10 @@ export type FurniturePipelineLogOptions = {
 };
 
 const emitConsoleLog = (
-  level: FurniturePipelineLogLevel,
-  event: string,
-  payload?: Record<string, unknown>
-) => {
-  const logger = level === 'warn' ? console.warn : console.info;
-  const message = `[FurniturePipeline][${event}]`;
-  if (payload) {
-    logger(message, payload);
-  } else {
-    logger(message);
-  }
-};
+  _level: FurniturePipelineLogLevel,
+  _event: string,
+  _payload?: Record<string, unknown>
+) => {};
 
 export const logFurniturePipelineEvent = (
   event: string,
