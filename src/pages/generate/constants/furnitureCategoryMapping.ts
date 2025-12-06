@@ -94,12 +94,11 @@ const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
 } as const;
 
 // cabinet 2차 분류 결과 → 12개 코드 매핑
-const CABINET_CATEGORY_TO_CODE: Record<
-  FurnitureCategory,
-  FurnitureCategoryCode
+const CABINET_CATEGORY_TO_CODE: Partial<
+  Record<FurnitureCategory, FurnitureCategoryCode>
 > = {
   lowerCabinet: 'DISPLAY_CABINET',
-  upperCabinet: 'WHITE_BOOKSHELF',
+  // upperCabinet: 'WHITE_BOOKSHELF', // 상부장(upperCabinet)은 2차 cabinet 분류에서 추론 비활성 처리
   wardrobe: 'CLOSET',
   builtInCloset: 'CLOSET',
   storageCabinet: 'DISPLAY_CABINET',
