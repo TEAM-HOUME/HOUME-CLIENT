@@ -26,11 +26,7 @@ export const logLandingClickBtnType = (option: InteriorOption) => {
   const functionName = optionMap[option];
   const eventName = `landing_click_btn${functionName}`;
 
-  logAnalyticsEvent(
-    eventName,
-    { option_type: option },
-    `${eventName} 이벤트 전송 (옵션: ${option})`
-  );
+  logAnalyticsEvent(eventName, { option_type: option });
 };
 
 /**
@@ -77,9 +73,5 @@ export const logLandingClickBtnCTA = () => {
  */
 export const logLandingScrollDepthTreshold = (percentage: 50 | 100) => {
   const eventName = `landing_scroll_depthTreshold${percentage}%`;
-  logAnalyticsEvent(
-    eventName,
-    { scroll_depth: percentage },
-    `${eventName} 이벤트 전송 (스크롤 깊이: ${percentage}%)`
-  );
+  logAnalyticsEvent(eventName, { scroll_depth: percentage });
 };

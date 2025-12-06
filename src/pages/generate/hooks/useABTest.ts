@@ -83,10 +83,10 @@ export const useABTest = () => {
 
         // 1. 개발 모드 하드코딩 값으로 그룹 설정
         if (DEV_FIXED_VARIANT) {
-          console.log(
-            '[개발 모드] 하드코딩된 A/B 그룹 설정:',
-            DEV_FIXED_VARIANT
-          );
+          // console.log(
+          //   '[개발 모드] 하드코딩된 A/B 그룹 설정:',
+          //   DEV_FIXED_VARIANT
+          // );
           setVariant(DEV_FIXED_VARIANT);
           setABTestGroup(DEV_FIXED_VARIANT);
           logABTestAssignment(DEV_FIXED_VARIANT, false);
@@ -97,9 +97,9 @@ export const useABTest = () => {
         // 2. userId 기반으로 그룹 배정
         if (userId !== null && userId !== undefined) {
           const assignedVariant = getVariantFromUserId(userId);
-          console.log(
-            `[userId 기반] 그룹 배정: userId=${userId} → ${assignedVariant}`
-          );
+          // console.log(
+          //   `[userId 기반] 그룹 배정: userId=${userId} → ${assignedVariant}`
+          // );
 
           // localStorage에 저장된 값과 비교하여 중복 Analytics 이벤트 방지
           const cachedVariant = localStorage.getItem('ab_image_variant');
@@ -111,27 +111,27 @@ export const useABTest = () => {
           setABTestGroup(assignedVariant);
           if (isNewAssignment) {
             logABTestAssignment(assignedVariant, true);
-            console.log('[userId 기반] 새로운 A/B 그룹 할당:', assignedVariant);
+            // console.log('[userId 기반] 새로운 A/B 그룹 할당:', assignedVariant);
           } else {
-            console.log('[userId 기반] 기존 그룹 유지:', assignedVariant);
+            // console.log('[userId 기반] 기존 그룹 유지:', assignedVariant);
           }
 
           // localStorage에 저장 (fallback용)
           try {
             localStorage.setItem('ab_image_variant', assignedVariant);
           } catch {
-            console.warn('localStorage 저장 실패');
+            // console.warn('localStorage 저장 실패');
           }
         } else {
           // userId가 없는 경우 (비로그인 사용자)
-          console.warn('userId가 없어 기본 그룹(multiple) 사용');
+          // console.warn('userId가 없어 기본 그룹(multiple) 사용');
           const defaultVariant: ImageGenerationVariant = 'multiple';
           setVariant(defaultVariant);
           setABTestGroup(defaultVariant);
           try {
             localStorage.setItem('ab_image_variant', defaultVariant);
           } catch {
-            console.warn('localStorage 저장 실패');
+            // console.warn('localStorage 저장 실패');
           }
         }
       } catch (err) {
@@ -142,11 +142,11 @@ export const useABTest = () => {
         try {
           const cachedVariant = localStorage.getItem('ab_image_variant');
           if (cachedVariant === 'single' || cachedVariant === 'multiple') {
-            console.log('Fallback: 캐시된 그룹 사용:', cachedVariant);
+            // console.log('Fallback: 캐시된 그룹 사용:', cachedVariant);
             setVariant(cachedVariant);
             setABTestGroup(cachedVariant);
           } else {
-            console.log('Fallback: 기본 그룹(multiple) 사용');
+            // console.log('Fallback: 기본 그룹(multiple) 사용');
             const defaultVariant: ImageGenerationVariant = 'multiple';
             setVariant(defaultVariant);
             setABTestGroup(defaultVariant);

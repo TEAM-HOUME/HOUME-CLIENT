@@ -21,11 +21,10 @@ import type { ImageGenerationVariant } from '@pages/generate/hooks/useABTest';
  */
 export const logAnalyticsEvent = (
   eventName: string,
-  params?: Record<string, unknown>,
-  logMessage?: string
+  params?: Record<string, unknown>
 ) => {
   if (!analytics) {
-    console.warn('[Firebase Analytics] Analytics 초기화 실패');
+    // console.warn('[Firebase Analytics] Analytics 초기화 실패');
     return;
   }
 
@@ -34,7 +33,7 @@ export const logAnalyticsEvent = (
       page_path: window.location.pathname,
       ...params,
     });
-    console.log(`[Firebase Analytics] ${logMessage || eventName} 이벤트 전송`);
+    // console.log(`[Firebase Analytics] ${logMessage || eventName} 이벤트 전송`);
   } catch (error) {
     console.error('Analytics logEvent 오류:', error);
   }
@@ -52,7 +51,7 @@ export const logAnalyticsEvent = (
  */
 export const setABTestGroup = (variant: ImageGenerationVariant) => {
   if (!analytics) {
-    console.warn('Analytics not initialized');
+    // console.warn('Analytics not initialized');
     return;
   }
 
@@ -60,7 +59,7 @@ export const setABTestGroup = (variant: ImageGenerationVariant) => {
     setUserProperties(analytics, {
       ab_image_variant: variant, // 사용자 속성으로 A/B 그룹 저장
     });
-    console.log('[Firebase Analytics] A/B 그룹 설정:', variant);
+    // console.log('[Firebase Analytics] A/B 그룹 설정:', variant);
   } catch (error) {
     console.error('Analytics setUserProperties 오류:', error);
   }
@@ -82,7 +81,7 @@ export const logABTestAssignment = (
   isNewUser: boolean
 ) => {
   if (!analytics) {
-    console.warn('Analytics not initialized');
+    // console.warn('Analytics not initialized');
     return;
   }
 
@@ -92,7 +91,7 @@ export const logABTestAssignment = (
       is_new_user: isNewUser, // 신규 할당 여부
       timestamp: Date.now(), // 할당 시점
     });
-    console.log('[Firebase Analytics] A/B 그룹 할당 이벤트:', variant);
+    // console.log('[Firebase Analytics] A/B 그룹 할당 이벤트:', variant);
   } catch (error) {
     console.error('Analytics logEvent 오류:', error);
   }

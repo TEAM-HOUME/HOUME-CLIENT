@@ -93,7 +93,7 @@ const ResultPage = () => {
   if (shouldFetchFromAPI) {
     if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
       // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
-      console.log('mypageResult.histories', mypageResult.histories);
+      // console.log('mypageResult.histories', mypageResult.histories);
       const allImageData = mypageResult.histories.map((history) => ({
         imageId: history.imageId,
         imageUrl: history.generatedImageUrl,
@@ -179,9 +179,9 @@ const ResultPage = () => {
   });
 
   // currentImgId가 변경될 때마다 로그 출력
-  useEffect(() => {
-    console.log('currentImgId 변경됨:', currentImgId);
-  }, [currentImgId]);
+  // useEffect(() => {
+  //   console.log('currentImgId 변경됨:', currentImgId);
+  // }, [currentImgId]);
 
   useEffect(() => {
     // 유효한 이미지 id일 때만 큐레이션 활성화 상태 갱신
@@ -237,9 +237,9 @@ const ResultPage = () => {
             [imageId]: null,
           }));
         },
-        onError: (error) => {
-          console.error('취소 API 실패:', error);
-        },
+        // onError: (error) => {
+        //   console.log('취소 API 실패:', error);
+        // },
       });
     } else {
       // 좋아요/싫어요 상태가 바뀌었다면 현재 선택된 factor 취소
@@ -248,10 +248,10 @@ const ResultPage = () => {
         currentState !== newState &&
         currentFactorId
       ) {
-        console.log(
-          '좋아요/싫어요 상태 변경으로 factor 취소:',
-          currentFactorId
-        );
+        // console.log(
+        //   '좋아요/싫어요 상태 변경으로 factor 취소:',
+        //   currentFactorId
+        // );
         sendFactorPreference({ imageId, factorId: currentFactorId });
         setImageFactorStates((prev) => ({
           ...prev,
@@ -270,8 +270,8 @@ const ResultPage = () => {
               [imageId]: finalState,
             }));
           },
-          onError: (error) => {
-            console.error('선택 API 실패:', error);
+          onError: () => {
+            // console.log('선택 API 실패:', error);
           },
         }
       );
@@ -294,9 +294,9 @@ const ResultPage = () => {
               [imageId]: null,
             }));
           },
-          onError: (error) => {
-            console.error('factor 취소 API 실패:', error);
-          },
+          // onError: (error) => {
+          //   console.log('factor 취소 API 실패:', error);
+          // },
         }
       );
     } else {
@@ -310,9 +310,9 @@ const ResultPage = () => {
               [imageId]: factorId,
             }));
           },
-          onError: (error) => {
-            console.error('factor 선택 API 실패:', error);
-          },
+          // onError: (error) => {
+          //   console.log('factor 선택 API 실패:', error);
+          // },
         }
       );
     }

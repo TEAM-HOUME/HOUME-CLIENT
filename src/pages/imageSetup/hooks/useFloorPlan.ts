@@ -14,7 +14,7 @@ export const useFloorPlan = (
 ) => {
   // FloorPlan 컴포넌트 렌더링 -> useFloorPlan 훅 실행 -> 서버가 사용자 선택 정보 기반으로 도면 반환
   const { data, isLoading, error, isError } = useFloorPlanQuery();
-  console.log('도면 데이터: ', data);
+  // console.log('도면 데이터: ', data);
 
   // Zustand store에서 저장된 데이터
   const savedFloorPlan = useFunnelStore((state) => state.floorPlan);

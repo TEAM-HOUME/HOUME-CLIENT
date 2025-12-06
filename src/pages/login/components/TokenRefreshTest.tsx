@@ -5,12 +5,12 @@ import { HTTPMethod, request } from '@/shared/apis/request';
 const TokenRefreshTest = () => {
   const getTokenTest = async () => {
     try {
-      const res = await request({
+      await request({
         method: HTTPMethod.GET,
         url: '/access-test',
       });
 
-      console.log('API 응답:', res);
+      // console.log('API 응답');
     } catch (err: any) {
       console.error('API 요청 에러:', err);
     }

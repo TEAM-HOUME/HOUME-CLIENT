@@ -53,14 +53,14 @@ const initAnalytics = async () => {
       const supported = await isSupported();
       if (supported) {
         analytics = getAnalytics(app);
-        console.log('Firebase Analytics 초기화 완료');
-        console.log(
-          'Measurement ID:',
-          import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-        );
+        // console.log('Firebase Analytics 초기화 완료');
+        // console.log(
+        //   'Measurement ID:',
+        //   import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+        // );
         return analytics;
       } else {
-        console.warn('Firebase Analytics가 지원되지 않는 환경입니다');
+        // console.warn('Firebase Analytics가 지원되지 않는 환경입니다');
         return null;
       }
     } catch (error) {

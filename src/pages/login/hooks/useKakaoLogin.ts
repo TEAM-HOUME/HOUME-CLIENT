@@ -31,7 +31,7 @@ export const useKakaoLogin = () => {
   return useMutation<LoginApiResponse, Error, string>({
     mutationFn: getKakaoLogin,
     onSuccess: (response) => {
-      console.log('[useKakaoLogin] 로그인 성공:', response.data);
+      // console.log('[useKakaoLogin] 로그인 성공:', response.data);
 
       const accessToken = response.accessToken;
 

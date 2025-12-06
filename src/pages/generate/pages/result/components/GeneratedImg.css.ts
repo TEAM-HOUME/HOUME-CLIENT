@@ -45,7 +45,6 @@ export const slideNum = style({
   position: 'absolute',
   right: '1.2rem',
   top: '1.2rem',
-  bottom: '22.8rem',
   width: '3.4rem',
   height: '2rem',
   borderRadius: '99.9rem',
