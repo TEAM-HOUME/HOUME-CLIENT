@@ -288,7 +288,6 @@ const LoadingPage = () => {
                     src={nextImage.url}
                     alt={`다음 가구 이미지 ${nextImage.carouselId}`}
                     className={styles.imageStyle}
-                    crossOrigin="anonymous"
                   />
                 </div>
               )}
@@ -304,7 +303,6 @@ const LoadingPage = () => {
                     src={currentImage.url}
                     alt={`현재 가구 이미지 ${currentImage.carouselId}`}
                     className={styles.imageStyle}
-                    crossOrigin="anonymous"
                   />
                 </div>
               )}
