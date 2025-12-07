@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 });
 
 // 인증 제외 API 경로 (Authorization 헤더 제거 대상)
-const EXCLUDE_AUTH_URLS = ['/oauth/kakao/callback'];
+const EXCLUDE_AUTH_URLS = ['/oauth/kakao', '/oauth/kakao/callback'];
 
 // 요청 시 accessToken 자동 삽입
 axiosInstance.interceptors.request.use((config) => {
@@ -78,14 +78,12 @@ axiosInstance.interceptors.response.use(
         }
 
         return axiosInstance(originalRequest); // 원래 요청 재시도
-      } catch (refreshError) {
-        console.error('[axiosInstance] 토큰 재발급 실패:', refreshError);
-
-        // 상태 정리 (alert 제거하고 에러만 던지기)
+      } catch {
+        // 리프레시 토큰 재발급 실패 시 상태 정리 및 에러 처리
         const { useUserStore } = await import('../../store/useUserStore');
         useUserStore.getState().clearUser();
 
-        // 에러만 던지고 UI 처리는 상위 컴포넌트에서 담당
+        // 통일된 SESSION_EXPIRED 에러로 변환하여 상위 컴포넌트에서 처리하도록 함
         return Promise.reject(new Error('SESSION_EXPIRED'));
       }
     }
