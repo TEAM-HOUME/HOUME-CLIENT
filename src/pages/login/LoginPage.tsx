@@ -5,19 +5,44 @@ import CtaButton from '@/shared/components/button/ctaButton/CtaButton';
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
 
 import LoginBeforeImage from '@assets/icons/loginBefore.png';
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 
-import { KAKAO_AUTH_URL } from './constants/kakaoLoginPath';
 import * as styles from './loginPage.css';
 import { logLoginSocialClickBtnCTA } from './utils/analytics';
 
 const LoginPage = () => {
+  /**
+   * 카카오 로그인 버튼 클릭 핸들러
+   *
+   * 로그인 흐름:
+   * 1. 프론트엔드가 현재 환경을 감지하여 `local` 또는 `dev` 쿼리 파라미터 결정
+   * 2. 백엔드 `/oauth/kakao?env=local` 또는 `/oauth/kakao?env=dev`로 리다이렉트
+   * 3. 백엔드가 `env` 쿼리 파라미터를 기반으로 프론트엔드 URL 결정
+   *    - `env=local`: http://localhost:5173
+   *    - `env=dev`: https://www.houme.kr (또는 배포 환경 URL)
+   * 4. 백엔드가 카카오 인증 서버로 리다이렉트 (동적 redirect_uri 포함)
+   * 5. 카카오 인증 완료 후 프론트엔드 `/oauth/kakao/callback?code=인가코드`로 리다이렉트
+   * 6. KakaoCallback 컴포넌트에서 인가 코드(code)를 파싱
+   * 7. 파싱한 code를 백엔드 `/oauth/kakao/callback` API로 전달하여 로그인 처리
+   */
   const handleKakaoLogin = () => {
     // CTA 버튼 클릭 시 GA 이벤트 전송
     logLoginSocialClickBtnCTA();
 
+    // 현재 환경 감지: hostname이 localhost면 local, 아니면 dev
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost';
+    const env = isLocalhost ? 'local' : 'dev';
+
+    // 백엔드 `/oauth/kakao` 엔드포인트로 리다이렉트 (env, prompt 쿼리 파라미터 포함)
+    // 백엔드가 env 파라미터를 기반으로 프론트엔드 URL을 결정하고
+    // prompt=login 파라미터를 카카오 인증 URL에 포함시켜 항상 로그인 화면이 표시되도록 합니다.
+    // 카카오 인증을 처리한 후 프론트엔드 `/oauth/kakao/callback?code=인가코드`로 리다이렉트합니다.
+    const backendAuthUrl = `${import.meta.env.VITE_API_BASE_URL}${API_ENDPOINT.AUTH.KAKAO_AUTH}?env=${env}&prompt=login`;
+
     // Firebase Analytics 이벤트 전송을 위한 지연 후 리다이렉트
     setTimeout(() => {
-      window.location.href = KAKAO_AUTH_URL;
+      window.location.href = backendAuthUrl;
     }, 200);
   };
 
