@@ -8,10 +8,10 @@
  *
  * @example
  * ```typescript
- * const { mutate: login, isPending, isError } = useKakaoLogin();
+ * const { mutate: login, isPending, isError } = useKakaoLoginMutation();
  *
- * // 카카오 인가 코드로 로그인
- * login('authorization_code');
+ * // 카카오 인가 코드와 환경 정보로 로그인
+ * login({ code: 'authorization_code', env: 'local' });
  * ```
  */
 import { useMutation } from '@tanstack/react-query';
@@ -24,15 +24,13 @@ import { getKakaoLogin } from '../apis/kakaoLogin';
 
 import type { LoginApiResponse } from '../types/auth';
 
-export const useKakaoLogin = () => {
+export const useKakaoLoginMutation = () => {
   const navigate = useNavigate();
-  const setAccessToken = useUserStore((state) => state.setAccessToken); // 액세스토큰 저장 함수 가져오기
+  const setAccessToken = useUserStore((state) => state.setAccessToken);
 
-  return useMutation<LoginApiResponse, Error, string>({
-    mutationFn: getKakaoLogin,
+  return useMutation<LoginApiResponse, Error, { code: string; env: string }>({
+    mutationFn: ({ code, env }) => getKakaoLogin(code, env),
     onSuccess: (response) => {
-      // console.log('[useKakaoLogin] 로그인 성공:', response.data);
-
       const accessToken = response.accessToken;
 
       // zustand에 저장 (localStorage 동시 저장)
@@ -45,8 +43,7 @@ export const useKakaoLogin = () => {
         navigate(ROUTES.HOME);
       }
     },
-    onError: (error) => {
-      console.error('[useKakaoLogin] 로그인 실패:', error);
+    onError: () => {
       // 오류 처리는 KakaoCallback 컴포넌트에서 useErrorHandler로 처리
     },
   });

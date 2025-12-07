@@ -1,5 +1,6 @@
 export const API_ENDPOINT = {
   AUTH: {
+    KAKAO_AUTH: '/oauth/kakao',
     KAKAO_CALLBACK: '/oauth/kakao/callback',
     LOGOUT: '/logout',
     REISSUE: '/reissue',
