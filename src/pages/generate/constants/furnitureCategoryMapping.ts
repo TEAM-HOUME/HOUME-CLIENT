@@ -48,19 +48,19 @@ const uniqueCodes = (codes: FurnitureCategoryCode[]) => {
 // 모델 최종 라벨을 12개 코드로 단일화하는 매핑(정리본 기반, 불필요 단어 제거)
 const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
   const entries: Array<[string, FurnitureCategoryCode[]]> = [
-    ['Cabinet/shelf', ['DISPLAY_CABINET']], // 12번 기본값, 리파인 실패 시 사용
-    ['Chair', ['SINGLE_SOFA']], // 2
-    ['Desk', ['OFFICE_DESK']], // 9
-    ['Storage box', ['DRAWER']], // 20
-    ['Bench', ['SINGLE_SOFA']], // 24
-    ['Monitor/TV', ['MOVABLE_TV']], // 37
-    ['Stool', ['SINGLE_SOFA']], // 47
-    ['Couch', ['TWO_SEATER_SOFA']], // 50
-    ['Bed', ['SINGLE']], // 75
-    ['Mirror', ['MIRROR']], // 79
-    ['Dining Table', ['DINING_TABLE']], // 98
-    ['Coffee Table', ['SITTING_TABLE']], // 167
-    ['Side Table', ['SITTING_TABLE']], // 168
+    ['Cabinet/shelf', ['DISPLAY_CABINET']], // 12번 OBJ365 'Cabinet/shelf' 기본값 리파인 실패 시 사용
+    ['Chair', ['SINGLE_SOFA']], // 2번 OBJ365 'Chair'
+    ['Desk', ['OFFICE_DESK']], // 9번 OBJ365 'Desk'
+    ['Storage box', ['DRAWER']], // 20번 OBJ365 'Storage box'
+    ['Bench', ['SINGLE_SOFA']], // 24번 OBJ365 'Bench'
+    ['Monitor/TV', ['MOVABLE_TV']], // 37번 OBJ365 'Monitor/TV'
+    ['Stool', ['SINGLE_SOFA']], // 47번 OBJ365 'Stool'
+    ['Couch', ['TWO_SEATER_SOFA']], // 50번 OBJ365 'Couch'
+    ['Bed', ['SINGLE']], // 75번 OBJ365 'Bed'
+    ['Mirror', ['MIRROR']], // 79번 OBJ365 'Mirror'
+    ['Dining Table', ['DINING_TABLE']], // 98번 OBJ365 'Dining Table'
+    ['Coffee Table', ['SITTING_TABLE']], // 167번 OBJ365 'Coffee Table'
+    ['Side Table', ['SITTING_TABLE']], // 168번 OBJ365 'Side Table'
     // ['Nightstand', ['DRAWER']], // 121 (미지원 가구로 비활성화)
   ];
   return entries.reduce<Record<string, FurnitureCategoryCode[]>>(
@@ -77,19 +77,19 @@ const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
 const FINAL_LABEL_MAP = defineLabelMap();
 
 const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
-  2: ['SINGLE_SOFA'],
-  9: ['OFFICE_DESK'],
-  12: ['DISPLAY_CABINET'],
-  20: ['DRAWER'],
-  24: ['SINGLE_SOFA'],
-  37: ['MOVABLE_TV'],
-  47: ['SINGLE_SOFA'],
-  50: ['TWO_SEATER_SOFA'],
-  75: ['SINGLE'],
-  79: ['MIRROR'],
-  98: ['DINING_TABLE'],
-  167: ['SITTING_TABLE'],
-  168: ['SITTING_TABLE'],
+  2: ['SINGLE_SOFA'], // OBJ365 'Chair'
+  9: ['OFFICE_DESK'], // OBJ365 'Desk'
+  12: ['DISPLAY_CABINET'], // OBJ365 'Cabinet/shelf'
+  20: ['DRAWER'], // OBJ365 'Storage box'
+  24: ['SINGLE_SOFA'], // OBJ365 'Bench'
+  37: ['MOVABLE_TV'], // OBJ365 'Monitor/TV'
+  47: ['SINGLE_SOFA'], // OBJ365 'Stool'
+  50: ['TWO_SEATER_SOFA'], // OBJ365 'Couch'
+  75: ['SINGLE'], // OBJ365 'Bed'
+  79: ['MIRROR'], // OBJ365 'Mirror'
+  98: ['DINING_TABLE'], // OBJ365 'Dining Table'
+  167: ['SITTING_TABLE'], // OBJ365 'Coffee Table'
+  168: ['SITTING_TABLE'], // OBJ365 'Side Table'
   // 121: ['DRAWER'], // Nightstand 미지원으로 비활성화
 } as const;
 
