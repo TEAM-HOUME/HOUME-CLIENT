@@ -4,7 +4,7 @@ import {
   OBJ365_FURNITURE_INDEX_SET,
 } from '../utils/obj365Furniture';
 
-import type { FurnitureCategory } from '../utils/furnitureCategories';
+import type { CabinetRefinementCategory } from '../utils/cabinetRefinementCategories';
 
 // 허용 FurnitureCategoryCode 목록
 export const FURNITURE_CATEGORY_CODES = [
@@ -95,7 +95,7 @@ const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
 
 // cabinet 2차 분류 결과 → 12개 코드 매핑
 const CABINET_CATEGORY_TO_CODE: Partial<
-  Record<FurnitureCategory, FurnitureCategoryCode>
+  Record<CabinetRefinementCategory, FurnitureCategoryCode>
 > = {
   lowerCabinet: 'DISPLAY_CABINET',
   // upperCabinet: 'WHITE_BOOKSHELF', // 상부장(upperCabinet)은 2차 cabinet 분류에서 추론 비활성 처리
@@ -123,7 +123,7 @@ const getCodeFromObj365Label = (
 };
 
 const getCodeFromRefinedLabel = (
-  refined: FurnitureCategory | undefined
+  refined: CabinetRefinementCategory | undefined
 ): FurnitureCategoryCode | null => {
   if (!refined) return null;
   return CABINET_CATEGORY_TO_CODE[refined] ?? null;
@@ -132,7 +132,7 @@ const getCodeFromRefinedLabel = (
 export const resolveFurnitureCodes = (input: {
   finalLabel?: string | null;
   obj365Label?: number | null;
-  refinedLabel?: FurnitureCategory;
+  refinedLabel?: CabinetRefinementCategory;
   refinedConfidence?: number;
 }): FurnitureCategoryCode[] => {
   const code = resolveFurnitureCode(input);
@@ -142,7 +142,7 @@ export const resolveFurnitureCodes = (input: {
 export const resolveFurnitureCode = (input: {
   finalLabel?: string | null;
   obj365Label?: number | null;
-  refinedLabel?: FurnitureCategory;
+  refinedLabel?: CabinetRefinementCategory;
   refinedConfidence?: number;
 }): FurnitureCategoryCode | null => {
   // Cabinet/shelf 인데 2차 리파인 결과가 없으면 감지 실패로 간주

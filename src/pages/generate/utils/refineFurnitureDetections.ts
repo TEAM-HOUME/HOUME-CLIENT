@@ -1,13 +1,13 @@
 import {
-  FURNITURE_CATEGORY_LABELS,
-  type FurnitureCategory,
-} from './furnitureCategories';
+  CABINET_REFINEMENT_CATEGORY_LABELS,
+  type CabinetRefinementCategory,
+} from './cabinetRefinementCategories';
 import { isCabinetShelfIndex } from './obj365Furniture';
 
 import type { Detection } from '@pages/generate/types/detection';
 
-export { FURNITURE_CATEGORY_LABELS } from './furnitureCategories';
-export type { FurnitureCategory } from './furnitureCategories';
+export { CABINET_REFINEMENT_CATEGORY_LABELS } from './cabinetRefinementCategories';
+export type { CabinetRefinementCategory } from './cabinetRefinementCategories';
 
 export interface FurnitureImageMeta {
   width: number;
@@ -49,12 +49,12 @@ export interface FurnitureRefinementContext {
 }
 
 export interface RefinedFurnitureDetection extends Detection {
-  refinedLabel: FurnitureCategory;
+  refinedLabel: CabinetRefinementCategory;
   refinedLabelEn: string;
   confidence: number;
-  probabilities: Record<FurnitureCategory, number>;
+  probabilities: Record<CabinetRefinementCategory, number>;
   features: FurnitureFeatures;
-  contributions: Record<FurnitureCategory, Record<string, number>>;
+  contributions: Record<CabinetRefinementCategory, Record<string, number>>;
 }
 
 const DEFAULT_OPTIONS: FurnitureRefinementOptions = {
@@ -86,7 +86,7 @@ type InternalFeatures = FurnitureFeatures & {
 };
 
 type CategoryComputation = {
-  key: FurnitureCategory;
+  key: CabinetRefinementCategory;
   compute: (
     features: FurnitureFeatures,
     context: FurnitureRefinementContext,
@@ -442,8 +442,11 @@ const refineSingle = (
     rawEntries.reduce((acc, entry) => acc + entry.raw, ambiguousRaw) +
     floorWeight * rawEntries.length;
 
-  const probabilities = {} as Record<FurnitureCategory, number>;
-  const contributions: Record<FurnitureCategory, Record<string, number>> = {
+  const probabilities = {} as Record<CabinetRefinementCategory, number>;
+  const contributions: Record<
+    CabinetRefinementCategory,
+    Record<string, number>
+  > = {
     lowerCabinet: {},
     upperCabinet: {},
     wardrobe: {},
@@ -461,9 +464,10 @@ const refineSingle = (
     contributions[entry.key] = entry.contributions;
   });
 
-  let bestLabel: FurnitureCategory = rawEntries[0]?.key ?? 'storageCabinet';
+  let bestLabel: CabinetRefinementCategory =
+    rawEntries[0]?.key ?? 'storageCabinet';
   let bestProbability = probabilities[bestLabel] ?? 0;
-  (Object.keys(probabilities) as FurnitureCategory[]).forEach((key) => {
+  (Object.keys(probabilities) as CabinetRefinementCategory[]).forEach((key) => {
     if ((probabilities[key] ?? 0) > bestProbability) {
       bestLabel = key;
       bestProbability = probabilities[key];
@@ -492,9 +496,9 @@ const refineSingle = (
 
   return {
     ...detection,
-    className: FURNITURE_CATEGORY_LABELS[bestLabel].en,
+    className: CABINET_REFINEMENT_CATEGORY_LABELS[bestLabel].en,
     refinedLabel: bestLabel,
-    refinedLabelEn: FURNITURE_CATEGORY_LABELS[bestLabel].en,
+    refinedLabelEn: CABINET_REFINEMENT_CATEGORY_LABELS[bestLabel].en,
     confidence,
     probabilities,
     features: furnitureFeatures,
