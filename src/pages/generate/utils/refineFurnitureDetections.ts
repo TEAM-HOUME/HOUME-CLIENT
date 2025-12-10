@@ -282,6 +282,19 @@ export const refineFurnitureDetections = (
     refineSingle(detection, featureList[idx], context, mergedOptions)
   );
 
+  // 2차 분류 디버깅용 라벨 로그
+  if (import.meta.env.DEV && refinedDetections.length > 0) {
+    console.log('[CabinetRefinement] refined labels', {
+      total: refinedDetections.length,
+      items: refinedDetections.map((det) => ({
+        id: det.label ?? null,
+        refinedLabel: det.refinedLabel,
+        refinedLabelEn: det.refinedLabelEn,
+        confidence: det.confidence,
+      })),
+    });
+  }
+
   return { refinedDetections, context, options: mergedOptions };
 };
 
