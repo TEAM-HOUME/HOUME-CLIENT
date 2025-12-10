@@ -38,6 +38,9 @@ const CardProductItem = memo(
 
     const savedProductIds = useSavedItemsStore((s) => s.savedProductIds);
     const isSaved = hasRecommendId ? savedProductIds.has(recommendId) : false;
+    const setHasShownFavoriteToast = useSavedItemsStore(
+      (s) => s.setHasShownFavoriteToast
+    ); // 찜 스낵바 노출 플래그 setter
 
     const { mutate: toggleJjym } = usePostJjymMutation();
     const { notify } = useToast();
@@ -75,13 +78,16 @@ const CardProductItem = memo(
 
       toggleJjym(recommendId, {
         onSuccess: (data) => {
-          if (!wasSaved && data.favorited) {
+          const { hasShownFavoriteToast } = useSavedItemsStore.getState();
+          if (!wasSaved && data.favorited && !hasShownFavoriteToast) {
+            // 스낵바 중복 노출 방지 가드
             notify({
               text: '상품을 찜했어요! 위시리스트로 이동할까요?',
               type: TOAST_TYPE.NAVIGATE,
               onClick: handleNavigateAndFocus,
               options: { style: { marginBottom: '2rem' } },
             });
+            setHasShownFavoriteToast(true);
           }
         },
       });

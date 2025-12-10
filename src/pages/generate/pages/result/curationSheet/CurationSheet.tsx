@@ -92,6 +92,9 @@ export const CurationSheet = () => {
   // 서버 찜 목록 불러오기
   const { data: jjymItems = [] } = useGetJjymListQuery();
   const setSavedProductIds = useSavedItemsStore((s) => s.setSavedProductIds);
+  const setHasShownFavoriteToast = useSavedItemsStore(
+    (s) => s.setHasShownFavoriteToast
+  ); // 찜 스낵바 플래그 리셋용 setter
 
   useEffect(() => {
     // 추천ID(recommendId) 기준으로 맞춰서 넣기
@@ -274,6 +277,7 @@ export const CurationSheet = () => {
         // 시트 완전히 닫힌 뒤에만 선택 상태 해제해 목록이 사라지는 시점을 늦춤
         selectCategory(activeImageId, null);
         selectHotspot(activeImageId, null);
+        setHasShownFavoriteToast(false); // 스낵바 플래그 리셋
       }}
     >
       {(snapState) => (
