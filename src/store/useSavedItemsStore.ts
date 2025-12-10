@@ -8,8 +8,6 @@ interface SavedItemsState {
   savedProductIds: Set<number>;
   toggleSaveProduct: (recommendId: number) => void;
   setSavedProductIds: (ids: number[] | Set<number>) => void;
-  hasShownFavoriteToast: boolean;
-  setHasShownFavoriteToast: (flag: boolean) => void;
 }
 
 export const useSavedItemsStore = create<SavedItemsState>((set, get) => ({
@@ -40,11 +38,5 @@ export const useSavedItemsStore = create<SavedItemsState>((set, get) => ({
       prev.size === next.size && [...next].every((id) => prev.has(id));
     if (isEqual) return; // no-op (아무 동작 X)
     set({ savedProductIds: next }); // 내용이 달라진 경우에만 새로운 set으로 갱신
-  },
-  // 찜 스낵바 노출 여부 상태
-  hasShownFavoriteToast: false,
-  // 스낵바 표시 플래그 갱신 함수
-  setHasShownFavoriteToast: (flag) => {
-    set({ hasShownFavoriteToast: flag });
   },
 }));

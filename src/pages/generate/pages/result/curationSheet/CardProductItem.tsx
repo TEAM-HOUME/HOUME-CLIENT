@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 
 import { useIsMutating } from '@tanstack/react-query';
 
@@ -27,6 +27,8 @@ interface CardProductItemProps {
   onGotoMypage: () => void;
 }
 
+const TOAST_COOLDOWN_MS = 1500; // 스낵바 재노출 최소 간격(ms)
+
 const CardProductItem = memo(
   ({ product, onGotoMypage }: CardProductItemProps) => {
     const recommendId =
@@ -38,9 +40,7 @@ const CardProductItem = memo(
 
     const savedProductIds = useSavedItemsStore((s) => s.savedProductIds);
     const isSaved = hasRecommendId ? savedProductIds.has(recommendId) : false;
-    const setHasShownFavoriteToast = useSavedItemsStore(
-      (s) => s.setHasShownFavoriteToast
-    ); // 찜 스낵바 노출 플래그 setter
+    const toastCooldownRef = useRef(0); // 최근 스낵바 노출 시각(ms)
 
     const { mutate: toggleJjym } = usePostJjymMutation();
     const { notify } = useToast();
@@ -78,8 +78,12 @@ const CardProductItem = memo(
 
       toggleJjym(recommendId, {
         onSuccess: (data) => {
-          const { hasShownFavoriteToast } = useSavedItemsStore.getState();
-          if (!wasSaved && data.favorited && !hasShownFavoriteToast) {
+          if (!wasSaved && data.favorited) {
+            const now = Date.now();
+            if (now - toastCooldownRef.current < TOAST_COOLDOWN_MS) {
+              return; // 연속 클릭 시 스낵바 중복 방지
+            }
+            toastCooldownRef.current = now;
             // 스낵바 중복 노출 방지 가드
             notify({
               text: '상품을 찜했어요! 위시리스트로 이동할까요?',
@@ -87,7 +91,6 @@ const CardProductItem = memo(
               onClick: handleNavigateAndFocus,
               options: { style: { marginBottom: '2rem' } },
             });
-            setHasShownFavoriteToast(true);
           }
         },
       });
