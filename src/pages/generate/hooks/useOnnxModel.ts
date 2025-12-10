@@ -38,8 +38,84 @@ type ModelCacheEntry = {
 
 type ProgressCallback = (value: number) => void;
 
+const MODEL_CACHE_STORAGE = 'houme-onnx-models-v1';
 const WASM_ASSET_BASE = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 const modelCache = new Map<string, ModelCacheEntry>();
+
+const hasCacheStorageSupport = () =>
+  typeof window !== 'undefined' && typeof caches !== 'undefined';
+
+const resolveModelCacheKey = (modelPath: string) => {
+  if (typeof window === 'undefined') return modelPath;
+  return new URL(modelPath, window.location.origin).toString();
+};
+
+const readModelFromPersistentCache = async (
+  modelPath: string
+): Promise<ArrayBuffer | null> => {
+  if (!hasCacheStorageSupport()) return null;
+  try {
+    const cache = await caches.open(MODEL_CACHE_STORAGE);
+    const cached = await cache.match(resolveModelCacheKey(modelPath));
+    if (!cached) return null;
+    return cached.arrayBuffer();
+  } catch {
+    return null;
+  }
+};
+
+const writeModelToPersistentCache = async (
+  modelPath: string,
+  buffer: ArrayBuffer
+) => {
+  if (!hasCacheStorageSupport()) return;
+  try {
+    const cache = await caches.open(MODEL_CACHE_STORAGE);
+    const request = new Request(resolveModelCacheKey(modelPath));
+    const response = new Response(buffer.slice(0), {
+      headers: {
+        'content-type': 'application/octet-stream',
+      },
+    });
+    await cache.put(request, response);
+  } catch {
+    // 캐시 저장 실패는 치명적이지 않으므로 무시
+  }
+};
+
+const deleteModelFromPersistentCache = async (modelPath: string) => {
+  if (!hasCacheStorageSupport()) return;
+  try {
+    const cache = await caches.open(MODEL_CACHE_STORAGE);
+    await cache.delete(resolveModelCacheKey(modelPath));
+  } catch {
+    // 삭제 실패도 치명적이지 않음
+  }
+};
+
+const ensureModelBufferIsBinary = (arrayBuffer: ArrayBuffer) => {
+  const head = new Uint8Array(arrayBuffer.slice(0, 256));
+  const headText = new TextDecoder('utf-8', { fatal: false }).decode(head);
+  if (/<!doctype|<html|Not Found|Error/i.test(headText)) {
+    throw new Error('모델 파일 대신 HTML/오류 페이지가 로드되었습니다');
+  }
+};
+
+const fetchModelBinary = async (modelPath: string): Promise<ArrayBuffer> => {
+  const response = await fetch(modelPath);
+  if (!response.ok) {
+    throw new Error(`모델 로드 실패: ${response.statusText}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('text/html') || contentType.includes('text/plain')) {
+    throw new Error('모델 경로가 잘못되었거나 HTML/텍스트가 반환되었습니다');
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  ensureModelBufferIsBinary(arrayBuffer);
+  return arrayBuffer;
+};
 
 const getCacheEntry = (modelPath: string): ModelCacheEntry => {
   const existing = modelCache.get(modelPath);
@@ -60,22 +136,21 @@ const loadOnnxModel = async (
   // onnxruntime 경고 숨길 때 배포 직전에 주석 해제하고 사용
   // ort.env.logLevel = 'error';
 
-  const response = await fetch(modelPath);
-  if (!response.ok) {
-    throw new Error(`모델 로드 실패: ${response.statusText}`);
+  let arrayBuffer = await readModelFromPersistentCache(modelPath);
+  if (arrayBuffer) {
+    try {
+      ensureModelBufferIsBinary(arrayBuffer);
+      onProgress?.(40);
+    } catch {
+      arrayBuffer = null;
+      await deleteModelFromPersistentCache(modelPath);
+    }
   }
 
-  const contentType = response.headers.get('content-type') || '';
-  if (contentType.includes('text/html') || contentType.includes('text/plain')) {
-    throw new Error('모델 경로가 잘못되었거나 HTML/텍스트가 반환되었습니다');
-  }
-
-  onProgress?.(40);
-  const arrayBuffer = await response.arrayBuffer();
-  const head = new Uint8Array(arrayBuffer.slice(0, 256));
-  const headText = new TextDecoder('utf-8', { fatal: false }).decode(head);
-  if (/<!doctype|<html|Not Found|Error/i.test(headText)) {
-    throw new Error('모델 파일 대신 HTML/오류 페이지가 로드되었습니다');
+  if (!arrayBuffer) {
+    onProgress?.(40);
+    arrayBuffer = await fetchModelBinary(modelPath);
+    await writeModelToPersistentCache(modelPath, arrayBuffer);
   }
 
   onProgress?.(70);
