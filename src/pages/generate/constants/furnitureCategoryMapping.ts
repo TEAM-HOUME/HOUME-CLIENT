@@ -49,12 +49,12 @@ const uniqueCodes = (codes: FurnitureCategoryCode[]) => {
 const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
   const entries: Array<[string, FurnitureCategoryCode[]]> = [
     ['Cabinet/shelf', ['DISPLAY_CABINET']], // 12번 OBJ365 'Cabinet/shelf' 기본값 리파인 실패 시 사용
-    ['Chair', ['SINGLE_SOFA']], // 2번 OBJ365 'Chair'
+    // ['Chair', ['SINGLE_SOFA']], // 2번 OBJ365 'Chair' 비활성화
     ['Desk', ['OFFICE_DESK']], // 9번 OBJ365 'Desk'
     ['Storage box', ['DRAWER']], // 20번 OBJ365 'Storage box'
-    ['Bench', ['SINGLE_SOFA']], // 24번 OBJ365 'Bench'
+    // ['Bench', ['SINGLE_SOFA']], // 24번 OBJ365 'Bench' 비활성화
     ['Monitor/TV', ['MOVABLE_TV']], // 37번 OBJ365 'Monitor/TV'
-    ['Stool', ['SINGLE_SOFA']], // 47번 OBJ365 'Stool'
+    // ['Stool', ['SINGLE_SOFA']], // 47번 OBJ365 'Stool' 비활성화
     ['Couch', ['TWO_SEATER_SOFA']], // 50번 OBJ365 'Couch'
     ['Bed', ['SINGLE']], // 75번 OBJ365 'Bed'
     ['Mirror', ['MIRROR']], // 79번 OBJ365 'Mirror'
@@ -77,13 +77,13 @@ const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
 const FINAL_LABEL_MAP = defineLabelMap();
 
 const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
-  2: ['SINGLE_SOFA'], // OBJ365 'Chair'
+  // 2: ['SINGLE_SOFA'], // OBJ365 'Chair' 비활성화
   9: ['OFFICE_DESK'], // OBJ365 'Desk'
   12: ['DISPLAY_CABINET'], // OBJ365 'Cabinet/shelf'
   20: ['DRAWER'], // OBJ365 'Storage box'
-  24: ['SINGLE_SOFA'], // OBJ365 'Bench'
+  // 24: ['SINGLE_SOFA'], // OBJ365 'Bench' 비활성화
   37: ['MOVABLE_TV'], // OBJ365 'Monitor/TV'
-  47: ['SINGLE_SOFA'], // OBJ365 'Stool'
+  // 47: ['SINGLE_SOFA'], // OBJ365 'Stool' 비활성화
   50: ['TWO_SEATER_SOFA'], // OBJ365 'Couch'
   75: ['SINGLE'], // OBJ365 'Bed'
   79: ['MIRROR'], // OBJ365 'Mirror'
