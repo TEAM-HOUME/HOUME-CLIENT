@@ -55,7 +55,7 @@ const defineLabelMap = (): Record<string, FurnitureCategoryCode[]> => {
     // ['Bench', ['SINGLE_SOFA']], // 24번 OBJ365 'Bench' 비활성화
     ['Monitor/TV', ['MOVABLE_TV']], // 37번 OBJ365 'Monitor/TV'
     // ['Stool', ['SINGLE_SOFA']], // 47번 OBJ365 'Stool' 비활성화
-    ['Couch', ['TWO_SEATER_SOFA']], // 50번 OBJ365 'Couch'
+    ['Couch', ['TWO_SEATER_SOFA', 'SINGLE_SOFA']], // 50번 OBJ365 'Couch' → 2인/1인 겸용
     ['Bed', ['SINGLE']], // 75번 OBJ365 'Bed'
     ['Mirror', ['MIRROR']], // 79번 OBJ365 'Mirror'
     ['Dining Table', ['DINING_TABLE']], // 98번 OBJ365 'Dining Table'
@@ -84,7 +84,7 @@ const OBJ365_TO_CODE: Record<number, FurnitureCategoryCode[]> = {
   // 24: ['SINGLE_SOFA'], // OBJ365 'Bench' 비활성화
   37: ['MOVABLE_TV'], // OBJ365 'Monitor/TV'
   // 47: ['SINGLE_SOFA'], // OBJ365 'Stool' 비활성화
-  50: ['TWO_SEATER_SOFA'], // OBJ365 'Couch'
+  50: ['TWO_SEATER_SOFA', 'SINGLE_SOFA'], // OBJ365 'Couch' → 2인/1인 겸용
   75: ['SINGLE'], // OBJ365 'Bed'
   79: ['MIRROR'], // OBJ365 'Mirror'
   98: ['DINING_TABLE'], // OBJ365 'Dining Table'
