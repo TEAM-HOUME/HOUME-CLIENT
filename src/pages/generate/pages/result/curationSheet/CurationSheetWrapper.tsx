@@ -3,6 +3,7 @@ import { useRef, useCallback, useEffect, type ReactNode } from 'react';
 import clsx from 'clsx';
 
 import { useABTest } from '@/pages/generate/hooks/useABTest';
+import type { CurationSnapState } from '@/pages/generate/stores/useCurationStore';
 import {
   logResultImgSwipeCurationSheetDown,
   logResultImgSwipeCurationSheetUp,
@@ -18,10 +19,10 @@ const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
 interface CurationSheetWrapperProps {
-  snapState: 'collapsed' | 'mid' | 'expanded';
-  onSnapStateChange: (next: 'collapsed' | 'mid' | 'expanded') => void;
+  snapState: CurationSnapState;
+  onSnapStateChange: (next: CurationSnapState) => void;
   onCollapsed?: () => void;
-  children: (snapState: 'collapsed' | 'mid' | 'expanded') => ReactNode;
+  children: (snapState: CurationSnapState) => ReactNode;
 }
 
 export const CurationSheetWrapper = ({
@@ -75,7 +76,7 @@ export const CurationSheetWrapper = ({
 
   // backdrop 활성화시 body의 스크롤 막기
   useEffect(() => {
-    const lock = snapState !== 'collapsed';
+    const lock = snapState === 'expanded' || snapState === 'mid';
 
     document.body.style.overflow = lock ? 'hidden' : 'unset';
     return () => {

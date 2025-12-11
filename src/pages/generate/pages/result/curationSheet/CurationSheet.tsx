@@ -100,7 +100,11 @@ export const CurationSheet = () => {
   }, [jjymItems, setSavedProductIds]);
 
   useEffect(() => {
-    if (activeImageId === null && snapState !== 'collapsed') {
+    if (
+      activeImageId === null &&
+      snapState !== 'collapsed' &&
+      snapState !== 'hidden'
+    ) {
       setSnapState('collapsed');
     }
   }, [activeImageId, snapState, setSnapState]);

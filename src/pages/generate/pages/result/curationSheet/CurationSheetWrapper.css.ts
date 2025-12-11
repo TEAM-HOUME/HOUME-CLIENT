@@ -48,4 +48,7 @@ export const snapStyles = styleVariants({
   expanded: {
     vars: { '--base-y': '0px' },
   },
+  hidden: {
+    vars: { '--base-y': '100%' },
+  },
 });
