@@ -287,11 +287,31 @@ export const useInvalidateCurationQueries = () => {
         if (groupId !== null) {
           clearGroupCategories(groupId);
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP, groupId],
+            // 그룹 기반 카테고리 쿼리만 정밀 무효화
+            predicate: (query) => {
+              const [key, variables] = query.queryKey as [
+                unknown,
+                Partial<CategoriesQueryVariables>,
+              ];
+              return (
+                key === QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP &&
+                variables?.groupId === groupId
+              );
+            },
           });
         } else {
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES, imageId],
+            // 단일 이미지 기반 카테고리 쿼리만 정밀 무효화
+            predicate: (query) => {
+              const [key, variables] = query.queryKey as [
+                unknown,
+                Partial<CategoriesQueryVariables>,
+              ];
+              return (
+                key === QUERY_KEY.GENERATE_FURNITURE_CATEGORIES &&
+                variables?.imageId === imageId
+              );
+            },
           });
         }
       },
@@ -304,9 +324,26 @@ export const useInvalidateCurationQueries = () => {
           clearGroupProduct(groupId, categoryId);
         }
         queryClient.invalidateQueries({
-          queryKey: groupId
-            ? [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP, groupId, categoryId]
-            : [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS, imageId, categoryId],
+          // 그룹/이미지별 상품 쿼리 정밀 무효화
+          predicate: (query) => {
+            const [key, variables] = query.queryKey as [
+              unknown,
+              Partial<ProductsQueryVariables>,
+            ];
+
+            if (groupId !== null) {
+              if (key !== QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP)
+                return false;
+              if (variables?.groupId !== groupId) return false;
+              if (categoryId === undefined) return true; // 그룹 내 전체 무효화
+              return variables?.categoryId === categoryId;
+            }
+
+            if (key !== QUERY_KEY.GENERATE_FURNITURE_PRODUCTS) return false;
+            if (variables?.imageId !== imageId) return false;
+            if (categoryId === undefined) return true; // 이미지 내 전체 무효화
+            return variables?.categoryId === categoryId;
+          },
         });
       },
     }),
