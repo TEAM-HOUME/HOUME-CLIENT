@@ -342,7 +342,7 @@ export const useInvalidateCurationQueries = () => {
         imageId: number | null,
         categoryId?: number | null
       ) => {
-        if (groupId !== null && categoryId !== null) {
+        if (groupId !== null && categoryId != null) {
           clearGroupProduct(groupId, categoryId);
         }
         queryClient.invalidateQueries({
