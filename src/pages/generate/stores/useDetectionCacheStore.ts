@@ -39,7 +39,7 @@ const storage =
     : undefined;
 
 export const useDetectionCacheStore = create<DetectionCacheStore>()(
-  persist<DetectionCacheStore, DetectionCachePersistedState>(
+  persist(
     (set) => ({
       images: {},
       setEntry: (imageId, payload) => {

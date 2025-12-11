@@ -4,6 +4,7 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
 import type {
+  MyPageImageDetail,
   MyPageImageHistory,
   MyPageUserData,
 } from '@/pages/mypage/types/apis/MyPage';
@@ -134,6 +135,8 @@ const ResultPage = () => {
     placeholderData: detailPlaceholder ? () => detailPlaceholder : undefined,
   });
   const mypageResult = mypageDetailQuery.data;
+  const mypageHistories: MyPageImageDetail[] | null =
+    mypageResult?.histories ?? null;
   const mypageLoading = mypageDetailQuery.isLoading;
   const isSlideCountReady =
     !shouldFetchMypageDetail ||
@@ -141,9 +144,9 @@ const ResultPage = () => {
   const isSlideCountLoading = !isSlideCountReady;
 
   // state 또는 API에서 가져온 데이터 사용
-  if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
+  if (isFromMypage && mypageHistories && mypageHistories.length > 0) {
     // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
-    const allImageData = mypageResult.histories.map((history) => ({
+    const allImageData = mypageHistories.map((history: MyPageImageDetail) => ({
       imageId: history.imageId,
       imageUrl: history.generatedImageUrl,
       isMirror: false,
@@ -162,12 +165,17 @@ const ResultPage = () => {
   }
 
   // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)
-  const historyById = useMemo(
+  const historyById = useMemo<Map<number, MyPageImageDetail> | null>(
     () =>
-      isFromMypage && mypageResult?.histories
-        ? new Map(mypageResult.histories.map((h) => [h.imageId, h]))
+      isFromMypage && mypageHistories
+        ? new Map(
+            mypageHistories.map((history: MyPageImageDetail) => [
+              history.imageId,
+              history,
+            ])
+          )
         : null,
-    [isFromMypage, mypageResult?.histories]
+    [isFromMypage, mypageHistories]
   );
 
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산

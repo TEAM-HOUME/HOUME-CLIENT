@@ -11,8 +11,8 @@ import {
 import type { MyPageImageDetailData } from '../types/apis/MyPage';
 
 type QueryResult<T> = Awaited<T>;
-type UseQueryBaseOptions<TData, TQueryKey extends readonly unknown[]> = Omit<
-  UseQueryOptions<TData, Error, TData, TQueryKey>,
+type UseQueryBaseOptions<TData> = Omit<
+  UseQueryOptions<TData, Error, TData>,
   'queryKey' | 'queryFn'
 >;
 
@@ -20,8 +20,7 @@ type UseQueryBaseOptions<TData, TQueryKey extends readonly unknown[]> = Omit<
  * 마이페이지 사용자 정보 조회 훅
  */
 type UseMyPageUserOptions = UseQueryBaseOptions<
-  QueryResult<ReturnType<typeof getMyPageUser>>,
-  [typeof QUERY_KEY.MYPAGE_USER]
+  QueryResult<ReturnType<typeof getMyPageUser>>
 >;
 
 export const useMyPageUser = (options?: UseMyPageUserOptions) => {
@@ -38,8 +37,7 @@ export const useMyPageUser = (options?: UseMyPageUserOptions) => {
  * 마이페이지 이미지 생성 이력 조회 훅
  */
 type UseMyPageImagesOptions = UseQueryBaseOptions<
-  QueryResult<ReturnType<typeof getMyPageImages>>,
-  [typeof QUERY_KEY.MYPAGE_IMAGES]
+  QueryResult<ReturnType<typeof getMyPageImages>>
 >;
 
 export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
@@ -57,11 +55,7 @@ export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
  * 마이페이지 이미지 상세 조회 훅
  */
 type ImageDetailResult = MyPageImageDetailData;
-type ImageDetailQueryKey = [typeof QUERY_KEY.MYPAGE_IMAGE_DETAIL, number];
-type ImageDetailOptions = UseQueryBaseOptions<
-  ImageDetailResult,
-  ImageDetailQueryKey
->;
+type ImageDetailOptions = UseQueryBaseOptions<ImageDetailResult>;
 
 export const useMyPageImageDetail = (
   houseId: number,
