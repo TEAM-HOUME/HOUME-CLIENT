@@ -53,8 +53,8 @@ export const useGeneratedCategoriesQuery = (imageId: number | null) => {
     ],
     queryFn: () => getGeneratedImageCategories(imageId!, detectedObjects),
     enabled: Boolean(imageId) && detectedObjects.length > 0,
-    staleTime: 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export const useGeneratedProductsQuery = (
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
     enabled: Boolean(imageId) && Boolean(categoryId),
     staleTime: 5 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 };
 
