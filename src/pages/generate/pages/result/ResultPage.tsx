@@ -115,6 +115,7 @@ const ResultPage = () => {
   const hasValidHouseId = parsedHouseId !== null;
   const shouldFetchExternalResult = !result && hasValidHouseId && !isFromMypage;
   const shouldFetchMypageDetail = hasValidHouseId && isFromMypage;
+  const groupId = parsedHouseId;
   const detailPlaceholder =
     shouldFetchMypageDetail && initialHistory
       ? createImageDetailPlaceholder(initialHistory)
@@ -381,12 +382,14 @@ const ResultPage = () => {
             userProfile={forwardedUserProfile}
             detectionCache={forwardedDetectionMap ?? undefined}
             isSlideCountLoading={isSlideCountLoading}
+            groupId={groupId}
           />
         ) : (
           <GeneratedImgB
             result={result}
             onCurrentImgIdChange={setCurrentImgId}
             detectionCache={forwardedDetectionMap ?? undefined}
+            groupId={groupId}
           />
         )}
 
@@ -488,7 +491,7 @@ const ResultPage = () => {
           </div>
         </div>
       </section>
-      <CurationSheet />
+      <CurationSheet groupId={groupId} />
     </div>
   );
 };

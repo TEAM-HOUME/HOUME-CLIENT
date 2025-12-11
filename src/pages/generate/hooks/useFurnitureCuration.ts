@@ -10,12 +10,14 @@ import {
   getGeneratedImageCategories,
   getGeneratedImageProducts,
 } from '@pages/generate/apis/furniture';
+import { useCurationCacheStore } from '@pages/generate/stores/useCurationCacheStore';
 import {
   useCurationStore,
   selectActiveImageState,
   type CurationSnapState,
 } from '@pages/generate/stores/useCurationStore';
 
+import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureCategoryMapping';
 import type {
   FurnitureAndActivityResponse,
   FurnitureCategoriesResponse,
@@ -36,25 +38,87 @@ export const useActiveImageId = () =>
   useCurationStore((state) => state.activeImageId);
 
 // 활성 이미지에 대한 카테고리 쿼리 훅 정의
-export const useGeneratedCategoriesQuery = (imageId: number | null) => {
+export const useGeneratedCategoriesQuery = (
+  groupId: number | null,
+  imageId: number | null
+) => {
   const selectCategory = useCurationStore((state) => state.selectCategory);
   const imageState = useCurationStore((state) =>
     imageId !== null ? (state.images[imageId] ?? null) : null
   );
-
-  const detectedObjects = imageState?.detectedObjects ?? [];
+  const detectedObjects = useMemo<FurnitureCategoryCode[]>(
+    () => imageState?.detectedObjects ?? [],
+    [imageState?.detectedObjects]
+  );
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;
 
+  const normalizedDetectedObjects = useMemo<FurnitureCategoryCode[]>(
+    () => Array.from(new Set(detectedObjects)),
+    [detectedObjects]
+  );
+  const detectionSignature = useMemo(
+    () => normalizedDetectedObjects.slice().sort().join(','),
+    [normalizedDetectedObjects]
+  );
+
+  const groupCategoriesEntry = useCurationCacheStore((state) =>
+    groupId ? (state.groups[groupId]?.categories ?? null) : null
+  );
+  const cachedCodeSet = useMemo(
+    () =>
+      groupCategoriesEntry
+        ? new Set(groupCategoriesEntry.detectedObjects)
+        : null,
+    [groupCategoriesEntry]
+  );
+  const shouldSkipFetchWithCache =
+    Boolean(groupId) &&
+    Boolean(groupCategoriesEntry) &&
+    cachedCodeSet !== null &&
+    normalizedDetectedObjects.every((code) => cachedCodeSet.has(code));
+
   const query = useQuery<FurnitureCategoriesResponse>({
+    // queryKey에 이미지/감지값 전체를 직접 포함해 의존성 유지
     queryKey: [
-      QUERY_KEY.GENERATE_FURNITURE_CATEGORIES,
+      groupId
+        ? QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP
+        : QUERY_KEY.GENERATE_FURNITURE_CATEGORIES,
+      groupId ?? imageId,
       imageId,
+      detectionSignature,
+      normalizedDetectedObjects,
       detectedObjects,
     ],
-    queryFn: () => getGeneratedImageCategories(imageId!, detectedObjects),
-    enabled: Boolean(imageId) && detectedObjects.length > 0,
+    queryFn: () =>
+      getGeneratedImageCategories(imageId!, normalizedDetectedObjects),
+    enabled:
+      Boolean(imageId) &&
+      normalizedDetectedObjects.length > 0 &&
+      !shouldSkipFetchWithCache,
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    initialData:
+      groupId && groupCategoriesEntry
+        ? () => groupCategoriesEntry.response
+        : undefined,
+    onSuccess: (data) => {
+      if (!groupId) return;
+      const existing =
+        useCurationCacheStore.getState().groups[groupId]?.categories;
+      if (
+        existing &&
+        existing.detectionSignature === detectionSignature &&
+        existing.response === data
+      ) {
+        return;
+      }
+      useCurationCacheStore.getState().saveCategories({
+        groupId,
+        response: data,
+        detectedObjects: normalizedDetectedObjects,
+        detectionSignature,
+      });
+    },
   });
 
   useEffect(() => {
@@ -82,18 +146,55 @@ export const useGeneratedCategoriesQuery = (imageId: number | null) => {
   return query;
 };
 
-// 활성 이미지의 추천 상품 쿼리 훅 정의
 export const useGeneratedProductsQuery = (
+  groupId: number | null,
   imageId: number | null,
   categoryId: number | null
 ) => {
-  return useQuery<FurnitureProductsInfoResponse>({
-    queryKey: [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS, imageId, categoryId],
+  const productCacheEntry = useCurationCacheStore((state) =>
+    groupId && categoryId
+      ? (state.groups[groupId]?.products[categoryId] ?? null)
+      : null
+  );
+
+  const shouldSkipFetchWithCache =
+    Boolean(groupId) && Boolean(productCacheEntry);
+
+  const query = useQuery<FurnitureProductsInfoResponse>({
+    // queryKey에 그룹/이미지/카테고리 식별자를 직접 배치
+    queryKey: [
+      groupId
+        ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
+        : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
+      groupId ?? imageId,
+      imageId,
+      categoryId,
+    ],
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
-    enabled: Boolean(imageId) && Boolean(categoryId),
+    enabled:
+      Boolean(imageId) && Boolean(categoryId) && !shouldSkipFetchWithCache,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    initialData:
+      groupId && productCacheEntry
+        ? () => productCacheEntry.response
+        : undefined,
+    onSuccess: (data) => {
+      if (!groupId || !categoryId) return;
+      const existing =
+        useCurationCacheStore.getState().groups[groupId]?.products[categoryId];
+      if (existing?.response === data) {
+        return;
+      }
+      useCurationCacheStore.getState().saveProducts({
+        groupId,
+        categoryId,
+        response: data,
+      });
+    },
   });
+
+  return query;
 };
 
 // 활성 이미지 상태 선택 훅 정의
@@ -116,25 +217,45 @@ export const useSheetSnapState = () => {
 // 카테고리 쿼리 무효화 유틸 훅 정의
 export const useInvalidateCurationQueries = () => {
   const queryClient = useQueryClient();
+  const clearGroupCategories = useCurationCacheStore(
+    (state) => state.clearGroupCategories
+  );
+  const clearGroupProduct = useCurationCacheStore(
+    (state) => state.clearGroupProduct
+  );
   return useMemo(
     () => ({
-      invalidateCategories: (imageId: number | null) =>
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES, imageId],
-        }),
+      invalidateCategories: (
+        groupId: number | null,
+        imageId: number | null
+      ) => {
+        if (groupId) {
+          clearGroupCategories(groupId);
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP, groupId],
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES, imageId],
+          });
+        }
+      },
       invalidateProducts: (
+        groupId: number | null,
         imageId: number | null,
         categoryId?: number | null
-      ) =>
+      ) => {
+        if (groupId && categoryId) {
+          clearGroupProduct(groupId, categoryId);
+        }
         queryClient.invalidateQueries({
-          queryKey: [
-            QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
-            imageId,
-            categoryId,
-          ],
-        }),
+          queryKey: groupId
+            ? [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP, groupId, categoryId]
+            : [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS, imageId, categoryId],
+        });
+      },
     }),
-    [queryClient]
+    [clearGroupCategories, clearGroupProduct, queryClient]
   );
 };
 

@@ -13,6 +13,7 @@ import {
   useGeneratedProductsQuery,
   useSheetSnapState,
 } from '@/pages/generate/hooks/useFurnitureCuration';
+import { useCurationCacheStore } from '@/pages/generate/stores/useCurationCacheStore';
 import { useCurationStore } from '@/pages/generate/stores/useCurationStore';
 import { logResultImgClickCurationSheetFilter } from '@/pages/generate/utils/analytics';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
@@ -31,10 +32,25 @@ import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
 import { CurationSheetWrapper } from './CurationSheetWrapper';
 
+import type { FurnitureProductsInfoResponse } from '@pages/generate/types/furniture';
+
 // 카테고리 스켈레톤 칩 길이 프리셋 중 세 번째(long)만 사용
 const FILTER_SKELETON_WIDTH = 'long' as const;
+// 프리패치 쿼리키 튜플 정의
+type ProductPrefetchQueryKey = [
+  string,
+  {
+    groupId: number | null;
+    imageId: number;
+    categoryId: number;
+  },
+];
 
-export const CurationSheet = () => {
+interface CurationSheetProps {
+  groupId?: number | null;
+}
+
+export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
   // 전역상태 사용
   const displayName = useUserStore((state) => state.userName ?? '사용자');
   const activeImageId = useActiveImageId();
@@ -42,8 +58,14 @@ export const CurationSheet = () => {
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;
   const selectCategory = useCurationStore((state) => state.selectCategory);
   const selectHotspot = useCurationStore((state) => state.selectHotspot);
-  const hotspots = imageState?.hotspots ?? [];
-  const detectedObjects = imageState?.detectedObjects ?? [];
+  const hotspots = useMemo(
+    () => imageState?.hotspots ?? [],
+    [imageState?.hotspots]
+  );
+  const detectedObjects = useMemo(
+    () => imageState?.detectedObjects ?? [],
+    [imageState?.detectedObjects]
+  );
   const { snapState, setSnapState } = useSheetSnapState();
 
   const navigate = useNavigate();
@@ -53,13 +75,23 @@ export const CurationSheet = () => {
     navigate(ROUTES.MYPAGE);
   };
 
-  const categoriesQuery = useGeneratedCategoriesQuery(activeImageId ?? null);
+  const categoriesQuery = useGeneratedCategoriesQuery(
+    groupId,
+    activeImageId ?? null
+  );
   const productsQuery = useGeneratedProductsQuery(
+    groupId,
     activeImageId ?? null,
     selectedCategoryId
   );
 
-  const categories = categoriesQuery.data?.categories ?? [];
+  const categories = useMemo(
+    () => categoriesQuery.data?.categories ?? [],
+    [categoriesQuery.data?.categories]
+  );
+  const groupProductCache = useCurationCacheStore((state) =>
+    groupId ? (state.groups[groupId]?.products ?? {}) : {}
+  );
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
   const detectedCodeToCategoryId = useMemo(
@@ -123,21 +155,45 @@ export const CurationSheet = () => {
 
     // 카테고리별 프리패치를 병렬로 처리해 초기 반응 속도 확보
     categories.forEach((category) => {
-      const key = `${activeImageId}:${category.id}`;
-      if (prefetchedRef.current.has(key)) return;
-      prefetchedRef.current.add(key);
-
+      const dedupeKey = `${groupId ?? activeImageId}:${category.id}`;
+      if (prefetchedRef.current.has(dedupeKey)) return;
+      if (groupId && groupProductCache[category.id]) {
+        prefetchedRef.current.add(dedupeKey);
+        return;
+      }
+      // 프리패치용 쿼리키를 그룹/이미지/카테고리 세트로 구성
+      const productQueryKey: ProductPrefetchQueryKey = [
+        groupId
+          ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
+          : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
+        {
+          groupId,
+          imageId: activeImageId,
+          categoryId: category.id,
+        },
+      ];
+      const cachedQuery =
+        queryClient.getQueryData<FurnitureProductsInfoResponse>(
+          productQueryKey
+        );
+      if (cachedQuery) {
+        prefetchedRef.current.add(dedupeKey);
+        return;
+      }
+      prefetchedRef.current.add(dedupeKey);
       void queryClient.prefetchQuery({
-        queryKey: [
-          QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
-          activeImageId,
-          category.id,
-        ],
-        queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
+        queryKey: productQueryKey,
+        queryFn: ({ queryKey }) => {
+          const [, variables] = queryKey as ProductPrefetchQueryKey;
+          return getGeneratedImageProducts(
+            variables.imageId,
+            variables.categoryId
+          );
+        },
         staleTime: 30 * 1000,
       });
     });
-  }, [queryClient, activeImageId, categories]);
+  }, [queryClient, activeImageId, categories, groupId, groupProductCache]);
 
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;

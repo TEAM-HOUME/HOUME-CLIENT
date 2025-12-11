@@ -68,6 +68,7 @@ interface DetectionHotspotsProps {
   mirrored?: boolean;
   shouldInferHotspots?: boolean;
   cachedDetection?: DetectionCacheEntry | null;
+  groupId?: number | null;
 }
 
 const DetectionHotspots = ({
@@ -76,6 +77,7 @@ const DetectionHotspots = ({
   mirrored = false,
   shouldInferHotspots = true,
   cachedDetection,
+  groupId,
 }: DetectionHotspotsProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const setImageDetection = useCurationStore(
@@ -93,7 +95,10 @@ const DetectionHotspots = ({
       : EMPTY_DETECTED_CODES
   );
   const openSheet = useOpenCurationSheet();
-  const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
+  const categoriesQuery = useGeneratedCategoriesQuery(
+    groupId ?? null,
+    imageId ?? null
+  );
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
   const lastDetectionsRef = useRef<ProcessedDetections | null>(null);

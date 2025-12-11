@@ -61,6 +61,7 @@ interface GeneratedImgAProps {
   userProfile?: MyPageUserData | null;
   detectionCache?: Record<number, DetectionCacheEntry> | null;
   isSlideCountLoading?: boolean;
+  groupId?: number | null;
 }
 
 const GeneratedImgA = ({
@@ -71,6 +72,7 @@ const GeneratedImgA = ({
   userProfile,
   detectionCache,
   isSlideCountLoading = false,
+  groupId,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -244,6 +246,7 @@ const GeneratedImgA = ({
                 // 결과 페이지 플래그로 추론 on/off 제어
                 shouldInferHotspots={shouldInferHotspots}
                 cachedDetection={cachedDetection}
+                groupId={groupId}
               />
             </SwiperSlide>
           );

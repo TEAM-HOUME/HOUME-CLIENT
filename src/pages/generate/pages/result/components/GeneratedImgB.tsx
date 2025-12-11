@@ -30,6 +30,7 @@ interface GeneratedImgBProps {
   onCurrentImgIdChange?: (currentImgId: number) => void;
   shouldInferHotspots?: boolean;
   detectionCache?: Record<number, DetectionCacheEntry> | null;
+  groupId?: number | null;
 }
 
 const GeneratedImgB = ({
@@ -37,6 +38,7 @@ const GeneratedImgB = ({
   onCurrentImgIdChange,
   shouldInferHotspots = true,
   detectionCache,
+  groupId,
 }: GeneratedImgBProps) => {
   const result = propResult;
 
@@ -79,6 +81,7 @@ const GeneratedImgB = ({
         // 결과 페이지 플래그로 추론 on/off 제어
         shouldInferHotspots={shouldInferHotspots}
         cachedDetection={cachedDetection}
+        groupId={groupId}
       />
       <button
         type="button"
