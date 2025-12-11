@@ -3,7 +3,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageUserData } from '@/pages/mypage/types/apis/MyPage';
+import type {
+  MyPageImageHistory,
+  MyPageUserData,
+} from '@/pages/mypage/types/apis/MyPage';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 
@@ -35,6 +38,18 @@ type UnifiedGenerateImageResult = {
   imageInfoResponses: GenerateImageData[];
 };
 
+const toGenerateImageData = (
+  history: MyPageImageHistory
+): GenerateImageData => ({
+  imageId: history.imageId,
+  imageUrl: history.generatedImageUrl,
+  isMirror: false,
+  equilibrium: history.equilibrium,
+  houseForm: history.houseForm,
+  tagName: history.tasteTag,
+  name: history.tasteTag,
+});
+
 const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -60,10 +75,17 @@ const ResultPage = () => {
       | GenerateImageAResponse['data']
       | GenerateImageBResponse['data'];
     userProfile?: MyPageUserData | null;
+    initialHistory?: MyPageImageHistory | null;
   };
   let result = locationState?.result;
   const forwardedUserProfile = locationState?.userProfile ?? null;
+  const initialHistory = locationState?.initialHistory ?? null;
 
+  if (!result && initialHistory) {
+    result = {
+      imageInfoResponses: [toGenerateImageData(initialHistory)],
+    } as UnifiedGenerateImageResult;
+  }
   // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
   const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');

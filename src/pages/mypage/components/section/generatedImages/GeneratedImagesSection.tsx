@@ -4,7 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
 import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
-import type { MyPageUserData } from '@/pages/mypage/types/apis/MyPage';
+import type {
+  MyPageImageHistory,
+  MyPageUserData,
+} from '@/pages/mypage/types/apis/MyPage';
 import { logMyPageClickBtnImgCard } from '@/pages/mypage/utils/analytics';
 import { ROUTES } from '@/routes/paths.ts';
 import Loading from '@/shared/components/loading/Loading';
@@ -33,7 +36,8 @@ const GeneratedImagesSection = ({
     }
   );
 
-  const handleViewResult = (houseId: number) => {
+  const handleViewResult = (history: MyPageImageHistory) => {
+    const { houseId } = history;
     logMyPageClickBtnImgCard();
     const params = new URLSearchParams({
       from: 'mypage',
@@ -42,6 +46,7 @@ const GeneratedImagesSection = ({
     navigate(`${ROUTES.GENERATE_RESULT}?${params.toString()}`, {
       state: {
         userProfile,
+        initialHistory: history,
       },
     });
   };
@@ -82,7 +87,7 @@ const GeneratedImagesSection = ({
             imageUrl={image.generatedImageUrl}
             isLoaded={loadedImages[image.imageId]}
             onImageLoad={handleImageLoad}
-            onCurationClick={() => handleViewResult(image.houseId)}
+            onCurationClick={() => handleViewResult(image)}
           />
         ))}
       </div>
