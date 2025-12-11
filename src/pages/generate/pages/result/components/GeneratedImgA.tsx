@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
@@ -82,6 +82,7 @@ const GeneratedImgA = ({
   const { snapState, setSnapState } = useSheetSnapState();
   const { variant } = useABTest();
   const prevSnapStateRef = useRef<CurationSnapState>('collapsed');
+  const isSheetHiddenByImageMoreRef = useRef(false);
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: fetchedUserData } = useMyPageUser({
@@ -122,21 +123,37 @@ const GeneratedImgA = ({
 
   const lastImage = images[images.length - 1];
   const totalSlideCount = lastImage ? images.length + 1 : images.length;
+  const isImageMoreSlide =
+    Boolean(lastImage) && currentSlideIndex === totalSlideCount - 1;
 
-  const restoreSheetSnapState = () => {
+  const restoreSheetSnapState = useCallback(() => {
     const targetState =
       prevSnapStateRef.current && prevSnapStateRef.current !== 'hidden'
         ? prevSnapStateRef.current
         : 'collapsed';
     setSnapState(targetState);
-  };
+  }, [setSnapState]);
+
+  useEffect(() => {
+    if (!isImageMoreSlide) {
+      if (isSheetHiddenByImageMoreRef.current) {
+        isSheetHiddenByImageMoreRef.current = false;
+        restoreSheetSnapState();
+      }
+      return;
+    }
+
+    if (snapState !== 'hidden') {
+      if (!isSheetHiddenByImageMoreRef.current) {
+        prevSnapStateRef.current = snapState;
+      }
+      setSnapState('hidden');
+    }
+    isSheetHiddenByImageMoreRef.current = true;
+  }, [isImageMoreSlide, snapState, restoreSheetSnapState, setSnapState]);
 
   const handleOpenModal = () => {
     logResultImgClickBtnMoreImg(variant);
-    if (snapState !== 'hidden') {
-      prevSnapStateRef.current = snapState;
-    }
-    setSnapState('hidden');
     overlay.open(
       (
         { unmount } // @toss/overlay-kit 사용
