@@ -63,6 +63,8 @@ export const slideNumSkeleton = style({
   width: '100%',
   height: '100%',
   borderRadius: 'inherit',
+  border: `1px solid ${colorVars.color.gray200}`,
+  boxShadow: `inset 0 0 0 1px ${colorVars.color.gray100}`,
   background: `linear-gradient(
     90deg,
     ${colorVars.color.gray200} 0%,

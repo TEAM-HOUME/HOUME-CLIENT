@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +27,7 @@ const GeneratedImagesSection = ({
   const navigate = useNavigate();
   const { data: imagesData, isLoading, isError } = useMyPageImages();
   const { prefetchDetection } = useDetectionPrefetch();
+  const prefetchedImageIdsRef = useRef<Set<number>>(new Set<number>());
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>(
     () => {
       if (typeof window === 'undefined') return {};
@@ -40,11 +41,24 @@ const GeneratedImagesSection = ({
   );
   const primaryImageId = imagesData?.histories[0]?.imageId ?? null;
 
+  useEffect(() => {
+    if (!imagesData?.histories) return;
+    imagesData.histories.forEach((history, index) => {
+      if (prefetchedImageIdsRef.current.has(history.imageId)) return;
+      prefetchedImageIdsRef.current.add(history.imageId);
+      prefetchDetection(history.imageId, history.generatedImageUrl, {
+        priority: index === 0 ? 'immediate' : 'background',
+      });
+    });
+  }, [imagesData, prefetchDetection]);
+
   const scheduleDetectionPrefetch = useCallback(
     (imageId: number, imageUrl: string, options?: { immediate?: boolean }) => {
       if (!imageId || !imageUrl) return;
       const runTask = () => {
-        void prefetchDetection(imageId, imageUrl);
+        prefetchDetection(imageId, imageUrl, {
+          priority: options?.immediate ? 'immediate' : 'background',
+        });
       };
       if (options?.immediate || typeof window === 'undefined') {
         runTask();
@@ -78,8 +92,10 @@ const GeneratedImagesSection = ({
     navigate(`${ROUTES.GENERATE_RESULT}?${params.toString()}`, {
       state: navigationState,
     });
-    // 네비게이션 이후 브라우저가 한 템포 쉬는 시점에 프리페치 실행
-    scheduleDetectionPrefetch(history.imageId, history.generatedImageUrl);
+    // 네비게이션 직후 우선순위 감지 프리페치 실행
+    scheduleDetectionPrefetch(history.imageId, history.generatedImageUrl, {
+      immediate: true,
+    });
   };
 
   const handleImageLoad = useCallback(
