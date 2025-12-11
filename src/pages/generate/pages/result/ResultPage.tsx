@@ -7,6 +7,7 @@ import type {
   MyPageImageHistory,
   MyPageUserData,
 } from '@/pages/mypage/types/apis/MyPage';
+import { createImageDetailPlaceholder } from '@/pages/mypage/utils/resultNavigation';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 
@@ -111,43 +112,49 @@ const ResultPage = () => {
     Number.isSafeInteger(Number(trimmedHouseId))
       ? Number(trimmedHouseId)
       : null;
-  const shouldFetchFromAPI = !result && parsedHouseId !== null;
+  const hasValidHouseId = parsedHouseId !== null;
+  const shouldFetchExternalResult = !result && hasValidHouseId && !isFromMypage;
+  const shouldFetchMypageDetail = hasValidHouseId && isFromMypage;
+  const detailPlaceholder =
+    shouldFetchMypageDetail && initialHistory
+      ? createImageDetailPlaceholder(initialHistory)
+      : null;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
   const { data: apiResult, isLoading } = useGetResultDataQuery(
     parsedHouseId ?? 0,
     {
-      enabled: shouldFetchFromAPI && !isFromMypage,
+      enabled: shouldFetchExternalResult,
     }
   );
 
   const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
     parsedHouseId ?? 0,
-    { enabled: shouldFetchFromAPI && isFromMypage }
+    {
+      enabled: shouldFetchMypageDetail,
+      placeholderData: detailPlaceholder ? () => detailPlaceholder : undefined,
+    }
   );
 
-  // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
-  if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
-      // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
-      // console.log('mypageResult.histories', mypageResult.histories);
-      const allImageData = mypageResult.histories.map((history) => ({
-        imageId: history.imageId,
-        imageUrl: history.generatedImageUrl,
-        isMirror: false,
-        equilibrium: history.equilibrium,
-        houseForm: history.houseForm,
-        tagName: history.tasteTag,
-        name: history.name,
-      }));
-      result = {
-        imageInfoResponses: allImageData,
-      } as UnifiedGenerateImageResult;
-    } else if (!isFromMypage && apiResult) {
-      result = apiResult as
-        | GenerateImageAResponse['data']
-        | GenerateImageBResponse['data'];
-    }
+  // state 또는 API에서 가져온 데이터 사용
+  if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
+    // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
+    const allImageData = mypageResult.histories.map((history) => ({
+      imageId: history.imageId,
+      imageUrl: history.generatedImageUrl,
+      isMirror: false,
+      equilibrium: history.equilibrium,
+      houseForm: history.houseForm,
+      tagName: history.tasteTag,
+      name: history.name,
+    }));
+    result = {
+      imageInfoResponses: allImageData,
+    } as UnifiedGenerateImageResult;
+  } else if (!result && apiResult) {
+    result = apiResult as
+      | GenerateImageAResponse['data']
+      | GenerateImageBResponse['data'];
   }
 
   // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)

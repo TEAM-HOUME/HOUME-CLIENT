@@ -37,9 +37,12 @@ export const useMyPageImages = () => {
 /**
  * 마이페이지 이미지 상세 조회 훅
  */
+type ImageDetailResult = Awaited<ReturnType<typeof getMyPageImageDetail>>;
+
 type ImageDetailOptions = {
   enabled?: boolean;
-  initialData?: () => ReturnType<typeof getMyPageImageDetail>;
+  initialData?: () => ImageDetailResult;
+  placeholderData?: () => ImageDetailResult;
 };
 
 export const useMyPageImageDetail = (

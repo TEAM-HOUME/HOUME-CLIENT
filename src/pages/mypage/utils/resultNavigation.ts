@@ -1,12 +1,9 @@
-import { queryClient } from '@/shared/apis/queryClient';
-import { QUERY_KEY } from '@/shared/constants/queryKey';
-
 import { primeDetectionCacheEntry } from '@pages/generate/hooks/useDetectionCache';
 import { useDetectionCacheStore } from '@pages/generate/stores/useDetectionCacheStore';
 
 import type {
   MyPageImageDetail,
-  MyPageImageDetailResponse,
+  MyPageImageDetailData,
   MyPageImageHistory,
   MyPageUserData,
 } from '../types/apis/MyPage';
@@ -33,27 +30,6 @@ const toDetailSkeleton = (history: MyPageImageHistory): MyPageImageDetail => ({
   imageId: history.imageId,
 });
 
-const seedImageDetailQuery = (history: MyPageImageHistory) => {
-  const existing = queryClient.getQueryData<
-    MyPageImageDetailResponse | undefined
-  >([QUERY_KEY.MYPAGE_IMAGE_DETAIL, history.houseId]);
-
-  if (existing) return;
-
-  const skeleton: MyPageImageDetailResponse = {
-    code: 200,
-    message: '',
-    data: {
-      histories: [toDetailSkeleton(history)],
-    },
-  };
-
-  queryClient.setQueryData(
-    [QUERY_KEY.MYPAGE_IMAGE_DETAIL, history.houseId],
-    skeleton
-  );
-};
-
 export const buildResultNavigationState = ({
   history,
   userProfile,
@@ -64,11 +40,15 @@ export const buildResultNavigationState = ({
     primeDetectionCacheEntry(history.imageId, detectionEntry);
   }
 
-  seedImageDetailQuery(history);
-
   return {
     userProfile,
     initialHistory: history,
     cachedDetection: detectionEntry,
   };
 };
+
+export const createImageDetailPlaceholder = (
+  history: MyPageImageHistory
+): MyPageImageDetailData => ({
+  histories: [toDetailSkeleton(history)],
+});
