@@ -91,7 +91,10 @@ async function loadCorsImage(
 export function useFurnitureHotspots(
   imageUrl: string,
   mirrored = false,
-  enabled = true
+  enabled = true,
+  options?: {
+    onInferenceComplete?: (result: ProcessedDetections) => void;
+  }
 ) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -104,6 +107,7 @@ export function useFurnitureHotspots(
     isLoading,
     error: modelError,
   } = useONNXModel(OBJ365_MODEL_PATH);
+  const onInferenceComplete = options?.onInferenceComplete;
 
   const logHotspotEvent = useCallback(
     (
@@ -232,6 +236,7 @@ export function useFurnitureHotspots(
         totalDetections: result.detections.length,
         samples: result.detections.slice(0, 5),
       });
+      onInferenceComplete?.(result);
       processDetections(imageEl, result);
       hasRunRef.current = true;
     };
@@ -245,6 +250,7 @@ export function useFurnitureHotspots(
     try {
       const imageEl = imgRef.current;
       if (!imageEl) return;
+
       await executeInference(imageEl, 'inference-start');
     } catch (error) {
       const err = toError(error);
@@ -323,6 +329,7 @@ export function useFurnitureHotspots(
     logHotspotEvent,
     updateRenderMetrics,
     resetPipeline,
+    onInferenceComplete,
   ]);
 
   useEffect(() => {

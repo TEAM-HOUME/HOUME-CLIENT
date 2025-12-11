@@ -2,7 +2,7 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   resolveFurnitureCode,
@@ -13,6 +13,7 @@ import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureC
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
+import { useDetectionCacheStore } from '@pages/generate/stores/useDetectionCacheStore';
 import { logResultImgClickBtnSpot } from '@pages/generate/utils/analytics';
 import {
   filterAllowedDetectedObjects,
@@ -29,6 +30,7 @@ import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
+import type { ProcessedDetections } from '@pages/generate/types/detection';
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
 
@@ -92,6 +94,7 @@ const DetectionHotspots = ({
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
   const { variant } = useABTest();
+  const setCacheEntry = useDetectionCacheStore((state) => state.setEntry);
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -110,8 +113,21 @@ const DetectionHotspots = ({
 
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   // 페이지 시나리오별로 추론 사용 여부 제어
+  const handleInferenceComplete = useCallback(
+    (result: ProcessedDetections) => {
+      if (!imageId) return;
+      setCacheEntry(imageId, {
+        imageUrl,
+        processedDetections: result,
+      });
+    },
+    [imageId, imageUrl, setCacheEntry]
+  );
+
   const { imgRef, containerRef, hotspots, isLoading, error } =
-    useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
+    useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots, {
+      onInferenceComplete: handleInferenceComplete,
+    });
   const allowedCategories = categoriesQuery.data?.categories;
 
   // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭
