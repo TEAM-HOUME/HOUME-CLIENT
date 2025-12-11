@@ -27,16 +27,41 @@ import {
   furnitureHotspotReducer,
 } from './furnitureHotspotState';
 
+import type { FurnitureHotspot, RenderMetrics } from './furnitureHotspotState';
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
+type FurnitureHotspotOptions = {
+  prefetchedDetections?: ProcessedDetections | null;
+  onInferenceComplete?: (
+    result: ProcessedDetections,
+    hotspots: FurnitureHotspot[]
+  ) => void;
+};
+
 export type { FurnitureHotspot } from './furnitureHotspotState';
+
+// 렌더 메트릭 값이 동일하면 추가 dispatch를 피하기 위한 비교 함수
+const areRenderMetricsEqual = (
+  prev: RenderMetrics | null,
+  next: RenderMetrics | null
+) => {
+  if (!prev || !next) return prev === next;
+  return (
+    prev.offsetX === next.offsetX &&
+    prev.offsetY === next.offsetY &&
+    prev.scaleX === next.scaleX &&
+    prev.scaleY === next.scaleY &&
+    prev.width === next.width &&
+    prev.height === next.height
+  );
+};
 
 /**
  * CORS 이미지 로더(loadCorsImage)
  * - 목적: SecurityError 발생 시 크로스 도메인 이미지를 우회 로딩
  * - signal: 중복 요청이나 컴포넌트 언마운트 시 취소(abort) 지원
  */
-async function loadCorsImage(
+export async function loadCorsImage(
   url: string,
   signal?: AbortSignal
 ): Promise<HTMLImageElement | null> {
@@ -91,19 +116,30 @@ async function loadCorsImage(
 export function useFurnitureHotspots(
   imageUrl: string,
   mirrored = false,
-  enabled = true
+  enabled = true,
+  options?: FurnitureHotspotOptions
 ) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const corsAbortRef = useRef<AbortController | null>(null);
   const isRunningRef = useRef(false);
   const hasRunRef = useRef(false);
+  const renderMetricsRef = useRef<RenderMetrics | null>(null);
 
   const {
     runInference,
     isLoading,
     error: modelError,
   } = useONNXModel(OBJ365_MODEL_PATH);
+  const prefetchedDetections = options?.prefetchedDetections ?? null;
+  const onInferenceComplete = options?.onInferenceComplete;
+  const inferenceCompleteRef =
+    useRef<FurnitureHotspotOptions['onInferenceComplete']>(onInferenceComplete);
+
+  // 최신 콜백 참조를 ref에 유지해 의존성 배열 증폭 방지
+  useEffect(() => {
+    inferenceCompleteRef.current = onInferenceComplete;
+  }, [onInferenceComplete]);
 
   const logHotspotEvent = useCallback(
     (
@@ -112,6 +148,7 @@ export function useFurnitureHotspots(
       level: 'info' | 'warn' = 'info'
     ) => {
       const { imageUrl: _omitted, ...restPayload } = payload ?? {};
+      void _omitted; // 이미지 URL은 로그에서 제외
       const hasRestPayload = Object.keys(restPayload).length > 0;
       const enrichedPayload = hasRestPayload
         ? { mirrored, ...restPayload }
@@ -125,6 +162,7 @@ export function useFurnitureHotspots(
     furnitureHotspotReducer,
     furnitureHotspotInitialState
   );
+  renderMetricsRef.current = state.renderMetrics;
 
   const dispatch = useMemo(
     () =>
@@ -140,6 +178,11 @@ export function useFurnitureHotspots(
 
   const updateRenderMetrics = useCallback(() => {
     const metrics = computeRenderMetrics(imgRef.current, containerRef.current);
+    if (areRenderMetricsEqual(renderMetricsRef.current, metrics)) {
+      return renderMetricsRef.current ?? null;
+    }
+    // 측정값이 바뀔 때만 상태 dispatch
+    renderMetricsRef.current = metrics;
     dispatch({ type: 'SET_RENDER_METRICS', payload: metrics });
     return metrics;
   }, [dispatch]);
@@ -200,8 +243,10 @@ export function useFurnitureHotspots(
           imageMeta: result.imageMeta,
         },
       });
+
+      return result;
     },
-    [dispatch, imageUrl, logHotspotEvent]
+    [dispatch, logHotspotEvent]
   );
 
   const toError = (value: unknown): Error =>
@@ -232,7 +277,8 @@ export function useFurnitureHotspots(
         totalDetections: result.detections.length,
         samples: result.detections.slice(0, 5),
       });
-      processDetections(imageEl, result);
+      const processed = processDetections(imageEl, result);
+      inferenceCompleteRef.current?.(result, processed.hotspots);
       hasRunRef.current = true;
     };
 
@@ -245,6 +291,19 @@ export function useFurnitureHotspots(
     try {
       const imageEl = imgRef.current;
       if (!imageEl) return;
+
+      if (prefetchedDetections) {
+        logHotspotEvent('inference-cache-hit');
+        updateRenderMetrics();
+        const processed = processDetections(imageEl, prefetchedDetections);
+        inferenceCompleteRef.current?.(
+          prefetchedDetections,
+          processed.hotspots
+        );
+        hasRunRef.current = true;
+        return;
+      }
+
       await executeInference(imageEl, 'inference-start');
     } catch (error) {
       const err = toError(error);
@@ -323,6 +382,7 @@ export function useFurnitureHotspots(
     logHotspotEvent,
     updateRenderMetrics,
     resetPipeline,
+    prefetchedDetections,
   ]);
 
   useEffect(() => {

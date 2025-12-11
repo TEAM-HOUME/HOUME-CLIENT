@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+import { getCanHistoryGoBack } from '@/shared/utils/history';
 
 const GeneratePage = () => {
   const location = useLocation();
@@ -25,8 +26,12 @@ const GeneratePage = () => {
   const handleBackClick = () => {
     if (location.pathname === '/generate/result') {
       if (isFromMypage) {
-        // 마이페이지에서 온 경우 마이페이지로 이동
-        navigate('/mypage');
+        // 마이페이지에서 온 경우 스택이 남아 있으면 실제 이전 화면으로 이동
+        if (getCanHistoryGoBack()) {
+          navigate(-1);
+        } else {
+          navigate('/mypage', { replace: true });
+        }
       } else {
         // 일반 생성 플로우에서는 랜딩페이지로 이동
         navigate('/');

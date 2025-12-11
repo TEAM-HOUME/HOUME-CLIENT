@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+import { useDetectionCacheStore } from '@pages/generate/stores/useDetectionCacheStore';
+
 interface UserStateTypes {
   accessToken: string | null;
   userName: string | null;
@@ -44,5 +46,7 @@ export const useUserStore = create<UserStateTypes>((set) => ({
     localStorage.removeItem('userName');
     localStorage.removeItem('userId');
     set({ accessToken: null, userName: null, userId: null });
+    // 세션 감지 캐시 초기화
+    useDetectionCacheStore.getState().clear();
   },
 }));

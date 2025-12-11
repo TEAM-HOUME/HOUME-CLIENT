@@ -180,6 +180,7 @@ export const useGenerateImageApi = () => {
 
       // console.log('프로그래스 바 완료 대기 중...');
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.MYPAGE_IMAGES] });
     },
   });
 
@@ -244,6 +245,7 @@ export const useFallbackImage = (
 
       // 프로그래스 바 완료 후 이동하도록 변경
       queryClient.invalidateQueries({ queryKey: ['generateImage'] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.MYPAGE_IMAGES] });
     }
   }, [query.isSuccess, query.data]);
 

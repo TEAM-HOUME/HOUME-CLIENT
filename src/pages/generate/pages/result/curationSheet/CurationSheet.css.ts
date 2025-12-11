@@ -31,6 +31,29 @@ export const filterSection = style({
   msOverflowStyle: 'none', // IE and Edge
 });
 
+// 카테고리 칩 스켈레톤 공통 스타일 정의
+export const filterSkeletonChip = style({
+  height: '3.6rem',
+  borderRadius: '999px',
+  background: `linear-gradient(
+    90deg,
+    ${colorVars.color.gray200} 0%,
+    ${colorVars.color.gray100} 50%,
+    ${colorVars.color.gray200} 100%
+  )`,
+  backgroundSize: '200% 100%',
+  animation: `${animationTokens.skeletonWave} 1.6s ease-in-out infinite`,
+  flexShrink: 0,
+});
+
+// 스켈레톤 칩의 가변 너비를 프리셋으로 제공
+export const filterSkeletonChipWidth = styleVariants({
+  short: { width: '5.6rem' },
+  medium: { width: '6.8rem' },
+  long: { width: '8.8rem' },
+  wide: { width: '10.4rem' },
+});
+
 export const scrollContentBase = style({
   display: 'flex',
   flexDirection: 'column',

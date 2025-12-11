@@ -9,6 +9,7 @@ import Tag from '@shared/assets/icons/tagIcon.svg?react';
 import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageData,
   GenerateImageAResponse,
@@ -28,12 +29,16 @@ interface GeneratedImgBProps {
     | GenerateImageBResponse['data'];
   onCurrentImgIdChange?: (currentImgId: number) => void;
   shouldInferHotspots?: boolean;
+  detectionCache?: Record<number, DetectionCacheEntry> | null;
+  groupId?: number | null;
 }
 
 const GeneratedImgB = ({
   result: propResult,
   onCurrentImgIdChange,
   shouldInferHotspots = true,
+  detectionCache,
+  groupId,
 }: GeneratedImgBProps) => {
   const result = propResult;
 
@@ -62,6 +67,11 @@ const GeneratedImgB = ({
     return null;
   }
 
+  const cachedDetection =
+    image?.imageId && detectionCache
+      ? (detectionCache[image.imageId] ?? null)
+      : null;
+
   return (
     <div className={styles.container}>
       <DetectionHotspots
@@ -70,6 +80,8 @@ const GeneratedImgB = ({
         mirrored={image.isMirror}
         // 결과 페이지 플래그로 추론 on/off 제어
         shouldInferHotspots={shouldInferHotspots}
+        cachedDetection={cachedDetection}
+        groupId={groupId}
       />
       <button
         type="button"
