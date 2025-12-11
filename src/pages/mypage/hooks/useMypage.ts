@@ -27,7 +27,8 @@ export const useMyPageImages = () => {
   return useQuery({
     queryKey: [QUERY_KEY.MYPAGE_IMAGES],
     queryFn: getMyPageImages,
-    staleTime: 0,
+    staleTime: 15 * 60 * 1000, // 15분 캐시
+    refetchOnWindowFocus: false,
   });
 };
 
