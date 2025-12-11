@@ -121,33 +121,22 @@ export const CurationSheet = () => {
     if (!activeImageId) return;
     if (!categories || categories.length === 0) return;
 
-    let isCancelled = false;
-    // 카테고리별 상품을 순차 프리패치
-    const prefetchSequentially = async () => {
-      for (const category of categories) {
-        if (isCancelled) break;
-        const key = `${activeImageId}:${category.id}`;
-        if (prefetchedRef.current.has(key)) continue;
-        prefetchedRef.current.add(key);
-        // 한 번에 하나씩 순서대로 호출해 서버 부하 완화
+    // 카테고리별 프리패치를 병렬로 처리해 초기 반응 속도 확보
+    categories.forEach((category) => {
+      const key = `${activeImageId}:${category.id}`;
+      if (prefetchedRef.current.has(key)) return;
+      prefetchedRef.current.add(key);
 
-        await queryClient.prefetchQuery({
-          queryKey: [
-            QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
-            activeImageId,
-            category.id,
-          ],
-          queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
-          staleTime: 30 * 1000,
-        });
-      }
-    };
-
-    void prefetchSequentially();
-
-    return () => {
-      isCancelled = true;
-    };
+      void queryClient.prefetchQuery({
+        queryKey: [
+          QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
+          activeImageId,
+          category.id,
+        ],
+        queryFn: () => getGeneratedImageProducts(activeImageId, category.id),
+        staleTime: 30 * 1000,
+      });
+    });
   }, [queryClient, activeImageId, categories]);
 
   const handleCategorySelect = (categoryId: number) => {
