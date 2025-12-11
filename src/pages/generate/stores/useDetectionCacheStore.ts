@@ -12,7 +12,7 @@ export interface DetectionCacheEntry {
   imageUrl: string;
   processedDetections: ProcessedDetections;
   hotspots: FurnitureHotspot[];
-  detectedObjects: FurnitureCategoryCode[];
+  detectedObjects?: FurnitureCategoryCode[];
   updatedAt: number;
 }
 

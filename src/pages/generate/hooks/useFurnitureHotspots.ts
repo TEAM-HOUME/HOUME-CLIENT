@@ -29,6 +29,14 @@ import {
 
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
+type FurnitureHotspotOptions = {
+  prefetchedDetections?: ProcessedDetections | null;
+  onInferenceComplete?: (
+    result: ProcessedDetections,
+    hotspots: FurnitureHotspot[]
+  ) => void;
+};
+
 export type { FurnitureHotspot } from './furnitureHotspotState';
 
 /**
@@ -92,9 +100,7 @@ export function useFurnitureHotspots(
   imageUrl: string,
   mirrored = false,
   enabled = true,
-  options?: {
-    onInferenceComplete?: (result: ProcessedDetections) => void;
-  }
+  options?: FurnitureHotspotOptions
 ) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -107,6 +113,7 @@ export function useFurnitureHotspots(
     isLoading,
     error: modelError,
   } = useONNXModel(OBJ365_MODEL_PATH);
+  const prefetchedDetections = options?.prefetchedDetections ?? null;
   const onInferenceComplete = options?.onInferenceComplete;
 
   const logHotspotEvent = useCallback(
@@ -204,6 +211,8 @@ export function useFurnitureHotspots(
           imageMeta: result.imageMeta,
         },
       });
+
+      return result;
     },
     [dispatch, imageUrl, logHotspotEvent]
   );
@@ -236,8 +245,8 @@ export function useFurnitureHotspots(
         totalDetections: result.detections.length,
         samples: result.detections.slice(0, 5),
       });
-      onInferenceComplete?.(result);
-      processDetections(imageEl, result);
+      const processed = processDetections(imageEl, result);
+      onInferenceComplete?.(result, processed.hotspots);
       hasRunRef.current = true;
     };
 
@@ -250,6 +259,15 @@ export function useFurnitureHotspots(
     try {
       const imageEl = imgRef.current;
       if (!imageEl) return;
+
+      if (prefetchedDetections) {
+        logHotspotEvent('inference-cache-hit');
+        updateRenderMetrics();
+        const processed = processDetections(imageEl, prefetchedDetections);
+        onInferenceComplete?.(prefetchedDetections, processed.hotspots);
+        hasRunRef.current = true;
+        return;
+      }
 
       await executeInference(imageEl, 'inference-start');
     } catch (error) {
@@ -330,6 +348,7 @@ export function useFurnitureHotspots(
     updateRenderMetrics,
     resetPipeline,
     onInferenceComplete,
+    prefetchedDetections,
   ]);
 
   useEffect(() => {

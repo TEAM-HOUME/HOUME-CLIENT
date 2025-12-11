@@ -20,13 +20,19 @@ const GeneratePage = () => {
 
   // 조건부 타이틀 설정
   const title = '스타일링 이미지 생성';
+  const canHistoryGoBack =
+    typeof window !== 'undefined' && (window.history.state?.idx ?? 0) > 0;
 
   // 현재 경로에 따라 뒤로가기 로직 결정
   const handleBackClick = () => {
     if (location.pathname === '/generate/result') {
       if (isFromMypage) {
-        // 마이페이지에서 온 경우 마이페이지로 이동
-        navigate('/mypage');
+        // 마이페이지에서 온 경우 스택이 남아 있으면 실제 이전 화면으로 이동
+        if (canHistoryGoBack) {
+          navigate(-1);
+        } else {
+          navigate('/mypage', { replace: true });
+        }
       } else {
         // 일반 생성 플로우에서는 랜딩페이지로 이동
         navigate('/');

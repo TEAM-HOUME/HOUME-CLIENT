@@ -26,6 +26,7 @@ import GeneratedImgB from './components/GeneratedImgB.tsx';
 import { CurationSheet } from './curationSheet/CurationSheet';
 import * as styles from './ResultPage.css.ts';
 
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageAResponse,
   GenerateImageBResponse,
@@ -76,16 +77,28 @@ const ResultPage = () => {
       | GenerateImageBResponse['data'];
     userProfile?: MyPageUserData | null;
     initialHistory?: MyPageImageHistory | null;
+    cachedDetection?: DetectionCacheEntry | null;
   };
   let result = locationState?.result;
   const forwardedUserProfile = locationState?.userProfile ?? null;
   const initialHistory = locationState?.initialHistory ?? null;
+  const forwardedDetection = locationState?.cachedDetection ?? null;
 
   if (!result && initialHistory) {
     result = {
       imageInfoResponses: [toGenerateImageData(initialHistory)],
     } as UnifiedGenerateImageResult;
   }
+  const initialImageId = initialHistory?.imageId ?? null;
+  const forwardedDetectionMap = useMemo<Record<
+    number,
+    DetectionCacheEntry
+  > | null>(() => {
+    if (!forwardedDetection || !initialImageId) return null;
+    return {
+      [initialImageId]: forwardedDetection,
+    };
+  }, [forwardedDetection, initialImageId]);
   // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
   const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');
@@ -356,11 +369,13 @@ const ResultPage = () => {
             onSlideChange={handleSlideChange}
             onCurrentImgIdChange={setCurrentImgId}
             userProfile={forwardedUserProfile}
+            detectionCache={forwardedDetectionMap ?? undefined}
           />
         ) : (
           <GeneratedImgB
             result={result}
             onCurrentImgIdChange={setCurrentImgId}
+            detectionCache={forwardedDetectionMap ?? undefined}
           />
         )}
 

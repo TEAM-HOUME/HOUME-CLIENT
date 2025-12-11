@@ -13,7 +13,10 @@ import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureC
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
-import { useDetectionCacheStore } from '@pages/generate/stores/useDetectionCacheStore';
+import {
+  useDetectionCacheStore,
+  type DetectionCacheEntry,
+} from '@pages/generate/stores/useDetectionCacheStore';
 import { logResultImgClickBtnSpot } from '@pages/generate/utils/analytics';
 import {
   filterAllowedDetectedObjects,
@@ -66,6 +69,7 @@ interface DetectionHotspotsProps {
   imageUrl: string;
   mirrored?: boolean;
   shouldInferHotspots?: boolean;
+  cachedDetection?: DetectionCacheEntry | null;
 }
 
 const DetectionHotspots = ({
@@ -73,6 +77,7 @@ const DetectionHotspots = ({
   imageUrl,
   mirrored = false,
   shouldInferHotspots = true,
+  cachedDetection,
 }: DetectionHotspotsProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const setImageDetection = useCurationStore(
@@ -93,8 +98,15 @@ const DetectionHotspots = ({
   const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
+  const lastDetectionsRef = useRef<ProcessedDetections | null>(null);
   const { variant } = useABTest();
   const setCacheEntry = useDetectionCacheStore((state) => state.setEntry);
+  const storeCacheEntry = useDetectionCacheStore((state) =>
+    imageId !== null ? (state.images[imageId] ?? null) : null
+  );
+  const effectiveCachedDetection = useMemo(() => {
+    return cachedDetection ?? storeCacheEntry ?? null;
+  }, [cachedDetection, storeCacheEntry]);
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -116,17 +128,35 @@ const DetectionHotspots = ({
   const handleInferenceComplete = useCallback(
     (result: ProcessedDetections, latestHotspots: FurnitureHotspot[]) => {
       if (!imageId) return;
+      lastDetectionsRef.current = result;
       setCacheEntry(imageId, {
         imageUrl,
         processedDetections: result,
         hotspots: latestHotspots,
+        detectedObjects: undefined,
       });
     },
     [imageId, imageUrl, setCacheEntry]
   );
 
+  const prefetchedDetections = useMemo(() => {
+    if (!effectiveCachedDetection) return null;
+    if (effectiveCachedDetection.imageUrl !== imageUrl) return null;
+    return effectiveCachedDetection.processedDetections;
+  }, [effectiveCachedDetection, imageUrl]);
+
+  useEffect(() => {
+    if (!prefetchedDetections) return;
+    lastDetectionsRef.current = prefetchedDetections;
+  }, [prefetchedDetections]);
+
+  useEffect(() => {
+    lastDetectionsRef.current = null;
+  }, [imageUrl]);
+
   const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots, {
+      prefetchedDetections,
       onInferenceComplete: (result, latestHotspots) =>
         handleInferenceComplete(result, latestHotspots),
     });
@@ -190,12 +220,24 @@ const DetectionHotspots = ({
       hotspots,
       detectedObjects,
     });
+    const processedDetections = lastDetectionsRef.current;
+    if (processedDetections) {
+      setCacheEntry(imageId, {
+        imageUrl,
+        processedDetections,
+        hotspots,
+        detectedObjects,
+      });
+      lastDetectionsRef.current = null;
+    }
   }, [
     imageId,
     hotspots,
     setImageDetection,
     resetImageState,
     shouldInferHotspots,
+    setCacheEntry,
+    imageUrl,
   ]);
 
   useEffect(() => {

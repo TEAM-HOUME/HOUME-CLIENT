@@ -12,6 +12,8 @@ import { logMyPageClickBtnImgCard } from '@/pages/mypage/utils/analytics';
 import { ROUTES } from '@/routes/paths.ts';
 import Loading from '@/shared/components/loading/Loading';
 
+import { useDetectionCacheStore } from '@pages/generate/stores/useDetectionCacheStore';
+
 import * as styles from './GeneratedImagesSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
 
@@ -37,8 +39,10 @@ const GeneratedImagesSection = ({
   );
 
   const handleViewResult = (history: MyPageImageHistory) => {
-    const { houseId } = history;
+    const { houseId, imageId } = history;
     logMyPageClickBtnImgCard();
+    const cachedDetection =
+      useDetectionCacheStore.getState().images[imageId] ?? null; // 세션 캐시에 있으면 그대로 전달
     const params = new URLSearchParams({
       from: 'mypage',
       houseId: String(houseId),
@@ -47,6 +51,7 @@ const GeneratedImagesSection = ({
       state: {
         userProfile,
         initialHistory: history,
+        cachedDetection,
       },
     });
   };

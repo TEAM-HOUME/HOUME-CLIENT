@@ -33,6 +33,7 @@ import Tag from '@shared/assets/icons/tagIcon.svg?react';
 import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageData,
   GenerateImageAResponse,
@@ -54,6 +55,7 @@ interface GeneratedImgAProps {
   onCurrentImgIdChange?: (currentImgId: number) => void;
   shouldInferHotspots?: boolean;
   userProfile?: MyPageUserData | null;
+  detectionCache?: Record<number, DetectionCacheEntry> | null;
 }
 
 const GeneratedImgA = ({
@@ -62,6 +64,7 @@ const GeneratedImgA = ({
   onCurrentImgIdChange,
   shouldInferHotspots = true,
   userProfile,
+  detectionCache,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -176,20 +179,27 @@ const GeneratedImgA = ({
         >
           {currentSlideIndex === 0 ? <SlidePrevDisabled /> : <SlidePrev />}
         </button>
-        {images.map((image, index) => (
-          <SwiperSlide
-            key={`${image.imageId}-${index}`}
-            className={styles.swiperSlide}
-          >
-            <DetectionHotspots
-              imageId={image.imageId}
-              imageUrl={image.imageUrl}
-              mirrored={image.isMirror}
-              // 결과 페이지 플래그로 추론 on/off 제어
-              shouldInferHotspots={shouldInferHotspots}
-            />
-          </SwiperSlide>
-        ))}
+        {images.map((image, index) => {
+          const cachedDetection =
+            image.imageId && detectionCache
+              ? (detectionCache[image.imageId] ?? null)
+              : null;
+          return (
+            <SwiperSlide
+              key={`${image.imageId}-${index}`}
+              className={styles.swiperSlide}
+            >
+              <DetectionHotspots
+                imageId={image.imageId}
+                imageUrl={image.imageUrl}
+                mirrored={image.isMirror}
+                // 결과 페이지 플래그로 추론 on/off 제어
+                shouldInferHotspots={shouldInferHotspots}
+                cachedDetection={cachedDetection}
+              />
+            </SwiperSlide>
+          );
+        })}
         {lastImage && (
           <SwiperSlide key="blurred-last-image" className={styles.swiperSlide}>
             <img
