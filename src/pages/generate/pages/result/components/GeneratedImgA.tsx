@@ -19,6 +19,7 @@ import {
   logResultImgSwipeSlideRight,
 } from '@/pages/generate/utils/analytics';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import type { MyPageUserData } from '@/pages/mypage/types/apis/MyPage';
 import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 
@@ -52,6 +53,7 @@ interface GeneratedImgAProps {
   onSlideChange?: (currentIndex: number, totalCount: number) => void;
   onCurrentImgIdChange?: (currentImgId: number) => void;
   shouldInferHotspots?: boolean;
+  userProfile?: MyPageUserData | null;
 }
 
 const GeneratedImgA = ({
@@ -59,6 +61,7 @@ const GeneratedImgA = ({
   onSlideChange,
   onCurrentImgIdChange,
   shouldInferHotspots = true,
+  userProfile,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -68,7 +71,11 @@ const GeneratedImgA = ({
   const { variant } = useABTest();
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
-  const { data: userData } = useMyPageUser();
+  const { data: fetchedUserData } = useMyPageUser({
+    enabled: !userProfile,
+  });
+  const creditCount =
+    userProfile?.CreditCount ?? fetchedUserData?.CreditCount ?? 0;
 
   // currentImgId가 변경될 때마다 부모에게 전달
   useEffect(() => {
@@ -117,7 +124,7 @@ const GeneratedImgA = ({
           cancelVariant="default"
           confirmVariant="primary"
           showCreditChip={true}
-          creditCount={userData?.CreditCount || 0}
+          creditCount={creditCount}
           maxCredit={5}
           onCancel={() => {
             logResultImgClickMoreModalBack(variant);

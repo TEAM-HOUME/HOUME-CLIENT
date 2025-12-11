@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
+import type { MyPageUserData } from '@/pages/mypage/types/apis/MyPage';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 
@@ -53,14 +54,15 @@ const ResultPage = () => {
   const activeImageIdInStore = useCurationStore((state) => state.activeImageId);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
-  let result = (
-    location.state as {
-      result?:
-        | UnifiedGenerateImageResult
-        | GenerateImageAResponse['data']
-        | GenerateImageBResponse['data'];
-    }
-  )?.result;
+  const locationState = location.state as {
+    result?:
+      | UnifiedGenerateImageResult
+      | GenerateImageAResponse['data']
+      | GenerateImageBResponse['data'];
+    userProfile?: MyPageUserData | null;
+  };
+  let result = locationState?.result;
+  const forwardedUserProfile = locationState?.userProfile ?? null;
 
   // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
   const rawHouseId = searchParams.get('houseId');
@@ -331,6 +333,7 @@ const ResultPage = () => {
             result={result}
             onSlideChange={handleSlideChange}
             onCurrentImgIdChange={setCurrentImgId}
+            userProfile={forwardedUserProfile}
           />
         ) : (
           <GeneratedImgB
