@@ -114,11 +114,12 @@ const DetectionHotspots = ({
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   // 페이지 시나리오별로 추론 사용 여부 제어
   const handleInferenceComplete = useCallback(
-    (result: ProcessedDetections) => {
+    (result: ProcessedDetections, latestHotspots: FurnitureHotspot[]) => {
       if (!imageId) return;
       setCacheEntry(imageId, {
         imageUrl,
         processedDetections: result,
+        hotspots: latestHotspots,
       });
     },
     [imageId, imageUrl, setCacheEntry]
@@ -126,7 +127,8 @@ const DetectionHotspots = ({
 
   const { imgRef, containerRef, hotspots, isLoading, error } =
     useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots, {
-      onInferenceComplete: handleInferenceComplete,
+      onInferenceComplete: (result, latestHotspots) =>
+        handleInferenceComplete(result, latestHotspots),
     });
   const allowedCategories = categoriesQuery.data?.categories;
 
