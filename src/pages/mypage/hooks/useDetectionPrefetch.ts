@@ -14,6 +14,8 @@ import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureC
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
+const PREFETCH_DELAY_MS = 120;
+
 /**
  * 외부 이미지 요소 로더
  * - crossOrigin 허용을 기본으로 시도
@@ -51,8 +53,8 @@ type PrefetchTask = {
 };
 
 /**
- * 마이페이지 카드 클릭 직전 감지 프리페치를 수행하는 훅
- * - 클릭 단일 건만 즉시 처리하고, 나머지는 기존 파이프라인대로 진행
+ * 감지(inference) 결과를 사전 계산해 캐시에 적재하는 훅
+ * - 즉시(immediate) 요청과 백그라운드 큐를 분리해 성능 균형 유지
  */
 export const useDetectionPrefetch = () => {
   const { runInference, isLoading, error } = useONNXModel(OBJ365_MODEL_PATH);
@@ -150,6 +152,7 @@ export const useDetectionPrefetch = () => {
     [error, isLoading, processAndStore, runInference]
   );
 
+  // 백그라운드 큐를 순차로 소모해 모델 호출 폭주 방지
   const drainQueue = useCallback(async () => {
     if (drainingRef.current) return;
     drainingRef.current = true;
@@ -158,7 +161,7 @@ export const useDetectionPrefetch = () => {
         const task = queueRef.current.shift();
         if (!task) continue;
         await executePrefetch(task.imageId, task.imageUrl);
-        await sleep(120); // 감지 모델 연속 호출 완화
+        await sleep(PREFETCH_DELAY_MS); // 감지 모델 연속 호출 완화
       }
     } finally {
       drainingRef.current = false;
@@ -187,6 +190,10 @@ export const useDetectionPrefetch = () => {
     [executePrefetch, scheduleBackgroundPrefetch]
   );
 
+  /**
+   * 감지 프리패치 트리거
+   * - 반환 객체를 통해 외부에서 우선순위를 선택적으로 제어
+   */
   return {
     prefetchDetection,
   };

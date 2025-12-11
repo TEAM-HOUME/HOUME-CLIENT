@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
 import { useDetectionPrefetch } from '@/pages/mypage/hooks/useDetectionPrefetch';
-import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+import { useMyPageImagesQuery } from '@/pages/mypage/hooks/useMypage';
 import type {
   MyPageImageHistory,
   MyPageUserData,
@@ -21,11 +21,15 @@ interface GeneratedImagesSectionProps {
   userProfile?: MyPageUserData | null;
 }
 
+/**
+ * 마이페이지 생성 이미지 목록 섹션
+ * - 감지 데이터 프리패치와 네비게이션 상태 구성을 함께 처리
+ */
 const GeneratedImagesSection = ({
   userProfile,
 }: GeneratedImagesSectionProps) => {
   const navigate = useNavigate();
-  const { data: imagesData, isLoading, isError } = useMyPageImages();
+  const { data: imagesData, isLoading, isError } = useMyPageImagesQuery();
   const { prefetchDetection } = useDetectionPrefetch();
   const prefetchedImageIdsRef = useRef<Set<number>>(new Set<number>());
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>(
@@ -52,6 +56,10 @@ const GeneratedImagesSection = ({
     });
   }, [imagesData, prefetchDetection]);
 
+  /**
+   * 감지 프리패치를 브라우저 idle 시간에 스케줄링
+   * - 우선순위(immediate) 요청은 즉시 수행
+   */
   const scheduleDetectionPrefetch = useCallback(
     (imageId: number, imageUrl: string, options?: { immediate?: boolean }) => {
       if (!imageId || !imageUrl) return;
@@ -78,6 +86,9 @@ const GeneratedImagesSection = ({
     [prefetchDetection]
   );
 
+  /**
+   * 결과 페이지로 이동하며 필요한 감지 데이터를 선행 프리패치
+   */
   const handleViewResult = (history: MyPageImageHistory) => {
     const { houseId } = history;
     logMyPageClickBtnImgCard();
@@ -98,6 +109,9 @@ const GeneratedImagesSection = ({
     });
   };
 
+  /**
+   * 이미지 로드 완료 시 로컬 캐시를 갱신하고 프리패치 스케줄
+   */
   const handleImageLoad = useCallback(
     (imageId: number, imageUrl?: string) => {
       setLoadedImages((prev) => {

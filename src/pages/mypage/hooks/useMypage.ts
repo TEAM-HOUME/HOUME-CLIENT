@@ -18,6 +18,8 @@ type UseQueryBaseOptions<TData> = Omit<
 
 /**
  * 마이페이지 사용자 정보 조회 훅
+ * @param options React Query 추가 옵션(optional options)
+ * @returns 사용자 정보 쿼리 결과(query result)
  */
 type UseMyPageUserOptions = UseQueryBaseOptions<
   QueryResult<ReturnType<typeof getMyPageUser>>
@@ -35,12 +37,14 @@ export const useMyPageUser = (options?: UseMyPageUserOptions) => {
 
 /**
  * 마이페이지 이미지 생성 이력 조회 훅
+ * @param options React Query 추가 옵션(optional options)
+ * @returns 이미지 이력 쿼리 결과(query result)
  */
 type UseMyPageImagesOptions = UseQueryBaseOptions<
   QueryResult<ReturnType<typeof getMyPageImages>>
 >;
 
-export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
+export const useMyPageImagesQuery = (options?: UseMyPageImagesOptions) => {
   return useQuery<QueryResult<ReturnType<typeof getMyPageImages>>>({
     queryKey: [QUERY_KEY.MYPAGE_IMAGES],
     queryFn: getMyPageImages,
@@ -53,6 +57,9 @@ export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
 
 /**
  * 마이페이지 이미지 상세 조회 훅
+ * @param houseId 생성 결과 식별자(house id)
+ * @param options React Query 추가 옵션(optional options)
+ * @returns 단일 결과 상세 쿼리 결과(query result)
  */
 type ImageDetailResult = MyPageImageDetailData;
 type ImageDetailOptions = UseQueryBaseOptions<ImageDetailResult>;

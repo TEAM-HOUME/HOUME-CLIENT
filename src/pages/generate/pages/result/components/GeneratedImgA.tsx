@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
@@ -64,6 +64,11 @@ interface GeneratedImgAProps {
   groupId?: number | null;
 }
 
+/**
+ * 다중 이미지 결과 뷰(variant A)
+ * - 스와이프 기반 슬라이더와 바텀시트 연동
+ * - 마지막 슬라이드에서 추가 생성 CTA 노출
+ */
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
@@ -82,6 +87,7 @@ const GeneratedImgA = ({
   const { snapState, setSnapState } = useSheetSnapState();
   const { variant } = useABTest();
   const prevSnapStateRef = useRef<CurationSnapState>('collapsed');
+  const isSheetHiddenByImageMoreRef = useRef(false);
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: fetchedUserData } = useMyPageUser({
@@ -122,21 +128,40 @@ const GeneratedImgA = ({
 
   const lastImage = images[images.length - 1];
   const totalSlideCount = lastImage ? images.length + 1 : images.length;
+  const isImageMoreSlide =
+    Boolean(lastImage) && currentSlideIndex === totalSlideCount - 1;
 
-  const restoreSheetSnapState = () => {
+  const restoreSheetSnapState = useCallback(() => {
     const targetState =
       prevSnapStateRef.current && prevSnapStateRef.current !== 'hidden'
         ? prevSnapStateRef.current
         : 'collapsed';
     setSnapState(targetState);
-  };
+  }, [setSnapState]);
 
+  useEffect(() => {
+    if (!isImageMoreSlide) {
+      if (isSheetHiddenByImageMoreRef.current) {
+        isSheetHiddenByImageMoreRef.current = false;
+        restoreSheetSnapState();
+      }
+      return;
+    }
+
+    if (snapState !== 'hidden') {
+      if (!isSheetHiddenByImageMoreRef.current) {
+        prevSnapStateRef.current = snapState;
+      }
+      setSnapState('hidden');
+    }
+    isSheetHiddenByImageMoreRef.current = true;
+  }, [isImageMoreSlide, snapState, restoreSheetSnapState, setSnapState]);
+
+  /**
+   * 더보기 모달을 열고 바텀시트 상태를 함께 관리
+   */
   const handleOpenModal = () => {
     logResultImgClickBtnMoreImg(variant);
-    if (snapState !== 'hidden') {
-      prevSnapStateRef.current = snapState;
-    }
-    setSnapState('hidden');
     overlay.open(
       (
         { unmount } // @toss/overlay-kit 사용

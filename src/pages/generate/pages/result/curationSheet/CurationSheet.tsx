@@ -50,6 +50,11 @@ interface CurationSheetProps {
   groupId?: number | null;
 }
 
+/**
+ * 결과 페이지 하단 큐레이션 시트
+ * - 감지된 가구 카테고리/상품을 표시하고 바텀시트 스냅 상태와 연동
+ * - 그룹 기반 진입 시 groupId를 통해 캐시·프리패치 범위를 확정
+ */
 export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
   // 전역상태 사용
   const displayName = useUserStore((state) => state.userName ?? '사용자');
@@ -90,7 +95,7 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     [categoriesQuery.data?.categories]
   );
   const groupProductCache = useCurationCacheStore((state) =>
-    groupId ? (state.groups[groupId]?.products ?? null) : null
+    groupId !== null ? (state.groups[groupId]?.products ?? null) : null
   );
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
@@ -157,13 +162,17 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     categories.forEach((category) => {
       const dedupeKey = `${groupId ?? activeImageId}:${category.id}`;
       if (prefetchedRef.current.has(dedupeKey)) return;
-      if (groupId && groupProductCache && groupProductCache[category.id]) {
+      if (
+        groupId !== null &&
+        groupProductCache &&
+        groupProductCache[category.id]
+      ) {
         prefetchedRef.current.add(dedupeKey);
         return;
       }
       // 프리패치용 쿼리키를 그룹/이미지/카테고리 세트로 구성
       const productQueryKey: ProductPrefetchQueryKey = [
-        groupId
+        groupId !== null
           ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
           : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
         {
@@ -195,6 +204,9 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     });
   }, [queryClient, activeImageId, categories, groupId, groupProductCache]);
 
+  /**
+   * 카테고리 선택 시 핫스팟 동기화 및 시트 펼침
+   */
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
@@ -221,6 +233,9 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
   //   </span>
   // );
 
+  /**
+   * 상태 메시지 렌더러
+   */
   const renderStatus = (
     message: string,
     description?: string,
@@ -249,6 +264,9 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     </div>
   );
 
+  /**
+   * 카테고리/상품 로딩 상태에 따라 섹션을 분기 렌더링
+   */
   const renderProductSection = () => {
     if (activeImageId === null) {
       return renderStatus(

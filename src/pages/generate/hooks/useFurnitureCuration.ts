@@ -24,12 +24,12 @@ import type {
   FurnitureProductsInfoResponse,
 } from '@pages/generate/types/furniture';
 
-type CategoriesQueryVariables = {
+interface CategoriesQueryVariables {
   groupId: number | null;
   imageId: number | null;
   detectionSignature: string;
   codes: FurnitureCategoryCode[];
-};
+}
 
 type CategoriesQueryKey = readonly [
   (
@@ -39,11 +39,11 @@ type CategoriesQueryKey = readonly [
   CategoriesQueryVariables,
 ];
 
-type ProductsQueryVariables = {
+interface ProductsQueryVariables {
   groupId: number | null;
   imageId: number | null;
   categoryId: number | null;
-};
+}
 
 type ProductsQueryKey = readonly [
   (
@@ -53,7 +53,10 @@ type ProductsQueryKey = readonly [
   ProductsQueryVariables,
 ];
 
-// 대시보드 정보 조회 훅 정의
+/**
+ * 가구 대시보드 정보를 조회하는 React Query 훅
+ * - 결과는 5분 동안 신선(stale) 상태로 유지
+ */
 export const useFurnitureDashboardQuery = () => {
   return useQuery<FurnitureAndActivityResponse>({
     queryKey: [QUERY_KEY.GENERATE_FURNITURE_DASHBOARD],
@@ -62,11 +65,17 @@ export const useFurnitureDashboardQuery = () => {
   });
 };
 
-// 활성 이미지 ID 선택 훅 정의
+/**
+ * 큐레이션 스토어에서 활성 이미지 ID를 구독하는 훅
+ */
 export const useActiveImageId = () =>
   useCurationStore((state) => state.activeImageId);
 
-// 활성 이미지에 대한 카테고리 쿼리 훅 정의
+/**
+ * 활성 이미지에 대한 카테고리 목록을 불러오는 훅
+ * - 감지 객체 서명(detection signature)을 queryKey에 포함해 캐시를 정밀 관리
+ * - 그룹 단위 초기 데이터가 있으면 초기 데이터로 hydrate
+ */
 export const useGeneratedCategoriesQuery = (
   groupId: number | null,
   imageId: number | null
@@ -91,18 +100,18 @@ export const useGeneratedCategoriesQuery = (
   );
 
   const groupCategoriesEntry = useCurationCacheStore((state) =>
-    groupId ? (state.groups[groupId]?.categories ?? null) : null
+    groupId !== null ? (state.groups[groupId]?.categories ?? null) : null
   );
   const saveGroupCategories = useCurationCacheStore(
     (state) => state.saveCategories
   );
   const canUseGroupInitialData =
-    Boolean(groupId) &&
-    Boolean(groupCategoriesEntry) &&
-    groupCategoriesEntry?.detectionSignature === detectionSignature;
+    groupId !== null &&
+    groupCategoriesEntry !== null &&
+    groupCategoriesEntry.detectionSignature === detectionSignature;
 
   const categoriesQueryKey: CategoriesQueryKey = [
-    groupId
+    groupId !== null
       ? QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP
       : QUERY_KEY.GENERATE_FURNITURE_CATEGORIES,
     {
@@ -136,7 +145,7 @@ export const useGeneratedCategoriesQuery = (
   });
 
   useEffect(() => {
-    if (!groupId) return;
+    if (groupId === null) return;
     if (!query.data) return;
     const existing =
       useCurationCacheStore.getState().groups[groupId]?.categories ?? null;
@@ -187,13 +196,17 @@ export const useGeneratedCategoriesQuery = (
   return query;
 };
 
+/**
+ * 선택된 카테고리에 대한 상품 정보를 불러오는 훅
+ * - 그룹 단위 캐시와 연동해 동일 카테고리 요청을 재사용
+ */
 export const useGeneratedProductsQuery = (
   groupId: number | null,
   imageId: number | null,
   categoryId: number | null
 ) => {
   const productCacheEntry = useCurationCacheStore((state) =>
-    groupId && categoryId
+    groupId !== null && categoryId !== null
       ? (state.groups[groupId]?.products[categoryId] ?? null)
       : null
   );
@@ -202,7 +215,7 @@ export const useGeneratedProductsQuery = (
   );
 
   const productsQueryKey: ProductsQueryKey = [
-    groupId
+    groupId !== null
       ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
       : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
     {
@@ -213,7 +226,9 @@ export const useGeneratedProductsQuery = (
   ];
 
   const initialProductsResponse =
-    groupId && productCacheEntry ? productCacheEntry.response : undefined;
+    groupId !== null && productCacheEntry
+      ? productCacheEntry.response
+      : undefined;
 
   const query = useQuery<
     FurnitureProductsInfoResponse,
@@ -224,7 +239,7 @@ export const useGeneratedProductsQuery = (
     // queryKey에 그룹/이미지/카테고리 식별자를 직접 배치
     queryKey: productsQueryKey,
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
-    enabled: Boolean(imageId) && Boolean(categoryId),
+    enabled: Boolean(imageId) && categoryId !== null,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     ...(initialProductsResponse
@@ -233,7 +248,7 @@ export const useGeneratedProductsQuery = (
   });
 
   useEffect(() => {
-    if (!groupId || !categoryId) return;
+    if (groupId === null || categoryId === null) return;
     if (!query.data) return;
     const groupCache = useCurationCacheStore.getState().groups[groupId];
     const existing = groupCache?.products[categoryId] ?? null;
@@ -250,11 +265,16 @@ export const useGeneratedProductsQuery = (
   return query;
 };
 
-// 활성 이미지 상태 선택 훅 정의
+/**
+ * 활성 이미지 상태(감지 결과·선택된 카테고리 등)를 구독하는 훅
+ */
 export const useActiveImageCurationState = () =>
   useCurationStore(selectActiveImageState);
 
-// 스냅 상태 제어 훅 정의
+/**
+ * 바텀시트 스냅 상태를 읽고 설정하는 훅
+ * - useMemo로 setter 묶음 제공해 리렌더 최소화
+ */
 export const useSheetSnapState = () => {
   const snapState = useCurationStore((state) => state.sheetSnapState);
   const setSnapState = useCurationStore((state) => state.setSheetSnapState);
@@ -267,7 +287,11 @@ export const useSheetSnapState = () => {
   );
 };
 
-// 카테고리 쿼리 무효화 유틸 훅 정의
+/**
+ * 카테고리/상품 쿼리를 정밀 무효화(invalidate)하는 헬퍼 훅
+ * - 그룹 단위와 단일 이미지 단위를 분기 처리
+ * - 캐시 스토어도 함께 비워 일관성 유지
+ */
 export const useInvalidateCurationQueries = () => {
   const queryClient = useQueryClient();
   const clearGroupCategories = useCurationCacheStore(
@@ -282,14 +306,34 @@ export const useInvalidateCurationQueries = () => {
         groupId: number | null,
         imageId: number | null
       ) => {
-        if (groupId) {
+        if (groupId !== null) {
           clearGroupCategories(groupId);
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP, groupId],
+            // 그룹 기반 카테고리 쿼리만 정밀 무효화
+            predicate: (query) => {
+              const [key, variables] = query.queryKey as [
+                unknown,
+                Partial<CategoriesQueryVariables>,
+              ];
+              return (
+                key === QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP &&
+                variables?.groupId === groupId
+              );
+            },
           });
         } else {
           queryClient.invalidateQueries({
-            queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES, imageId],
+            // 단일 이미지 기반 카테고리 쿼리만 정밀 무효화
+            predicate: (query) => {
+              const [key, variables] = query.queryKey as [
+                unknown,
+                Partial<CategoriesQueryVariables>,
+              ];
+              return (
+                key === QUERY_KEY.GENERATE_FURNITURE_CATEGORIES &&
+                variables?.imageId === imageId
+              );
+            },
           });
         }
       },
@@ -298,13 +342,30 @@ export const useInvalidateCurationQueries = () => {
         imageId: number | null,
         categoryId?: number | null
       ) => {
-        if (groupId && categoryId) {
+        if (groupId !== null && categoryId !== null) {
           clearGroupProduct(groupId, categoryId);
         }
         queryClient.invalidateQueries({
-          queryKey: groupId
-            ? [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP, groupId, categoryId]
-            : [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS, imageId, categoryId],
+          // 그룹/이미지별 상품 쿼리 정밀 무효화
+          predicate: (query) => {
+            const [key, variables] = query.queryKey as [
+              unknown,
+              Partial<ProductsQueryVariables>,
+            ];
+
+            if (groupId !== null) {
+              if (key !== QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP)
+                return false;
+              if (variables?.groupId !== groupId) return false;
+              if (categoryId === undefined) return true; // 그룹 내 전체 무효화
+              return variables?.categoryId === categoryId;
+            }
+
+            if (key !== QUERY_KEY.GENERATE_FURNITURE_PRODUCTS) return false;
+            if (variables?.imageId !== imageId) return false;
+            if (categoryId === undefined) return true; // 이미지 내 전체 무효화
+            return variables?.categoryId === categoryId;
+          },
         });
       },
     }),
@@ -312,7 +373,9 @@ export const useInvalidateCurationQueries = () => {
   );
 };
 
-// 스냅 상태를 직접 설정하는 헬퍼 정의
+/**
+ * 큐레이션 시트 스냅 상태를 직접 열어주는 헬퍼
+ */
 export const useOpenCurationSheet = () => {
   const { setSnapState } = useSheetSnapState();
   return (next: CurationSnapState) => {
