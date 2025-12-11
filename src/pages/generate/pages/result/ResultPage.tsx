@@ -81,16 +81,10 @@ const ResultPage = () => {
     initialHistory?: MyPageImageHistory | null;
     cachedDetection?: DetectionCacheEntry | null;
   };
-  let result = locationState?.result;
+  const forwardedResult = locationState?.result ?? null;
   const forwardedUserProfile = locationState?.userProfile ?? null;
   const initialHistory = locationState?.initialHistory ?? null;
   const forwardedDetection = locationState?.cachedDetection ?? null;
-
-  if (!result && initialHistory) {
-    result = {
-      imageInfoResponses: [toGenerateImageData(initialHistory)],
-    } as UnifiedGenerateImageResult;
-  }
   const initialImageId = initialHistory?.imageId ?? null;
   const forwardedDetectionMap = useMemo<Record<
     number,
@@ -114,7 +108,9 @@ const ResultPage = () => {
       ? Number(trimmedHouseId)
       : null;
   const hasValidHouseId = parsedHouseId !== null;
-  const shouldFetchExternalResult = !result && hasValidHouseId && !isFromMypage;
+  const hasInitialResult = Boolean(forwardedResult || initialHistory);
+  const shouldFetchExternalResult =
+    !hasInitialResult && hasValidHouseId && !isFromMypage;
   const shouldFetchMypageDetail = hasValidHouseId && isFromMypage;
   const groupId = parsedHouseId;
   const detailPlaceholder =
@@ -143,26 +139,45 @@ const ResultPage = () => {
     (!mypageDetailQuery.isLoading && !mypageDetailQuery.isPlaceholderData);
   const isSlideCountLoading = !isSlideCountReady;
 
-  // state 또는 API에서 가져온 데이터 사용
-  if (isFromMypage && mypageHistories && mypageHistories.length > 0) {
-    // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
-    const allImageData = mypageHistories.map((history: MyPageImageDetail) => ({
-      imageId: history.imageId,
-      imageUrl: history.generatedImageUrl,
-      isMirror: false,
-      equilibrium: history.equilibrium,
-      houseForm: history.houseForm,
-      tagName: history.tasteTag,
-      name: history.name,
-    }));
-    result = {
-      imageInfoResponses: allImageData,
-    } as UnifiedGenerateImageResult;
-  } else if (!result && apiResult) {
-    result = apiResult as
-      | GenerateImageAResponse['data']
-      | GenerateImageBResponse['data'];
-  }
+  const resolvedResult = useMemo(() => {
+    if (isFromMypage && mypageHistories && mypageHistories.length > 0) {
+      const allImageData = mypageHistories.map(
+        (history: MyPageImageDetail) => ({
+          imageId: history.imageId,
+          imageUrl: history.generatedImageUrl,
+          isMirror: false,
+          equilibrium: history.equilibrium,
+          houseForm: history.houseForm,
+          tagName: history.tasteTag,
+          name: history.name,
+        })
+      );
+      return {
+        imageInfoResponses: allImageData,
+      } as UnifiedGenerateImageResult;
+    }
+    if (forwardedResult) {
+      return forwardedResult;
+    }
+    if (initialHistory) {
+      return {
+        imageInfoResponses: [toGenerateImageData(initialHistory)],
+      } as UnifiedGenerateImageResult;
+    }
+    if (apiResult) {
+      return apiResult as
+        | GenerateImageAResponse['data']
+        | GenerateImageBResponse['data'];
+    }
+    return null;
+  }, [
+    apiResult,
+    forwardedResult,
+    initialHistory,
+    isFromMypage,
+    mypageHistories,
+  ]);
+  const result = resolvedResult;
 
   // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)
   const historyById = useMemo<Map<number, MyPageImageDetail> | null>(

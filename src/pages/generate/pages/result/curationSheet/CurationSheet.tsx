@@ -90,7 +90,7 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     [categoriesQuery.data?.categories]
   );
   const groupProductCache = useCurationCacheStore((state) =>
-    groupId ? (state.groups[groupId]?.products ?? null) : null
+    groupId !== null ? (state.groups[groupId]?.products ?? null) : null
   );
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
@@ -157,13 +157,17 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     categories.forEach((category) => {
       const dedupeKey = `${groupId ?? activeImageId}:${category.id}`;
       if (prefetchedRef.current.has(dedupeKey)) return;
-      if (groupId && groupProductCache && groupProductCache[category.id]) {
+      if (
+        groupId !== null &&
+        groupProductCache &&
+        groupProductCache[category.id]
+      ) {
         prefetchedRef.current.add(dedupeKey);
         return;
       }
       // 프리패치용 쿼리키를 그룹/이미지/카테고리 세트로 구성
       const productQueryKey: ProductPrefetchQueryKey = [
-        groupId
+        groupId !== null
           ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
           : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
         {

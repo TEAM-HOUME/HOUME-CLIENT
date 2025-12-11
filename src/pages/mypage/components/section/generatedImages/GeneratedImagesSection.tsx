@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
 import { useDetectionPrefetch } from '@/pages/mypage/hooks/useDetectionPrefetch';
-import { useMyPageImages } from '@/pages/mypage/hooks/useMypage';
+import { useMyPageImagesQuery } from '@/pages/mypage/hooks/useMypage';
 import type {
   MyPageImageHistory,
   MyPageUserData,
@@ -25,7 +25,7 @@ const GeneratedImagesSection = ({
   userProfile,
 }: GeneratedImagesSectionProps) => {
   const navigate = useNavigate();
-  const { data: imagesData, isLoading, isError } = useMyPageImages();
+  const { data: imagesData, isLoading, isError } = useMyPageImagesQuery();
   const { prefetchDetection } = useDetectionPrefetch();
   const prefetchedImageIdsRef = useRef<Set<number>>(new Set<number>());
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>(

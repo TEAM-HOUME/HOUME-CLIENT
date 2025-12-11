@@ -40,7 +40,7 @@ type UseMyPageImagesOptions = UseQueryBaseOptions<
   QueryResult<ReturnType<typeof getMyPageImages>>
 >;
 
-export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
+export const useMyPageImagesQuery = (options?: UseMyPageImagesOptions) => {
   return useQuery<QueryResult<ReturnType<typeof getMyPageImages>>>({
     queryKey: [QUERY_KEY.MYPAGE_IMAGES],
     queryFn: getMyPageImages,

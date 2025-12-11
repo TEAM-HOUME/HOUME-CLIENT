@@ -5,11 +5,11 @@ import CardHistory from '@/shared/components/card/cardHistory/CardHistory';
 import Loading from '@/shared/components/loading/Loading';
 
 import * as styles from './HistorySection.css';
-import { useMyPageImages } from '../../hooks/useMypage';
+import { useMyPageImagesQuery } from '../../hooks/useMypage';
 
 const HistorySection = () => {
   const navigate = useNavigate();
-  const { data: imagesData, isLoading, isError } = useMyPageImages();
+  const { data: imagesData, isLoading, isError } = useMyPageImagesQuery();
 
   const handleViewResult = (houseId: number) => {
     navigate(`/generate/result?from=mypage&houseId=${houseId}`);

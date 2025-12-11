@@ -14,6 +14,8 @@ import type { FurnitureCategoryCode } from '@pages/generate/constants/furnitureC
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
+const PREFETCH_DELAY_MS = 120;
+
 /**
  * 외부 이미지 요소 로더
  * - crossOrigin 허용을 기본으로 시도
@@ -158,7 +160,7 @@ export const useDetectionPrefetch = () => {
         const task = queueRef.current.shift();
         if (!task) continue;
         await executePrefetch(task.imageId, task.imageUrl);
-        await sleep(120); // 감지 모델 연속 호출 완화
+        await sleep(PREFETCH_DELAY_MS); // 감지 모델 연속 호출 완화
       }
     } finally {
       drainingRef.current = false;

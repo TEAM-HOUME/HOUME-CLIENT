@@ -24,12 +24,12 @@ import type {
   FurnitureProductsInfoResponse,
 } from '@pages/generate/types/furniture';
 
-type CategoriesQueryVariables = {
+interface CategoriesQueryVariables {
   groupId: number | null;
   imageId: number | null;
   detectionSignature: string;
   codes: FurnitureCategoryCode[];
-};
+}
 
 type CategoriesQueryKey = readonly [
   (
@@ -39,11 +39,11 @@ type CategoriesQueryKey = readonly [
   CategoriesQueryVariables,
 ];
 
-type ProductsQueryVariables = {
+interface ProductsQueryVariables {
   groupId: number | null;
   imageId: number | null;
   categoryId: number | null;
-};
+}
 
 type ProductsQueryKey = readonly [
   (
@@ -91,18 +91,18 @@ export const useGeneratedCategoriesQuery = (
   );
 
   const groupCategoriesEntry = useCurationCacheStore((state) =>
-    groupId ? (state.groups[groupId]?.categories ?? null) : null
+    groupId !== null ? (state.groups[groupId]?.categories ?? null) : null
   );
   const saveGroupCategories = useCurationCacheStore(
     (state) => state.saveCategories
   );
   const canUseGroupInitialData =
-    Boolean(groupId) &&
-    Boolean(groupCategoriesEntry) &&
-    groupCategoriesEntry?.detectionSignature === detectionSignature;
+    groupId !== null &&
+    groupCategoriesEntry !== null &&
+    groupCategoriesEntry.detectionSignature === detectionSignature;
 
   const categoriesQueryKey: CategoriesQueryKey = [
-    groupId
+    groupId !== null
       ? QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP
       : QUERY_KEY.GENERATE_FURNITURE_CATEGORIES,
     {
@@ -136,7 +136,7 @@ export const useGeneratedCategoriesQuery = (
   });
 
   useEffect(() => {
-    if (!groupId) return;
+    if (groupId === null) return;
     if (!query.data) return;
     const existing =
       useCurationCacheStore.getState().groups[groupId]?.categories ?? null;
@@ -193,7 +193,7 @@ export const useGeneratedProductsQuery = (
   categoryId: number | null
 ) => {
   const productCacheEntry = useCurationCacheStore((state) =>
-    groupId && categoryId
+    groupId !== null && categoryId !== null
       ? (state.groups[groupId]?.products[categoryId] ?? null)
       : null
   );
@@ -202,7 +202,7 @@ export const useGeneratedProductsQuery = (
   );
 
   const productsQueryKey: ProductsQueryKey = [
-    groupId
+    groupId !== null
       ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
       : QUERY_KEY.GENERATE_FURNITURE_PRODUCTS,
     {
@@ -213,7 +213,9 @@ export const useGeneratedProductsQuery = (
   ];
 
   const initialProductsResponse =
-    groupId && productCacheEntry ? productCacheEntry.response : undefined;
+    groupId !== null && productCacheEntry
+      ? productCacheEntry.response
+      : undefined;
 
   const query = useQuery<
     FurnitureProductsInfoResponse,
@@ -224,7 +226,7 @@ export const useGeneratedProductsQuery = (
     // queryKey에 그룹/이미지/카테고리 식별자를 직접 배치
     queryKey: productsQueryKey,
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
-    enabled: Boolean(imageId) && Boolean(categoryId),
+    enabled: Boolean(imageId) && categoryId !== null,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     ...(initialProductsResponse
@@ -233,7 +235,7 @@ export const useGeneratedProductsQuery = (
   });
 
   useEffect(() => {
-    if (!groupId || !categoryId) return;
+    if (groupId === null || categoryId === null) return;
     if (!query.data) return;
     const groupCache = useCurationCacheStore.getState().groups[groupId];
     const existing = groupCache?.products[categoryId] ?? null;
@@ -282,7 +284,7 @@ export const useInvalidateCurationQueries = () => {
         groupId: number | null,
         imageId: number | null
       ) => {
-        if (groupId) {
+        if (groupId !== null) {
           clearGroupCategories(groupId);
           queryClient.invalidateQueries({
             queryKey: [QUERY_KEY.GENERATE_FURNITURE_CATEGORIES_GROUP, groupId],
@@ -298,7 +300,7 @@ export const useInvalidateCurationQueries = () => {
         imageId: number | null,
         categoryId?: number | null
       ) => {
-        if (groupId && categoryId) {
+        if (groupId !== null && categoryId !== null) {
           clearGroupProduct(groupId, categoryId);
         }
         queryClient.invalidateQueries({
