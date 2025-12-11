@@ -45,7 +45,7 @@ export const useMyPageImages = (options?: UseMyPageImagesOptions) => {
     queryKey: [QUERY_KEY.MYPAGE_IMAGES],
     queryFn: getMyPageImages,
     staleTime: 15 * 60 * 1000, // 15분 캐시
-    cacheTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
     ...options,
   });
@@ -65,7 +65,7 @@ export const useMyPageImageDetail = (
     queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, houseId],
     queryFn: () => getMyPageImageDetail(houseId),
     staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     ...options,
   });
 };
