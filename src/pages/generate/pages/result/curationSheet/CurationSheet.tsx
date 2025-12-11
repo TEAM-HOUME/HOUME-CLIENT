@@ -31,6 +31,9 @@ import CardProductItem from './CardProductItem';
 import * as styles from './CurationSheet.css';
 import { CurationSheetWrapper } from './CurationSheetWrapper';
 
+// 카테고리 스켈레톤 칩 길이 프리셋 중 세 번째(long)만 사용
+const FILTER_SKELETON_WIDTH = 'long' as const;
+
 export const CurationSheet = () => {
   // 전역상태 사용
   const displayName = useUserStore((state) => state.userName ?? '사용자');
@@ -283,8 +286,15 @@ export const CurationSheet = () => {
       {(snapState) => (
         <>
           <div className={styles.filterSection}>
-            {categories.length === 0 && !categoriesQuery.isLoading ? (
-              <FilterChip disabled>감지된 가구 없음</FilterChip>
+            {categories.length === 0 ? (
+              // 추론 중에는 세 번째 길이(long) 스켈레톤 칩 하나만 노출
+              <span
+                className={clsx(
+                  styles.filterSkeletonChip,
+                  styles.filterSkeletonChipWidth[FILTER_SKELETON_WIDTH]
+                )}
+                aria-hidden
+              />
             ) : (
               categories.map((category) => (
                 <FilterChip
