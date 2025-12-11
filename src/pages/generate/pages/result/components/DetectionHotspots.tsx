@@ -141,12 +141,22 @@ const DetectionHotspots = ({
     lastDetectionsRef.current = null;
   }, [imageUrl]);
 
-  const { imgRef, containerRef, hotspots, isLoading, error } =
-    useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots, {
+  // 훅 옵션 객체를 메모이제이션해 불필요한 재실행 차단
+  const hotspotOptions = useMemo(
+    () => ({
       prefetchedDetections,
-      onInferenceComplete: (result, latestHotspots) =>
-        handleInferenceComplete(result, latestHotspots),
-    });
+      onInferenceComplete: handleInferenceComplete,
+    }),
+    [prefetchedDetections, handleInferenceComplete]
+  );
+
+  const { imgRef, containerRef, hotspots, isLoading, error } =
+    useFurnitureHotspots(
+      imageUrl,
+      mirrored,
+      shouldInferHotspots,
+      hotspotOptions
+    );
   const allowedCategories = categoriesQuery.data?.categories;
 
   // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭

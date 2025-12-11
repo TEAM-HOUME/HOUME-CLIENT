@@ -27,6 +27,7 @@ import {
   furnitureHotspotReducer,
 } from './furnitureHotspotState';
 
+import type { FurnitureHotspot, RenderMetrics } from './furnitureHotspotState';
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
 type FurnitureHotspotOptions = {
@@ -38,6 +39,22 @@ type FurnitureHotspotOptions = {
 };
 
 export type { FurnitureHotspot } from './furnitureHotspotState';
+
+// 렌더 메트릭 값이 동일하면 추가 dispatch를 피하기 위한 비교 함수
+const areRenderMetricsEqual = (
+  prev: RenderMetrics | null,
+  next: RenderMetrics | null
+) => {
+  if (!prev || !next) return prev === next;
+  return (
+    prev.offsetX === next.offsetX &&
+    prev.offsetY === next.offsetY &&
+    prev.scaleX === next.scaleX &&
+    prev.scaleY === next.scaleY &&
+    prev.width === next.width &&
+    prev.height === next.height
+  );
+};
 
 /**
  * CORS 이미지 로더(loadCorsImage)
@@ -107,6 +124,7 @@ export function useFurnitureHotspots(
   const corsAbortRef = useRef<AbortController | null>(null);
   const isRunningRef = useRef(false);
   const hasRunRef = useRef(false);
+  const renderMetricsRef = useRef<RenderMetrics | null>(null);
 
   const {
     runInference,
@@ -115,6 +133,13 @@ export function useFurnitureHotspots(
   } = useONNXModel(OBJ365_MODEL_PATH);
   const prefetchedDetections = options?.prefetchedDetections ?? null;
   const onInferenceComplete = options?.onInferenceComplete;
+  const inferenceCompleteRef =
+    useRef<FurnitureHotspotOptions['onInferenceComplete']>(onInferenceComplete);
+
+  // 최신 콜백 참조를 ref에 유지해 의존성 배열 증폭 방지
+  useEffect(() => {
+    inferenceCompleteRef.current = onInferenceComplete;
+  }, [onInferenceComplete]);
 
   const logHotspotEvent = useCallback(
     (
@@ -123,6 +148,7 @@ export function useFurnitureHotspots(
       level: 'info' | 'warn' = 'info'
     ) => {
       const { imageUrl: _omitted, ...restPayload } = payload ?? {};
+      void _omitted; // 이미지 URL은 로그에서 제외
       const hasRestPayload = Object.keys(restPayload).length > 0;
       const enrichedPayload = hasRestPayload
         ? { mirrored, ...restPayload }
@@ -136,6 +162,7 @@ export function useFurnitureHotspots(
     furnitureHotspotReducer,
     furnitureHotspotInitialState
   );
+  renderMetricsRef.current = state.renderMetrics;
 
   const dispatch = useMemo(
     () =>
@@ -151,6 +178,11 @@ export function useFurnitureHotspots(
 
   const updateRenderMetrics = useCallback(() => {
     const metrics = computeRenderMetrics(imgRef.current, containerRef.current);
+    if (areRenderMetricsEqual(renderMetricsRef.current, metrics)) {
+      return renderMetricsRef.current ?? null;
+    }
+    // 측정값이 바뀔 때만 상태 dispatch
+    renderMetricsRef.current = metrics;
     dispatch({ type: 'SET_RENDER_METRICS', payload: metrics });
     return metrics;
   }, [dispatch]);
@@ -214,7 +246,7 @@ export function useFurnitureHotspots(
 
       return result;
     },
-    [dispatch, imageUrl, logHotspotEvent]
+    [dispatch, logHotspotEvent]
   );
 
   const toError = (value: unknown): Error =>
@@ -246,7 +278,7 @@ export function useFurnitureHotspots(
         samples: result.detections.slice(0, 5),
       });
       const processed = processDetections(imageEl, result);
-      onInferenceComplete?.(result, processed.hotspots);
+      inferenceCompleteRef.current?.(result, processed.hotspots);
       hasRunRef.current = true;
     };
 
@@ -264,7 +296,10 @@ export function useFurnitureHotspots(
         logHotspotEvent('inference-cache-hit');
         updateRenderMetrics();
         const processed = processDetections(imageEl, prefetchedDetections);
-        onInferenceComplete?.(prefetchedDetections, processed.hotspots);
+        inferenceCompleteRef.current?.(
+          prefetchedDetections,
+          processed.hotspots
+        );
         hasRunRef.current = true;
         return;
       }
@@ -347,7 +382,6 @@ export function useFurnitureHotspots(
     logHotspotEvent,
     updateRenderMetrics,
     resetPipeline,
-    onInferenceComplete,
     prefetchedDetections,
   ]);
 
