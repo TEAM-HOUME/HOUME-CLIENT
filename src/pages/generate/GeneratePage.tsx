@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 
 import TitleNavBar from '@/shared/components/navBar/TitleNavBar';
+import { getCanHistoryGoBack } from '@/shared/utils/history';
 
 const GeneratePage = () => {
   const location = useLocation();
@@ -20,15 +21,13 @@ const GeneratePage = () => {
 
   // 조건부 타이틀 설정
   const title = '스타일링 이미지 생성';
-  const canHistoryGoBack =
-    typeof window !== 'undefined' && (window.history.state?.idx ?? 0) > 0;
 
   // 현재 경로에 따라 뒤로가기 로직 결정
   const handleBackClick = () => {
     if (location.pathname === '/generate/result') {
       if (isFromMypage) {
         // 마이페이지에서 온 경우 스택이 남아 있으면 실제 이전 화면으로 이동
-        if (canHistoryGoBack) {
+        if (getCanHistoryGoBack()) {
           navigate(-1);
         } else {
           navigate('/mypage', { replace: true });

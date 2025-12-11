@@ -16,7 +16,8 @@ export const useMyPageUser = (options?: { enabled?: boolean }) => {
     queryKey: [QUERY_KEY.MYPAGE_USER],
     queryFn: getMyPageUser,
     ...options,
-    staleTime: 0,
+    staleTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -28,6 +29,7 @@ export const useMyPageImages = () => {
     queryKey: [QUERY_KEY.MYPAGE_IMAGES],
     queryFn: getMyPageImages,
     staleTime: 15 * 60 * 1000, // 15분 캐시
+    cacheTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };
@@ -35,14 +37,20 @@ export const useMyPageImages = () => {
 /**
  * 마이페이지 이미지 상세 조회 훅
  */
+type ImageDetailOptions = {
+  enabled?: boolean;
+  initialData?: () => ReturnType<typeof getMyPageImageDetail>;
+};
+
 export const useMyPageImageDetail = (
   houseId: number,
-  options?: { enabled?: boolean }
+  options?: ImageDetailOptions
 ) => {
   return useQuery({
     queryKey: [QUERY_KEY.MYPAGE_IMAGE_DETAIL, houseId],
     queryFn: () => getMyPageImageDetail(houseId),
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
     ...options,
   });
 };

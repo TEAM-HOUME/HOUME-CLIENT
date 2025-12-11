@@ -91,7 +91,7 @@ export const useGeneratedProductsQuery = (
     queryKey: [QUERY_KEY.GENERATE_FURNITURE_PRODUCTS, imageId, categoryId],
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
     enabled: Boolean(imageId) && Boolean(categoryId),
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });
 };

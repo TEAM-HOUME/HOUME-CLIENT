@@ -9,14 +9,11 @@ import {
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
 import { useABTest } from '@pages/generate/hooks/useABTest';
+import { useDetectionCache } from '@pages/generate/hooks/useDetectionCache';
 import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureCuration';
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
 import { useCurationStore } from '@pages/generate/stores/useCurationStore';
-import {
-  useDetectionCacheStore,
-  type DetectionCacheEntry,
-} from '@pages/generate/stores/useDetectionCacheStore';
 import { logResultImgClickBtnSpot } from '@pages/generate/utils/analytics';
 import {
   filterAllowedDetectedObjects,
@@ -33,6 +30,7 @@ import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type { ProcessedDetections } from '@pages/generate/types/detection';
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
@@ -100,13 +98,11 @@ const DetectionHotspots = ({
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
   const lastDetectionsRef = useRef<ProcessedDetections | null>(null);
   const { variant } = useABTest();
-  const setCacheEntry = useDetectionCacheStore((state) => state.setEntry);
-  const storeCacheEntry = useDetectionCacheStore((state) =>
-    imageId !== null ? (state.images[imageId] ?? null) : null
+  const { prefetchedDetections, saveEntry } = useDetectionCache(
+    imageId,
+    imageUrl,
+    { initialEntry: cachedDetection ?? null }
   );
-  const effectiveCachedDetection = useMemo(() => {
-    return cachedDetection ?? storeCacheEntry ?? null;
-  }, [cachedDetection, storeCacheEntry]);
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -127,23 +123,14 @@ const DetectionHotspots = ({
   // 페이지 시나리오별로 추론 사용 여부 제어
   const handleInferenceComplete = useCallback(
     (result: ProcessedDetections, latestHotspots: FurnitureHotspot[]) => {
-      if (!imageId) return;
       lastDetectionsRef.current = result;
-      setCacheEntry(imageId, {
-        imageUrl,
+      saveEntry({
         processedDetections: result,
         hotspots: latestHotspots,
-        detectedObjects: undefined,
       });
     },
-    [imageId, imageUrl, setCacheEntry]
+    [saveEntry]
   );
-
-  const prefetchedDetections = useMemo(() => {
-    if (!effectiveCachedDetection) return null;
-    if (effectiveCachedDetection.imageUrl !== imageUrl) return null;
-    return effectiveCachedDetection.processedDetections;
-  }, [effectiveCachedDetection, imageUrl]);
 
   useEffect(() => {
     if (!prefetchedDetections) return;
@@ -222,8 +209,7 @@ const DetectionHotspots = ({
     });
     const processedDetections = lastDetectionsRef.current;
     if (processedDetections) {
-      setCacheEntry(imageId, {
-        imageUrl,
+      saveEntry({
         processedDetections,
         hotspots,
         detectedObjects,
@@ -236,8 +222,7 @@ const DetectionHotspots = ({
     setImageDetection,
     resetImageState,
     shouldInferHotspots,
-    setCacheEntry,
-    imageUrl,
+    saveEntry,
   ]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { useABTest } from '@/pages/generate/hooks/useABTest';
-import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
+import {
+  useOpenCurationSheet,
+  useSheetSnapState,
+} from '@/pages/generate/hooks/useFurnitureCuration';
 import {
   logResultImgClickBtnMoreImg,
   logResultImgClickBtnTag,
@@ -33,6 +36,7 @@ import Tag from '@shared/assets/icons/tagIcon.svg?react';
 import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
+import type { CurationSnapState } from '@pages/generate/stores/useCurationStore';
 import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageData,
@@ -71,7 +75,9 @@ const GeneratedImgA = ({
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
   const openSheet = useOpenCurationSheet();
+  const { snapState, setSnapState } = useSheetSnapState();
   const { variant } = useABTest();
+  const prevSnapStateRef = useRef<CurationSnapState>('collapsed');
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
   const { data: fetchedUserData } = useMyPageUser({
@@ -113,37 +119,56 @@ const GeneratedImgA = ({
   const lastImage = images[images.length - 1];
   const totalSlideCount = lastImage ? images.length + 1 : images.length;
 
+  const restoreSheetSnapState = () => {
+    const targetState =
+      prevSnapStateRef.current && prevSnapStateRef.current !== 'hidden'
+        ? prevSnapStateRef.current
+        : 'collapsed';
+    setSnapState(targetState);
+  };
+
   const handleOpenModal = () => {
     logResultImgClickBtnMoreImg(variant);
+    if (snapState !== 'hidden') {
+      prevSnapStateRef.current = snapState;
+    }
+    setSnapState('hidden');
     overlay.open(
       (
         { unmount } // @toss/overlay-kit 사용
-      ) => (
-        <GeneralModal
-          title="더 다양한 이미지가 궁금하신가요?"
-          content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
-          cancelText="돌아가기"
-          confirmText="이미지 새로 만들기"
-          cancelVariant="default"
-          confirmVariant="primary"
-          showCreditChip={true}
-          creditCount={creditCount}
-          maxCredit={5}
-          onCancel={() => {
-            logResultImgClickMoreModalBack(variant);
-            unmount();
-          }}
-          onConfirm={() => {
-            logResultImgClickMoreModalMakeNew(variant);
-            unmount();
-            navigate(ROUTES.GENERATE_START);
-          }}
-          onClose={() => {
-            logResultImgClickMoreModalBack(variant);
-            unmount();
-          }}
-        />
-      )
+      ) => {
+        const closeModal = (afterClose?: () => void) => {
+          unmount();
+          restoreSheetSnapState();
+          afterClose?.();
+        };
+
+        return (
+          <GeneralModal
+            title="더 다양한 이미지가 궁금하신가요?"
+            content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
+            cancelText="돌아가기"
+            confirmText="이미지 새로 만들기"
+            cancelVariant="default"
+            confirmVariant="primary"
+            showCreditChip={true}
+            creditCount={creditCount}
+            maxCredit={5}
+            onCancel={() => {
+              logResultImgClickMoreModalBack(variant);
+              closeModal();
+            }}
+            onConfirm={() => {
+              logResultImgClickMoreModalMakeNew(variant);
+              closeModal(() => navigate(ROUTES.GENERATE_START));
+            }}
+            onClose={() => {
+              logResultImgClickMoreModalBack(variant);
+              closeModal();
+            }}
+          />
+        );
+      }
     );
   };
 
