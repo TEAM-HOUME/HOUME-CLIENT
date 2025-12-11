@@ -13,7 +13,6 @@
 
 > HOUME는 나만의 개성 있는 공간을 디자인하고 꾸밀 수 있도록 도와주는 AI 기반 인테리어 플랫폼입니다.
 
-
 <br>
 
 ## HOUME Web Developers
@@ -154,18 +153,18 @@ src/
 <img src="https://github.com/user-attachments/assets/d0e499ac-8938-46d9-9c44-6ad18ba5a772" style="width: 1000px;" />
 
 ### Convention
+
 - **Branch Convention**
-`type/설명/#이슈번호`
+  `type/설명/#이슈번호`
 
 - **Issue Convention**
-`[type] 제목`
+  `[type] 제목`
 
 - **Pull Request Convention**
-`[type] 제목`
-
+  `[type] 제목`
 
 - **Commit Convention**
-`type: 제목`
+  `type: 제목`
 
 | 커밋유형   | 의미                                                                          |
 | ---------- | ----------------------------------------------------------------------------- |
@@ -184,7 +183,6 @@ src/
 <br />
 
 <br>
-
 
 <img width="1920" height="1080" alt="Slide 16_9 - 49" src="https://github.com/user-attachments/assets/5ee6dc3f-c86d-463a-a7d5-291a415c2ded" />
 
