@@ -10,7 +10,7 @@ interface CardCurationSectionProps {
   imageId: number;
   imageUrl?: string;
   isLoaded?: boolean;
-  onImageLoad?: (imageId: number) => void;
+  onImageLoad?: (imageId: number, imageUrl?: string) => void;
   onCurationClick?: () => void;
 }
 
@@ -34,7 +34,7 @@ const CardCurationSection = ({
     if (!localLoaded) {
       setLocalLoaded(true);
     }
-    onImageLoad?.(imageId);
+    onImageLoad?.(imageId, imageUrl);
   };
 
   return (

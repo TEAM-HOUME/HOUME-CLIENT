@@ -61,7 +61,7 @@ const areRenderMetricsEqual = (
  * - 목적: SecurityError 발생 시 크로스 도메인 이미지를 우회 로딩
  * - signal: 중복 요청이나 컴포넌트 언마운트 시 취소(abort) 지원
  */
-async function loadCorsImage(
+export async function loadCorsImage(
   url: string,
   signal?: AbortSignal
 ): Promise<HTMLImageElement | null> {
