@@ -1,3 +1,5 @@
+import { useCallback, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 import CardCuration from '@/pages/mypage/components/card/cardCuration/CardCuration';
@@ -12,6 +14,17 @@ import EmptyStateSection from '../emptyState/EmptyStateSection';
 const GeneratedImagesSection = () => {
   const navigate = useNavigate();
   const { data: imagesData, isLoading, isError } = useMyPageImages();
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>(
+    () => {
+      if (typeof window === 'undefined') return {};
+      try {
+        const stored = sessionStorage.getItem('mypage-image-loaded');
+        return stored ? (JSON.parse(stored) as Record<number, boolean>) : {};
+      } catch {
+        return {};
+      }
+    }
+  );
 
   const handleViewResult = (houseId: number) => {
     logMyPageClickBtnImgCard();
@@ -21,6 +34,17 @@ const GeneratedImagesSection = () => {
     });
     navigate(`${ROUTES.GENERATE_RESULT}?${params.toString()}`);
   };
+
+  const handleImageLoad = useCallback((imageId: number) => {
+    setLoadedImages((prev) => {
+      if (prev[imageId]) return prev;
+      const next = { ...prev, [imageId]: true };
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('mypage-image-loaded', JSON.stringify(next));
+      }
+      return next;
+    });
+  }, []);
 
   // 로딩 중
   if (isLoading) {
@@ -43,7 +67,10 @@ const GeneratedImagesSection = () => {
         {imagesData.histories.map((image) => (
           <CardCuration
             key={image.imageId}
+            imageId={image.imageId}
             imageUrl={image.generatedImageUrl}
+            isLoaded={loadedImages[image.imageId]}
+            onImageLoad={handleImageLoad}
             onCurationClick={() => handleViewResult(image.houseId)}
           />
         ))}
