@@ -141,24 +141,25 @@ export const useGeneratedCategoriesQuery = (
       groupId && groupCategoriesEntry
         ? () => groupCategoriesEntry.response
         : undefined,
+    onSuccess: (data: FurnitureCategoriesResponse) => {
+      if (!groupId) return;
+      const existing =
+        useCurationCacheStore.getState().groups[groupId]?.categories ?? null;
+      if (
+        existing &&
+        existing.detectionSignature === detectionSignature &&
+        existing.response === data
+      ) {
+        return;
+      }
+      saveGroupCategories({
+        groupId,
+        response: data,
+        detectedObjects: normalizedDetectedObjects,
+        detectionSignature,
+      });
+    },
   });
-
-  useEffect(() => {
-    if (!groupId) return;
-    if (!query.data) return;
-    saveGroupCategories({
-      groupId,
-      response: query.data,
-      detectedObjects: normalizedDetectedObjects,
-      detectionSignature,
-    });
-  }, [
-    groupId,
-    detectionSignature,
-    normalizedDetectedObjects,
-    query.data,
-    saveGroupCategories,
-  ]);
 
   useEffect(() => {
     // 카테고리 자동 선택 제거
@@ -231,17 +232,20 @@ export const useGeneratedProductsQuery = (
       groupId && productCacheEntry
         ? () => productCacheEntry.response
         : undefined,
+    onSuccess: (data: FurnitureProductsInfoResponse) => {
+      if (!groupId || !categoryId) return;
+      const groupCache = useCurationCacheStore.getState().groups[groupId];
+      const existing = groupCache?.products[categoryId] ?? null;
+      if (existing?.response === data) {
+        return;
+      }
+      saveGroupProducts({
+        groupId,
+        categoryId,
+        response: data,
+      });
+    },
   });
-
-  useEffect(() => {
-    if (!groupId || !categoryId) return;
-    if (!query.data) return;
-    saveGroupProducts({
-      groupId,
-      categoryId,
-      response: query.data,
-    });
-  }, [groupId, categoryId, query.data, saveGroupProducts]);
 
   return query;
 };
