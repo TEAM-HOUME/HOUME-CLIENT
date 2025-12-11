@@ -57,3 +57,4 @@ AGENTS.md
 
 .pnpm-store/
 .serena/
+.npm-cache/
