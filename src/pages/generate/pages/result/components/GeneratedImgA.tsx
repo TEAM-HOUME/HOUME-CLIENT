@@ -137,9 +137,17 @@ const GeneratedImgA = ({
       (
         { unmount } // @toss/overlay-kit 사용
       ) => {
-        const closeModal = (afterClose?: () => void) => {
+        const closeModal = (
+          afterClose?: () => void,
+          options?: { restoreSnap?: boolean }
+        ) => {
+          const shouldRestore = options?.restoreSnap ?? true;
           unmount();
-          restoreSheetSnapState();
+          if (shouldRestore) {
+            restoreSheetSnapState();
+          } else {
+            setSnapState('collapsed');
+          }
           afterClose?.();
         };
 
@@ -160,7 +168,10 @@ const GeneratedImgA = ({
             }}
             onConfirm={() => {
               logResultImgClickMoreModalMakeNew(variant);
-              closeModal(() => navigate(ROUTES.GENERATE_START));
+              closeModal(
+                () => navigate(ROUTES.GENERATE_START, { replace: true }),
+                { restoreSnap: false }
+              );
             }}
             onClose={() => {
               logResultImgClickMoreModalBack(variant);
