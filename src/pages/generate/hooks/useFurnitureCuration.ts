@@ -96,18 +96,10 @@ export const useGeneratedCategoriesQuery = (
   const saveGroupCategories = useCurationCacheStore(
     (state) => state.saveCategories
   );
-  const cachedCodeSet = useMemo(
-    () =>
-      groupCategoriesEntry
-        ? new Set(groupCategoriesEntry.detectedObjects)
-        : null,
-    [groupCategoriesEntry]
-  );
-  const shouldSkipFetchWithCache =
+  const canUseGroupInitialData =
     Boolean(groupId) &&
     Boolean(groupCategoriesEntry) &&
-    cachedCodeSet !== null &&
-    normalizedDetectedObjects.every((code) => cachedCodeSet.has(code));
+    groupCategoriesEntry?.detectionSignature === detectionSignature;
 
   const categoriesQueryKey: CategoriesQueryKey = [
     groupId
@@ -121,46 +113,53 @@ export const useGeneratedCategoriesQuery = (
     },
   ];
 
-  const initialCategoriesResponse =
-    groupId && groupCategoriesEntry ? groupCategoriesEntry.response : undefined;
+  const initialCategoriesResponse = canUseGroupInitialData
+    ? groupCategoriesEntry!.response
+    : undefined;
 
-  const categoriesQueryOptions: UseQueryOptions<
+  const query = useQuery<
     FurnitureCategoriesResponse,
     Error,
     FurnitureCategoriesResponse,
     CategoriesQueryKey
-  > = {
+  >({
     // queryKey에 이미지/감지값 전체를 직접 포함해 의존성 유지
     queryKey: categoriesQueryKey,
     queryFn: () =>
       getGeneratedImageCategories(imageId!, normalizedDetectedObjects),
-    enabled:
-      Boolean(imageId) &&
-      normalizedDetectedObjects.length > 0 &&
-      !shouldSkipFetchWithCache,
+    enabled: Boolean(imageId) && normalizedDetectedObjects.length > 0,
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    onSuccess: (data: FurnitureCategoriesResponse) => {
-      if (!groupId) return;
-      const existing =
-        useCurationCacheStore.getState().groups[groupId]?.categories ?? null;
-      if (existing && existing.detectionSignature === detectionSignature) {
-        return;
-      }
-      saveGroupCategories({
-        groupId,
-        response: data,
-        detectedObjects: normalizedDetectedObjects,
-        detectionSignature,
-      });
-    },
-  };
+    ...(initialCategoriesResponse
+      ? { initialData: initialCategoriesResponse }
+      : {}),
+  });
 
-  if (initialCategoriesResponse) {
-    categoriesQueryOptions.initialData = initialCategoriesResponse;
-  }
-
-  const query = useQuery(categoriesQueryOptions);
+  useEffect(() => {
+    if (!groupId) return;
+    if (!query.data) return;
+    const existing =
+      useCurationCacheStore.getState().groups[groupId]?.categories ?? null;
+    if (
+      existing &&
+      existing.detectionSignature === detectionSignature &&
+      existing.response === query.data
+    ) {
+      return;
+    }
+    saveGroupCategories({
+      groupId,
+      response: query.data,
+      detectedObjects: normalizedDetectedObjects,
+      detectionSignature,
+    });
+  }, [
+    groupId,
+    query.data,
+    detectionSignature,
+    normalizedDetectedObjects,
+    saveGroupCategories,
+  ]);
 
   useEffect(() => {
     // 카테고리 자동 선택 제거
@@ -202,9 +201,6 @@ export const useGeneratedProductsQuery = (
     (state) => state.saveProducts
   );
 
-  const shouldSkipFetchWithCache =
-    Boolean(groupId) && Boolean(productCacheEntry);
-
   const productsQueryKey: ProductsQueryKey = [
     groupId
       ? QUERY_KEY.GENERATE_FURNITURE_PRODUCTS_GROUP
@@ -219,39 +215,37 @@ export const useGeneratedProductsQuery = (
   const initialProductsResponse =
     groupId && productCacheEntry ? productCacheEntry.response : undefined;
 
-  const productsQueryOptions: UseQueryOptions<
+  const query = useQuery<
     FurnitureProductsInfoResponse,
     Error,
     FurnitureProductsInfoResponse,
     ProductsQueryKey
-  > = {
+  >({
     // queryKey에 그룹/이미지/카테고리 식별자를 직접 배치
     queryKey: productsQueryKey,
     queryFn: () => getGeneratedImageProducts(imageId!, categoryId!),
-    enabled:
-      Boolean(imageId) && Boolean(categoryId) && !shouldSkipFetchWithCache,
+    enabled: Boolean(imageId) && Boolean(categoryId),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    onSuccess: (data: FurnitureProductsInfoResponse) => {
-      if (!groupId || !categoryId) return;
-      const groupCache = useCurationCacheStore.getState().groups[groupId];
-      const existing = groupCache?.products[categoryId] ?? null;
-      if (existing) {
-        return;
-      }
-      saveGroupProducts({
-        groupId,
-        categoryId,
-        response: data,
-      });
-    },
-  };
+    ...(initialProductsResponse
+      ? { initialData: initialProductsResponse }
+      : {}),
+  });
 
-  if (initialProductsResponse) {
-    productsQueryOptions.initialData = initialProductsResponse;
-  }
-
-  const query = useQuery(productsQueryOptions);
+  useEffect(() => {
+    if (!groupId || !categoryId) return;
+    if (!query.data) return;
+    const groupCache = useCurationCacheStore.getState().groups[groupId];
+    const existing = groupCache?.products[categoryId] ?? null;
+    if (existing?.response === query.data) {
+      return;
+    }
+    saveGroupProducts({
+      groupId,
+      categoryId,
+      response: query.data,
+    });
+  }, [groupId, categoryId, query.data, saveGroupProducts]);
 
   return query;
 };
