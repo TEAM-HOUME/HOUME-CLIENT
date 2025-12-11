@@ -41,13 +41,19 @@ let analytics: Analytics | null = null;
  * Firebase Analytics 초기화 함수
  *
  * 초기화 과정:
- * 1. 브라우저 환경 확인 (window 객체 존재)
- * 2. Analytics 지원 여부 확인 (isSupported)
- * 3. Analytics 인스턴스 생성 및 반환
+ * 1. 프로덕션 환경 확인 (배포 환경에서만 초기화)
+ * 2. 브라우저 환경 확인 (window 객체 존재)
+ * 3. Analytics 지원 여부 확인 (isSupported)
+ * 4. Analytics 인스턴스 생성 및 반환
  *
  * @returns {Promise<Analytics | null>} 초기화된 Analytics 인스턴스 또는 null
  */
 const initAnalytics = async () => {
+  // 프로덕션 환경에서만 Analytics 초기화
+  if (!import.meta.env.PROD) {
+    return null;
+  }
+
   if (typeof window !== 'undefined') {
     try {
       const supported = await isSupported();
