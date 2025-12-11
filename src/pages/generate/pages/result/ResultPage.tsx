@@ -41,6 +41,11 @@ type UnifiedGenerateImageResult = {
   imageInfoResponses: GenerateImageData[];
 };
 
+/**
+ * 마이페이지 히스토리 데이터를 결과 페이지 이미지 포맷으로 변환
+ * @param history 마이페이지 히스토리 객체(history item)
+ * @returns 결과 페이지에서 사용하는 이미지 데이터(generate image data)
+ */
 const toGenerateImageData = (
   history: MyPageImageHistory
 ): GenerateImageData => ({
@@ -53,6 +58,12 @@ const toGenerateImageData = (
   name: history.tasteTag,
 });
 
+/**
+ * 결과(Result) 페이지
+ * - 전달된 state 또는 houseId 기반으로 생성 결과를 결정
+ * - 좋아요/싫어요 + factor 선택 상태를 이미지별로 관리
+ * - A/B 테스트 플래그에 따라 단일/다중 결과 컴포넌트 분기
+ */
 const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -284,6 +295,11 @@ const ResultPage = () => {
     return <Navigate to="/" replace />;
   }
 
+  /**
+   * 좋아요/싫어요 토글 핸들러
+   * - 동일 버튼 재클릭 시 상태 해제
+   * - 상태 변경 시 factor 선택 초기화 및 API 연동
+   */
   const handleVote = (isLike: boolean) => {
     const imageId = currentImgId;
 
@@ -350,6 +366,10 @@ const ResultPage = () => {
   };
 
   // 태그 버튼 클릭 핸들러 (좋아요/싫어요 상태 변경 시 factor 취소 및 선택)
+  /**
+   * factor(선호 요인) 선택 핸들러
+   * - 선택/해제에 따라 API 호출 및 로컬 상태 동기화
+   */
   const handleFactorClick = (factorId: number) => {
     const imageId = currentImgId;
     const isSelected = currentFactorId === factorId;
@@ -389,6 +409,9 @@ const ResultPage = () => {
     }
   };
 
+  /**
+   * 슬라이드 변경 시 마지막 슬라이드 여부를 갱신
+   */
   const handleSlideChange = (currentIndex: number, totalCount: number) => {
     setIsLastSlide(currentIndex === totalCount - 1);
   };

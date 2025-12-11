@@ -53,7 +53,10 @@ type ProductsQueryKey = readonly [
   ProductsQueryVariables,
 ];
 
-// 대시보드 정보 조회 훅 정의
+/**
+ * 가구 대시보드 정보를 조회하는 React Query 훅
+ * - 결과는 5분 동안 신선(stale) 상태로 유지
+ */
 export const useFurnitureDashboardQuery = () => {
   return useQuery<FurnitureAndActivityResponse>({
     queryKey: [QUERY_KEY.GENERATE_FURNITURE_DASHBOARD],
@@ -62,11 +65,17 @@ export const useFurnitureDashboardQuery = () => {
   });
 };
 
-// 활성 이미지 ID 선택 훅 정의
+/**
+ * 큐레이션 스토어에서 활성 이미지 ID를 구독하는 훅
+ */
 export const useActiveImageId = () =>
   useCurationStore((state) => state.activeImageId);
 
-// 활성 이미지에 대한 카테고리 쿼리 훅 정의
+/**
+ * 활성 이미지에 대한 카테고리 목록을 불러오는 훅
+ * - 감지 객체 서명(detection signature)을 queryKey에 포함해 캐시를 정밀 관리
+ * - 그룹 단위 초기 데이터가 있으면 초기 데이터로 hydrate
+ */
 export const useGeneratedCategoriesQuery = (
   groupId: number | null,
   imageId: number | null
@@ -187,6 +196,10 @@ export const useGeneratedCategoriesQuery = (
   return query;
 };
 
+/**
+ * 선택된 카테고리에 대한 상품 정보를 불러오는 훅
+ * - 그룹 단위 캐시와 연동해 동일 카테고리 요청을 재사용
+ */
 export const useGeneratedProductsQuery = (
   groupId: number | null,
   imageId: number | null,
@@ -252,11 +265,16 @@ export const useGeneratedProductsQuery = (
   return query;
 };
 
-// 활성 이미지 상태 선택 훅 정의
+/**
+ * 활성 이미지 상태(감지 결과·선택된 카테고리 등)를 구독하는 훅
+ */
 export const useActiveImageCurationState = () =>
   useCurationStore(selectActiveImageState);
 
-// 스냅 상태 제어 훅 정의
+/**
+ * 바텀시트 스냅 상태를 읽고 설정하는 훅
+ * - useMemo로 setter 묶음 제공해 리렌더 최소화
+ */
 export const useSheetSnapState = () => {
   const snapState = useCurationStore((state) => state.sheetSnapState);
   const setSnapState = useCurationStore((state) => state.setSheetSnapState);
@@ -269,7 +287,11 @@ export const useSheetSnapState = () => {
   );
 };
 
-// 카테고리 쿼리 무효화 유틸 훅 정의
+/**
+ * 카테고리/상품 쿼리를 정밀 무효화(invalidate)하는 헬퍼 훅
+ * - 그룹 단위와 단일 이미지 단위를 분기 처리
+ * - 캐시 스토어도 함께 비워 일관성 유지
+ */
 export const useInvalidateCurationQueries = () => {
   const queryClient = useQueryClient();
   const clearGroupCategories = useCurationCacheStore(
@@ -351,7 +373,9 @@ export const useInvalidateCurationQueries = () => {
   );
 };
 
-// 스냅 상태를 직접 설정하는 헬퍼 정의
+/**
+ * 큐레이션 시트 스냅 상태를 직접 열어주는 헬퍼
+ */
 export const useOpenCurationSheet = () => {
   const { setSnapState } = useSheetSnapState();
   return (next: CurationSnapState) => {

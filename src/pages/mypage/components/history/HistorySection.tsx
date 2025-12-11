@@ -7,14 +7,20 @@ import Loading from '@/shared/components/loading/Loading';
 import * as styles from './HistorySection.css';
 import { useMyPageImagesQuery } from '../../hooks/useMypage';
 
+/**
+ * 마이페이지 결과 히스토리 섹션
+ * - 이미지 생성 이력을 불러와 카드 형태로 노출
+ */
 const HistorySection = () => {
   const navigate = useNavigate();
   const { data: imagesData, isLoading, isError } = useMyPageImagesQuery();
 
+  // 생성 결과 상세로 이동
   const handleViewResult = (houseId: number) => {
     navigate(`/generate/result?from=mypage&houseId=${houseId}`);
   };
 
+  // 이미지 생성 플로우로 이동
   const handleCreateImage = () => {
     navigate('/imageSetup');
   };

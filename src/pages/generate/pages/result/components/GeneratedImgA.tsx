@@ -64,6 +64,11 @@ interface GeneratedImgAProps {
   groupId?: number | null;
 }
 
+/**
+ * 다중 이미지 결과 뷰(variant A)
+ * - 스와이프 기반 슬라이더와 바텀시트 연동
+ * - 마지막 슬라이드에서 추가 생성 CTA 노출
+ */
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
@@ -152,6 +157,9 @@ const GeneratedImgA = ({
     isSheetHiddenByImageMoreRef.current = true;
   }, [isImageMoreSlide, snapState, restoreSheetSnapState, setSnapState]);
 
+  /**
+   * 더보기 모달을 열고 바텀시트 상태를 함께 관리
+   */
   const handleOpenModal = () => {
     logResultImgClickBtnMoreImg(variant);
     overlay.open(
