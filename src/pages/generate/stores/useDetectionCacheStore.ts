@@ -29,13 +29,17 @@ interface DetectionCacheStore {
   clear: () => void;
 }
 
+type DetectionCachePersistedState = Pick<DetectionCacheStore, 'images'>;
+
 const storage =
   typeof window !== 'undefined'
-    ? createJSONStorage<DetectionCacheStore>(() => window.sessionStorage)
+    ? createJSONStorage<DetectionCachePersistedState>(
+        () => window.sessionStorage
+      )
     : undefined;
 
 export const useDetectionCacheStore = create<DetectionCacheStore>()(
-  persist(
+  persist<DetectionCacheStore, DetectionCachePersistedState>(
     (set) => ({
       images: {},
       setEntry: (imageId, payload) => {
