@@ -128,13 +128,16 @@ const ResultPage = () => {
     }
   );
 
-  const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
-    parsedHouseId ?? 0,
-    {
-      enabled: shouldFetchMypageDetail,
-      placeholderData: detailPlaceholder ? () => detailPlaceholder : undefined,
-    }
-  );
+  const mypageDetailQuery = useMyPageImageDetail(parsedHouseId ?? 0, {
+    enabled: shouldFetchMypageDetail,
+    placeholderData: detailPlaceholder ? () => detailPlaceholder : undefined,
+  });
+  const mypageResult = mypageDetailQuery.data;
+  const mypageLoading = mypageDetailQuery.isLoading;
+  const isSlideCountReady =
+    !shouldFetchMypageDetail ||
+    (!mypageDetailQuery.isLoading && !mypageDetailQuery.isPlaceholderData);
+  const isSlideCountLoading = !isSlideCountReady;
 
   // state 또는 API에서 가져온 데이터 사용
   if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
@@ -377,6 +380,7 @@ const ResultPage = () => {
             onCurrentImgIdChange={setCurrentImgId}
             userProfile={forwardedUserProfile}
             detectionCache={forwardedDetectionMap ?? undefined}
+            isSlideCountLoading={isSlideCountLoading}
           />
         ) : (
           <GeneratedImgB

@@ -60,6 +60,7 @@ interface GeneratedImgAProps {
   shouldInferHotspots?: boolean;
   userProfile?: MyPageUserData | null;
   detectionCache?: Record<number, DetectionCacheEntry> | null;
+  isSlideCountLoading?: boolean;
 }
 
 const GeneratedImgA = ({
@@ -69,6 +70,7 @@ const GeneratedImgA = ({
   shouldInferHotspots = true,
   userProfile,
   detectionCache,
+  isSlideCountLoading = false,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -202,10 +204,20 @@ const GeneratedImgA = ({
         }}
         onSwiper={setSwiper}
       >
-        <div className={styles.slideNum}>
-          <span>{currentSlideIndex + 1}</span>
-          <span>/</span>
-          <span>{totalSlideCount}</span>
+        <div className={styles.slideNum} aria-live="polite">
+          {isSlideCountLoading ? (
+            <div
+              className={styles.slideNumSkeleton}
+              aria-hidden="true"
+              role="presentation"
+            />
+          ) : (
+            <>
+              <span>{currentSlideIndex + 1}</span>
+              <span>/</span>
+              <span>{totalSlideCount}</span>
+            </>
+          )}
         </div>
         <button
           type="button"
