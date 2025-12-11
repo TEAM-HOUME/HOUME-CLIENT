@@ -90,7 +90,7 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     [categoriesQuery.data?.categories]
   );
   const groupProductCache = useCurationCacheStore((state) =>
-    groupId ? (state.groups[groupId]?.products ?? {}) : {}
+    groupId ? (state.groups[groupId]?.products ?? null) : null
   );
   const productsData = productsQuery.data?.products;
   const headerName = productsQuery.data?.userName ?? displayName;
@@ -157,7 +157,7 @@ export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
     categories.forEach((category) => {
       const dedupeKey = `${groupId ?? activeImageId}:${category.id}`;
       if (prefetchedRef.current.has(dedupeKey)) return;
-      if (groupId && groupProductCache[category.id]) {
+      if (groupId && groupProductCache && groupProductCache[category.id]) {
         prefetchedRef.current.add(dedupeKey);
         return;
       }
