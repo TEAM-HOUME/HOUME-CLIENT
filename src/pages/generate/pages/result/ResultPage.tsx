@@ -3,6 +3,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { useMyPageImageDetail } from '@/pages/mypage/hooks/useMypage';
+import type {
+  MyPageImageDetail,
+  MyPageImageHistory,
+  MyPageUserData,
+} from '@/pages/mypage/types/apis/MyPage';
+import { createImageDetailPlaceholder } from '@/pages/mypage/utils/resultNavigation';
 import DislikeButton from '@/shared/components/button/likeButton/DislikeButton';
 import LikeButton from '@/shared/components/button/likeButton/LikeButton';
 
@@ -22,6 +28,7 @@ import GeneratedImgB from './components/GeneratedImgB.tsx';
 import { CurationSheet } from './curationSheet/CurationSheet';
 import * as styles from './ResultPage.css.ts';
 
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageAResponse,
   GenerateImageBResponse,
@@ -34,6 +41,29 @@ type UnifiedGenerateImageResult = {
   imageInfoResponses: GenerateImageData[];
 };
 
+/**
+ * 마이페이지 히스토리 데이터를 결과 페이지 이미지 포맷으로 변환
+ * @param history 마이페이지 히스토리 객체(history item)
+ * @returns 결과 페이지에서 사용하는 이미지 데이터(generate image data)
+ */
+const toGenerateImageData = (
+  history: MyPageImageHistory
+): GenerateImageData => ({
+  imageId: history.imageId,
+  imageUrl: history.generatedImageUrl,
+  isMirror: false,
+  equilibrium: history.equilibrium,
+  houseForm: history.houseForm,
+  tagName: history.tasteTag,
+  name: history.tasteTag,
+});
+
+/**
+ * 결과(Result) 페이지
+ * - 전달된 state 또는 houseId 기반으로 생성 결과를 결정
+ * - 좋아요/싫어요 + factor 선택 상태를 이미지별로 관리
+ * - A/B 테스트 플래그에 따라 단일/다중 결과 컴포넌트 분기
+ */
 const ResultPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -53,15 +83,29 @@ const ResultPage = () => {
   const activeImageIdInStore = useCurationStore((state) => state.activeImageId);
 
   // 1차: location.state에서 데이터 가져오기 (정상적인 플로우)
-  let result = (
-    location.state as {
-      result?:
-        | UnifiedGenerateImageResult
-        | GenerateImageAResponse['data']
-        | GenerateImageBResponse['data'];
-    }
-  )?.result;
-
+  const locationState = location.state as {
+    result?:
+      | UnifiedGenerateImageResult
+      | GenerateImageAResponse['data']
+      | GenerateImageBResponse['data'];
+    userProfile?: MyPageUserData | null;
+    initialHistory?: MyPageImageHistory | null;
+    cachedDetection?: DetectionCacheEntry | null;
+  };
+  const forwardedResult = locationState?.result ?? null;
+  const forwardedUserProfile = locationState?.userProfile ?? null;
+  const initialHistory = locationState?.initialHistory ?? null;
+  const forwardedDetection = locationState?.cachedDetection ?? null;
+  const initialImageId = initialHistory?.imageId ?? null;
+  const forwardedDetectionMap = useMemo<Record<
+    number,
+    DetectionCacheEntry
+  > | null>(() => {
+    if (!forwardedDetection || !initialImageId) return null;
+    return {
+      [initialImageId]: forwardedDetection,
+    };
+  }, [forwardedDetection, initialImageId]);
   // 2차: query parameter에서 houseId 가져와서 API 호출 (직접 접근 시)
   const rawHouseId = searchParams.get('houseId');
   const from = searchParams.get('from');
@@ -74,52 +118,90 @@ const ResultPage = () => {
     Number.isSafeInteger(Number(trimmedHouseId))
       ? Number(trimmedHouseId)
       : null;
-  const shouldFetchFromAPI = !result && parsedHouseId !== null;
+  const hasValidHouseId = parsedHouseId !== null;
+  const hasInitialResult = Boolean(forwardedResult || initialHistory);
+  const shouldFetchExternalResult =
+    !hasInitialResult && hasValidHouseId && !isFromMypage;
+  const shouldFetchMypageDetail = hasValidHouseId && isFromMypage;
+  const groupId = parsedHouseId;
+  const detailPlaceholder =
+    shouldFetchMypageDetail && initialHistory
+      ? createImageDetailPlaceholder(initialHistory)
+      : null;
 
   // 마이페이지에서 온 경우와 일반 생성 플로우에서 온 경우 구분
   const { data: apiResult, isLoading } = useGetResultDataQuery(
     parsedHouseId ?? 0,
     {
-      enabled: shouldFetchFromAPI && !isFromMypage,
+      enabled: shouldFetchExternalResult,
     }
   );
 
-  const { data: mypageResult, isLoading: mypageLoading } = useMyPageImageDetail(
-    parsedHouseId ?? 0,
-    { enabled: shouldFetchFromAPI && isFromMypage }
-  );
+  const mypageDetailQuery = useMyPageImageDetail(parsedHouseId ?? 0, {
+    enabled: shouldFetchMypageDetail,
+    placeholderData: detailPlaceholder ? () => detailPlaceholder : undefined,
+  });
+  const mypageResult = mypageDetailQuery.data;
+  const mypageHistories: MyPageImageDetail[] | null =
+    mypageResult?.histories ?? null;
+  const mypageLoading = mypageDetailQuery.isLoading;
+  const isSlideCountReady =
+    !shouldFetchMypageDetail ||
+    (!mypageDetailQuery.isLoading && !mypageDetailQuery.isPlaceholderData);
+  const isSlideCountLoading = !isSlideCountReady;
 
-  // state 또는 API에서 가져온 데이터 사용 (API 호출이 필요한 경우만)
-  if (shouldFetchFromAPI) {
-    if (isFromMypage && mypageResult && mypageResult.histories.length > 0) {
-      // 마이페이지에서는 모든 히스토리를 다중 이미지 구조로 변환
-      // console.log('mypageResult.histories', mypageResult.histories);
-      const allImageData = mypageResult.histories.map((history) => ({
-        imageId: history.imageId,
-        imageUrl: history.generatedImageUrl,
-        isMirror: false,
-        equilibrium: history.equilibrium,
-        houseForm: history.houseForm,
-        tagName: history.tasteTag,
-        name: history.name,
-      }));
-      result = {
+  const resolvedResult = useMemo(() => {
+    if (isFromMypage && mypageHistories && mypageHistories.length > 0) {
+      const allImageData = mypageHistories.map(
+        (history: MyPageImageDetail) => ({
+          imageId: history.imageId,
+          imageUrl: history.generatedImageUrl,
+          isMirror: false,
+          equilibrium: history.equilibrium,
+          houseForm: history.houseForm,
+          tagName: history.tasteTag,
+          name: history.name,
+        })
+      );
+      return {
         imageInfoResponses: allImageData,
       } as UnifiedGenerateImageResult;
-    } else if (!isFromMypage && apiResult) {
-      result = apiResult as
+    }
+    if (forwardedResult) {
+      return forwardedResult;
+    }
+    if (initialHistory) {
+      return {
+        imageInfoResponses: [toGenerateImageData(initialHistory)],
+      } as UnifiedGenerateImageResult;
+    }
+    if (apiResult) {
+      return apiResult as
         | GenerateImageAResponse['data']
         | GenerateImageBResponse['data'];
     }
-  }
+    return null;
+  }, [
+    apiResult,
+    forwardedResult,
+    initialHistory,
+    isFromMypage,
+    mypageHistories,
+  ]);
+  const result = resolvedResult;
 
   // 마이페이지 히스토리를 imageId로 빠르게 조회하기 위한 Map (O(1) 조회)
-  const historyById = useMemo(
+  const historyById = useMemo<Map<number, MyPageImageDetail> | null>(
     () =>
-      isFromMypage && mypageResult?.histories
-        ? new Map(mypageResult.histories.map((h) => [h.imageId, h]))
+      isFromMypage && mypageHistories
+        ? new Map(
+            mypageHistories.map((history: MyPageImageDetail) => [
+              history.imageId,
+              history,
+            ])
+          )
         : null,
-    [isFromMypage, mypageResult?.histories]
+    [isFromMypage, mypageHistories]
   );
 
   // 현재 슬라이드의 좋아요/싫어요 상태를 직접 계산
@@ -213,6 +295,11 @@ const ResultPage = () => {
     return <Navigate to="/" replace />;
   }
 
+  /**
+   * 좋아요/싫어요 토글 핸들러
+   * - 동일 버튼 재클릭 시 상태 해제
+   * - 상태 변경 시 factor 선택 초기화 및 API 연동
+   */
   const handleVote = (isLike: boolean) => {
     const imageId = currentImgId;
 
@@ -279,6 +366,10 @@ const ResultPage = () => {
   };
 
   // 태그 버튼 클릭 핸들러 (좋아요/싫어요 상태 변경 시 factor 취소 및 선택)
+  /**
+   * factor(선호 요인) 선택 핸들러
+   * - 선택/해제에 따라 API 호출 및 로컬 상태 동기화
+   */
   const handleFactorClick = (factorId: number) => {
     const imageId = currentImgId;
     const isSelected = currentFactorId === factorId;
@@ -318,6 +409,9 @@ const ResultPage = () => {
     }
   };
 
+  /**
+   * 슬라이드 변경 시 마지막 슬라이드 여부를 갱신
+   */
   const handleSlideChange = (currentIndex: number, totalCount: number) => {
     setIsLastSlide(currentIndex === totalCount - 1);
   };
@@ -331,11 +425,17 @@ const ResultPage = () => {
             result={result}
             onSlideChange={handleSlideChange}
             onCurrentImgIdChange={setCurrentImgId}
+            userProfile={forwardedUserProfile}
+            detectionCache={forwardedDetectionMap ?? undefined}
+            isSlideCountLoading={isSlideCountLoading}
+            groupId={groupId}
           />
         ) : (
           <GeneratedImgB
             result={result}
             onCurrentImgIdChange={setCurrentImgId}
+            detectionCache={forwardedDetectionMap ?? undefined}
+            groupId={groupId}
           />
         )}
 
@@ -437,7 +537,7 @@ const ResultPage = () => {
           </div>
         </div>
       </section>
-      <CurationSheet />
+      <CurationSheet groupId={groupId} />
     </div>
   );
 };

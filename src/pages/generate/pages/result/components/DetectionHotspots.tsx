@@ -2,13 +2,14 @@
 // - 역할: 훅(useFurnitureHotspots)이 만든 가구 핫스팟을 렌더
 // - 파이프라인 요약: Obj365 → 가구만 선별 → cabinet만 리파인 → 가구 전체 핫스팟 렌더
 // - 비고: 스토어로 핫스팟 상태를 전달해 바텀시트와 연계
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   resolveFurnitureCode,
   type FurnitureCategoryCode,
 } from '@pages/generate/constants/furnitureCategoryMapping';
 import { useABTest } from '@pages/generate/hooks/useABTest';
+import { useDetectionCache } from '@pages/generate/hooks/useDetectionCache';
 import { useGeneratedCategoriesQuery } from '@pages/generate/hooks/useFurnitureCuration';
 import { useOpenCurationSheet } from '@pages/generate/hooks/useFurnitureCuration';
 import { useFurnitureHotspots } from '@pages/generate/hooks/useFurnitureHotspots';
@@ -29,6 +30,8 @@ import HotspotGray from '@shared/assets/icons/icnHotspotGray.svg?react';
 import * as styles from './DetectionHotspots.css.ts';
 
 import type { FurnitureHotspot } from '@pages/generate/hooks/useFurnitureHotspots';
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
+import type { ProcessedDetections } from '@pages/generate/types/detection';
 
 const EMPTY_DETECTED_CODES: FurnitureCategoryCode[] = [];
 
@@ -64,6 +67,8 @@ interface DetectionHotspotsProps {
   imageUrl: string;
   mirrored?: boolean;
   shouldInferHotspots?: boolean;
+  cachedDetection?: DetectionCacheEntry | null;
+  groupId?: number | null;
 }
 
 const DetectionHotspots = ({
@@ -71,6 +76,8 @@ const DetectionHotspots = ({
   imageUrl,
   mirrored = false,
   shouldInferHotspots = true,
+  cachedDetection,
+  groupId,
 }: DetectionHotspotsProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const setImageDetection = useCurationStore(
@@ -88,10 +95,19 @@ const DetectionHotspots = ({
       : EMPTY_DETECTED_CODES
   );
   const openSheet = useOpenCurationSheet();
-  const categoriesQuery = useGeneratedCategoriesQuery(imageId ?? null);
+  const categoriesQuery = useGeneratedCategoriesQuery(
+    groupId ?? null,
+    imageId ?? null
+  );
   const pendingCategoryIdRef = useRef<number | null>(null);
   const lastSyncedHotspotsRef = useRef<FurnitureHotspot[] | null>(null);
+  const lastDetectionsRef = useRef<ProcessedDetections | null>(null);
   const { variant } = useABTest();
+  const { prefetchedDetections, saveEntry } = useDetectionCache(
+    imageId,
+    imageUrl,
+    { initialEntry: cachedDetection ?? null }
+  );
   const logDetectionEvent = (
     event: string,
     payload?: Record<string, unknown>,
@@ -110,8 +126,42 @@ const DetectionHotspots = ({
 
   // 훅으로 로직 이동: refs/hotspots/isLoading/error 제공
   // 페이지 시나리오별로 추론 사용 여부 제어
+  const handleInferenceComplete = useCallback(
+    (result: ProcessedDetections, latestHotspots: FurnitureHotspot[]) => {
+      lastDetectionsRef.current = result;
+      saveEntry({
+        processedDetections: result,
+        hotspots: latestHotspots,
+      });
+    },
+    [saveEntry]
+  );
+
+  useEffect(() => {
+    if (!prefetchedDetections) return;
+    lastDetectionsRef.current = prefetchedDetections;
+  }, [prefetchedDetections]);
+
+  useEffect(() => {
+    lastDetectionsRef.current = null;
+  }, [imageUrl]);
+
+  // 훅 옵션 객체를 메모이제이션해 불필요한 재실행 차단
+  const hotspotOptions = useMemo(
+    () => ({
+      prefetchedDetections,
+      onInferenceComplete: handleInferenceComplete,
+    }),
+    [prefetchedDetections, handleInferenceComplete]
+  );
+
   const { imgRef, containerRef, hotspots, isLoading, error } =
-    useFurnitureHotspots(imageUrl, mirrored, shouldInferHotspots);
+    useFurnitureHotspots(
+      imageUrl,
+      mirrored,
+      shouldInferHotspots,
+      hotspotOptions
+    );
   const allowedCategories = categoriesQuery.data?.categories;
 
   // 서버 응답 순서를 신뢰해 detectedObjects 와 카테고리를 1:1 매칭
@@ -172,12 +222,22 @@ const DetectionHotspots = ({
       hotspots,
       detectedObjects,
     });
+    const processedDetections = lastDetectionsRef.current;
+    if (processedDetections) {
+      saveEntry({
+        processedDetections,
+        hotspots,
+        detectedObjects,
+      });
+      lastDetectionsRef.current = null;
+    }
   }, [
     imageId,
     hotspots,
     setImageDetection,
     resetImageState,
     shouldInferHotspots,
+    saveEntry,
   ]);
 
   useEffect(() => {

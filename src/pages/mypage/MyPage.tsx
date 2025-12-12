@@ -62,27 +62,8 @@ const MyPage = () => {
     return null;
   }
 
-  // 로딩 상태 처리
-  if (isUserLoading) {
-    return (
-      <>
-        <div className={styles.contentWrapper}>
-          <TitleNavBar
-            title="마이페이지"
-            isBackIcon
-            isLoginBtn={false}
-            onBackClick={() => navigate(ROUTES.HOME)}
-          />
-        </div>
-        <Loading />
-      </>
-    );
-  }
-
-  // 에러 상태 처리
-  if (isUserError || !userData) {
-    return null;
-  }
+  const profileName = userData?.name || '사용자';
+  const profileCredit = userData?.CreditCount ?? 0;
 
   return (
     <div className={styles.contentWrapper}>
@@ -95,8 +76,8 @@ const MyPage = () => {
       />
 
       <ProfileSection
-        userName={userData.name || '사용자'}
-        credit={userData.CreditCount ?? 0}
+        userName={profileName}
+        credit={profileCredit}
         maxCredit={5}
       />
 
@@ -105,8 +86,10 @@ const MyPage = () => {
       {activeTab === 'savedItems' ? (
         <SavedItemsSection />
       ) : (
-        <GeneratedImagesSection />
+        <GeneratedImagesSection userProfile={userData} />
       )}
+
+      {isUserLoading && <Loading />}
     </div>
   );
 };

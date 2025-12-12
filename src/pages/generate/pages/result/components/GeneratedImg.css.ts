@@ -3,6 +3,7 @@ import { recipe } from '@vanilla-extract/recipes';
 
 // import { zIndex } from '@/shared/styles/tokens/zIndex';
 import { fontStyle } from '@/shared/styles/fontStyle';
+import { animationTokens } from '@/shared/styles/tokens/animation.css';
 
 import { colorVars } from '@styles/tokens/color.css';
 
@@ -56,6 +57,22 @@ export const slideNum = style({
   backgroundColor: colorVars.color.gray999_30,
   ...fontStyle('caption_r_11'),
   gap: '0.1rem',
+});
+
+export const slideNumSkeleton = style({
+  width: '100%',
+  height: '100%',
+  borderRadius: 'inherit',
+  border: `1px solid ${colorVars.color.gray200}`,
+  boxShadow: `inset 0 0 0 1px ${colorVars.color.gray100}`,
+  background: `linear-gradient(
+    90deg,
+    ${colorVars.color.gray200} 0%,
+    ${colorVars.color.gray100} 50%,
+    ${colorVars.color.gray200} 100%
+  )`,
+  backgroundSize: '200% 100%',
+  animation: `${animationTokens.skeletonWave} 1.6s ease-in-out infinite`,
 });
 
 export const slidePrevBtn = style({

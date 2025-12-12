@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { useABTest } from '@/pages/generate/hooks/useABTest';
-import { useOpenCurationSheet } from '@/pages/generate/hooks/useFurnitureCuration';
+import {
+  useOpenCurationSheet,
+  useSheetSnapState,
+} from '@/pages/generate/hooks/useFurnitureCuration';
 import {
   logResultImgClickBtnMoreImg,
   logResultImgClickBtnTag,
@@ -19,6 +22,7 @@ import {
   logResultImgSwipeSlideRight,
 } from '@/pages/generate/utils/analytics';
 import { useMyPageUser } from '@/pages/mypage/hooks/useMypage';
+import type { MyPageUserData } from '@/pages/mypage/types/apis/MyPage';
 import { ROUTES } from '@/routes/paths.ts';
 import GeneralModal from '@/shared/components/overlay/modal/GeneralModal';
 
@@ -32,6 +36,8 @@ import Tag from '@shared/assets/icons/tagIcon.svg?react';
 import DetectionHotspots from './DetectionHotspots';
 import * as styles from './GeneratedImg.css.ts';
 
+import type { CurationSnapState } from '@pages/generate/stores/useCurationStore';
+import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
 import type {
   GenerateImageData,
   GenerateImageAResponse,
@@ -52,23 +58,43 @@ interface GeneratedImgAProps {
   onSlideChange?: (currentIndex: number, totalCount: number) => void;
   onCurrentImgIdChange?: (currentImgId: number) => void;
   shouldInferHotspots?: boolean;
+  userProfile?: MyPageUserData | null;
+  detectionCache?: Record<number, DetectionCacheEntry> | null;
+  isSlideCountLoading?: boolean;
+  groupId?: number | null;
 }
 
+/**
+ * 다중 이미지 결과 뷰(variant A)
+ * - 스와이프 기반 슬라이더와 바텀시트 연동
+ * - 마지막 슬라이드에서 추가 생성 CTA 노출
+ */
 const GeneratedImgA = ({
   result: propResult,
   onSlideChange,
   onCurrentImgIdChange,
   shouldInferHotspots = true,
+  userProfile,
+  detectionCache,
+  isSlideCountLoading = false,
+  groupId,
 }: GeneratedImgAProps) => {
   const navigate = useNavigate();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentImgId, setCurrentImgId] = useState(0);
   const openSheet = useOpenCurationSheet();
+  const { snapState, setSnapState } = useSheetSnapState();
   const { variant } = useABTest();
+  const prevSnapStateRef = useRef<CurationSnapState>('collapsed');
+  const isSheetHiddenByImageMoreRef = useRef(false);
 
   // 마이페이지 사용자 정보 (크레딧 정보 포함)
-  const { data: userData } = useMyPageUser();
+  const { data: fetchedUserData } = useMyPageUser({
+    enabled: !userProfile,
+  });
+  const creditCount =
+    userProfile?.CreditCount ?? fetchedUserData?.CreditCount ?? 0;
 
   // currentImgId가 변경될 때마다 부모에게 전달
   useEffect(() => {
@@ -102,38 +128,87 @@ const GeneratedImgA = ({
 
   const lastImage = images[images.length - 1];
   const totalSlideCount = lastImage ? images.length + 1 : images.length;
+  const isImageMoreSlide =
+    Boolean(lastImage) && currentSlideIndex === totalSlideCount - 1;
 
+  const restoreSheetSnapState = useCallback(() => {
+    const targetState =
+      prevSnapStateRef.current && prevSnapStateRef.current !== 'hidden'
+        ? prevSnapStateRef.current
+        : 'collapsed';
+    setSnapState(targetState);
+  }, [setSnapState]);
+
+  useEffect(() => {
+    if (!isImageMoreSlide) {
+      if (isSheetHiddenByImageMoreRef.current) {
+        isSheetHiddenByImageMoreRef.current = false;
+        restoreSheetSnapState();
+      }
+      return;
+    }
+
+    if (snapState !== 'hidden') {
+      if (!isSheetHiddenByImageMoreRef.current) {
+        prevSnapStateRef.current = snapState;
+      }
+      setSnapState('hidden');
+    }
+    isSheetHiddenByImageMoreRef.current = true;
+  }, [isImageMoreSlide, snapState, restoreSheetSnapState, setSnapState]);
+
+  /**
+   * 더보기 모달을 열고 바텀시트 상태를 함께 관리
+   */
   const handleOpenModal = () => {
     logResultImgClickBtnMoreImg(variant);
     overlay.open(
       (
         { unmount } // @toss/overlay-kit 사용
-      ) => (
-        <GeneralModal
-          title="더 다양한 이미지가 궁금하신가요?"
-          content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
-          cancelText="돌아가기"
-          confirmText="이미지 새로 만들기"
-          cancelVariant="default"
-          confirmVariant="primary"
-          showCreditChip={true}
-          creditCount={userData?.CreditCount || 0}
-          maxCredit={5}
-          onCancel={() => {
-            logResultImgClickMoreModalBack(variant);
-            unmount();
-          }}
-          onConfirm={() => {
-            logResultImgClickMoreModalMakeNew(variant);
-            unmount();
-            navigate(ROUTES.GENERATE_START);
-          }}
-          onClose={() => {
-            logResultImgClickMoreModalBack(variant);
-            unmount();
-          }}
-        />
-      )
+      ) => {
+        const closeModal = (
+          afterClose?: () => void,
+          options?: { restoreSnap?: boolean }
+        ) => {
+          const shouldRestore = options?.restoreSnap ?? true;
+          unmount();
+          if (shouldRestore) {
+            restoreSheetSnapState();
+          } else {
+            setSnapState('collapsed');
+          }
+          afterClose?.();
+        };
+
+        return (
+          <GeneralModal
+            title="더 다양한 이미지가 궁금하신가요?"
+            content={`새로운 취향과 정보를 반영해 다시 생성해보세요!\n이미지를 생성할 때마다 크레딧이 1개 소진돼요.`}
+            cancelText="돌아가기"
+            confirmText="이미지 새로 만들기"
+            cancelVariant="default"
+            confirmVariant="primary"
+            showCreditChip={true}
+            creditCount={creditCount}
+            maxCredit={5}
+            onCancel={() => {
+              logResultImgClickMoreModalBack(variant);
+              closeModal();
+            }}
+            onConfirm={() => {
+              logResultImgClickMoreModalMakeNew(variant);
+              closeModal(
+                () => navigate(ROUTES.GENERATE_START, { replace: true }),
+                { restoreSnap: false }
+              );
+            }}
+            onClose={() => {
+              logResultImgClickMoreModalBack(variant);
+              closeModal();
+            }}
+          />
+        );
+      }
     );
   };
 
@@ -156,10 +231,20 @@ const GeneratedImgA = ({
         }}
         onSwiper={setSwiper}
       >
-        <div className={styles.slideNum}>
-          <span>{currentSlideIndex + 1}</span>
-          <span>/</span>
-          <span>{totalSlideCount}</span>
+        <div className={styles.slideNum} aria-live="polite">
+          {isSlideCountLoading ? (
+            <div
+              className={styles.slideNumSkeleton}
+              aria-hidden="true"
+              role="presentation"
+            />
+          ) : (
+            <>
+              <span>{currentSlideIndex + 1}</span>
+              <span>/</span>
+              <span>{totalSlideCount}</span>
+            </>
+          )}
         </div>
         <button
           type="button"
@@ -169,20 +254,28 @@ const GeneratedImgA = ({
         >
           {currentSlideIndex === 0 ? <SlidePrevDisabled /> : <SlidePrev />}
         </button>
-        {images.map((image, index) => (
-          <SwiperSlide
-            key={`${image.imageId}-${index}`}
-            className={styles.swiperSlide}
-          >
-            <DetectionHotspots
-              imageId={image.imageId}
-              imageUrl={image.imageUrl}
-              mirrored={image.isMirror}
-              // 결과 페이지 플래그로 추론 on/off 제어
-              shouldInferHotspots={shouldInferHotspots}
-            />
-          </SwiperSlide>
-        ))}
+        {images.map((image, index) => {
+          const cachedDetection =
+            image.imageId && detectionCache
+              ? (detectionCache[image.imageId] ?? null)
+              : null;
+          return (
+            <SwiperSlide
+              key={`${image.imageId}-${index}`}
+              className={styles.swiperSlide}
+            >
+              <DetectionHotspots
+                imageId={image.imageId}
+                imageUrl={image.imageUrl}
+                mirrored={image.isMirror}
+                // 결과 페이지 플래그로 추론 on/off 제어
+                shouldInferHotspots={shouldInferHotspots}
+                cachedDetection={cachedDetection}
+                groupId={groupId}
+              />
+            </SwiperSlide>
+          );
+        })}
         {lastImage && (
           <SwiperSlide key="blurred-last-image" className={styles.swiperSlide}>
             <img
