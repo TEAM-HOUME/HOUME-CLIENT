@@ -158,12 +158,12 @@ export const logResultImgSwipeCurationSheetDown = (
 };
 
 /**
- * ResultImg 큐레이션 시트 가구 필터 클릭 이벤트
+ * ResultImg 큐레이션 섹션 가구 필터 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetFilter
+ * 이벤트 코드: resultImg_click_curationSectionFilter
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: FilterFurniture
  *
  * 큐레이션 시트에서 가구 필터 클릭 시 전송
@@ -171,7 +171,7 @@ export const logResultImgSwipeCurationSheetDown = (
 export const logResultImgClickCurationSheetFilter = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetFilter', {
+  logAnalyticsEvent('resultImg_click_curationSectionFilter', {
     ab_variant: variant,
   });
 };
@@ -179,10 +179,10 @@ export const logResultImgClickCurationSheetFilter = (
 /**
  * ResultImg 큐레이션 시트 사이트 이동 버튼 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetBtnGoSite
+ * 이벤트 코드: resultImg_click_curationSectionBtnGoSite
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: BtnGoSite
  *
  * 큐레이션 시트에서 사이트 이동 버튼 클릭 시 전송
@@ -190,7 +190,7 @@ export const logResultImgClickCurationSheetFilter = (
 export const logResultImgClickCurationSheetBtnGoSite = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetBtnGoSite', {
+  logAnalyticsEvent('resultImg_click_curationSectionBtnGoSite', {
     ab_variant: variant,
   });
 };
@@ -198,10 +198,10 @@ export const logResultImgClickCurationSheetBtnGoSite = (
 /**
  * ResultImg 큐레이션 시트 저장 버튼 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetBtnSave
+ * 이벤트 코드: resultImg_click_curationSectionBtnSave
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: BtnSave
  *
  * 큐레이션 시트에서 저장 버튼 클릭 시 전송
@@ -209,7 +209,7 @@ export const logResultImgClickCurationSheetBtnGoSite = (
 export const logResultImgClickCurationSheetBtnSave = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetBtnSave', {
+  logAnalyticsEvent('resultImg_click_curationSectionBtnSave', {
     ab_variant: variant,
   });
 };
@@ -217,10 +217,10 @@ export const logResultImgClickCurationSheetBtnSave = (
 /**
  * ResultImg 큐레이션 시트 카드 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetCard
+ * 이벤트 코드: resultImg_click_curationSectionCard
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: Card
  *
  * 큐레이션 시트에서 카드 클릭 시 전송
@@ -228,7 +228,7 @@ export const logResultImgClickCurationSheetBtnSave = (
 export const logResultImgClickCurationSheetCard = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetCard', {
+  logAnalyticsEvent('resultImg_click_curationSectionCard', {
     ab_variant: variant,
   });
 };
@@ -236,10 +236,10 @@ export const logResultImgClickCurationSheetCard = (
 /**
  * ResultImg 큐레이션 카드 이미지 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetCardImage
+ * 이벤트 코드: resultImg_click_curationSectionCardImage
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: CardImage
  *
  * 카드 이미지 영역 클릭 시 전송 (외부 링크 이동)
@@ -247,7 +247,7 @@ export const logResultImgClickCurationSheetCard = (
 export const logResultImgClickCurationSheetCardImage = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetCardImage', {
+  logAnalyticsEvent('resultImg_click_curationSectionCardImage', {
     ab_variant: variant,
   });
 };
@@ -255,10 +255,10 @@ export const logResultImgClickCurationSheetCardImage = (
 /**
  * ResultImg 큐레이션 카드 타이틀 클릭 이벤트
  *
- * 이벤트 코드: resultImg_click_curationSheetCardTitle
+ * 이벤트 코드: resultImg_click_curationSectionCardTitle
  * - Page: resultImg
  * - Action: click
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: CardTitle
  *
  * 카드 타이틀/텍스트 영역 클릭 시 전송 (외부 링크 이동)
@@ -266,7 +266,7 @@ export const logResultImgClickCurationSheetCardImage = (
 export const logResultImgClickCurationSheetCardTitle = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_click_curationSheetCardTitle', {
+  logAnalyticsEvent('resultImg_click_curationSectionCardTitle', {
     ab_variant: variant,
   });
 };
