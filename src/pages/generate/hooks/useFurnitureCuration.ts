@@ -374,9 +374,9 @@ export const useInvalidateCurationQueries = () => {
 };
 
 /**
- * 큐레이션 시트 스냅 상태를 직접 열어주는 헬퍼
+ * 큐레이션 섹션 스냅 상태를 직접 열어주는 헬퍼
  */
-export const useOpenCurationSheet = () => {
+export const useOpenCurationSection = () => {
   const { setSnapState } = useSheetSnapState();
   return (next: CurationSnapState) => {
     setSnapState(next);
