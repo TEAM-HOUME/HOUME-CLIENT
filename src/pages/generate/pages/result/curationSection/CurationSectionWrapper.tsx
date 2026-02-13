@@ -5,8 +5,8 @@ import clsx from 'clsx';
 import { useABTest } from '@/pages/generate/hooks/useABTest';
 import type { CurationSnapState } from '@/pages/generate/stores/useCurationStore';
 import {
-  logResultImgSwipeCurationSheetDown,
-  logResultImgSwipeCurationSheetUp,
+  logResultImgSwipeCurationSectionDown,
+  logResultImgSwipeCurationSectionUp,
 } from '@/pages/generate/utils/analytics';
 import { DragHandle } from '@/shared/components/dragHandle/DragHandle';
 import { useBottomSheetDrag } from '@/shared/hooks/useBottomSheetDrag';
@@ -37,10 +37,10 @@ export const CurationSectionWrapper = ({
   const handleDragUp = useCallback(() => {
     if (snapState === 'collapsed') {
       onSnapStateChange('mid');
-      logResultImgSwipeCurationSheetUp(variant);
+      logResultImgSwipeCurationSectionUp(variant);
     } else if (snapState === 'mid') {
       onSnapStateChange('expanded');
-      logResultImgSwipeCurationSheetUp(variant);
+      logResultImgSwipeCurationSectionUp(variant);
     }
   }, [snapState, onSnapStateChange, variant]);
 
@@ -52,14 +52,14 @@ export const CurationSectionWrapper = ({
         // 2단계 한 번에 (바로 닫힘)
         if (move >= THRESHOLD_JUMP) {
           onSnapStateChange('collapsed');
-          logResultImgSwipeCurationSheetDown(variant);
+          logResultImgSwipeCurationSectionDown(variant);
         } else {
           onSnapStateChange('mid');
-          logResultImgSwipeCurationSheetDown(variant);
+          logResultImgSwipeCurationSectionDown(variant);
         }
       } else if (snapState === 'mid') {
         onSnapStateChange('collapsed');
-        logResultImgSwipeCurationSheetDown(variant);
+        logResultImgSwipeCurationSectionDown(variant);
       }
     },
     [snapState, onSnapStateChange, variant]

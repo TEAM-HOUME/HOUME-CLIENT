@@ -122,37 +122,39 @@ export const logResultImgClickBtnTag = (variant: ImageGenerationVariant) => {
 };
 
 /**
- * ResultImg 큐레이션 시트 위로 스와이프 이벤트
+ * ResultImg 큐레이션 섹션 위로 스와이프 이벤트
  *
- * 이벤트 코드: resultImg_swipe_curationSheetUp
+ * 이벤트 코드: resultImg_swipe_curationSectionUp
  * - Page: resultImg
  * - Action: swipe
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: Up
  *
- * 큐레이션 시트를 위로 스와이프할 때 전송
+ * 큐레이션 섹션을 위로 스와이프할 때 전송
  */
-export const logResultImgSwipeCurationSheetUp = (
+export const logResultImgSwipeCurationSectionUp = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_swipe_curationSheetUp', { ab_variant: variant });
+  logAnalyticsEvent('resultImg_swipe_curationSectionUp', {
+    ab_variant: variant,
+  });
 };
 
 /**
- * ResultImg 큐레이션 시트 아래로 스와이프 이벤트
+ * ResultImg 큐레이션 섹션 아래로 스와이프 이벤트
  *
- * 이벤트 코드: resultImg_swipe_curationSheetDown
+ * 이벤트 코드: resultImg_swipe_curationSectionDown
  * - Page: resultImg
  * - Action: swipe
- * - Component: curationSheet
+ * - Component: curationSection
  * - Function: Down
  *
- * 큐레이션 시트를 아래로 스와이프할 때 전송
+ * 큐레이션 섹션을 아래로 스와이프할 때 전송
  */
-export const logResultImgSwipeCurationSheetDown = (
+export const logResultImgSwipeCurationSectionDown = (
   variant: ImageGenerationVariant
 ) => {
-  logAnalyticsEvent('resultImg_swipe_curationSheetDown', {
+  logAnalyticsEvent('resultImg_swipe_curationSectionDown', {
     ab_variant: variant,
   });
 };
@@ -166,9 +168,9 @@ export const logResultImgSwipeCurationSheetDown = (
  * - Component: curationSection
  * - Function: FilterFurniture
  *
- * 큐레이션 시트에서 가구 필터 클릭 시 전송
+ * 큐레이션 섹션에서 가구 필터 클릭 시 전송
  */
-export const logResultImgClickCurationSheetFilter = (
+export const logResultImgClickCurationSectionFilter = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionFilter', {
@@ -185,9 +187,9 @@ export const logResultImgClickCurationSheetFilter = (
  * - Component: curationSection
  * - Function: BtnGoSite
  *
- * 큐레이션 시트에서 사이트 이동 버튼 클릭 시 전송
+ * 큐레이션 섹션에서 사이트 이동 버튼 클릭 시 전송
  */
-export const logResultImgClickCurationSheetBtnGoSite = (
+export const logResultImgClickCurationSectionBtnGoSite = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionBtnGoSite', {
@@ -204,9 +206,9 @@ export const logResultImgClickCurationSheetBtnGoSite = (
  * - Component: curationSection
  * - Function: BtnSave
  *
- * 큐레이션 시트에서 저장 버튼 클릭 시 전송
+ * 큐레이션 섹션에서 저장 버튼 클릭 시 전송
  */
-export const logResultImgClickCurationSheetBtnSave = (
+export const logResultImgClickCurationSectionBtnSave = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionBtnSave', {
@@ -223,9 +225,9 @@ export const logResultImgClickCurationSheetBtnSave = (
  * - Component: curationSection
  * - Function: Card
  *
- * 큐레이션 시트에서 카드 클릭 시 전송
+ * 큐레이션 섹션에서 카드 클릭 시 전송
  */
-export const logResultImgClickCurationSheetCard = (
+export const logResultImgClickCurationSectionCard = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionCard', {
@@ -244,7 +246,7 @@ export const logResultImgClickCurationSheetCard = (
  *
  * 카드 이미지 영역 클릭 시 전송 (외부 링크 이동)
  */
-export const logResultImgClickCurationSheetCardImage = (
+export const logResultImgClickCurationSectionCardImage = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionCardImage', {
@@ -263,7 +265,7 @@ export const logResultImgClickCurationSheetCardImage = (
  *
  * 카드 타이틀/텍스트 영역 클릭 시 전송 (외부 링크 이동)
  */
-export const logResultImgClickCurationSheetCardTitle = (
+export const logResultImgClickCurationSectionCardTitle = (
   variant: ImageGenerationVariant
 ) => {
   logAnalyticsEvent('resultImg_click_curationSectionCardTitle', {

@@ -13,7 +13,7 @@ import {
 } from '@/pages/generate/hooks/useFurnitureCuration';
 import { useCurationCacheStore } from '@/pages/generate/stores/useCurationCacheStore';
 import { useCurationStore } from '@/pages/generate/stores/useCurationStore';
-import { logResultImgClickCurationSheetFilter } from '@/pages/generate/utils/analytics';
+import { logResultImgClickCurationSectionFilter } from '@/pages/generate/utils/analytics';
 import { useGetJjymListQuery } from '@/pages/mypage/hooks/useSaveItemList';
 import { ROUTES } from '@/routes/paths';
 import { QUERY_KEY } from '@/shared/constants/queryKey';
@@ -202,7 +202,7 @@ export const CurationSection = ({ groupId = null }: CurationSectionProps) => {
   const handleCategorySelect = (categoryId: number) => {
     if (activeImageId === null) return;
     if (selectedCategoryId === categoryId) return;
-    logResultImgClickCurationSheetFilter(variant);
+    logResultImgClickCurationSectionFilter(variant);
     selectCategory(activeImageId, categoryId);
   };
 

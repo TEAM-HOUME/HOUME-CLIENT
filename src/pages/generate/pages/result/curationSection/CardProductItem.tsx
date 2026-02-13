@@ -5,11 +5,11 @@ import { useIsMutating } from '@tanstack/react-query';
 import { useABTest } from '@/pages/generate/hooks/useABTest';
 import { usePostJjymMutation } from '@/pages/generate/hooks/useSaveItem';
 import {
-  logResultImgClickCurationSheetBtnGoSite,
-  logResultImgClickCurationSheetBtnSave,
-  logResultImgClickCurationSheetCard,
-  logResultImgClickCurationSheetCardImage,
-  logResultImgClickCurationSheetCardTitle,
+  logResultImgClickCurationSectionBtnGoSite,
+  logResultImgClickCurationSectionBtnSave,
+  logResultImgClickCurationSectionCard,
+  logResultImgClickCurationSectionCardImage,
+  logResultImgClickCurationSectionCardTitle,
 } from '@/pages/generate/utils/analytics';
 import CardProduct from '@/shared/components/card/cardProduct/CardProduct';
 import { useToast } from '@/shared/components/toast/useToast';
@@ -102,7 +102,7 @@ const CardProductItem = memo(
       const wasSaved = isSaved;
 
       // 저장 버튼 클릭 이벤트 전송
-      logResultImgClickCurationSheetBtnSave(variant);
+      logResultImgClickCurationSectionBtnSave(variant);
 
       toggleJjym(recommendId, {
         onSuccess: (data) => {
@@ -141,18 +141,18 @@ const CardProductItem = memo(
         colorHexes={product.furnitureProductColorHexes}
         saveCount={product.furnitureProductSaveCount}
         onLinkClick={() => {
-          logResultImgClickCurationSheetBtnGoSite(variant);
+          logResultImgClickCurationSectionBtnGoSite(variant);
         }}
         onCardClick={(area) => {
           if (area === 'image') {
-            logResultImgClickCurationSheetCardImage(variant);
+            logResultImgClickCurationSectionCardImage(variant);
             return;
           }
           if (area === 'title') {
-            logResultImgClickCurationSheetCardTitle(variant);
+            logResultImgClickCurationSectionCardTitle(variant);
             return;
           }
-          logResultImgClickCurationSheetCard(variant);
+          logResultImgClickCurationSectionCard(variant);
         }}
       />
     );
