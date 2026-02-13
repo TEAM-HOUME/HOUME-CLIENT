@@ -13,24 +13,24 @@ import { useBottomSheetDrag } from '@/shared/hooks/useBottomSheetDrag';
 
 import * as commonStyles from '@components/bottomSheet/BottomSheetWrapper.css';
 
-import * as styles from './CurationSheetWrapper.css';
+import * as styles from './CurationSectionWrapper.css';
 
 const THRESHOLD = 100; // 드래그해야 상태 변경 임계값
 const THRESHOLD_JUMP = 300; // expanded -> collapsed 바로
 
-interface CurationSheetWrapperProps {
+interface CurationSectionWrapperProps {
   snapState: CurationSnapState;
   onSnapStateChange: (next: CurationSnapState) => void;
   onCollapsed?: () => void;
   children: (snapState: CurationSnapState) => ReactNode;
 }
 
-export const CurationSheetWrapper = ({
+export const CurationSectionWrapper = ({
   snapState,
   onSnapStateChange,
   onCollapsed,
   children,
-}: CurationSheetWrapperProps) => {
+}: CurationSectionWrapperProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const { variant } = useABTest();
 

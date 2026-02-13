@@ -22,7 +22,7 @@ import { useSavedItemsStore } from '@/store/useSavedItemsStore';
 import { getGeneratedImageProducts } from '@pages/generate/apis/furniture';
 
 import CardProductItem from './CardProductItem';
-import * as styles from './CurationSheet.css';
+import * as styles from './CurationSection.css';
 
 import type { FurnitureProductsInfoResponse } from '@pages/generate/types/furniture';
 
@@ -38,7 +38,7 @@ type ProductPrefetchQueryKey = [
   },
 ];
 
-interface CurationSheetProps {
+interface CurationSectionProps {
   groupId?: number | null;
 }
 
@@ -47,7 +47,7 @@ interface CurationSheetProps {
  * - 감지된 가구 카테고리/상품을 고정 영역에 표시
  * - 그룹 기반 진입 시 groupId를 통해 캐시·프리패치 범위를 확정
  */
-export const CurationSheet = ({ groupId = null }: CurationSheetProps) => {
+export const CurationSection = ({ groupId = null }: CurationSectionProps) => {
   const activeImageId = useActiveImageId();
   const imageState = useActiveImageCurationState();
   const selectedCategoryId = imageState?.selectedCategoryId ?? null;

@@ -17,7 +17,7 @@ import { useCurationStore } from '@pages/generate/stores/useCurationStore';
 
 import GeneratedImgA from './components/GeneratedImgA.tsx';
 import GeneratedImgB from './components/GeneratedImgB.tsx';
-import { CurationSheet } from './curationSheet/CurationSheet';
+import { CurationSection } from './curationSection/CurationSection';
 import * as styles from './ResultPage.css.ts';
 
 import type { DetectionCacheEntry } from '@pages/generate/stores/useDetectionCacheStore';
@@ -226,7 +226,7 @@ const ResultPage = () => {
             detectionCache={forwardedDetectionMap ?? undefined}
           />
         )}
-        <CurationSheet groupId={groupId} />
+        <CurationSection groupId={groupId} />
       </section>
     </div>
   );
