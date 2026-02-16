@@ -2,5 +2,5 @@
 components:
   jjym-toast:
     action: update
-    path: src/components/common/JjymToast.tsx
-    story: src/components/common/JjymToast.stories.tsx
+    path: src/shared/components/toast/Toast.tsx
+    story: src/stories/Toast.stories.tsx
