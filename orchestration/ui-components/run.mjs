@@ -5,7 +5,10 @@ import { getChangedFiles } from './lib/git-gates.mjs';
 import { createRunId, writeReport } from './lib/report.mjs';
 import { parseArgs, readScenario } from './lib/scenario.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
+import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
+import { stepGateCodeConnect } from './steps/gate-code-connect.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
+import { stepGateStoryDesignLinks } from './steps/gate-story-design-links.mjs';
 import { stepPreflight } from './steps/preflight.mjs';
 import { stepResolveComponent } from './steps/resolve-component-plan.mjs';
 import { stepRunAgent } from './steps/run-agent-implementation.mjs';
@@ -74,6 +77,9 @@ function main() {
     contracts: null,
     figmaScope: null,
     designContextArtifactPath: null,
+    codeConnectArtifactPath: null,
+    codeConnectMap: null,
+    codeConnectGate: null,
     componentPlan: null,
     implementationResult: null,
     agentTraceArtifacts: [],
@@ -90,6 +96,9 @@ function main() {
     runStep(context, 'resolve-component-plan', stepResolveComponent);
     runStep(context, 'run-agent-implementation', stepRunAgent);
     runStep(context, 'gate-changed-paths', stepGateChangedPaths);
+    runStep(context, 'gate-story-design-links', stepGateStoryDesignLinks);
+    runStep(context, 'extract-code-connect-map', stepExtractCodeConnectMap);
+    runStep(context, 'gate-code-connect', stepGateCodeConnect);
     runStep(context, 'verify', stepVerify);
     context.status = 'passed';
   } catch (error) {

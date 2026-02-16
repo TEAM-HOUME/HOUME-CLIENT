@@ -33,7 +33,12 @@ export function writeReport(context) {
     designContextArtifactPath: context.designContextArtifactPath
       ? relative(context.rootPath, context.designContextArtifactPath)
       : null,
+    codeConnectArtifactPath: context.codeConnectArtifactPath
+      ? relative(context.rootPath, context.codeConnectArtifactPath)
+      : null,
     figmaScope: context.figmaScope || null,
+    codeConnectMap: context.codeConnectMap || null,
+    codeConnectGate: context.codeConnectGate || null,
     componentPlan: context.componentPlan || null,
     implementationResult: context.implementationResult || null,
     agentTraceArtifacts: context.agentTraceArtifacts || [],

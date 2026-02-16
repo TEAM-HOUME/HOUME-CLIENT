@@ -16,10 +16,15 @@ targets:
 
 verification:
   - lint
+  - typecheck
+  - test
+  - test-storybook
   - storybook
 
 gates:
   require_visual_approval: true
+  require_story_design_url: true
+  code_connect_mode: warn
   allowed_changed_paths:
     - 'src/shared/components/toast/**'
     - 'src/stories/Toast.stories.tsx'

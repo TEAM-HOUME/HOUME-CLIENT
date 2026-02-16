@@ -107,6 +107,20 @@ function parseSectionNumber(sectionLines, key, defaultValue) {
   return Number.isNaN(numeric) ? defaultValue : numeric;
 }
 
+function parseEnumValue(rawValue, allowedValues, defaultValue, fieldName) {
+  if (rawValue === null || rawValue === undefined) {
+    return defaultValue;
+  }
+
+  const normalized = String(rawValue).trim().toLowerCase();
+  if (!allowedValues.includes(normalized)) {
+    fail(
+      `Invalid ${fieldName}: ${rawValue}. Allowed values: ${allowedValues.join(', ')}`
+    );
+  }
+  return normalized;
+}
+
 function parseSectionList(sectionLines, key) {
   const values = [];
   const keyPattern = new RegExp(`^\\s{2}${key}:\\s*$`);
@@ -202,6 +216,17 @@ export function readScenario(pathArg) {
         gatesSection,
         'require_visual_approval',
         true
+      ),
+      requireStoryDesignUrl: parseSectionBoolean(
+        gatesSection,
+        'require_story_design_url',
+        true
+      ),
+      codeConnectMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'code_connect_mode', null),
+        ['off', 'warn', 'error'],
+        'warn',
+        'gates.code_connect_mode'
       ),
       allowedChangedPaths: parseSectionList(
         gatesSection,

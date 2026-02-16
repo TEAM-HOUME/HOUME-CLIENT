@@ -30,9 +30,12 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
   결과를 `artifacts/<runId>-design-context.json`으로 고정 저장.
 - `resolve-component-plan`: `component-map` + 프로젝트 파일 상태로 `update/create` 결정.
 - `run-agent-implementation`: Codex/Claude 헤드리스 실행으로 컴포넌트 수정.
+- `gate-story-design-links`: 변경된 `*.stories.*` 파일에 `parameters.design.url` 존재 여부 강제.
+- `extract-code-connect-map`: Figma MCP 기반 Code Connect 매핑 추출 후 artifact 저장.
+- `gate-code-connect`: Code Connect 매핑 경로와 시나리오 타깃 경로 정합성 게이트.
 - `agent-trace`: 각 에이전트 호출별 원본 prompt/stdout/stderr/파싱 결과를 artifact로 저장.
 - `gate-changed-paths`: 시나리오에 정의한 허용 경로 밖 파일 변경 시 실패.
-- `verify`: lint/test/typecheck/storybook 및 viewport 규칙 검증.
+- `verify`: `lint/typecheck/test/test-storybook`를 기본 강제 실행하고 viewport 규칙 검증.
 - `report`: 실행 결과를 `reports/*.json`으로 기록.
 
 ## Options
@@ -47,6 +50,8 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `agent.args`: `agent.command` 앞단에 붙일 공통 인자 리스트.
 - `figma.timeout_ms`: Figma 컨텍스트 추출 단계 타임아웃.
 - `gates.require_visual_approval`: Storybook 검증 후 수동 승인 강제 여부.
+- `gates.require_story_design_url`: 변경된 Story 파일의 `parameters.design.url` 강제 여부.
+- `gates.code_connect_mode`: `off|warn|error` (`warn` 권장).
 - `gates.allowed_changed_paths`: 구현 단계에서 허용하는 변경 파일 경로(glob).
 
 ## Notes

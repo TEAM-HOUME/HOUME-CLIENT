@@ -4,15 +4,20 @@ import { resolve } from 'node:path';
 import { runCommand } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
 
+const REQUIRED_CHECKS = ['lint', 'typecheck', 'test', 'test-storybook'];
+
 function verificationCommand(check) {
   if (check === 'lint') {
     return ['pnpm', ['lint'], 300_000];
   }
   if (check === 'test') {
-    return ['pnpm', ['vitest', 'run'], 600_000];
+    return ['pnpm', ['test'], 600_000];
   }
   if (check === 'typecheck') {
-    return ['pnpm', ['exec', 'tsc', '-b'], 300_000];
+    return ['pnpm', ['typecheck'], 300_000];
+  }
+  if (check === 'test-storybook') {
+    return ['pnpm', ['test-storybook'], 900_000];
   }
   if (check === 'storybook') {
     return ['pnpm', ['build-storybook'], 900_000];
@@ -29,8 +34,11 @@ export function stepVerify(context) {
   }
 
   const verificationResults = [];
+  const verificationPlan = [
+    ...new Set([...REQUIRED_CHECKS, ...context.scenario.verification]),
+  ];
 
-  for (const check of context.scenario.verification) {
+  for (const check of verificationPlan) {
     const [command, args, timeoutMs] = verificationCommand(check);
     const startedMs = Date.now();
     try {
