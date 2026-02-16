@@ -1,5 +1,32 @@
+import { dirname } from 'node:path';
+
 import { getChangedFiles, matchesPattern } from '../lib/git-gates.mjs';
 import { fail } from '../lib/errors.mjs';
+
+function toDirectoryPattern(path) {
+  if (!path) {
+    return null;
+  }
+  const normalized = String(path).replace(/\\/g, '/').replace(/^\.\//, '');
+  if (!normalized.includes('/')) {
+    return null;
+  }
+  return `${dirname(normalized)}/**`;
+}
+
+function resolveAllowedPatterns(context) {
+  const configured = context.scenario.gates.allowedChangedPaths;
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  const inferred = [
+    toDirectoryPattern(context.componentPlan?.targetPath),
+    context.componentPlan?.storyPath || null,
+    ...context.scenario.targets,
+  ].filter(Boolean);
+  return [...new Set(inferred)];
+}
 
 export function stepGateChangedPaths(context) {
   if (context.options.dryRun) {
@@ -9,11 +36,11 @@ export function stepGateChangedPaths(context) {
     };
   }
 
-  const allowedPatterns = context.scenario.gates.allowedChangedPaths;
+  const allowedPatterns = resolveAllowedPatterns(context);
   if (allowedPatterns.length === 0) {
     return {
       skipped: true,
-      reason: 'no `gates.allowed_changed_paths` configured',
+      reason: 'no allowed paths inferred',
     };
   }
 

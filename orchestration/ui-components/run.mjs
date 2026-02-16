@@ -7,6 +7,7 @@ import { getChangedFiles } from './lib/git-gates.mjs';
 import { createRunId, writeReport } from './lib/report.mjs';
 import { parseArgs, readScenario } from './lib/scenario.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
+import { stepGateFigmaScope } from './steps/gate-figma-scope.mjs';
 import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
 import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
 import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
@@ -60,6 +61,9 @@ function summarizeStepOutput(name, output) {
       : 0;
     return `스코프=${output.selectedNodeId}, 소스=${output.source}, 상위탐색=${parentDepth}단계`;
   }
+  if (name === 'gate-figma-scope') {
+    return `상태=${output.status}, 협소=${output.isNarrow ? '예' : '아니오'}, 상위탐색=${output.parentDepth}단계`;
+  }
   if (name === 'extract-design-tokens') {
     return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3`;
   }
@@ -67,7 +71,7 @@ function summarizeStepOutput(name, output) {
     return `모드=${output.mode}, 상태=${output.status}, 토큰=${output.totalTokens}개`;
   }
   if (name === 'resolve-component-plan') {
-    return `계획=${output.action}, 대상=${output.targetPath}`;
+    return `계획=${output.action}, 대상=${output.targetPath}, 소스=${output.source}`;
   }
   if (name === 'run-agent-implementation') {
     const changedCount = Array.isArray(output.changedFiles)
@@ -151,6 +155,26 @@ function logStepDetails(name, output, traceRecords) {
     }
   }
 
+  if (name === 'resolve-component-plan') {
+    if (output.rationale) {
+      console.log(
+        `${stepPrefix(name)} └ 계획 근거: ${truncateText(output.rationale, 220)}`
+      );
+    }
+    const questions = compactArray(output.behaviorQuestions, 2);
+    for (const question of questions) {
+      console.log(`${stepPrefix(name)} └ 동작 확인 질문: ${question}`);
+    }
+    if (
+      Array.isArray(output.behaviorQuestions) &&
+      output.behaviorQuestions.length > questions.length
+    ) {
+      console.log(
+        `${stepPrefix(name)} └ 동작 확인 질문: 외 ${output.behaviorQuestions.length - questions.length}건`
+      );
+    }
+  }
+
   if (name === 'extract-code-connect-map') {
     const notes = compactArray(output.notes, 2);
     for (const note of notes) {
@@ -181,6 +205,11 @@ function logStepFailureHint(name, traceRecords) {
   if (name === 'gate-design-tokens') {
     console.log(
       `${stepPrefix(name)} └ 조치: design token capture 상태/도구 오류를 artifact에서 확인`
+    );
+  }
+  if (name === 'gate-figma-scope') {
+    console.log(
+      `${stepPrefix(name)} └ 조치: 노드가 넓게 선택됐습니다. figma.scope_node_id 지정 또는 노드 범위 축소 필요`
     );
   }
 
@@ -340,6 +369,7 @@ function main() {
     contracts: null,
     figmaScope: null,
     designContextArtifactPath: null,
+    figmaScopeGate: null,
     designTokensArtifactPath: null,
     designTokens: null,
     designTokensGate: null,
@@ -360,6 +390,7 @@ function main() {
   try {
     runStep(context, 'preflight', stepPreflight);
     runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
+    runStep(context, 'gate-figma-scope', stepGateFigmaScope);
     runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
     runStep(context, 'gate-design-tokens', stepGateDesignTokens);
     runStep(context, 'resolve-component-plan', stepResolveComponent);

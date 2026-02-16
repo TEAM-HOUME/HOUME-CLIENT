@@ -12,6 +12,7 @@ export function stepExtractFigmaScope(context) {
       context.scenario.figma.scopeNodeId || figmaMeta.nodeIdNormalized,
     source: context.scenario.figma.scopeNodeId ? 'scenario' : 'input',
     parentChain: [],
+    isNarrow: null,
     rationale: context.scenario.figma.scopeNodeId
       ? 'scenario override'
       : 'input node-id',
@@ -66,6 +67,8 @@ export function stepExtractFigmaScope(context) {
             String(id).trim().replace(/-/g, ':')
           )
         : [];
+      scope.isNarrow =
+        typeof scopeResult.isNarrow === 'boolean' ? scopeResult.isNarrow : null;
       scope.rationale = String(scopeResult.rationale);
       scope.source = 'agent';
     }
@@ -89,6 +92,7 @@ export function stepExtractFigmaScope(context) {
     inputNodeId: scope.nodeIdNormalized,
     selectedNodeId: scope.selectedNodeId,
     source: scope.source,
+    isNarrow: scope.isNarrow,
     rationale: scope.rationale,
     parentChain: scope.parentChain,
     artifactPath: relative(context.rootPath, designContextArtifactPath),

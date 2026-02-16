@@ -3,64 +3,103 @@ import { join, relative, resolve } from 'node:path';
 
 import { fail } from './errors.mjs';
 
-function parseComponentMap(content) {
-  const components = {};
-  const blockRegex = /^\s{2}([A-Za-z0-9_-]+):\s*\n((?:\s{4}[^\n]*\n?)*)/gm;
-  let match;
+const DEFAULT_UI_RULE_DOCS = [
+  'docs/reference/ui-component-design-conventions.md',
+  'docs/reference/styling-system.md',
+];
+const DEFAULT_REQUIRED_VIEWPORTS = ['mobile375', 'mobile440'];
 
-  while ((match = blockRegex.exec(content)) !== null) {
-    const componentKey = match[1];
-    const block = match[2];
-    const actionMatch = block.match(/^\s{4}action:\s*([^\n#]+)\s*$/m);
-    const pathMatch = block.match(/^\s{4}path:\s*([^\n#]+)\s*$/m);
-    const storyMatch = block.match(/^\s{4}story:\s*([^\n#]+)\s*$/m);
-
-    components[componentKey] = {
-      action: actionMatch
-        ? actionMatch[1].trim().replace(/^['"]|['"]$/g, '')
-        : null,
-      path: pathMatch ? pathMatch[1].trim().replace(/^['"]|['"]$/g, '') : null,
-      story: storyMatch
-        ? storyMatch[1].trim().replace(/^['"]|['"]$/g, '')
-        : null,
-    };
-  }
-
-  return components;
+function normalizePath(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^\.\//, '');
 }
 
-export function readContracts(rootPath) {
-  const componentMapPath = resolve(
-    rootPath,
-    'orchestration/ui-components/contracts/component-map.yml'
-  );
-  const uiRulesPath = resolve(
-    rootPath,
-    'orchestration/ui-components/contracts/ui-rules.yml'
+function resolveUiRuleDocPaths(rootPath, scenario) {
+  const configured = Array.isArray(scenario?.context?.uiRulesDocs)
+    ? scenario.context.uiRulesDocs.map(normalizePath).filter(Boolean)
+    : [];
+  const candidatePaths =
+    configured.length > 0 ? configured : DEFAULT_UI_RULE_DOCS;
+  const missing = candidatePaths.filter(
+    (path) => !existsSync(resolve(rootPath, path))
   );
 
-  if (!existsSync(componentMapPath)) {
-    fail(`Component map not found: ${componentMapPath}`);
-  }
-  if (!existsSync(uiRulesPath)) {
-    fail(`UI rules not found: ${uiRulesPath}`);
+  if (missing.length > 0) {
+    fail(`UI rule docs not found: ${missing.join(', ')}`);
   }
 
-  const componentMapContent = readFileSync(componentMapPath, 'utf8');
-  const uiRulesContent = readFileSync(uiRulesPath, 'utf8');
+  return candidatePaths.map((path) => resolve(rootPath, path));
+}
 
+function extractRequiredViewports(content) {
+  const lines = content.split(/\r?\n/);
+  const viewports = [];
+  let inSection = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!inSection) {
+      if (/^required_storybook_viewports:\s*$/i.test(trimmed)) {
+        inSection = true;
+      }
+      continue;
+    }
+
+    if (!trimmed) {
+      continue;
+    }
+    if (/^#{1,6}\s/.test(trimmed)) {
+      break;
+    }
+    if (/^[A-Za-z0-9_-]+:\s*$/.test(trimmed)) {
+      break;
+    }
+
+    const match = trimmed.match(/^-+\s*`?([A-Za-z0-9_-]+)`?\s*$/);
+    if (!match) {
+      continue;
+    }
+    viewports.push(match[1]);
+  }
+
+  return viewports;
+}
+
+export function readContracts(rootPath, scenario) {
+  const uiRuleDocPaths = resolveUiRuleDocPaths(rootPath, scenario);
+  const uiRuleDocs = uiRuleDocPaths.map((path) => {
+    const content = readFileSync(path, 'utf8');
+    return {
+      absolutePath: path,
+      relativePath: relative(rootPath, path),
+      content,
+    };
+  });
   const requiredViewports = [
-    ...uiRulesContent.matchAll(/^\s*-\s*([A-Za-z0-9_-]+)\s*$/gm),
-  ].map((match) => match[1]);
+    ...new Set(
+      uiRuleDocs.flatMap((doc) => extractRequiredViewports(doc.content))
+    ),
+  ];
+  const uiRulesContent = uiRuleDocs
+    .map((doc) => {
+      const trimmed = doc.content.trim();
+      return trimmed ? `## ${doc.relativePath}\n${trimmed}` : '';
+    })
+    .filter(Boolean)
+    .join('\n\n');
 
   return {
-    componentMap: parseComponentMap(componentMapContent),
     uiRulesContent,
-    requiredViewports,
+    requiredViewports:
+      requiredViewports.length > 0
+        ? requiredViewports
+        : DEFAULT_REQUIRED_VIEWPORTS,
     paths: {
-      componentMapPath,
-      uiRulesPath,
+      uiRuleDocPaths,
     },
+    sources: uiRuleDocs.map((doc) => doc.relativePath),
   };
 }
 

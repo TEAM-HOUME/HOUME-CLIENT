@@ -72,6 +72,16 @@ function summarizeDesignTokens(context) {
   ].join(', ');
 }
 
+function summarizeUiRuleSources(context) {
+  if (!context.contracts || !Array.isArray(context.contracts.sources)) {
+    return '(unavailable)';
+  }
+  if (context.contracts.sources.length === 0) {
+    return '(none)';
+  }
+  return context.contracts.sources.join(', ');
+}
+
 export function stepRunAgent(context) {
   if (context.options.dryRun) {
     return {
@@ -97,12 +107,20 @@ export function stepRunAgent(context) {
     `- Design token summary: ${summarizeDesignTokens(context)}`,
     `- Action: ${context.componentPlan.action}`,
     `- Target path: ${context.componentPlan.targetPath}`,
+    `- Plan source: ${context.componentPlan.source}`,
+    context.componentPlan.rationale
+      ? `- Plan rationale: ${context.componentPlan.rationale}`
+      : '- Plan rationale: (not provided)',
     context.componentPlan.storyPath
       ? `- Story path: ${context.componentPlan.storyPath}`
       : '- Story path: (not specified)',
+    `- UI rule docs: ${summarizeUiRuleSources(context)}`,
+    context.scenario.behavior.spec.trim()
+      ? `- Behavior spec: ${context.scenario.behavior.spec.trim()}`
+      : '- Behavior spec: (none)',
     '',
-    '# Contracts',
-    'Apply these UI constraints exactly:',
+    '# Design Conventions',
+    'Apply these conventions exactly:',
     context.contracts.uiRulesContent,
     '',
     '# Constraints',

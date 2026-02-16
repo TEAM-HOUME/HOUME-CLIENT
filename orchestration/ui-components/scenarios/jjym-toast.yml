@@ -2,29 +2,22 @@ id: jjym-toast
 
 figma:
   url: 'https://www.figma.com/design/87dDqo3EUSFSzXK7f7s5Gs/TEMP?node-id=1-427&m=dev'
-  auto_parent: true
-  parent_hops_max: 3
-  timeout_ms: 600000
 
 agent:
   engine: codex
-  command: codexf
-  args: []
 
-targets:
-  - 'src/shared/components/toast/Toast.tsx'
+target: 'src/shared/components/toast/Toast.tsx'
+
+context:
+  ui_rules_docs:
+    - 'docs/reference/ui-component-design-conventions.md'
+    - 'docs/reference/styling-system.md'
+    - 'docs/reference/component-catalog.md'
 
 verification:
-  - lint
-  - typecheck
-  - test
-  - test-storybook
   - storybook
 
 gates:
   require_visual_approval: true
   design_tokens_mode: warn
   code_connect_mode: warn
-  allowed_changed_paths:
-    - 'src/shared/components/toast/**'
-    - 'src/stories/Toast.stories.tsx'

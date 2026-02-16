@@ -1,21 +1,21 @@
 # UI Components Orchestration
 
-This directory stores reproducible inputs and constraints for design-to-code UI work.
+Single-command pipeline for turning a Figma node into a validated UI component change.
 
 ## Goal
 
-- Single entry flow for component implementation from a design node URL.
-- Fail fast if the required local environment is missing.
-- Keep outputs traceable with scenario-based execution.
+- Keep design-to-code flow reproducible.
+- Fail fast when local CLI/MCP prerequisites are missing.
+- Apply project UI conventions from `docs/` instead of hard-coded component maps.
 
 ## Directory Layout
 
-- `scenarios/`: task input files with design URL and target components.
-- `contracts/`: implementation constraints and component ownership map.
-- `prompts/`: shared system prompt snippets for each coding agent.
-- `reports/`: execution reports (kept local by default).
-- `artifacts/`: temporary outputs (kept local by default).
-  - `artifacts/<runId>/agent-trace/`: per-agent prompt/stdout/stderr/parsed JSON.
+- `scenarios/`: scenario inputs (`.yml`)
+- `prompts/`: system prompt fragments for Codex/Claude
+- `steps/`: pipeline stages
+- `lib/`: shared runtime helpers
+- `artifacts/`: per-run outputs (local)
+- `reports/`: per-run summary reports (local)
 
 ## Run
 
@@ -25,41 +25,50 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 
 ## Pipeline Stages
 
-- `preflight`: CLI/MCP 환경 확인, 미설정 시 즉시 실패.
-- `extract-figma-scope`: 디자인 URL 파싱, 필요 시 상위 노드 자동 스코프 분석.
-  결과를 `artifacts/<runId>-design-context.json`으로 고정 저장.
-- `extract-design-tokens`: Figma MCP 원본 응답(raw) + 정규화 토큰을
-  `artifacts/<runId>-design-tokens.json`으로 저장하고 `ok|partial|unavailable|invalid`
-  상태를 계산.
-- `gate-design-tokens`: `gates.design_tokens_mode` 기준으로 token 상태 게이트(`off|warn|error`).
-- `resolve-component-plan`: `component-map` + 프로젝트 파일 상태로 `update/create` 결정.
-- `run-agent-implementation`: Codex/Claude 헤드리스 실행으로 컴포넌트 수정.
-- `extract-code-connect-map`: Figma MCP 기반 Code Connect 매핑 추출 후 artifact 저장.
-- `gate-code-connect`: Code Connect 매핑 경로와 시나리오 타깃 경로 정합성 게이트.
-- `agent-trace`: 각 에이전트 호출별 원본 prompt/stdout/stderr/파싱 결과를 artifact로 저장.
-- `gate-changed-paths`: 시나리오에 정의한 허용 경로 밖 파일 변경 시 실패.
-- `verify`: `lint/typecheck/test/test-storybook`를 기본 강제 실행하고 viewport 규칙 검증.
-- `report`: 실행 결과를 `reports/*.json`으로 기록.
+- `preflight`: verify CLI + MCP availability.
+- `extract-figma-scope`: parse URL and optionally walk parent scope.
+- `gate-figma-scope`: fail when selected scope is still too broad.
+- `extract-design-tokens`: capture raw MCP evidence + normalized tokens.
+- `gate-design-tokens`: enforce token quality mode (`off|warn|error`).
+- `resolve-component-plan`: choose reuse/new target and behavior gate.
+- `run-agent-implementation`: implement code changes with injected context docs.
+- `gate-changed-paths`: block unrelated file changes.
+- `extract-code-connect-map`: collect Code Connect mapping evidence.
+- `gate-code-connect`: compare mapping paths with planned target.
+- `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
+- `report`: write run summary JSON.
 
-## Options
+## Scenario Shape (Minimal)
 
-- `--dry-run`: 에이전트 수정/검증을 생략하고 계획 단계까지만 실행.
-- `--approve-visual`: Storybook 시각 검증 수동 확인을 승인.
-- `--skip-mcp-check`: MCP 등록 확인 단계를 건너뜀.
-- `--open-storybook`: 성공 시 `storybook-static/index.html`을 자동으로 엽니다.
+```yaml
+id: jjym-toast
 
-## Scenario Keys
+figma:
+  url: 'https://www.figma.com/design/.../TEMP?node-id=1-427&m=dev'
 
-- `agent.command`: 기본 CLI 대신 사용할 실행 명령 (예: `codexf` alias).
-- `agent.args`: `agent.command` 앞단에 붙일 공통 인자 리스트.
-- `figma.timeout_ms`: Figma 컨텍스트 추출 단계 타임아웃.
-- `gates.require_visual_approval`: Storybook 검증 후 수동 승인 강제 여부.
-- `gates.design_tokens_mode`: `off|warn|error` (`warn` 권장).
-- `gates.code_connect_mode`: `off|warn|error` (`warn` 권장).
-- `gates.allowed_changed_paths`: 구현 단계에서 허용하는 변경 파일 경로(glob).
+agent:
+  engine: codex
+```
+
+## Scenario Keys (Optional)
+
+- `target`: explicit single target file path (preferred for deterministic updates)
+- `targets`: legacy list form; only one target is supported in automatic planning
+- `context.ui_rules_docs`: docs to inject as coding conventions
+- `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
+- `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
+- `gates.design_tokens_mode`: `off|warn|error`
+- `gates.code_connect_mode`: `off|warn|error`
+- `gates.allowed_changed_paths`: explicit allowed change paths
+- `gates.require_visual_approval`: require `--approve-visual` when Storybook verification is enabled
+
+## Behavior Decision Gate
+
+- If a similar existing component is found, pipeline follows the existing behavior pattern.
+- If no similar component exists and the planned target is interaction-heavy, pipeline stops and asks for explicit behavior confirmation in scenario.
 
 ## Notes
 
-- Prompt files in `prompts/` are explicitly injected by `ui:run`, not auto-loaded by CLI defaults.
-- Scenario report (`reports/*.json`) includes `agentTraceArtifacts` with relative paths to trace files.
-- CLI 출력은 단계별 `시작/통과/실패`와 핵심 요약(변경 파일 수, 매핑 수, 검증 개수)을 함께 표시합니다.
+- Prompt files in `prompts/` are explicitly injected by `ui:run`.
+- Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
+- Use `--open-storybook` to open `storybook-static/index.html` after a successful run.

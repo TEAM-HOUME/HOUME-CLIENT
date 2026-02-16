@@ -51,6 +51,16 @@ function parseTopLevelList(content, key) {
   return values;
 }
 
+function parseTopLevelScalar(content, key) {
+  const scalarMatch = content.match(
+    new RegExp(`^${key}:\\s*([^\\n#]+)\\s*$`, 'm')
+  );
+  if (!scalarMatch) {
+    return null;
+  }
+  return stripQuotes(scalarMatch[1]);
+}
+
 function parseSection(content, sectionName) {
   const lines = content.split(/\r?\n/);
   const sectionStartPattern = new RegExp(`^${sectionName}:\\s*$`);
@@ -197,11 +207,15 @@ export function readScenario(pathArg) {
   const content = readFileSync(scenarioPath, 'utf8');
   const idMatch = content.match(/^id:\s*([^\n#]+)\s*$/m);
   const agentSection = parseSection(content, 'agent');
+  const contextSection = parseSection(content, 'context');
+  const behaviorSection = parseSection(content, 'behavior');
   const figmaSection = parseSection(content, 'figma');
   const gatesSection = parseSection(content, 'gates');
   const engine = parseSectionScalar(agentSection, 'engine', null);
   const figmaUrl = parseSectionScalar(figmaSection, 'url', null);
+  const target = parseTopLevelScalar(content, 'target');
   const targets = parseTopLevelList(content, 'targets');
+  const combinedTargets = [...new Set([target, ...targets].filter(Boolean))];
   const verification = parseTopLevelList(content, 'verification');
 
   if (!idMatch) {
@@ -212,9 +226,6 @@ export function readScenario(pathArg) {
   }
   if (!figmaUrl) {
     fail('Scenario must include `figma.url`.');
-  }
-  if (targets.length === 0) {
-    fail('Scenario must include at least one `targets` entry.');
   }
 
   return {
@@ -227,7 +238,7 @@ export function readScenario(pathArg) {
     },
     figma: {
       url: figmaUrl,
-      autoParent: parseSectionBoolean(figmaSection, 'auto_parent', false),
+      autoParent: parseSectionBoolean(figmaSection, 'auto_parent', true),
       parentHopsMax: parseSectionNumber(figmaSection, 'parent_hops_max', 3),
       timeoutMs: parseSectionNumber(
         figmaSection,
@@ -235,6 +246,13 @@ export function readScenario(pathArg) {
         DEFAULT_FIGMA_TIMEOUT_MS
       ),
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
+    },
+    context: {
+      uiRulesDocs: parseSectionList(contextSection, 'ui_rules_docs'),
+    },
+    behavior: {
+      confirmed: parseSectionBoolean(behaviorSection, 'confirmed', false),
+      spec: parseSectionScalar(behaviorSection, 'spec', ''),
     },
     gates: {
       requireVisualApproval: parseSectionBoolean(
@@ -259,7 +277,7 @@ export function readScenario(pathArg) {
         'allowed_changed_paths'
       ),
     },
-    targets,
-    verification,
+    targets: combinedTargets,
+    verification: verification.length > 0 ? verification : ['storybook'],
   };
 }
