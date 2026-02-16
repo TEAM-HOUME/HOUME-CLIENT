@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { DEFAULT_FIGMA_TIMEOUT_MS } from './constants.mjs';
@@ -154,12 +154,32 @@ function parseSectionList(sectionLines, key) {
 
 export function parseArgs(argv) {
   const scenarioIndex = argv.indexOf('--scenario');
+  let scenarioArg = null;
+
+  if (scenarioIndex !== -1) {
+    const scenarioParts = [];
+    for (let i = scenarioIndex + 1; i < argv.length; i += 1) {
+      const token = argv[i];
+      if (!token) {
+        continue;
+      }
+      if (token.startsWith('--')) {
+        break;
+      }
+      scenarioParts.push(token);
+    }
+
+    if (scenarioParts.length > 0) {
+      scenarioArg = scenarioParts.join('');
+    }
+  }
+
   return {
-    scenarioArg:
-      scenarioIndex === -1 ? null : (argv[scenarioIndex + 1] ?? null),
+    scenarioArg,
     dryRun: argv.includes('--dry-run'),
     approveVisual: argv.includes('--approve-visual'),
     skipMcpCheck: argv.includes('--skip-mcp-check'),
+    openStorybook: argv.includes('--open-storybook'),
   };
 }
 
@@ -167,6 +187,11 @@ export function readScenario(pathArg) {
   const scenarioPath = resolve(process.cwd(), pathArg);
   if (!existsSync(scenarioPath)) {
     fail(`Scenario not found: ${scenarioPath}`);
+  }
+  if (statSync(scenarioPath).isDirectory()) {
+    fail(
+      `Scenario path is a directory: ${scenarioPath}. Use a .yml file path (e.g. orchestration/ui-components/scenarios/jjym-toast.yml).`
+    );
   }
 
   const content = readFileSync(scenarioPath, 'utf8');
