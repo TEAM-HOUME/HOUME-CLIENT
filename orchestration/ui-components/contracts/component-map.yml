@@ -1,0 +1,6 @@
+# figma_key -> owned code path
+components:
+  jjym-toast:
+    action: update
+    path: src/components/common/JjymToast.tsx
+    story: src/components/common/JjymToast.stories.tsx

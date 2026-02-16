@@ -1,0 +1,13 @@
+responsive:
+  width:
+    mode: fluid
+    value: 'calc(100vw - 3.2rem)'
+    min_px: 343
+    max_px: 408
+  height:
+    mode: fixed
+
+story-viewport:
+  required:
+    - mobile375
+    - mobile440
