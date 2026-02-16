@@ -41,6 +41,7 @@ export function writeReport(context) {
     codeConnectGate: context.codeConnectGate || null,
     componentPlan: context.componentPlan || null,
     implementationResult: context.implementationResult || null,
+    storybookOpenResult: context.storybookOpenResult || null,
     agentTraceArtifacts: context.agentTraceArtifacts || [],
     newChangedFiles: context.newChangedFiles || [],
     verificationResults: context.verificationResults || [],

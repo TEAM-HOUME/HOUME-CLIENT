@@ -43,6 +43,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `--dry-run`: 에이전트 수정/검증을 생략하고 계획 단계까지만 실행.
 - `--approve-visual`: Storybook 시각 검증 수동 확인을 승인.
 - `--skip-mcp-check`: MCP 등록 확인 단계를 건너뜀.
+- `--open-storybook`: 성공 시 `storybook-static/index.html`을 자동으로 엽니다.
 
 ## Scenario Keys
 
@@ -58,3 +59,4 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 
 - Prompt files in `prompts/` are explicitly injected by `ui:run`, not auto-loaded by CLI defaults.
 - Scenario report (`reports/*.json`) includes `agentTraceArtifacts` with relative paths to trace files.
+- CLI 출력은 단계별 `시작/통과/실패`와 핵심 요약(변경 파일 수, 매핑 수, 검증 개수)을 함께 표시합니다.
