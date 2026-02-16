@@ -1,12 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
-import {
-  invokeAgentWithSchema,
-  parseAgentJsonOutput,
-} from '../lib/agent-io.mjs';
-import { runAgentCommand } from '../lib/agent-runtime.mjs';
-import { fail } from '../lib/errors.mjs';
+import { invokeAgentWithSchema } from '../lib/agent.mjs';
 
 function readSystemPrompt(rootPath, engine) {
   const fileMap = {
@@ -46,43 +41,16 @@ function invokeImplementationAgent(context, prompt) {
     additionalProperties: false,
   };
 
-  if (context.scenario.engine === 'codex') {
-    return invokeAgentWithSchema(
-      context,
-      'implement',
-      prompt,
-      schema,
-      1_200_000
-    );
-  }
-
-  const result = runAgentCommand(
-    context.agentRuntime,
-    [
-      '-p',
-      '--output-format',
-      'json',
-      '--json-schema',
-      JSON.stringify(schema),
-      '--permission-mode',
-      'acceptEdits',
-      '--add-dir',
-      context.rootPath,
-      prompt,
-    ],
+  return invokeAgentWithSchema(
+    context,
+    'implement',
+    prompt,
+    schema,
+    1_200_000,
     {
-      cwd: context.rootPath,
-      timeoutMs: 1_200_000,
+      claudePermissionMode: 'acceptEdits',
     }
   );
-
-  const parsed = parseAgentJsonOutput(result.stdout);
-  if (!parsed) {
-    fail(
-      `Unable to parse JSON output from claude (implement). Output: ${result.stdout.slice(0, 400)}`
-    );
-  }
-  return parsed;
 }
 
 export function stepRunAgent(context) {

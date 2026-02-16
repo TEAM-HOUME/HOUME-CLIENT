@@ -15,6 +15,7 @@ This directory stores reproducible inputs and constraints for design-to-code UI 
 - `prompts/`: shared system prompt snippets for each coding agent.
 - `reports/`: execution reports (kept local by default).
 - `artifacts/`: temporary outputs (kept local by default).
+  - `artifacts/<runId>/agent-trace/`: per-agent prompt/stdout/stderr/parsed JSON.
 
 ## Run
 
@@ -29,6 +30,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
   결과를 `artifacts/<runId>-design-context.json`으로 고정 저장.
 - `resolve-component-plan`: `component-map` + 프로젝트 파일 상태로 `update/create` 결정.
 - `run-agent-implementation`: Codex/Claude 헤드리스 실행으로 컴포넌트 수정.
+- `agent-trace`: 각 에이전트 호출별 원본 prompt/stdout/stderr/파싱 결과를 artifact로 저장.
 - `gate-changed-paths`: 시나리오에 정의한 허용 경로 밖 파일 변경 시 실패.
 - `verify`: lint/test/typecheck/storybook 및 viewport 규칙 검증.
 - `report`: 실행 결과를 `reports/*.json`으로 기록.
@@ -50,3 +52,4 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 ## Notes
 
 - Prompt files in `prompts/` are explicitly injected by `ui:run`, not auto-loaded by CLI defaults.
+- Scenario report (`reports/*.json`) includes `agentTraceArtifacts` with relative paths to trace files.

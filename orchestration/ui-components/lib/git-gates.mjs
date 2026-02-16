@@ -1,4 +1,4 @@
-import { runCommand } from './command.mjs';
+import { runCommand } from './agent.mjs';
 
 export function getChangedFiles(rootPath) {
   const unstaged = runCommand('git', ['diff', '--name-only'], {

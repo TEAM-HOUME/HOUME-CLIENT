@@ -3,8 +3,11 @@ import {
   REQUIRED_BASE_COMMANDS,
   CODEX_SAFE_CONFIG,
 } from '../lib/constants.mjs';
-import { hasCommand } from '../lib/command.mjs';
-import { runAgentCommand, resolveAgentRuntime } from '../lib/agent-runtime.mjs';
+import {
+  hasCommand,
+  runAgentCommand,
+  resolveAgentRuntime,
+} from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
 
 export function stepPreflight(context) {

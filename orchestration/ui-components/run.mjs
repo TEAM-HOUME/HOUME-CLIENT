@@ -76,6 +76,7 @@ function main() {
     designContextArtifactPath: null,
     componentPlan: null,
     implementationResult: null,
+    agentTraceArtifacts: [],
     initialChangedFiles: getChangedFiles(rootPath),
     newChangedFiles: [],
     verificationResults: [],

@@ -36,6 +36,7 @@ export function writeReport(context) {
     figmaScope: context.figmaScope || null,
     componentPlan: context.componentPlan || null,
     implementationResult: context.implementationResult || null,
+    agentTraceArtifacts: context.agentTraceArtifacts || [],
     newChangedFiles: context.newChangedFiles || [],
     verificationResults: context.verificationResults || [],
     warnings: context.warnings,

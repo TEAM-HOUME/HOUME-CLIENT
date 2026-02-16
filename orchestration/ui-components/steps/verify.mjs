@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { runCommand } from '../lib/command.mjs';
+import { runCommand } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
 
 function verificationCommand(check) {

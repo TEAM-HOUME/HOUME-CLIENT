@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
-import { invokeAgentWithSchema } from '../lib/agent-io.mjs';
+import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { parseFigmaUrl, validateDesignContext } from '../lib/figma.mjs';
 
 export function stepExtractFigmaScope(context) {
