@@ -99,5 +99,6 @@ export function stepRunAgent(context) {
   return {
     summary: result.summary,
     changedFiles: result.changedFiles,
+    notes: Array.isArray(result.notes) ? result.notes : [],
   };
 }

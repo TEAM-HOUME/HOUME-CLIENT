@@ -136,6 +136,7 @@ export function stepExtractCodeConnectMap(context) {
   return {
     status: normalized.status,
     mappings: normalized.mappings.length,
+    notes: normalized.notes,
     artifactPath: relative(context.rootPath, artifactPath),
   };
 }

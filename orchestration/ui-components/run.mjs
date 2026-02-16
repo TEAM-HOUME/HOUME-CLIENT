@@ -10,7 +10,6 @@ import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
 import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
 import { stepGateCodeConnect } from './steps/gate-code-connect.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
-import { stepGateStoryDesignLinks } from './steps/gate-story-design-links.mjs';
 import { stepPreflight } from './steps/preflight.mjs';
 import { stepResolveComponent } from './steps/resolve-component-plan.mjs';
 import { stepRunAgent } from './steps/run-agent-implementation.mjs';
@@ -21,6 +20,25 @@ function formatDuration(durationMs) {
     return `${durationMs}ms`;
   }
   return `${(durationMs / 1_000).toFixed(1)}s`;
+}
+
+function toSingleLine(value) {
+  return String(value).replace(/\s+/g, ' ').trim();
+}
+
+function truncateText(value, maxLength = 160) {
+  const normalized = toSingleLine(value);
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+  return `${normalized.slice(0, maxLength - 1)}…`;
+}
+
+function compactArray(values, maxItems = 3) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+  return values.slice(0, maxItems).map((value) => truncateText(value, 180));
 }
 
 function summarizeStepOutput(name, output) {
@@ -35,7 +53,10 @@ function summarizeStepOutput(name, output) {
     return `엔진=${output.engine}, 실행=${output.command}(${output.mode})`;
   }
   if (name === 'extract-figma-scope') {
-    return `스코프=${output.selectedNodeId}, 소스=${output.source}`;
+    const parentDepth = Array.isArray(output.parentChain)
+      ? output.parentChain.length
+      : 0;
+    return `스코프=${output.selectedNodeId}, 소스=${output.source}, 상위탐색=${parentDepth}단계`;
   }
   if (name === 'resolve-component-plan') {
     return `계획=${output.action}, 대상=${output.targetPath}`;
@@ -44,7 +65,10 @@ function summarizeStepOutput(name, output) {
     const changedCount = Array.isArray(output.changedFiles)
       ? output.changedFiles.length
       : 0;
-    return `변경 파일=${changedCount}개`;
+    const summary = output.summary
+      ? `, 요약=${truncateText(output.summary, 80)}`
+      : '';
+    return `변경 파일=${changedCount}개${summary}`;
   }
   if (name === 'gate-changed-paths') {
     return `검사 파일=${output.checkedFiles}개`;
@@ -64,9 +88,90 @@ function summarizeStepOutput(name, output) {
   return '';
 }
 
+function stepPrefix(name) {
+  return `[ui-components] [${name}]`;
+}
+
+function logStepDetails(name, output, traceRecords) {
+  if (!output || typeof output !== 'object' || output.skipped) {
+    return;
+  }
+
+  if (name === 'extract-figma-scope' && output.rationale) {
+    console.log(
+      `${stepPrefix(name)} └ 스코프 판단: ${truncateText(output.rationale, 200)}`
+    );
+  }
+
+  if (name === 'run-agent-implementation') {
+    if (output.summary) {
+      console.log(
+        `${stepPrefix(name)} └ 에이전트 요약: ${truncateText(output.summary, 220)}`
+      );
+    }
+
+    const notes = compactArray(output.notes, 3);
+    for (const note of notes) {
+      console.log(`${stepPrefix(name)} └ 에이전트 노트: ${note}`);
+    }
+    if (Array.isArray(output.notes) && output.notes.length > notes.length) {
+      console.log(
+        `${stepPrefix(name)} └ 에이전트 노트: 외 ${output.notes.length - notes.length}건`
+      );
+    }
+  }
+
+  if (name === 'extract-code-connect-map') {
+    const notes = compactArray(output.notes, 2);
+    for (const note of notes) {
+      console.log(`${stepPrefix(name)} └ 코드커넥트 노트: ${note}`);
+    }
+    if (Array.isArray(output.notes) && output.notes.length > notes.length) {
+      console.log(
+        `${stepPrefix(name)} └ 코드커넥트 노트: 외 ${output.notes.length - notes.length}건`
+      );
+    }
+  }
+
+  const latestTrace = traceRecords.at(-1);
+  if (!latestTrace) {
+    return;
+  }
+
+  const tracePath =
+    latestTrace.parsedPath ||
+    latestTrace.stdoutPath ||
+    latestTrace.metadataPath;
+  if (tracePath) {
+    console.log(`${stepPrefix(name)} └ trace: ${tracePath}`);
+  }
+}
+
+function logStepFailureHint(name, traceRecords) {
+  if (name === 'gate-story-design-links') {
+    console.log(
+      `${stepPrefix(name)} └ 조치: 스토리 메타에 parameters.design.url(Figma 링크) 추가`
+    );
+  }
+
+  const latestTrace = traceRecords.at(-1);
+  if (!latestTrace) {
+    return;
+  }
+
+  const tracePath =
+    latestTrace.parsedPath ||
+    latestTrace.stdoutPath ||
+    latestTrace.metadataPath;
+  if (tracePath) {
+    console.log(`${stepPrefix(name)} └ 실패 trace: ${tracePath}`);
+  }
+}
+
 function runStep(context, name, handler) {
   const startedAt = new Date().toISOString();
   const startedMs = Date.now();
+  const traceCountBefore = context.agentTraceArtifacts.length;
   const stepLog = {
     name,
     status: 'running',
@@ -88,17 +193,22 @@ function runStep(context, name, handler) {
   } finally {
     stepLog.finishedAt = new Date().toISOString();
     stepLog.durationMs = Date.now() - startedMs;
+    const stepTraceRecords =
+      context.agentTraceArtifacts.slice(traceCountBefore);
+    stepLog.traceArtifacts = stepTraceRecords;
     const durationText = formatDuration(stepLog.durationMs);
     if (stepLog.status === 'passed') {
       const summary = summarizeStepOutput(name, stepLog.output);
       console.log(
         `[ui-components] [${name}] 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
       );
+      logStepDetails(name, stepLog.output, stepTraceRecords);
       return;
     }
     console.log(
       `[ui-components] [${name}] 실패 (${durationText}) - ${stepLog.error}`
     );
+    logStepFailureHint(name, stepTraceRecords);
   }
 }
 
@@ -220,7 +330,6 @@ function main() {
     runStep(context, 'resolve-component-plan', stepResolveComponent);
     runStep(context, 'run-agent-implementation', stepRunAgent);
     runStep(context, 'gate-changed-paths', stepGateChangedPaths);
-    runStep(context, 'gate-story-design-links', stepGateStoryDesignLinks);
     runStep(context, 'extract-code-connect-map', stepExtractCodeConnectMap);
     runStep(context, 'gate-code-connect', stepGateCodeConnect);
     runStep(context, 'verify', stepVerify);

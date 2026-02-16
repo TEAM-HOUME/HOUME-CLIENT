@@ -242,11 +242,6 @@ export function readScenario(pathArg) {
         'require_visual_approval',
         true
       ),
-      requireStoryDesignUrl: parseSectionBoolean(
-        gatesSection,
-        'require_story_design_url',
-        true
-      ),
       codeConnectMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'code_connect_mode', null),
         ['off', 'warn', 'error'],

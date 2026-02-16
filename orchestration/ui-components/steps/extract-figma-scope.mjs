@@ -89,6 +89,8 @@ export function stepExtractFigmaScope(context) {
     inputNodeId: scope.nodeIdNormalized,
     selectedNodeId: scope.selectedNodeId,
     source: scope.source,
+    rationale: scope.rationale,
+    parentChain: scope.parentChain,
     artifactPath: relative(context.rootPath, designContextArtifactPath),
   };
 }
