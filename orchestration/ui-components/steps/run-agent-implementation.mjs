@@ -53,6 +53,25 @@ function invokeImplementationAgent(context, prompt) {
   );
 }
 
+function summarizeDesignTokens(context) {
+  if (!context.designTokens || !context.designTokens.stats) {
+    return 'unavailable';
+  }
+
+  const { countsByCategory, totalTokens, coreCoverage } =
+    context.designTokens.stats;
+  return [
+    `status=${context.designTokens.status}`,
+    `total=${totalTokens}`,
+    `core=${coreCoverage}/3`,
+    `colors=${countsByCategory.colors}`,
+    `typography=${countsByCategory.typography}`,
+    `spacing=${countsByCategory.spacing}`,
+    `radius=${countsByCategory.radius}`,
+    `size=${countsByCategory.size}`,
+  ].join(', ');
+}
+
 export function stepRunAgent(context) {
   if (context.options.dryRun) {
     return {
@@ -72,6 +91,10 @@ export function stepRunAgent(context) {
     `- Figma URL: ${context.scenario.figma.url}`,
     `- Scope node-id: ${context.figmaScope.selectedNodeId}`,
     `- Design context artifact: ${relative(context.rootPath, context.designContextArtifactPath)}`,
+    context.designTokensArtifactPath
+      ? `- Design tokens artifact: ${relative(context.rootPath, context.designTokensArtifactPath)}`
+      : '- Design tokens artifact: (not available)',
+    `- Design token summary: ${summarizeDesignTokens(context)}`,
     `- Action: ${context.componentPlan.action}`,
     `- Target path: ${context.componentPlan.targetPath}`,
     context.componentPlan.storyPath

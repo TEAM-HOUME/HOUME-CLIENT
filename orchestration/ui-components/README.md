@@ -28,6 +28,10 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `preflight`: CLI/MCP 환경 확인, 미설정 시 즉시 실패.
 - `extract-figma-scope`: 디자인 URL 파싱, 필요 시 상위 노드 자동 스코프 분석.
   결과를 `artifacts/<runId>-design-context.json`으로 고정 저장.
+- `extract-design-tokens`: Figma MCP 원본 응답(raw) + 정규화 토큰을
+  `artifacts/<runId>-design-tokens.json`으로 저장하고 `ok|partial|unavailable|invalid`
+  상태를 계산.
+- `gate-design-tokens`: `gates.design_tokens_mode` 기준으로 token 상태 게이트(`off|warn|error`).
 - `resolve-component-plan`: `component-map` + 프로젝트 파일 상태로 `update/create` 결정.
 - `run-agent-implementation`: Codex/Claude 헤드리스 실행으로 컴포넌트 수정.
 - `extract-code-connect-map`: Figma MCP 기반 Code Connect 매핑 추출 후 artifact 저장.
@@ -50,6 +54,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `agent.args`: `agent.command` 앞단에 붙일 공통 인자 리스트.
 - `figma.timeout_ms`: Figma 컨텍스트 추출 단계 타임아웃.
 - `gates.require_visual_approval`: Storybook 검증 후 수동 승인 강제 여부.
+- `gates.design_tokens_mode`: `off|warn|error` (`warn` 권장).
 - `gates.code_connect_mode`: `off|warn|error` (`warn` 권장).
 - `gates.allowed_changed_paths`: 구현 단계에서 허용하는 변경 파일 경로(glob).
 

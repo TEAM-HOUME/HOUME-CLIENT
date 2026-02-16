@@ -242,6 +242,12 @@ export function readScenario(pathArg) {
         'require_visual_approval',
         true
       ),
+      designTokensMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'design_tokens_mode', null),
+        ['off', 'warn', 'error'],
+        'warn',
+        'gates.design_tokens_mode'
+      ),
       codeConnectMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'code_connect_mode', null),
         ['off', 'warn', 'error'],

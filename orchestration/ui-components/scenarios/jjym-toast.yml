@@ -23,6 +23,7 @@ verification:
 
 gates:
   require_visual_approval: true
+  design_tokens_mode: warn
   code_connect_mode: warn
   allowed_changed_paths:
     - 'src/shared/components/toast/**'

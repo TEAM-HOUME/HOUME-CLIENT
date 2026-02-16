@@ -7,6 +7,8 @@ import { getChangedFiles } from './lib/git-gates.mjs';
 import { createRunId, writeReport } from './lib/report.mjs';
 import { parseArgs, readScenario } from './lib/scenario.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
+import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
+import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
 import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
 import { stepGateCodeConnect } from './steps/gate-code-connect.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
@@ -58,6 +60,12 @@ function summarizeStepOutput(name, output) {
       : 0;
     return `스코프=${output.selectedNodeId}, 소스=${output.source}, 상위탐색=${parentDepth}단계`;
   }
+  if (name === 'extract-design-tokens') {
+    return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3`;
+  }
+  if (name === 'gate-design-tokens') {
+    return `모드=${output.mode}, 상태=${output.status}, 토큰=${output.totalTokens}개`;
+  }
   if (name === 'resolve-component-plan') {
     return `계획=${output.action}, 대상=${output.targetPath}`;
   }
@@ -72,9 +80,6 @@ function summarizeStepOutput(name, output) {
   }
   if (name === 'gate-changed-paths') {
     return `검사 파일=${output.checkedFiles}개`;
-  }
-  if (name === 'gate-story-design-links') {
-    return `스토리 디자인 링크 검사=${output.checkedStories}개`;
   }
   if (name === 'extract-code-connect-map') {
     return `상태=${output.status}, 매핑=${output.mappings}개`;
@@ -101,6 +106,31 @@ function logStepDetails(name, output, traceRecords) {
     console.log(
       `${stepPrefix(name)} └ 스코프 판단: ${truncateText(output.rationale, 200)}`
     );
+  }
+
+  if (name === 'extract-design-tokens') {
+    const warnings = compactArray(output.warnings, 2);
+    for (const warning of warnings) {
+      console.log(`${stepPrefix(name)} └ 토큰 경고: ${warning}`);
+    }
+    if (
+      Array.isArray(output.warnings) &&
+      output.warnings.length > warnings.length
+    ) {
+      console.log(
+        `${stepPrefix(name)} └ 토큰 경고: 외 ${output.warnings.length - warnings.length}건`
+      );
+    }
+
+    const errors = compactArray(output.errors, 2);
+    for (const error of errors) {
+      console.log(`${stepPrefix(name)} └ 토큰 오류: ${error}`);
+    }
+    if (Array.isArray(output.errors) && output.errors.length > errors.length) {
+      console.log(
+        `${stepPrefix(name)} └ 토큰 오류: 외 ${output.errors.length - errors.length}건`
+      );
+    }
   }
 
   if (name === 'run-agent-implementation') {
@@ -148,9 +178,9 @@ function logStepDetails(name, output, traceRecords) {
 }
 
 function logStepFailureHint(name, traceRecords) {
-  if (name === 'gate-story-design-links') {
+  if (name === 'gate-design-tokens') {
     console.log(
-      `${stepPrefix(name)} └ 조치: 스토리 메타에 parameters.design.url(Figma 링크) 추가`
+      `${stepPrefix(name)} └ 조치: design token capture 상태/도구 오류를 artifact에서 확인`
     );
   }
 
@@ -310,6 +340,9 @@ function main() {
     contracts: null,
     figmaScope: null,
     designContextArtifactPath: null,
+    designTokensArtifactPath: null,
+    designTokens: null,
+    designTokensGate: null,
     codeConnectArtifactPath: null,
     codeConnectMap: null,
     codeConnectGate: null,
@@ -327,6 +360,8 @@ function main() {
   try {
     runStep(context, 'preflight', stepPreflight);
     runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
+    runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
+    runStep(context, 'gate-design-tokens', stepGateDesignTokens);
     runStep(context, 'resolve-component-plan', stepResolveComponent);
     runStep(context, 'run-agent-implementation', stepRunAgent);
     runStep(context, 'gate-changed-paths', stepGateChangedPaths);
