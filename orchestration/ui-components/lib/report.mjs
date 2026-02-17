@@ -24,7 +24,6 @@ export function writeReport(context) {
       agentArgs: context.scenario.agent.args,
       figmaUrl: context.scenario.figma.url,
       targets: context.scenario.targets,
-      context: context.scenario.context,
       behavior: context.scenario.behavior,
       verification: context.scenario.verification,
       gates: context.scenario.gates,
