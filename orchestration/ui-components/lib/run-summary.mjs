@@ -118,7 +118,11 @@ export function summarizeStepOutput(name, output) {
   }
 
   if (name === 'preflight') {
-    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})`;
+    const mcpSummary =
+      output.mcpEndpoint && output.mcpTools
+        ? `, MCP=${output.mcpEndpoint}, 도구=${output.mcpTools}`
+        : '';
+    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})${mcpSummary}`;
   }
   if (name === 'extract-figma-scope') {
     const parentDepth = Array.isArray(output.parentChain)
