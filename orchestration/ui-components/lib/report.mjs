@@ -221,6 +221,7 @@ export function writeReport(context) {
     newChangedFiles: context.newChangedFiles || [],
     verificationResults: context.verificationResults || [],
     feedbackLoop: context.feedbackLoop || null,
+    feedbackHistory: context.feedbackHistory || [],
     warnings: context.warnings,
     error: context.error || null,
   };

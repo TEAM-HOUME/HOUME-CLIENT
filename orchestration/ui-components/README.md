@@ -260,4 +260,5 @@ figma:
 - Run report includes `figmaMcpToolUsage` and `agentTokenUsage` summaries.
 - `reports/index.jsonl` is auto-generated every run for quick team summary.
 - Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
+- Run report JSON includes `feedbackHistory` (retry question prompts + raw user answers).
 - Use `--open-storybook` to open `storybook-static/index.html` after a successful run.
