@@ -1,4 +1,9 @@
-import { existsSync, mkdirSync } from 'node:fs';
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+} from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
@@ -174,6 +179,40 @@ function isInteractiveTerminal() {
   return Boolean(process.stdin.isTTY && process.stdout.isTTY);
 }
 
+function createPromptInterface(stage) {
+  if (isInteractiveTerminal()) {
+    return {
+      rl: createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      }),
+      dispose() {},
+      source: 'stdio',
+    };
+  }
+
+  try {
+    const ttyInput = createReadStream('/dev/tty');
+    const ttyOutput = createWriteStream('/dev/tty');
+    return {
+      rl: createInterface({
+        input: ttyInput,
+        output: ttyOutput,
+      }),
+      dispose() {
+        ttyInput.destroy();
+        ttyOutput.end();
+      },
+      source: '/dev/tty',
+    };
+  } catch {
+    console.log(
+      `[ui-components] [${stage}] 입력 채널을 열 수 없어 종료합니다 (non-TTY & /dev/tty unavailable)`
+    );
+    return null;
+  }
+}
+
 function normalizeRetryAnswer(value) {
   const normalized = String(value ?? '')
     .trim()
@@ -188,22 +227,22 @@ async function promptRetryDecision(stage, attempt, maxAttempts, errorMessage) {
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts}) - ${truncateText(errorMessage, 220)}`
   );
 
-  if (!isInteractiveTerminal()) {
-    console.log(
-      `[ui-components] [${stage}] non-TTY 환경이라 입력 없이 종료합니다`
-    );
+  const promptInterface = createPromptInterface(stage);
+  if (!promptInterface) {
     return {
       retry: false,
       note: '',
     };
   }
 
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+  const { rl, dispose, source } = promptInterface;
 
   try {
+    if (source === '/dev/tty') {
+      console.log(
+        `[ui-components] [${stage}] non-TTY 환경 감지: /dev/tty로 입력을 받습니다`
+      );
+    }
     const retryAnswer = await rl.question(
       `[ui-components] [${stage}] 재시도하시겠습니까? (Y/n, 남은 ${remaining}회): `
     );
@@ -226,6 +265,7 @@ async function promptRetryDecision(stage, attempt, maxAttempts, errorMessage) {
     };
   } finally {
     rl.close();
+    dispose();
   }
 }
 
