@@ -219,7 +219,7 @@ figma:
   url: 'https://www.figma.com/design/.../TEMP?node-id=1-427&m=dev'
 ```
 
-## Scenario Keys (Optional)
+## Scenario Keys
 
 - `brief`: required natural-language context for intent extraction
 - `intent.page|component_kind|role|state|notes`: optional hints for stable intent resolution
@@ -240,6 +240,7 @@ figma:
 ## Notes
 
 - Prompt files in `prompts/` are explicitly injected by `ui:run`.
+- Agent runtime is fixed to Codex (`codexf` preferred, fallback to `codex`).
 - Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
 - Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
 - Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.

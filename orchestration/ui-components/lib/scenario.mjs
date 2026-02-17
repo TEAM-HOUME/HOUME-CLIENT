@@ -208,7 +208,6 @@ export function readScenario(pathArg) {
   }
 
   const content = readFileSync(scenarioPath, 'utf8');
-  const idMatch = content.match(/^id:\s*([^\n#]+)\s*$/m);
   const brief = parseTopLevelScalar(content, 'brief');
   const intentSection = parseSection(content, 'intent');
   const behaviorSection = parseSection(content, 'behavior');
@@ -222,9 +221,7 @@ export function readScenario(pathArg) {
   if (!brief) {
     fail('Scenario must include top-level `brief`.');
   }
-  const scenarioId = idMatch
-    ? stripQuotes(idMatch[1])
-    : createScenarioId(figmaUrl, brief);
+  const scenarioId = createScenarioId(figmaUrl, brief);
   const intentMinConfidence = clamp(
     parseSectionNumber(gatesSection, 'intent_min_confidence', 0.75),
     0,
@@ -235,10 +232,6 @@ export function readScenario(pathArg) {
     path: scenarioPath,
     id: scenarioId,
     engine: 'codex',
-    agent: {
-      command: null,
-      args: [],
-    },
     intent: {
       brief: stripQuotes(brief),
       pageHint: parseSectionScalar(intentSection, 'page', ''),
@@ -298,7 +291,6 @@ export function readScenario(pathArg) {
         'allowed_changed_paths'
       ),
     },
-    targets: [],
     verification: ['storybook'],
   };
 }

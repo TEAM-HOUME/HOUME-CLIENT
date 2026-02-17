@@ -73,17 +73,17 @@ function runShellCommand(commandLine, options = {}) {
 export function resolveAgentRuntime(scenario) {
   const fallbackCommand = AGENT_COMMAND_MAP[scenario.engine];
   if (!fallbackCommand) {
-    fail(`Unsupported agent.engine: ${scenario.engine}`);
+    fail(
+      `Unsupported agent engine: ${scenario.engine}. Only 'codex' is supported.`
+    );
   }
 
   const fallbackCommands =
     scenario.engine === 'codex'
       ? ['codexf', fallbackCommand]
       : [fallbackCommand];
-  const commandCandidates = scenario.agent.command
-    ? [scenario.agent.command]
-    : fallbackCommands;
-  const args = scenario.agent.args || [];
+  const commandCandidates = fallbackCommands;
+  const args = [];
 
   for (const command of commandCandidates) {
     if (hasCommand(command)) {

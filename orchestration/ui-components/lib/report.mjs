@@ -20,8 +20,6 @@ export function writeReport(context) {
       id: context.scenario.id,
       path: relative(context.rootPath, context.scenario.path),
       engine: context.scenario.engine,
-      agentCommand: context.scenario.agent.command,
-      agentArgs: context.scenario.agent.args,
       figmaUrl: context.scenario.figma.url,
       brief: context.scenario.intent?.brief || '',
       intentHints: {

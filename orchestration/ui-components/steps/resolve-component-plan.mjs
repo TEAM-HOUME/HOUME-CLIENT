@@ -177,6 +177,13 @@ function enforceBehaviorGate(context, componentPlan) {
 }
 
 export function stepResolveComponent(context) {
+  if (context.options.dryRun) {
+    return {
+      skipped: true,
+      reason: '--dry-run option',
+    };
+  }
+
   const contracts = readContracts(context.rootPath);
   context.contracts = contracts;
   const planFromAgent = invokeResolveAgent(context, contracts);
