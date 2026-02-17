@@ -270,7 +270,6 @@ figma:
 - Prompt files in `prompts/` are explicitly injected by `ui:run`.
 - Agent runtime is fixed to Codex (`codexf` preferred, fallback to `codex`).
 - Codex invocation pins model/runtime overrides: `-m gpt-5.3-codex` and `-c model_reasoning_effort="medium"`.
-- `ui:run` enters through `cli.mjs`, which prefers a PTY wrapper (`script`) on macOS/Linux to reduce shell job-control suspends during interactive retry prompts.
 - Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
 - Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
 - Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.

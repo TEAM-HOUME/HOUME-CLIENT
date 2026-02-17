@@ -44,11 +44,28 @@ async function askLine(rl, question) {
   return rl.question('');
 }
 
-function normalizeRetryAnswer(value) {
-  const normalized = String(value ?? '')
-    .trim()
-    .toLowerCase();
-  return !(normalized === 'n' || normalized === 'no');
+function parseRetryInput(rawAnswer) {
+  const raw = String(rawAnswer ?? '').trim();
+  if (!raw) {
+    return { retry: true, note: '', raw };
+  }
+
+  const lower = raw.toLowerCase();
+  if (lower === 'n' || lower === 'no') {
+    return { retry: false, note: '', raw };
+  }
+
+  const colonIndex = raw.indexOf(':');
+  if (colonIndex >= 0) {
+    const head = raw.slice(0, colonIndex).trim().toLowerCase();
+    const note = raw.slice(colonIndex + 1).trim();
+    if (head === 'n' || head === 'no') {
+      return { retry: false, note: '', raw };
+    }
+    return { retry: true, note, raw };
+  }
+
+  return { retry: true, note: '', raw };
 }
 
 function recordFeedbackHistory(context, entry) {
@@ -67,8 +84,7 @@ export async function promptRetryDecision(
 ) {
   const stageLabel = STAGE_LABELS[stage] || stage;
   const remaining = Math.max(0, maxAttempts - attempt);
-  const retryQuestion = `[ui-components] [${stage}] 재시도하시겠습니까? (Y/n, 남은 ${remaining}회): `;
-  const noteQuestion = `[ui-components] [${stage}] 보강 지시를 입력하세요 (없으면 Enter): `;
+  const retryQuestion = `[ui-components] [${stage}] 재시도 입력 (남은 ${remaining}회): [Enter|y]=재시도, n=중단, y: <보강지시>=재시도+지시 `;
   console.log(
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts}) - ${truncateText(errorMessage, 220)}`
   );
@@ -100,7 +116,8 @@ export async function promptRetryDecision(
 
   try {
     const retryAnswer = await askLine(rl, retryQuestion);
-    const retry = normalizeRetryAnswer(retryAnswer);
+    const parsedDecision = parseRetryInput(retryAnswer);
+    const retry = parsedDecision.retry;
     if (!retry) {
       recordFeedbackHistory(context, {
         stage,
@@ -110,7 +127,7 @@ export async function promptRetryDecision(
         errorMessage,
         questions: [retryQuestion],
         answers: {
-          retryAnswerRaw: retryAnswer,
+          retryAnswerRaw: parsedDecision.raw,
           note: null,
         },
         retry: false,
@@ -122,16 +139,16 @@ export async function promptRetryDecision(
       };
     }
 
-    const note = (await askLine(rl, noteQuestion)).trim();
+    const note = parsedDecision.note;
     recordFeedbackHistory(context, {
       stage,
       attempt,
       maxAttempts,
       timestamp: new Date().toISOString(),
       errorMessage,
-      questions: [retryQuestion, noteQuestion],
+      questions: [retryQuestion],
       answers: {
-        retryAnswerRaw: retryAnswer,
+        retryAnswerRaw: parsedDecision.raw,
         note,
       },
       retry: true,

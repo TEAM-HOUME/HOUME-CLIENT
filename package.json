@@ -17,7 +17,7 @@
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --stats-json",
-    "ui:run": "node orchestration/ui-components/cli.mjs"
+    "ui:run": "node orchestration/ui-components/run.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
