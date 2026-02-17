@@ -76,26 +76,34 @@ export function resolveAgentRuntime(scenario) {
     fail(`Unsupported agent.engine: ${scenario.engine}`);
   }
 
-  const command = scenario.agent.command || fallbackCommand;
+  const fallbackCommands =
+    scenario.engine === 'codex'
+      ? ['codexf', fallbackCommand]
+      : [fallbackCommand];
+  const commandCandidates = scenario.agent.command
+    ? [scenario.agent.command]
+    : fallbackCommands;
   const args = scenario.agent.args || [];
 
-  if (hasCommand(command)) {
-    return {
-      command,
-      args,
-      mode: 'binary',
-    };
+  for (const command of commandCandidates) {
+    if (hasCommand(command)) {
+      return {
+        command,
+        args,
+        mode: 'binary',
+      };
+    }
+
+    if (hasAlias(command)) {
+      return {
+        command,
+        args,
+        mode: 'alias',
+      };
+    }
   }
 
-  if (hasAlias(command)) {
-    return {
-      command,
-      args,
-      mode: 'alias',
-    };
-  }
-
-  fail(`Missing required command or alias: ${command}`);
+  fail(`Missing required command or alias: ${commandCandidates.join(', ')}`);
 }
 
 function buildAgentCommandLine(agentRuntime, commandArgs) {
