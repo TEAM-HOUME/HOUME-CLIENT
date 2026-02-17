@@ -18,19 +18,30 @@ const STAGE_LABELS = Object.freeze({
 });
 
 function isInteractiveTerminal() {
-  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+  return Boolean(process.stdin.isTTY);
 }
 
 function createPromptInterface(stage) {
   if (isInteractiveTerminal()) {
+    const output = process.stdout.isTTY ? process.stdout : process.stderr;
     return {
       rl: createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output,
+        terminal: Boolean(output.isTTY),
       }),
       dispose() {},
-      source: 'stdio',
+      source: output === process.stdout ? 'stdin/stdout' : 'stdin/stderr',
     };
+  }
+
+  const enableTtyFallback =
+    process.env.UI_COMPONENTS_PROMPT_TTY_FALLBACK === '1';
+  if (!enableTtyFallback) {
+    console.log(
+      `[ui-components] [${stage}] 입력 채널이 비대화형입니다. stdin TTY에서 실행하거나 UI_COMPONENTS_PROMPT_TTY_FALLBACK=1을 사용하세요`
+    );
+    return null;
   }
 
   try {
@@ -49,7 +60,7 @@ function createPromptInterface(stage) {
     };
   } catch {
     console.log(
-      `[ui-components] [${stage}] 입력 채널을 열 수 없어 종료합니다 (non-TTY & /dev/tty unavailable)`
+      `[ui-components] [${stage}] 입력 채널을 열 수 없어 종료합니다 (/dev/tty unavailable)`
     );
     return null;
   }

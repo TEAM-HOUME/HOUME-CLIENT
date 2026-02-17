@@ -2,6 +2,27 @@
 
 Single-command pipeline for turning a Figma node into a validated UI component change.
 
+## Why This Exists
+
+- Personal prompt/alias differences made UI implementation outcomes drift across team members.
+- Figma node links alone are often ambiguous, so intent/scope decisions needed explicit contracts.
+- UI component work needs guardrails before merge (`changed paths`, `verify`, `behavior gate`) instead of implicit trust in one-shot generation.
+- Team-level reproducibility required a run artifact trail (`agent-trace`, direct MCP logs, report index) and stable pass/fail criteria.
+
+## Why Gate Orchestration (Not Just Skills or Custom Commands)
+
+- Skills and custom shell commands are useful helpers, but they do not enforce stage-by-stage contracts or deterministic gates.
+- This orchestration fixes the execution contract in code: scenario schema, JSON-schema agent outputs, local gate checks, retry policy, and retention policy.
+- The same `pnpm ui:run ...` command works for everyone, independent of personal shell aliases; runtime uses `codexf` when available and falls back to `codex`.
+- Ambiguous interaction behavior is intentionally stopped by gate policy, so humans approve only the risky decision points.
+
+## Harness Implementation Model
+
+- Control plane: `run.mjs` defines stage order, fail/warn policy, feedback loops, and report lifecycle.
+- Agent plane: Codex handles intent extraction, scope extraction, planning, and implementation with explicit prompt injection.
+- Tool plane: direct Figma MCP tool calls are logged separately from agent outputs for traceability.
+- Governance plane: gates convert raw outputs into deterministic outcomes (`pass/warn/fail`) with retry and archive behavior.
+
 ## Goal
 
 - Keep design-to-code flow reproducible.
@@ -38,7 +59,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `run-agent-implementation`: implement code changes with injected context docs.
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
-- `feedback-loop`: on `plan/implement/verify` failure, ask terminal input and retry (max 3 attempts per stage).
+- `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 3 attempts per stage).
 - `report`: write run summary JSON.
 
 Default fixed policy:
@@ -77,11 +98,12 @@ flowchart TD
   B --> C[Init context + runId]
   C --> D{{preflight}}
 
+  D -- fail --> Z1[write report + fail exit]
   D -- pass --> DI[extract-intent]
   DI --> DG{{gate-intent}}
+  DG -- fail --> DR[feedback: intent retry]
+  DR --> DI
   DG -- pass/warn --> E[extract-figma-scope]
-  DG -- fail --> Z1
-  D -- fail --> Z1[write report + fail exit]
 
   E --> F{{gate-figma-scope}}
   F -- pass/warn --> G0[extract-figma-mcp-tool-logs]
@@ -91,27 +113,29 @@ flowchart TD
   F -- fail --> Z1
 
   G --> H{{gate-design-tokens}}
-  H -- pass/warn --> I[resolve-component-plan]
   H -- fail --> Z1
+  H -- pass/warn --> I[resolve-component-plan]
 
-  I --> J{{behavior decision gate<br/>inside resolve-component-plan}}
-  J -- confirmed/not-needed --> K[run-agent-implementation]
-  J -- missing behavior spec --> Z1
+  I -- fail --> IR[feedback: plan retry]
+  IR --> I
+  I -- pass --> K[run-agent-implementation]
 
   K --> L{{gate-changed-paths}}
+  L -- fail --> KR[feedback: implement/path retry]
+  KR --> K
   L -- pass --> O[verify]
-  L -- fail --> Z1
 
+  O -- fail --> VR[feedback: verify retry]
+  VR --> K
   O -- pass --> P[optional open-storybook]
-  O -- fail --> Z1
   P --> Q[write report + success exit]
 
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,DG,F,H,J,L,O gate;
+  class D,DG,F,H,L,O gate;
   class DI,E,K agent;
-  class A,B,C,P,Q,Z1,I local;
+  class A,B,C,P,Q,Z1,I,DR,IR,KR,VR local;
 ```
 
 ### Agent vs Tool Sequence
@@ -183,7 +207,11 @@ stateDiagram-v2
   [*] --> Initialized
   Initialized --> RunningSteps: runStep(step)
 
-  RunningSteps --> Failed: non-retryable step throws
+  RunningSteps --> Failed: preflight/scope/token/non-retryable fail
+  RunningSteps --> IntentRetry: extract-intent or gate-intent fail
+  IntentRetry --> RunningSteps: user confirms retry (<=3)
+  IntentRetry --> Failed: retry declined/exhausted
+
   RunningSteps --> PlanRetry: resolve-component-plan fail
   PlanRetry --> RunningSteps: user confirms retry (<=3)
   PlanRetry --> Failed: retry declined/exhausted
@@ -242,7 +270,20 @@ figma:
 - `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
 - `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
+- `figma.auto_parent`: if `true`, scope extraction agent can walk parent chain (`default: true`)
+- `figma.parent_hops_max`: maximum parent hops during auto scope selection (`default: 3`)
+- `figma.scope_node_id`: explicit scope override to skip agent scope walk
 - `gates.allowed_changed_paths`: explicit allowed change paths
+
+## Scope Gate Behavior
+
+- Gate verdict enum is fixed: `sufficient|too_broad|too_narrow|unknown`.
+- `sufficient` always passes.
+- `too_broad` with `cannotNarrowFurther=true` passes with warning (to avoid false-fail at parent-hop limit).
+- `too_broad|too_narrow|unknown` follow `gates.scope_gate_mode`:
+  - `error`: fail the run.
+  - `warn`: continue with warning.
+- If scope selection is unstable, prefer setting `figma.scope_node_id` explicitly.
 
 ## Behavior Decision Gate
 
