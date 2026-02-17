@@ -14,6 +14,8 @@ const TOKEN_KEYS = [
   'extras',
 ];
 const VALID_STATUS = new Set(['ok', 'partial', 'unavailable', 'invalid']);
+const UNAVAILABLE_ERROR_PATTERN =
+  /\b(401|403|unauthorized|forbidden|timeout|timed out|connection refused|econn|enotfound|not configured|service unavailable)\b/;
 
 function normalizeStatus(value) {
   const normalized = String(value ?? '')
@@ -83,10 +85,11 @@ function hasUnavailableSignal(toolRecord) {
   if (toolRecord.status === 'unavailable') {
     return true;
   }
-  const signalText = `${toolRecord.error}\n${toolRecord.output}`.toLowerCase();
-  return /(rate limit|timed out|timeout|connection|unavailable|not configured|mcp|try again)/.test(
-    signalText
-  );
+  const errorText = toolRecord.error.toLowerCase();
+  if (!errorText) {
+    return false;
+  }
+  return UNAVAILABLE_ERROR_PATTERN.test(errorText);
 }
 
 function calculateTokenStats(tokens) {
