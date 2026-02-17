@@ -35,23 +35,34 @@ export function runStep(context, name, handler) {
   const startedAt = new Date().toISOString();
   const startedMs = Date.now();
   const traceCountBefore = context.agentTraceArtifacts.length;
-  const stepIndex = context.steps.length + 1;
+  const stepSequence = context.steps.length + 1;
   const plannedStepCount = Number(context.plannedStepCount || 0);
+  const displayStepIndex = Number(context.stepDisplayOrder?.[name] || 0);
+  const stepIndex = displayStepIndex > 0 ? displayStepIndex : stepSequence;
+  const nextAttempt = (context.stepAttemptCounts?.[name] || 0) + 1;
+  if (context.stepAttemptCounts) {
+    context.stepAttemptCounts[name] = nextAttempt;
+  }
   const stepCounterText =
     plannedStepCount > 0
       ? ` (${stepIndex}/${plannedStepCount})`
       : ` (${stepIndex})`;
-  const stepLabelForHeartbeat = `${name}${stepCounterText}`;
+  const stepAttemptText = nextAttempt > 1 ? ` [시도 ${nextAttempt}]` : '';
+  const stepLabelForHeartbeat = `${name}${stepCounterText}${stepAttemptText}`;
   const stepLog = {
     name,
+    stepSequence,
     stepIndex,
+    stepAttempt: nextAttempt,
     plannedStepCount: plannedStepCount > 0 ? plannedStepCount : null,
     status: 'running',
     startedAt,
   };
   context.steps.push(stepLog);
   console.log('');
-  console.log(`[ui-components] [${name}]${stepCounterText} 시작`);
+  console.log(
+    `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 시작`
+  );
   const heartbeatProcess =
     !context.options?.dryRun && HEARTBEAT_STEPS.has(name)
       ? startStepHeartbeat(stepLabelForHeartbeat)
@@ -78,14 +89,14 @@ export function runStep(context, name, handler) {
     if (stepLog.status === 'passed') {
       const summary = summarizeStepOutput(name, stepLog.output);
       console.log(
-        `[ui-components] [${name}]${stepCounterText} 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
+        `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
       );
       logStepDetails(name, stepLog.output, stepTraceRecords);
       console.log('');
       return;
     }
     console.log(
-      `[ui-components] [${name}]${stepCounterText} 실패 (${durationText}) - ${stepLog.error}`
+      `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 실패 (${durationText}) - ${stepLog.error}`
     );
     logStepFailureHint(name, stepTraceRecords);
     console.log('');

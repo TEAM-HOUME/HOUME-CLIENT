@@ -33,6 +33,21 @@ import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
 const PLANNED_STEP_COUNT = 13;
+const STEP_DISPLAY_ORDER = Object.freeze({
+  preflight: 1,
+  'extract-intent': 2,
+  'gate-intent': 3,
+  'extract-figma-scope': 4,
+  'gate-figma-scope': 5,
+  'extract-figma-mcp-tool-logs': 6,
+  'gate-figma-mcp-tool-logs': 7,
+  'extract-design-tokens': 8,
+  'gate-design-tokens': 9,
+  'resolve-component-plan': 10,
+  'run-agent-implementation': 11,
+  'gate-changed-paths': 12,
+  verify: 13,
+});
 
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
   return {
@@ -40,6 +55,8 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     rootPath,
     artifactsDir,
     plannedStepCount: PLANNED_STEP_COUNT,
+    stepDisplayOrder: STEP_DISPLAY_ORDER,
+    stepAttemptCounts: {},
     options: args,
     scenario,
     steps: [],
