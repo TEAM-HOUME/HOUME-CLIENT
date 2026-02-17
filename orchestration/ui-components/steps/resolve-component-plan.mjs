@@ -19,6 +19,14 @@ const INTERACTION_KEYWORDS = [
   'accordion',
 ];
 
+const INTERACTION_COMPONENT_KINDS = new Set([
+  'modal',
+  'bottom_sheet',
+  'dialog',
+  'sheet',
+  'drawer',
+]);
+
 function normalizePath(value) {
   return String(value ?? '')
     .trim()
@@ -26,9 +34,22 @@ function normalizePath(value) {
     .replace(/^\.\//, '');
 }
 
-function isLikelyInteractiveComponent(scenarioId, targetPath) {
+function isLikelyInteractiveComponentByPath(scenarioId, targetPath) {
   const text = `${scenarioId} ${targetPath}`.toLowerCase();
   return INTERACTION_KEYWORDS.some((keyword) => text.includes(keyword));
+}
+
+function requiresBehaviorConfirmation(context, targetPath, targetExists) {
+  if (targetExists) {
+    return false;
+  }
+
+  const intentKind = context.resolvedIntent?.componentKind || 'unknown';
+  if (INTERACTION_COMPONENT_KINDS.has(intentKind)) {
+    return true;
+  }
+
+  return isLikelyInteractiveComponentByPath(context.scenario.id, targetPath);
 }
 
 function createPlan({
@@ -69,8 +90,17 @@ function buildResolvePrompt(context, contracts) {
   return [
     'You are planning a UI component implementation in read-only mode.',
     `Scenario id: ${context.scenario.id}`,
+    `Brief: ${context.scenario.intent.brief}`,
     `Figma URL: ${context.scenario.figma.url}`,
     `Scope node-id: ${context.figmaScope.selectedNodeId}`,
+    `Intent page: ${context.resolvedIntent?.page || '(unknown)'}`,
+    `Intent component kind: ${context.resolvedIntent?.componentKind || '(unknown)'}`,
+    `Intent role: ${context.resolvedIntent?.role || '(unknown)'}`,
+    `Intent state: ${context.resolvedIntent?.state || '(unknown)'}`,
+    `Intent confidence: ${Number(context.resolvedIntent?.confidence || 0).toFixed(2)}`,
+    context.resolvedIntent?.summary
+      ? `Intent summary: ${context.resolvedIntent.summary}`
+      : 'Intent summary: (none)',
     `Design context artifact: ${designContextPath}`,
     `Design token artifact: ${designTokenPath}`,
     `UI rule docs: ${uiRuleSources}`,
@@ -164,9 +194,11 @@ export function stepResolveComponent(context) {
       targetExists,
       storyPath: null,
       rationale: 'single explicit target from scenario',
-      requiresBehaviorConfirmation:
-        !targetExists &&
-        isLikelyInteractiveComponent(context.scenario.id, onlyTarget),
+      requiresBehaviorConfirmation: requiresBehaviorConfirmation(
+        context,
+        onlyTarget,
+        targetExists
+      ),
       behaviorQuestions: [],
     });
   } else if (context.scenario.targets.length > 1) {
@@ -191,9 +223,11 @@ export function stepResolveComponent(context) {
         targetExists,
         storyPath: null,
         rationale: 'path inferred from scenario id tokens',
-        requiresBehaviorConfirmation:
-          !targetExists &&
-          isLikelyInteractiveComponent(context.scenario.id, inferredTarget),
+        requiresBehaviorConfirmation: requiresBehaviorConfirmation(
+          context,
+          inferredTarget,
+          targetExists
+        ),
         behaviorQuestions: [],
       });
     }
@@ -217,11 +251,11 @@ export function stepResolveComponent(context) {
       rationale: String(planFromAgent.rationale || ''),
       requiresBehaviorConfirmation:
         Boolean(planFromAgent.requiresBehaviorConfirmation) ||
-        (!targetExists &&
-          isLikelyInteractiveComponent(
-            context.scenario.id,
-            normalizedTargetPath
-          )),
+        requiresBehaviorConfirmation(
+          context,
+          normalizedTargetPath,
+          targetExists
+        ),
       behaviorQuestions: planFromAgent.behaviorQuestions,
     });
   }

@@ -1,5 +1,30 @@
 import { fail } from '../lib/errors.mjs';
 
+const SCOPE_VERDICT_ENUM = new Set([
+  'sufficient',
+  'too_broad',
+  'too_narrow',
+  'unknown',
+]);
+
+function normalizeScopeVerdict(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
+  if (SCOPE_VERDICT_ENUM.has(normalized)) {
+    return normalized;
+  }
+  return 'unknown';
+}
+
+function failOrWarn(context, mode, message) {
+  if (mode === 'error') {
+    fail(message);
+  }
+  context.warnings.push(message);
+}
+
 export function stepGateFigmaScope(context) {
   if (context.options.dryRun) {
     return {
@@ -13,41 +38,83 @@ export function stepGateFigmaScope(context) {
     fail('Figma scope is missing in context.');
   }
 
-  if (scope.isNarrow === null || scope.isNarrow === undefined) {
-    context.figmaScopeGate = {
-      skipped: true,
-      reason: 'scope narrowness signal is unavailable',
-    };
-    return context.figmaScopeGate;
-  }
+  const parentDepth = Array.isArray(scope.parentChain)
+    ? scope.parentChain.length
+    : 0;
+  const scopeVerdict = normalizeScopeVerdict(scope.scopeVerdict);
+  const mode = context.scenario.gates.scopeGateMode;
+  const cannotNarrowFurther = Boolean(scope.cannotNarrowFurther);
 
-  if (scope.isNarrow === true) {
+  if (scopeVerdict === 'sufficient') {
     context.figmaScopeGate = {
+      mode,
       status: 'ok',
-      isNarrow: true,
-      parentDepth: scope.parentChain.length,
+      scopeVerdict,
+      cannotNarrowFurther,
+      parentDepth,
       parentHopsMax: context.scenario.figma.parentHopsMax,
     };
     return context.figmaScopeGate;
   }
 
-  const parentDepth = Array.isArray(scope.parentChain)
-    ? scope.parentChain.length
-    : 0;
-  const reachedLimit = parentDepth >= context.scenario.figma.parentHopsMax;
-  if (reachedLimit) {
-    fail(
-      `Selected scope is still broad after ${parentDepth} parent hops. Narrow the node or provide figma.scope_node_id explicitly.`
+  if (scopeVerdict === 'too_broad') {
+    if (cannotNarrowFurther) {
+      const message = `Selected scope remains broad at parent-hop limit (${parentDepth}/${context.scenario.figma.parentHopsMax}). Proceeding with warning because cannotNarrowFurther=true.`;
+      context.warnings.push(message);
+      context.figmaScopeGate = {
+        mode,
+        status: 'broad-at-limit-warning',
+        scopeVerdict,
+        cannotNarrowFurther,
+        parentDepth,
+        parentHopsMax: context.scenario.figma.parentHopsMax,
+      };
+      return context.figmaScopeGate;
+    }
+
+    failOrWarn(
+      context,
+      mode,
+      `Selected scope is too broad (node ${scope.selectedNodeId}). Narrow the node or provide figma.scope_node_id explicitly.`
     );
+    context.figmaScopeGate = {
+      mode,
+      status: mode === 'error' ? 'blocked' : 'broad-warning',
+      scopeVerdict,
+      cannotNarrowFurther,
+      parentDepth,
+      parentHopsMax: context.scenario.figma.parentHopsMax,
+    };
+    return context.figmaScopeGate;
   }
 
-  context.warnings.push(
-    `Selected scope may be broad (node ${scope.selectedNodeId}). Review artifacts before implementation.`
-  );
+  if (scopeVerdict === 'too_narrow') {
+    failOrWarn(
+      context,
+      mode,
+      `Selected scope is too narrow (node ${scope.selectedNodeId}). Expand to a parent node or set figma.scope_node_id explicitly.`
+    );
+    context.figmaScopeGate = {
+      mode,
+      status: mode === 'error' ? 'blocked' : 'narrow-warning',
+      scopeVerdict,
+      cannotNarrowFurther,
+      parentDepth,
+      parentHopsMax: context.scenario.figma.parentHopsMax,
+    };
+    return context.figmaScopeGate;
+  }
 
+  failOrWarn(
+    context,
+    mode,
+    `Scope verdict is unknown for node ${scope.selectedNodeId}. Review scope rationale and scenario intent.`
+  );
   context.figmaScopeGate = {
-    status: 'broad-warning',
-    isNarrow: false,
+    mode,
+    status: mode === 'error' ? 'blocked' : 'unknown-warning',
+    scopeVerdict,
+    cannotNarrowFurther,
     parentDepth,
     parentHopsMax: context.scenario.figma.parentHopsMax,
   };

@@ -6,6 +6,8 @@ import { runCommand } from './lib/agent.mjs';
 import { getChangedFiles } from './lib/git-gates.mjs';
 import { createRunId, writeReport } from './lib/report.mjs';
 import { parseArgs, readScenario } from './lib/scenario.mjs';
+import { stepExtractIntent } from './steps/extract-intent.mjs';
+import { stepGateIntent } from './steps/gate-intent.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
 import { stepGateFigmaScope } from './steps/gate-figma-scope.mjs';
 import { stepExtractFigmaMcpToolLogs } from './steps/extract-figma-mcp-tool-logs.mjs';
@@ -175,10 +177,19 @@ function summarizeStepOutput(name, output) {
     const parentDepth = Array.isArray(output.parentChain)
       ? output.parentChain.length
       : 0;
-    return `스코프=${output.selectedNodeId}, 소스=${output.source}, 상위탐색=${parentDepth}단계`;
+    return `스코프=${output.selectedNodeId}, 소스=${output.source}, 판정=${output.scopeVerdict}, 상위탐색=${parentDepth}단계`;
+  }
+  if (name === 'extract-intent') {
+    const ambiguityCount = Array.isArray(output.ambiguities)
+      ? output.ambiguities.length
+      : 0;
+    return `유형=${output.componentKind}, 역할=${output.role}, 상태=${output.state || '(none)'}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 모호점=${ambiguityCount}개`;
+  }
+  if (name === 'gate-intent') {
+    return `모드=${output.mode}, 상태=${output.status}, 신뢰도=${Number(output.confidence || 0).toFixed(2)} (기준 ${Number(output.minConfidence || 0).toFixed(2)})`;
   }
   if (name === 'gate-figma-scope') {
-    return `상태=${output.status}, 협소=${output.isNarrow ? '예' : '아니오'}, 상위탐색=${output.parentDepth}단계`;
+    return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계`;
   }
   if (name === 'extract-figma-mcp-tool-logs') {
     return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개, auth-env=${output.authTokenEnv || '(none)'}`;
@@ -226,6 +237,24 @@ function logStepDetails(name, output, traceRecords) {
     console.log(
       `${stepPrefix(name)} └ 스코프 판단: ${truncateText(output.rationale, 200)}`
     );
+  }
+
+  if (name === 'extract-intent') {
+    if (output.behaviorNeeded) {
+      console.log(`${stepPrefix(name)} └ 동작정의 필요: 예`);
+    }
+    const ambiguities = compactArray(output.ambiguities, 2);
+    for (const ambiguity of ambiguities) {
+      console.log(`${stepPrefix(name)} └ 모호점: ${ambiguity}`);
+    }
+    if (
+      Array.isArray(output.ambiguities) &&
+      output.ambiguities.length > ambiguities.length
+    ) {
+      console.log(
+        `${stepPrefix(name)} └ 모호점: 외 ${output.ambiguities.length - ambiguities.length}건`
+      );
+    }
   }
 
   if (name === 'extract-design-tokens') {
@@ -313,7 +342,12 @@ function logStepFailureHint(name, traceRecords) {
   }
   if (name === 'gate-figma-scope') {
     console.log(
-      `${stepPrefix(name)} └ 조치: 노드가 넓게 선택됐습니다. figma.scope_node_id 지정 또는 노드 범위 축소 필요`
+      `${stepPrefix(name)} └ 조치: 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 brief/intent 힌트를 보강하세요`
+    );
+  }
+  if (name === 'gate-intent') {
+    console.log(
+      `${stepPrefix(name)} └ 조치: brief 보강 또는 intent 힌트(page/component_kind/role/state) 추가 필요`
     );
   }
   if (name === 'gate-figma-mcp-tool-logs') {
@@ -497,6 +531,9 @@ function main() {
     error: null,
     agentRuntime: null,
     contracts: null,
+    resolvedIntent: null,
+    intentArtifactPath: null,
+    intentGate: null,
     figmaScope: null,
     designContextArtifactPath: null,
     figmaScopeGate: null,
@@ -522,6 +559,8 @@ function main() {
 
   try {
     runStep(context, 'preflight', stepPreflight);
+    runStep(context, 'extract-intent', stepExtractIntent);
+    runStep(context, 'gate-intent', stepGateIntent);
     runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
     runStep(context, 'gate-figma-scope', stepGateFigmaScope);
     runStep(

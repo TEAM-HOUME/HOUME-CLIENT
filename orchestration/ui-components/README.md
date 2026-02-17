@@ -26,8 +26,10 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 ## Pipeline Stages
 
 - `preflight`: verify CLI + MCP availability.
+- `extract-intent`: parse brief/hints into structured intent.
+- `gate-intent`: validate intent confidence/ambiguity and behavior preconditions.
 - `extract-figma-scope`: parse URL and optionally walk parent scope.
-- `gate-figma-scope`: fail when selected scope is still too broad.
+- `gate-figma-scope`: enforce `scopeVerdict` (`sufficient|too_broad|too_narrow|unknown`) with mode (`warn|error`).
 - `extract-figma-mcp-tool-logs`: call Figma MCP directly and store raw request/response logs.
 - `gate-figma-mcp-tool-logs`: enforce required direct tool-call quality (`off|warn|error`).
 - `extract-design-tokens`: normalize tokens from logged MCP evidence (+ agent assistance).
@@ -52,6 +54,8 @@ Default fixed policy:
 | Step                          | Type                 | Primary Runtime                                 |
 | ----------------------------- | -------------------- | ----------------------------------------------- |
 | `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version/mcp check       |
+| `extract-intent`              | Extraction           | Agent CLI                                       |
+| `gate-intent`                 | Gate                 | Local code                                      |
 | `extract-figma-scope`         | Extraction           | Agent CLI + Figma MCP (conditional)             |
 | `gate-figma-scope`            | Gate                 | Local code                                      |
 | `extract-figma-mcp-tool-logs` | Extraction           | Local direct MCP HTTP calls                     |
@@ -72,7 +76,10 @@ flowchart TD
   B --> C[Init context + runId]
   C --> D{{preflight}}
 
-  D -- pass --> E[extract-figma-scope]
+  D -- pass --> DI[extract-intent]
+  DI --> DG{{gate-intent}}
+  DG -- pass/warn --> E[extract-figma-scope]
+  DG -- fail --> Z1
   D -- fail --> Z1[write report + fail exit]
 
   E --> F{{gate-figma-scope}}
@@ -101,8 +108,8 @@ flowchart TD
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,F,H,J,L,O gate;
-  class E,K agent;
+  class D,DG,F,H,J,L,O gate;
+  class DI,E,K agent;
   class A,B,C,P,Q,Z1,I local;
 ```
 
@@ -126,11 +133,14 @@ sequenceDiagram
     R->>A: preflight mcp get (figma server candidates)
   end
 
+  R->>A: intent-resolve prompt (JSON schema)
+  A-->>R: page/componentKind/role/state/confidence
+
   alt auto_parent && !scope_node_id && !dry-run
     R->>A: figma-scope prompt (JSON schema)
     A->>M: read scope context
     M-->>A: scope evidence
-    A-->>R: selectedNodeId/parentChain/isNarrow
+    A-->>R: selectedNodeId/parentChain/scopeVerdict/cannotNarrowFurther
   else no scope extraction agent call
     R->>R: use input node-id directly
   end
@@ -205,7 +215,7 @@ stateDiagram-v2
 ## Scenario Shape (Minimal)
 
 ```yaml
-id: jjym-toast
+brief: 'Favorite toast on image result page, success state'
 
 figma:
   url: 'https://www.figma.com/design/.../TEMP?node-id=1-427&m=dev'
@@ -216,10 +226,16 @@ agent:
 
 ## Scenario Keys (Optional)
 
+- `id`: optional; auto-generated when omitted
+- `brief`: required natural-language context for intent extraction
+- `intent.page|component_kind|role|state|notes`: optional hints for stable intent resolution
 - `target`: explicit single target file path (preferred for deterministic updates)
 - `targets`: legacy list form; only one target is supported in automatic planning
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
+- `gates.intent_mode`: intent gate strictness (`warn|error`, default `error`)
+- `gates.intent_min_confidence`: minimum intent confidence (`0.0~1.0`, default `0.75`)
+- `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
 - `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
 - `gates.allowed_changed_paths`: explicit allowed change paths

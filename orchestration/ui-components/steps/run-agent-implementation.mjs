@@ -98,8 +98,17 @@ export function stepRunAgent(context) {
     systemPrompt,
     '# Task',
     `- Scenario: ${context.scenario.id}`,
+    `- Brief: ${context.scenario.intent.brief}`,
     `- Figma URL: ${context.scenario.figma.url}`,
     `- Scope node-id: ${context.figmaScope.selectedNodeId}`,
+    `- Intent page: ${context.resolvedIntent?.page || '(unknown)'}`,
+    `- Intent kind: ${context.resolvedIntent?.componentKind || '(unknown)'}`,
+    `- Intent role: ${context.resolvedIntent?.role || '(unknown)'}`,
+    `- Intent state: ${context.resolvedIntent?.state || '(unknown)'}`,
+    `- Intent confidence: ${Number(context.resolvedIntent?.confidence || 0).toFixed(2)}`,
+    context.resolvedIntent?.summary
+      ? `- Intent summary: ${context.resolvedIntent.summary}`
+      : '- Intent summary: (none)',
     `- Design context artifact: ${relative(context.rootPath, context.designContextArtifactPath)}`,
     context.designTokensArtifactPath
       ? `- Design tokens artifact: ${relative(context.rootPath, context.designTokensArtifactPath)}`

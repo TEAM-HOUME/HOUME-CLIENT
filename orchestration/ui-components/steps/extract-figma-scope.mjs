@@ -4,6 +4,41 @@ import { relative, resolve } from 'node:path';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { parseFigmaUrl, validateDesignContext } from '../lib/figma.mjs';
 
+const SCOPE_VERDICT_ENUM = ['sufficient', 'too_broad', 'too_narrow', 'unknown'];
+
+function normalizeScopeVerdict(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
+  if (SCOPE_VERDICT_ENUM.includes(normalized)) {
+    return normalized;
+  }
+  return 'unknown';
+}
+
+function buildScopePrompt(context, figmaMeta) {
+  const intent = context.resolvedIntent;
+  const lines = [
+    'You are doing read-only Figma scope selection for implementation.',
+    `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
+    `Current node-id: ${figmaMeta.nodeIdNormalized}`,
+    `Target component intent: ${intent?.componentKind || 'unknown'} / ${intent?.state || 'unknown'} / ${intent?.role || 'unknown'}`,
+    `Brief: ${context.scenario.intent.brief}`,
+    `If current node is too narrow for implementation, walk up parent chain up to ${context.scenario.figma.parentHopsMax} levels and select one implementation scope node.`,
+    '',
+    'Verdict rules:',
+    '- sufficient: selected node is component-level and implementable directly.',
+    '- too_broad: selected node still includes unrelated UI scope.',
+    '- too_narrow: selected node misses required UI pieces for this component.',
+    '- unknown: cannot determine confidently.',
+    '',
+    'Do not edit any code or files.',
+    'Return JSON only that matches the schema.',
+  ];
+  return lines.join('\n');
+}
+
 export function stepExtractFigmaScope(context) {
   const figmaMeta = parseFigmaUrl(context.scenario.figma.url);
   const scope = {
@@ -12,7 +47,8 @@ export function stepExtractFigmaScope(context) {
       context.scenario.figma.scopeNodeId || figmaMeta.nodeIdNormalized,
     source: context.scenario.figma.scopeNodeId ? 'scenario' : 'input',
     parentChain: [],
-    isNarrow: null,
+    scopeVerdict: context.scenario.figma.scopeNodeId ? 'sufficient' : 'unknown',
+    cannotNarrowFurther: false,
     rationale: context.scenario.figma.scopeNodeId
       ? 'scenario override'
       : 'input node-id',
@@ -35,26 +71,27 @@ export function stepExtractFigmaScope(context) {
             type: 'array',
             items: { type: 'string' },
           },
-          isNarrow: { type: 'boolean' },
+          scopeVerdict: {
+            type: 'string',
+            enum: SCOPE_VERDICT_ENUM,
+          },
+          cannotNarrowFurther: { type: 'boolean' },
           rationale: { type: 'string' },
         },
-        required: ['selectedNodeId', 'parentChain', 'isNarrow', 'rationale'],
+        required: [
+          'selectedNodeId',
+          'parentChain',
+          'scopeVerdict',
+          'cannotNarrowFurther',
+          'rationale',
+        ],
         additionalProperties: false,
       };
-
-      const prompt = [
-        'You are doing read-only Figma scope selection.',
-        `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
-        `Current node-id: ${figmaMeta.nodeIdNormalized}`,
-        `If current node is too narrow for implementation, walk up parent chain up to ${context.scenario.figma.parentHopsMax} levels and select one implementation scope node.`,
-        'Do not edit any code or files.',
-        'Return JSON only that matches the schema.',
-      ].join('\n');
 
       const scopeResult = invokeAgentWithSchema(
         context,
         'figma-scope',
-        prompt,
+        buildScopePrompt(context, figmaMeta),
         schema,
         context.scenario.figma.timeoutMs
       );
@@ -67,8 +104,8 @@ export function stepExtractFigmaScope(context) {
             String(id).trim().replace(/-/g, ':')
           )
         : [];
-      scope.isNarrow =
-        typeof scopeResult.isNarrow === 'boolean' ? scopeResult.isNarrow : null;
+      scope.scopeVerdict = normalizeScopeVerdict(scopeResult.scopeVerdict);
+      scope.cannotNarrowFurther = Boolean(scopeResult.cannotNarrowFurther);
       scope.rationale = String(scopeResult.rationale);
       scope.source = 'agent';
     }
@@ -92,7 +129,8 @@ export function stepExtractFigmaScope(context) {
     inputNodeId: scope.nodeIdNormalized,
     selectedNodeId: scope.selectedNodeId,
     source: scope.source,
-    isNarrow: scope.isNarrow,
+    scopeVerdict: scope.scopeVerdict,
+    cannotNarrowFurther: scope.cannotNarrowFurther,
     rationale: scope.rationale,
     parentChain: scope.parentChain,
     artifactPath: relative(context.rootPath, designContextArtifactPath),

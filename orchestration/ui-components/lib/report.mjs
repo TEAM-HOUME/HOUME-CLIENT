@@ -23,6 +23,14 @@ export function writeReport(context) {
       agentCommand: context.scenario.agent.command,
       agentArgs: context.scenario.agent.args,
       figmaUrl: context.scenario.figma.url,
+      brief: context.scenario.intent?.brief || '',
+      intentHints: {
+        page: context.scenario.intent?.pageHint || '',
+        componentKind: context.scenario.intent?.componentKindHint || '',
+        role: context.scenario.intent?.roleHint || '',
+        state: context.scenario.intent?.stateHint || '',
+        notes: context.scenario.intent?.notes || '',
+      },
       targets: context.scenario.targets,
       behavior: context.scenario.behavior,
       verification: context.scenario.verification,
@@ -34,6 +42,9 @@ export function writeReport(context) {
     designContextArtifactPath: context.designContextArtifactPath
       ? relative(context.rootPath, context.designContextArtifactPath)
       : null,
+    intentArtifactPath: context.intentArtifactPath
+      ? relative(context.rootPath, context.intentArtifactPath)
+      : null,
     figmaMcpToolLogsArtifactPath: context.figmaMcpToolLogsArtifactPath
       ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
       : null,
@@ -42,6 +53,8 @@ export function writeReport(context) {
       : null,
     figmaScope: context.figmaScope || null,
     figmaScopeGate: context.figmaScopeGate || null,
+    resolvedIntent: context.resolvedIntent || null,
+    intentGate: context.intentGate || null,
     figmaMcpToolLogs: context.figmaMcpToolLogs || null,
     figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,
     designTokens: context.designTokens || null,

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -118,6 +119,19 @@ function parseSectionNumber(sectionLines, key, defaultValue) {
   return Number.isNaN(numeric) ? defaultValue : numeric;
 }
 
+function parseEnumValue(rawValue, allowedValues, defaultValue, fieldName) {
+  if (rawValue === null || rawValue === undefined) {
+    return defaultValue;
+  }
+  const normalized = String(rawValue).trim().toLowerCase();
+  if (!allowedValues.includes(normalized)) {
+    fail(
+      `Invalid ${fieldName}: ${rawValue}. Allowed values: ${allowedValues.join(', ')}`
+    );
+  }
+  return normalized;
+}
+
 function parseSectionList(sectionLines, key) {
   const values = [];
   const keyPattern = new RegExp(`^\\s{2}${key}:\\s*$`);
@@ -147,6 +161,43 @@ function parseSectionList(sectionLines, key) {
   }
 
   return values;
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function createScenarioId(figmaUrl, brief) {
+  let nodePart = 'node';
+  try {
+    const url = new URL(figmaUrl);
+    const nodeId = decodeURIComponent(
+      url.searchParams.get('node-id') || 'node'
+    );
+    nodePart = nodeId.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (!nodePart) {
+      nodePart = 'node';
+    }
+  } catch {
+    nodePart = 'node';
+  }
+
+  const keywordPart = String(brief || '')
+    .toLowerCase()
+    .split(/[^a-z0-9가-힣]+/)
+    .filter((token) => token.length >= 2)
+    .slice(0, 3)
+    .join('-');
+  const hash = createHash('sha1')
+    .update(`${figmaUrl}|${brief}`)
+    .digest('hex')
+    .slice(0, 6);
+
+  const raw = `ui-${keywordPart || 'component'}-${nodePart}-${hash}`;
+  return raw
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96);
 }
 
 export function parseArgs(argv) {
@@ -194,7 +245,9 @@ export function readScenario(pathArg) {
 
   const content = readFileSync(scenarioPath, 'utf8');
   const idMatch = content.match(/^id:\s*([^\n#]+)\s*$/m);
+  const brief = parseTopLevelScalar(content, 'brief');
   const agentSection = parseSection(content, 'agent');
+  const intentSection = parseSection(content, 'intent');
   const behaviorSection = parseSection(content, 'behavior');
   const figmaSection = parseSection(content, 'figma');
   const gatesSection = parseSection(content, 'gates');
@@ -204,23 +257,43 @@ export function readScenario(pathArg) {
   const targets = parseTopLevelList(content, 'targets');
   const combinedTargets = [...new Set([target, ...targets].filter(Boolean))];
 
-  if (!idMatch) {
-    fail('Scenario must include top-level `id`.');
-  }
   if (!engine) {
     fail('Scenario must include `agent.engine`.');
   }
   if (!figmaUrl) {
     fail('Scenario must include `figma.url`.');
   }
+  if (!brief) {
+    fail('Scenario must include top-level `brief`.');
+  }
+  const scenarioId = idMatch
+    ? stripQuotes(idMatch[1])
+    : createScenarioId(figmaUrl, brief);
+  const intentMinConfidence = clamp(
+    parseSectionNumber(gatesSection, 'intent_min_confidence', 0.75),
+    0,
+    1
+  );
 
   return {
     path: scenarioPath,
-    id: stripQuotes(idMatch[1]),
+    id: scenarioId,
     engine,
     agent: {
       command: parseSectionScalar(agentSection, 'command', null),
       args: parseSectionList(agentSection, 'args'),
+    },
+    intent: {
+      brief: stripQuotes(brief),
+      pageHint: parseSectionScalar(intentSection, 'page', ''),
+      componentKindHint: parseSectionScalar(
+        intentSection,
+        'component_kind',
+        ''
+      ),
+      roleHint: parseSectionScalar(intentSection, 'role', ''),
+      stateHint: parseSectionScalar(intentSection, 'state', ''),
+      notes: parseSectionScalar(intentSection, 'notes', ''),
     },
     figma: {
       url: figmaUrl,
@@ -251,6 +324,19 @@ export function readScenario(pathArg) {
       requireVisualApproval: true,
       designTokensMode: 'error',
       figmaMcpLogsMode: 'error',
+      scopeGateMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'scope_gate_mode', null),
+        ['warn', 'error'],
+        'warn',
+        'gates.scope_gate_mode'
+      ),
+      intentMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'intent_mode', null),
+        ['warn', 'error'],
+        'error',
+        'gates.intent_mode'
+      ),
+      intentMinConfidence,
       allowedChangedPaths: parseSectionList(
         gatesSection,
         'allowed_changed_paths'
