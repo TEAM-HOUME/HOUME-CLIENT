@@ -25,9 +25,9 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 
 ## Pipeline Stages
 
-- `preflight`: verify required CLI availability and codex runtime.
-- `extract-intent`: parse brief/hints into structured intent.
-- `gate-intent`: validate intent confidence/ambiguity and behavior preconditions.
+- `preflight`: verify required CLI availability, codex runtime, and direct Figma MCP probe (`initialize` + `tools/list` + required tools).
+- `extract-intent`: resolve structured intent from brief/hints + docs conventions + retry context.
+- `gate-intent`: validate confidence/fields and split ambiguities into `blocking` vs `advisory`.
 - `extract-figma-scope`: parse URL and optionally walk parent scope.
 - `gate-figma-scope`: enforce `scopeVerdict` (`sufficient|too_broad|too_narrow|unknown`) with mode (`warn|error`).
 - `extract-figma-mcp-tool-logs`: call Figma MCP directly and store raw request/response logs.
@@ -35,7 +35,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `extract-design-tokens`: normalize tokens from logged MCP evidence (+ agent assistance).
 - `gate-design-tokens`: enforce token quality mode (`off|warn|error`).
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
-- `run-agent-implementation`: implement code changes with injected context docs.
+- `run-agent-implementation`: implement code changes with system prompt + task context + docs conventions.
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
 - `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
@@ -49,26 +49,37 @@ Default fixed policy:
 - `figma_mcp_logs_mode` is fixed to `error`.
 - `design_tokens_mode` is fixed to `error`.
 
+## Context Injection Matrix
+
+| Stage                      | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
+| -------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `preflight`                | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                            | runtime summary only                                                |
+| `extract-intent`           | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `intentOverrides`, `docs/reference/*` conventions                                    | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
+| `resolve-component-plan`   | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
+| `run-agent-implementation` | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
+| `extract-design-tokens`    | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                     | `artifacts/*-design-tokens.json`                                    |
+| `report`                   | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths, `intentOverrides`                                               | `reports/<runId>.json`, `reports/index.jsonl`                       |
+
 ## Orchestration Diagrams
 
 ### Step Ownership Map
 
-| Step                          | Type                 | Primary Runtime                                 |
-| ----------------------------- | -------------------- | ----------------------------------------------- |
-| `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version/mcp check       |
-| `extract-intent`              | Extraction           | Agent CLI                                       |
-| `gate-intent`                 | Gate                 | Local code                                      |
-| `extract-figma-scope`         | Extraction           | Agent CLI + Figma MCP (conditional)             |
-| `gate-figma-scope`            | Gate                 | Local code                                      |
-| `extract-figma-mcp-tool-logs` | Extraction           | Local direct MCP HTTP calls                     |
-| `gate-figma-mcp-tool-logs`    | Gate                 | Local code                                      |
-| `extract-design-tokens`       | Extraction           | Agent CLI (normalization) + logged MCP evidence |
-| `gate-design-tokens`          | Gate                 | Local code                                      |
-| `resolve-component-plan`      | Planning + Gate      | Local code, optional Agent CLI                  |
-| `run-agent-implementation`    | Implementation       | Agent CLI                                       |
-| `gate-changed-paths`          | Gate                 | Local git diff                                  |
-| `verify`                      | Gate                 | Local `pnpm` checks                             |
-| `report`                      | Finalization         | Local filesystem                                |
+| Step                          | Type                 | Primary Runtime                                    |
+| ----------------------------- | -------------------- | -------------------------------------------------- |
+| `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version + direct MCP probe |
+| `extract-intent`              | Extraction           | Agent CLI                                          |
+| `gate-intent`                 | Gate                 | Local code                                         |
+| `extract-figma-scope`         | Extraction           | Agent CLI + Figma MCP (conditional)                |
+| `gate-figma-scope`            | Gate                 | Local code                                         |
+| `extract-figma-mcp-tool-logs` | Extraction           | Local direct MCP HTTP calls                        |
+| `gate-figma-mcp-tool-logs`    | Gate                 | Local code                                         |
+| `extract-design-tokens`       | Extraction           | Agent CLI (normalization) + logged MCP evidence    |
+| `gate-design-tokens`          | Gate                 | Local code                                         |
+| `resolve-component-plan`      | Planning + Gate      | Agent CLI + local behavior guard                   |
+| `run-agent-implementation`    | Implementation       | Agent CLI                                          |
+| `gate-changed-paths`          | Gate                 | Local git diff                                     |
+| `verify`                      | Gate                 | Local `pnpm` checks                                |
+| `report`                      | Finalization         | Local filesystem                                   |
 
 ### Detailed Orchestration Flow
 
@@ -81,9 +92,9 @@ flowchart TD
   D -- fail --> Z1[write report + fail exit]
   D -- pass --> DI[extract-intent]
   DI --> DG{{gate-intent}}
-  DG -- fail --> DR[feedback: intent retry]
+  DG -- fail --> DR[feedback: intent retry + structured overrides]
   DR --> DI
-  DG -- pass/warn --> E[extract-figma-scope]
+  DG -- pass/ok_with_advisory --> E[extract-figma-scope]
 
   E --> F{{gate-figma-scope}}
   F -- pass/warn --> G0[extract-figma-mcp-tool-logs]
@@ -133,9 +144,19 @@ sequenceDiagram
   U->>R: pnpm ui:run --scenario ...
   R->>R: parseArgs + readScenario + init context
   R->>A: preflight --version
+  R->>M: preflight initialize + tools/list (direct)
+  M-->>R: endpoint/tools health
 
-  R->>A: intent-resolve prompt (JSON schema)
+  R->>A: intent-resolve prompt (brief + hints + docs + feedback + overrides)
   A-->>R: page/componentKind/role/state/confidence
+  R->>R: gate-intent (blocking/advisory split)
+
+  alt gate-intent blocked
+    R->>U: retry prompt (y/n + structured choices + extra prompt)
+    U-->>R: override decisions
+    R->>A: intent-resolve retry with merged overrides
+    A-->>R: refined intent
+  end
 
   alt auto_parent && !scope_node_id && !dry-run
     R->>A: figma-scope prompt (JSON schema)
@@ -156,11 +177,11 @@ sequenceDiagram
     A-->>R: normalized tokens + diagnostics
   end
 
-  R->>A: resolve-component-plan prompt
+  R->>A: resolve-component-plan prompt (intent + artifacts + docs sources + plan feedback)
   A-->>R: action/targetPath/behavior questions
 
   opt !dry-run
-    R->>A: implement prompt (system + task + conventions)
+    R->>A: implement prompt (codex.system.md + task + docs + feedback)
     A-->>R: summary + changedFiles + notes
 
     R->>G: git diff / ls-files (gate-changed-paths)
@@ -244,7 +265,7 @@ figma:
 - `gates.intent_mode`: intent gate strictness (`warn|error`, default `error`)
 - `gates.intent_min_confidence`: minimum intent confidence (`0.0~1.0`, default `0.75`)
 - `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
-- `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)
+- `figma.mcp_endpoint`: direct MCP endpoint for preflight/logging/capture (default: `http://127.0.0.1:3845/mcp`)
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
 - `figma.auto_parent`: if `true`, scope extraction agent can walk parent chain (`default: true`)
 - `figma.parent_hops_max`: maximum parent hops during auto scope selection (`default: 3`)
@@ -274,9 +295,10 @@ figma:
 - Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
 - Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
 - Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.
-- For remote MCP, set a bearer token env (`FIGMA_MCP_ACCESS_TOKEN` by default, or custom via `figma.mcp_auth_token_env`).
+- For remote MCP endpoint, set a bearer token env (`FIGMA_MCP_ACCESS_TOKEN` by default, or custom via `figma.mcp_auth_token_env`).
 - Run report includes `figmaMcpToolUsage` and `agentTokenUsage` summaries.
 - `reports/index.jsonl` is auto-generated every run for quick team summary.
 - Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
 - Run report JSON includes `feedbackHistory` (retry question prompts + raw user answers).
+- Run report JSON includes `intentOverrides` (structured user decisions from intent retry loop).
 - Use `--open-storybook` to open `storybook-static/index.html` after a successful run.
