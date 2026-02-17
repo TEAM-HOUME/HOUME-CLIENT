@@ -115,7 +115,21 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
 ]);
 
 const MAX_FEEDBACK_NOTES_PER_STAGE = 4;
-const MAX_FEEDBACK_NOTE_LENGTH = 280;
+const FEEDBACK_NOTE_MAX_LENGTH_BY_STAGE = Object.freeze({
+  intent: 1600,
+  asset: 1600,
+  plan: 1200,
+  implement: 900,
+  verify: 1200,
+  default: 900,
+});
+
+function getFeedbackNoteMaxLength(stage) {
+  return (
+    FEEDBACK_NOTE_MAX_LENGTH_BY_STAGE[stage] ||
+    FEEDBACK_NOTE_MAX_LENGTH_BY_STAGE.default
+  );
+}
 
 function isInteractiveTerminal() {
   return Boolean(process.stdin.isTTY);
@@ -728,10 +742,8 @@ export function appendFeedback(context, stage, value) {
     return;
   }
 
-  const normalized = truncateText(
-    String(value).trim(),
-    MAX_FEEDBACK_NOTE_LENGTH
-  );
+  const maxLength = getFeedbackNoteMaxLength(stage);
+  const normalized = truncateText(String(value).trim(), maxLength);
   if (!normalized) {
     return;
   }
@@ -774,7 +786,7 @@ export async function runPlanWithFeedbackLoop(context, options) {
         context,
         'plan',
         decision.note ||
-          `Previous plan failure: ${truncateText(errorMessage, 240)}`
+          `Previous plan failure: ${truncateText(errorMessage, getFeedbackNoteMaxLength('plan'))}`
       );
     }
   }
@@ -815,7 +827,7 @@ export async function runAssetCoverageWithFeedbackLoop(context, options) {
         context,
         'asset',
         decision.note ||
-          `Previous asset coverage failure: ${truncateText(errorMessage, 240)}`
+          `Previous asset coverage failure: ${truncateText(errorMessage, getFeedbackNoteMaxLength('asset'))}`
       );
     }
   }
@@ -851,7 +863,7 @@ export async function runIntentWithFeedbackLoop(context, options) {
         context,
         'intent',
         decision.note ||
-          `Previous intent failure: ${truncateText(errorMessage, 240)}`
+          `Previous intent failure: ${truncateText(errorMessage, getFeedbackNoteMaxLength('intent'))}`
       );
     }
   }
@@ -897,7 +909,7 @@ export async function runImplementationWithFeedbackLoop(context, options) {
         context,
         'implement',
         decision.note ||
-          `Previous implement/path-gate failure: ${truncateText(errorMessage, 240)}`
+          `Previous implement/path-gate failure: ${truncateText(errorMessage, getFeedbackNoteMaxLength('implement'))}`
       );
       continue;
     }
@@ -938,12 +950,12 @@ export async function runImplementationWithFeedbackLoop(context, options) {
         context,
         'verify',
         decision.note ||
-          `Previous verify failure: ${truncateText(errorMessage, 240)}`
+          `Previous verify failure: ${truncateText(errorMessage, getFeedbackNoteMaxLength('verify'))}`
       );
       appendFeedback(
         context,
         'implement',
-        `Fix verify failure before next validation: ${truncateText(errorMessage, 240)}`
+        `Fix verify failure before next validation: ${truncateText(errorMessage, getFeedbackNoteMaxLength('implement'))}`
       );
       if (decision.note) {
         appendFeedback(context, 'implement', decision.note);
