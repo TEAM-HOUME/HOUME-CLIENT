@@ -3,7 +3,7 @@ import {
   logStepFailureHint,
   summarizeStepOutput,
 } from './run-summary.mjs';
-import { formatDuration } from './step-utils.mjs';
+import { formatDuration, splitErrorDetails } from './step-utils.mjs';
 
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STEP_DIVIDER =
@@ -100,8 +100,17 @@ export function runStep(context, name, handler) {
       console.log('');
       return;
     }
-    console.log(`- 실패 (${durationText}) - ${stepLog.error}`);
-    logStepFailureHint(name, stepTraceRecords);
+    const errorDetails = splitErrorDetails(stepLog.error);
+    console.log(`- 실패 (${durationText})`);
+    if (errorDetails.summary) {
+      console.log(`- 사유: ${errorDetails.summary}`);
+    }
+    if (errorDetails.details.length > 0) {
+      errorDetails.details.forEach((detail, index) => {
+        console.log(`  - 상세 ${index + 1}: ${detail}`);
+      });
+    }
+    logStepFailureHint(context, name, stepTraceRecords);
     console.log(STEP_DIVIDER);
     console.log('');
   }

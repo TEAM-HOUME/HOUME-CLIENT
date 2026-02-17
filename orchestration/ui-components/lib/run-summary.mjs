@@ -105,6 +105,24 @@ export function formatAgentTokenUsage(summary) {
   return `입력 ${formatNumber(summary.totalInputTokens)}, 출력 ${formatNumber(summary.totalOutputTokens)}, 합계 ${formatNumber(summary.totalTokens)}${missingText}`;
 }
 
+function describeBlockingCategories(categories) {
+  const map = {
+    trigger: 'trigger 정책',
+    placement: '배치 정책',
+    dismiss: '닫기 정책',
+    concurrency: '중복 표시 정책',
+    accessibility: '접근성 정책',
+    cta: 'CTA 대상',
+    unknown: '기타 모호점',
+  };
+
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return [];
+  }
+
+  return categories.map((category) => map[category] || category);
+}
+
 export function summarizeStepOutput(name, output) {
   if (!output || typeof output !== 'object') {
     return '';
@@ -258,7 +276,7 @@ export function logStepDetails(name, output, traceRecords) {
   }
 }
 
-export function logStepFailureHint(name, traceRecords) {
+export function logStepFailureHint(context, name, traceRecords) {
   if (name === 'gate-design-tokens') {
     console.log('- 조치');
     console.log('- design token capture 상태/도구 오류를 artifact에서 확인');
@@ -270,12 +288,22 @@ export function logStepFailureHint(name, traceRecords) {
     );
   }
   if (name === 'gate-intent') {
+    const blockingCategories = describeBlockingCategories(
+      context?.intentGate?.blockingCategories
+    );
     console.log('- 조치');
     console.log('- 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요');
-    console.log('- 필수: 현재 블로킹 모호점 카테고리에 해당하는 항목 전부');
-    console.log(
-      '- 항목: trigger / placement / dismiss / concurrency / accessibility / CTA 대상'
-    );
+    if (blockingCategories.length > 0) {
+      console.log('- 필수 항목:');
+      blockingCategories.forEach((category, index) => {
+        console.log(`  - ${index + 1}. ${category}`);
+      });
+    } else {
+      console.log('- 필수 항목: 블로킹 모호점 카테고리에 해당하는 항목');
+      console.log(
+        '  - trigger / placement / dismiss / concurrency / accessibility / CTA 대상'
+      );
+    }
     console.log(
       '- 추가 프롬프트는 마지막 질문에 자유 텍스트로 입력 가능합니다'
     );

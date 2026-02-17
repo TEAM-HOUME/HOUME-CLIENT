@@ -1,7 +1,7 @@
 import { createReadStream, createWriteStream, existsSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 
-import { truncateText } from './step-utils.mjs';
+import { splitErrorDetails, truncateText } from './step-utils.mjs';
 
 export const DEFAULT_RETRY_LIMITS = Object.freeze({
   intent: 10,
@@ -314,9 +314,20 @@ export async function promptRetryDecision(
   const remaining = Math.max(0, maxAttempts - attempt);
   const retryQuestion = `[ui-components] [${stage}] 재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
   const noteQuestion = `[ui-components] [${stage}] 자유 보강 지시 입력 (선택, Enter=생략): `;
+  const parsedError = splitErrorDetails(errorMessage);
   console.log(
-    `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts}) - ${truncateText(errorMessage, 220)}`
+    `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts})`
   );
+  if (parsedError.summary) {
+    console.log(`[ui-components] [${stage}] - 사유: ${parsedError.summary}`);
+  }
+  if (parsedError.details.length > 0) {
+    parsedError.details.forEach((detail, index) => {
+      console.log(
+        `[ui-components] [${stage}]   - 상세 ${index + 1}: ${detail}`
+      );
+    });
+  }
 
   const promptInterface = createPromptInterface(stage);
   if (!promptInterface) {
