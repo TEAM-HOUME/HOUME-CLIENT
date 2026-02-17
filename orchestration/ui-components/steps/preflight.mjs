@@ -164,23 +164,32 @@ export function stepPreflight(context) {
   });
 
   let mcpProbe = null;
+  let effectiveSkipMcpCheck = context.options.skipMcpCheck;
   if (!context.options.skipMcpCheck) {
-    const mcpConfigured = hasConfiguredFigmaMcpServer(context);
-
-    if (!mcpConfigured) {
-      fail(
-        `Figma MCP server was not found. Expected one of: ${FIGMA_MCP_SERVER_CANDIDATES.join(', ')}`
+    try {
+      const mcpConfigured = hasConfiguredFigmaMcpServer(context);
+      if (!mcpConfigured) {
+        context.warnings.push(
+          `Figma MCP server was not found in preflight. Deferred to runtime checks. Expected one of: ${FIGMA_MCP_SERVER_CANDIDATES.join(', ')}`
+        );
+        effectiveSkipMcpCheck = true;
+      } else {
+        mcpProbe = runFigmaMcpLiveProbe(context);
+      }
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      context.warnings.push(
+        `Figma MCP preflight probe was deferred: ${reason}`
       );
+      effectiveSkipMcpCheck = true;
     }
-
-    mcpProbe = runFigmaMcpLiveProbe(context);
   }
 
   return {
     engine: context.scenario.engine,
     command: context.agentRuntime.command,
     mode: context.agentRuntime.mode,
-    skipMcpCheck: context.options.skipMcpCheck,
+    skipMcpCheck: effectiveSkipMcpCheck,
     mcpProbe,
   };
 }
