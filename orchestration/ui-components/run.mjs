@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
@@ -34,50 +33,6 @@ import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
 const PLANNED_STEP_COUNT = 13;
-
-function runStty(args) {
-  return spawnSync('stty', args, {
-    encoding: 'utf8',
-    stdio: ['inherit', 'pipe', 'pipe'],
-  });
-}
-
-function setupTostopGuard() {
-  const snapshot = runStty(['-g']);
-  if (snapshot.status !== 0) {
-    return;
-  }
-
-  const originalState = String(snapshot.stdout || '').trim();
-  if (!originalState) {
-    return;
-  }
-
-  const disableResult = runStty(['-tostop']);
-  if (disableResult.status !== 0) {
-    return;
-  }
-
-  let restored = false;
-  const restore = () => {
-    if (restored) {
-      return;
-    }
-    restored = true;
-    runStty([originalState]);
-  };
-  process.on('exit', restore);
-}
-
-function configureTerminalSignalGuards() {
-  if (!process.stdin.isTTY) {
-    return;
-  }
-  // Job-control stop signal guard
-  process.on('SIGTTOU', () => {});
-  process.on('SIGTTIN', () => {});
-  setupTostopGuard();
-}
 
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
   return {
@@ -210,7 +165,6 @@ async function executePipeline(context) {
 }
 
 async function main() {
-  configureTerminalSignalGuards();
   const args = parseArgs(process.argv);
   if (!args.scenarioArg) {
     console.error(

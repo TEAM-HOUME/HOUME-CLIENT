@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { createReadStream, createWriteStream, existsSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 
 import { truncateText } from './step-utils.mjs';
@@ -21,65 +21,42 @@ function isInteractiveTerminal() {
   return Boolean(process.stdin.isTTY);
 }
 
-function readProcessField(fieldName) {
-  const result = spawnSync(
-    'ps',
-    ['-o', `${fieldName}=`, '-p', String(process.pid)],
-    {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }
-  );
-  if (result.status !== 0) {
-    return null;
-  }
-  const value = String(result.stdout || '').trim();
-  return value || null;
-}
-
-function isForegroundProcessGroup() {
-  if (!isInteractiveTerminal()) {
-    return false;
-  }
-  if (process.platform === 'win32') {
-    return true;
-  }
-  const pgid = readProcessField('pgid');
-  const tpgid = readProcessField('tpgid');
-  if (!pgid || !tpgid) {
-    return true;
-  }
-  return pgid === tpgid;
-}
-
 function createPromptInterface(stage) {
-  if (isInteractiveTerminal() && isForegroundProcessGroup()) {
+  if (isInteractiveTerminal()) {
     return {
       rl: createInterface({
         input: process.stdin,
         output: process.stdout,
-        // Plain line reader
-        terminal: false,
+        terminal: true,
       }),
       dispose() {},
       source: 'stdin/stdout',
     };
   }
-  if (!isInteractiveTerminal()) {
-    console.log(
-      `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 자동 재시도로 진행합니다`
-    );
-    return null;
+  if (process.platform !== 'win32' && existsSync('/dev/tty')) {
+    const inputStream = createReadStream('/dev/tty');
+    const outputStream = createWriteStream('/dev/tty');
+    return {
+      rl: createInterface({
+        input: inputStream,
+        output: outputStream,
+        terminal: true,
+      }),
+      dispose() {
+        inputStream.destroy();
+        outputStream.destroy();
+      },
+      source: '/dev/tty',
+    };
   }
   console.log(
-    `[ui-components] [${stage}] 현재 프로세스가 foreground가 아니어서 입력을 받을 수 없습니다. 자동 재시도로 진행합니다`
+    `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 인터랙티브 터미널에서 실행해 주세요`
   );
   return null;
 }
 
 async function askLine(rl, question) {
-  process.stdout.write(question);
-  return rl.question('');
+  return rl.question(question);
 }
 
 function parseRetryInput(rawAnswer) {
@@ -129,7 +106,6 @@ export async function promptRetryDecision(
 
   const promptInterface = createPromptInterface(stage);
   if (!promptInterface) {
-    const autoNote = `Auto retry due unavailable interactive input. Previous error: ${truncateText(errorMessage, 220)}`;
     recordFeedbackHistory(context, {
       stage,
       attempt,
@@ -139,18 +115,15 @@ export async function promptRetryDecision(
       questions: [retryQuestion],
       answers: {
         retryAnswerRaw: null,
-        note: autoNote,
+        note: null,
       },
-      retry: true,
+      retry: false,
       inputSource: 'none',
-      reason: 'auto_retry_input_unavailable',
+      reason: 'input_unavailable',
     });
-    console.log(
-      `[ui-components] [${stage}] 입력 없이 자동 재시도합니다 (${attempt + 1}/${maxAttempts})`
-    );
     return {
-      retry: true,
-      note: autoNote,
+      retry: false,
+      note: '',
     };
   }
 

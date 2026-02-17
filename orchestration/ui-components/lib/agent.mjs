@@ -12,6 +12,7 @@ function runCommandInternal(command, args, options = {}) {
     allowFailure = false,
     shell = false,
     env = process.env,
+    detached = false,
   } = options;
   const result = spawnSync(command, args, {
     cwd,
@@ -20,6 +21,8 @@ function runCommandInternal(command, args, options = {}) {
     maxBuffer: 10 * 1024 * 1024,
     shell,
     env,
+    detached,
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
 
   const stdout = result.stdout?.trim() ?? '';
@@ -114,16 +117,24 @@ function buildAgentCommandLine(agentRuntime, commandArgs) {
 export function runAgentCommand(agentRuntime, commandArgs, options = {}) {
   const allArgs = [...agentRuntime.args, ...commandArgs];
   const commandLine = buildAgentCommandLine(agentRuntime, commandArgs);
+  const runOptions = {
+    ...options,
+    detached: true,
+  };
 
   if (agentRuntime.mode === 'binary') {
-    const result = runCommandInternal(agentRuntime.command, allArgs, options);
+    const result = runCommandInternal(
+      agentRuntime.command,
+      allArgs,
+      runOptions
+    );
     return {
       ...result,
       commandLine,
     };
   }
 
-  const result = runShellCommand(commandLine, options);
+  const result = runShellCommand(commandLine, runOptions);
   return {
     ...result,
     commandLine,

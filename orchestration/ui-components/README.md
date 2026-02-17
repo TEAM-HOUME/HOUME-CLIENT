@@ -39,7 +39,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
 - `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
-- If the process is not in foreground tty (or non-interactive), feedback-loop skips prompt and auto-retries with synthesized notes.
+- If input is unavailable (non-interactive tty), feedback-loop fails fast without auto-retry.
 - `report`: write run summary JSON.
 
 Default fixed policy:
