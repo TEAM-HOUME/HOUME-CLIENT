@@ -1,46 +1,324 @@
 # Component Catalog
 
-## 공용 네비게이션 & 헤더
+## 한글 자연어 요약
 
-- `shared/components/navBar/LogoNavBar.tsx`는 로그인/프로필 상태에 따라 버튼을 토글하고 `ROUTES`를 이용해 내비게이션을 제어해요.
-- `TitleNavBar.tsx`는 페이지별 제목, 뒤로가기, 설정/로그인 버튼을 조건부로 렌더링하며 대부분의 내부 페이지에서 사용돼요.
+### 공용 네비게이션 & 헤더
 
-## 버튼 스택
+- `src/shared/components/navBar/LogoNavBar.tsx`는 로그인/프로필 상태에 따라 버튼을 토글하고 `ROUTES`를 이용해 내비게이션을 제어합니다.
+- `src/shared/components/navBar/TitleNavBar.tsx`는 페이지별 제목, 뒤로가기, 설정/로그인 버튼을 조건부로 렌더링하며 내부 페이지에서 공통으로 사용됩니다.
 
-- `shared/components/button` 하위 디렉터리는 CTA, Kakao, Like, Save, Flip, Charge, Large/Small Filled, Error 버튼 등을 variant recipe 패턴으로 분류해요.
-- 각 버튼은 Vanilla Extract recipe로 상태(활성/비활성/선택), 사이즈, 타입 변형을 정의했기 때문에 디자이너 토큰을 그대로 반영해요.
+### 버튼 스택
 
-## 입력 & 폼 요소
+- `src/shared/components/button` 하위 디렉터리는 CTA, Like, Save, Flip, Charge, Filled, Error 계열 버튼을 variant recipe 패턴으로 분류합니다.
+- 각 버튼은 Vanilla Extract recipe로 상태(활성/비활성/선택), 사이즈, 타입 변형을 정의해 디자인 토큰 반영이 쉽습니다.
 
-- `shared/components/textField/TextField.tsx`는 controlled/ uncontrolled 하이브리드 패턴을 지원하고 focus/error 상태를 CSS variant로 노출해요.
-- `signup`/`imageSetup` 등 폼 페이지는 이 텍스트 필드와 `LargeFilledButton`, `Caption` 컴포넌트를 조합해 재사용성을 높였어요.
+### 입력 & 폼 요소
 
-## 정보 카드 & 피드백
+- `src/shared/components/textField/TextField.tsx`는 controlled/uncontrolled 하이브리드 패턴을 지원하고 focus/error 상태를 CSS variant로 노출합니다.
+- `signup`/`imageSetup` 등의 폼 페이지는 텍스트 필드와 공통 버튼/캡션 컴포넌트를 조합해 재사용성을 유지합니다.
 
-- `shared/components/card`, `cardReview`, `cardImage`, `cardHistory` 등은 이미지/텍스트 조합 카드 UI를 모듈화했고, Storybook 스토리를 통해 빠르게 시각 검증할 수 있어요.
-- `shared/components/loading/Loading.tsx`, `shared/components/text/Text.tsx`, `shared/components/divider/Divider.tsx` 등 상태 알려주는 컴포넌트도 별도 폴더로 나뉘어요.
+### 정보 카드 & 피드백
 
-## Toast & Overlay
+- `src/shared/components/card`, `cardReview`, `cardImage`, `cardHistory`는 이미지/텍스트 카드 UI를 모듈화해 도메인별 재사용에 맞춰 분리되어 있습니다.
+- `src/shared/components/loading/Loading.tsx`, `src/shared/components/text/HeadingText.tsx`, `src/shared/components/divider/Divider.tsx` 등 상태 전달용 컴포넌트도 폴더 단위로 분리되어 있습니다.
 
-- `shared/components/toast` 디렉터리는 `Toast` 프레젠테이션, `useToast` 훅, 테스트 컴포넌트를 포함해 토스트 UX를 완성해요.
-- `shared/components/overlay/{modal,popup}`는 오버레이 레벨 UI를 담당하며, `GeneralModal`은 두 버튼 슬롯, 크레딧 칩 옵션 등을 지원하고 `overlay-kit` provider에 의해 DOM 트리에 안전하게 주입돼요.
+### Toast & Overlay
 
-## Bottom Sheet & Drag UX
+- `src/shared/components/toast`는 `Toast` 프레젠테이션, `useToast` 훅, 테스트 컴포넌트를 포함합니다.
+- `src/shared/components/overlay/{modal,popup}`는 모달/팝업 오버레이 UI를 담당합니다.
 
-- `shared/components/bottomSheet/BottomSheetWrapper.tsx`는 스냅 상태·드래그 핸들·backdrop을 재사용 가능한 래퍼로 제공하고, `noMatchSheet`, `flipSheet`, `ResultPage`의 큐레이션 시트가 이를 확장해요.
-- `shared/hooks/useBottomSheetDrag.ts`와 `SHEET_*` 상수를 조합해 모바일 바텀시트 UX를 통일해요.
+### Bottom Sheet & Drag UX
 
-## Lottie & Media
+- `src/shared/components/bottomSheet/BottomSheetWrapper.tsx`는 스냅 상태, 드래그 핸들, backdrop을 재사용 가능한 래퍼로 제공합니다.
+- 관련 시트 컴포넌트(`flipSheet`, `noMatchSheet`)와 페이지 단위 시트가 이를 조합해 사용합니다.
 
-- `shared/components/lottie` 폴더는 Lottie 애니메이션 래퍼, placeholder, 스켈레톤 등을 보관해 이미지 생성 과정에서 자연스러운 로딩 경험을 제공해요.
+### 도메인 전용 섹션
 
-## 도메인 전용 섹션
+- `src/pages/home/components/*`: 랜딩 섹션 컴포넌트(인트로/가이드/리뷰)를 분리 관리합니다.
+- `src/pages/imageSetup/components/*`: 퍼널 전용 헤더/레이아웃/버튼그룹/캡션 컴포넌트를 제공합니다.
+- `src/pages/generate/pages/result/components/*`: 결과 페이지 전용 이미지/핫스팟 컴포넌트를 제공합니다.
+- `src/pages/mypage/components/*`: 마이페이지 전용 프로필/저장항목/생성이력/네비게이션 컴포넌트를 제공합니다.
 
-- `pages/home/components/*`: Intro/StepGuide/Review 섹션이 각각의 CSS 파일을 갖고 있어 랜딩 페이지 연출을 쉽게 유지보수할 수 있어요.
-- `pages/imageSetup/components`: Funnel Header/Layout/ButtonGroup/Caption 등 퍼널 전용 컴포넌트를 제공해 각 스텝이 일관된 UI를 유지해요.
-- `pages/generate/pages/result` 안의 `DetectionHotspots`, `GeneratedImgA/B`, `CurationSheet` 등은 AI 결과와 가구 큐레이션 UI를 세분화해 복잡한 상태를 나눠요.
-- `pages/mypage/components`: NavBar, ProfileSection, SavedItemsSection, GeneratedImagesSection, Button, Card, History 등 사용자 자산 뷰를 책임지고 있고, Tab & section 컴포넌트로 관심 영역별 구분을 명확히 했어요.
+### Storybook 커버리지
 
-## Storybook 커버리지
+- 스토리 파일은 기본적으로 `src/stories/*.stories.tsx`에 위치하며 공통 컴포넌트 시각 검증에 사용됩니다.
 
-- `src/stories/*.stories.tsx` 파일은 공통 컴포넌트를 모두 샘플 스토리로 등록해 디자인 QA, 회귀 테스트, 제품/마케팅 협업에 사용돼요. `Introduction.mdx`는 사용 가이드를 문서화하고 있어 신규 기여자가 UI 토큰을 빠르게 이해할 수 있어요.
+This document records the current UI component structure in the repository.
+It is intended to be used as implementation context for UI work.
+
+## Scan Scope
+
+- Target path pattern: `src/**/components/**`
+- Scan unit: files under each directory named `components`
+- Current roots are listed in the Snapshot section below
+
+## Include Rules
+
+- Include: `*.tsx`, `*.ts`, `*.jsx`, `*.js`, `*.css.ts`, `*.css`
+
+## Exclude Rules
+
+- Exclude: `*.stories.*`, `*.test.*`, `*.spec.*`
+- Exclude non-file entries and unsupported extensions
+
+## Last Updated Criteria
+
+- Update this document when files are created, moved, renamed, or deleted under `src/**/components/**`.
+- Update this document when include/exclude scan rules are changed.
+- Update this document when a new `components` root is added or removed.
+- If no structure/rule change occurred, this document does not need an update.
+
+## Snapshot
+
+- generated_at: `2026-02-17T16:31:11.447Z`
+- component_roots: 8
+- component_files: 132
+
+## Component Roots
+
+- `src/pages/generate/components`
+- `src/pages/generate/pages/result/components`
+- `src/pages/home/components`
+- `src/pages/imageSetup/components`
+- `src/pages/login/components`
+- `src/pages/mypage/components`
+- `src/pages/signup/components`
+- `src/shared/components`
+
+## Tree
+
+### `src/pages/generate/components`
+
+```text
+src/pages/generate/components/
+└─ filterChip/
+   ├─ FilterChip.css.ts
+   └─ FilterChip.tsx
+```
+
+### `src/pages/generate/pages/result/components`
+
+```text
+src/pages/generate/pages/result/components/
+├─ DetectionHotspots.css.ts
+├─ DetectionHotspots.tsx
+├─ GeneratedImg.css.ts
+├─ GeneratedImgA.tsx
+└─ GeneratedImgB.tsx
+```
+
+### `src/pages/home/components`
+
+```text
+src/pages/home/components/
+├─ AnimatedSection.tsx
+├─ introSection/
+│  ├─ IntroSection.css.ts
+│  └─ IntroSection.tsx
+├─ reviewSection/
+│  ├─ ReviewSection.css.ts
+│  └─ ReviewSection.tsx
+└─ stepGuideSection/
+   ├─ StepGuideSection.css.ts
+   └─ StepGuideSection.tsx
+```
+
+### `src/pages/imageSetup/components`
+
+```text
+src/pages/imageSetup/components/
+├─ buttonGroup/
+│  ├─ ButtonGroup.css.ts
+│  └─ ButtonGroup.tsx
+├─ caption/
+│  ├─ Caption.css.ts
+│  ├─ Caption.tsx
+│  ├─ CaptionChip.css.ts
+│  └─ CaptionChip.tsx
+├─ header/
+│  ├─ FunnelHeader.css.ts
+│  └─ FunnelHeader.tsx
+├─ headingText/
+│  ├─ HeadingText.css.ts
+│  └─ HeadingText.tsx
+└─ layout/
+   ├─ FunnelLayout.css.ts
+   └─ FunnelLayout.tsx
+```
+
+### `src/pages/login/components`
+
+```text
+src/pages/login/components/
+├─ LogoutButton.tsx
+└─ TokenRefreshTest.tsx
+```
+
+### `src/pages/mypage/components`
+
+```text
+src/pages/mypage/components/
+├─ button/
+│  ├─ curationButton/
+│  │  ├─ CurationButton.css.ts
+│  │  └─ CurationButton.tsx
+│  └─ smallButton/
+│     ├─ SmallButton.css.ts
+│     └─ SmallButton.tsx
+├─ card/
+│  └─ cardCuration/
+│     ├─ CardCuration.css.ts
+│     └─ CardCuration.tsx
+├─ history/
+│  ├─ HistorySection.css.ts
+│  └─ HistorySection.tsx
+├─ navBar/
+│  ├─ TabNavBar.css.ts
+│  └─ TabNavBar.tsx
+└─ section/
+   ├─ emptyState/
+   │  ├─ EmptyStateSection.css.ts
+   │  └─ EmptyStateSection.tsx
+   ├─ generatedImages/
+   │  ├─ GeneratedImagesSection.css.ts
+   │  └─ GeneratedImagesSection.tsx
+   ├─ profile/
+   │  ├─ ProfileSection.css.ts
+   │  └─ ProfileSection.tsx
+   └─ savedItems/
+      ├─ SavedItemsSection.css.ts
+      └─ SavedItemsSection.tsx
+```
+
+### `src/pages/signup/components`
+
+_No matching files under this root based on current include/exclude rules._
+
+### `src/shared/components`
+
+```text
+src/shared/components/
+├─ bottomSheet/
+│  ├─ BottomSheetWrapper.css.ts
+│  ├─ BottomSheetWrapper.tsx
+│  ├─ flipSheet/
+│  │  ├─ FlipSheet.css.ts
+│  │  └─ FlipSheet.tsx
+│  └─ noMatchSheet/
+│     ├─ NoMatchSheet.css.ts
+│     └─ NoMatchSheet.tsx
+├─ button/
+│  ├─ chargeButton/
+│  │  ├─ ChargeButton.css.ts
+│  │  └─ ChargeButton.tsx
+│  ├─ ctaButton/
+│  │  ├─ CtaButton.css.ts
+│  │  └─ CtaButton.tsx
+│  ├─ ErrorButton/
+│  │  ├─ ErrorButton.css.ts
+│  │  └─ ErrorMessage.tsx
+│  ├─ flipButton/
+│  │  ├─ FlipButton.css.ts
+│  │  └─ FlipButton.tsx
+│  ├─ largeFilledButton/
+│  │  ├─ LargeFilledButton.css.ts
+│  │  └─ LargeFilledButton.tsx
+│  ├─ likeButton/
+│  │  ├─ DislikeButton.tsx
+│  │  ├─ LikeButton.css.ts
+│  │  └─ LikeButton.tsx
+│  ├─ linkButton/
+│  │  ├─ LinkButton.css.ts
+│  │  └─ LinkButton.tsx
+│  ├─ noMatchButton/
+│  │  ├─ NoMatchButton.css.ts
+│  │  └─ NoMatchButton.tsx
+│  ├─ saveButton/
+│  │  ├─ SaveButton.css.ts
+│  │  └─ SaveButton.tsx
+│  └─ smallFilledButton/
+│     ├─ SmallFilledButton.css.ts
+│     └─ SmallFilledButton.tsx
+├─ card/
+│  ├─ cardHistory/
+│  │  ├─ CardHistory.css.ts
+│  │  └─ CardHistory.tsx
+│  ├─ cardImage/
+│  │  ├─ CardImage.css.ts
+│  │  ├─ CardImage.tsx
+│  │  └─ SkeletonCardImage.tsx
+│  ├─ cardProduct/
+│  │  ├─ CardProduct.css.ts
+│  │  └─ CardProduct.tsx
+│  └─ floorCard/
+│     ├─ FloorCard.css.ts
+│     └─ FloorCard.tsx
+├─ cardReview/
+│  ├─ CardReview.css.ts
+│  └─ CardReview.tsx
+├─ creditBox/
+│  ├─ CreditBox.css.ts
+│  └─ CreditBox.tsx
+├─ creditChip/
+│  ├─ CreditChip.css.ts
+│  └─ CreditChip.tsx
+├─ divider/
+│  ├─ Divider.css.ts
+│  └─ Divider.tsx
+├─ dragHandle/
+│  ├─ DragHandle.css.ts
+│  └─ DragHandle.tsx
+├─ errorFallback/
+│  ├─ AppErrorFallback.css.ts
+│  ├─ AppErrorFallback.tsx
+│  ├─ ErrorIllustration.css.ts
+│  ├─ ErrorIllustration.tsx
+│  ├─ FeatureErrorFallback.css.ts
+│  ├─ FeatureErrorFallback.tsx
+│  ├─ RouteErrorFallback.css.ts
+│  └─ RouteErrorFallback.tsx
+├─ inlineError/
+│  ├─ InlineError.css.ts
+│  └─ InlineError.tsx
+├─ loading/
+│  ├─ Loading.css.ts
+│  └─ Loading.tsx
+├─ lottie/
+│  └─ LoadingLottie.tsx
+├─ navBar/
+│  ├─ LogoNavBar.css.ts
+│  ├─ LogoNavBar.tsx
+│  ├─ NavBtn.css.ts
+│  ├─ TitleNavBar.css.ts
+│  └─ TitleNavBar.tsx
+├─ overlay/
+│  ├─ modal/
+│  │  ├─ CreditModal.css.ts
+│  │  ├─ CreditModal.tsx
+│  │  ├─ GeneralModal.css.ts
+│  │  ├─ GeneralModal.tsx
+│  │  ├─ GeneralModalTest.tsx
+│  │  └─ OverlayTest.tsx
+│  └─ popup/
+│     ├─ Popup.css.ts
+│     ├─ Popup.tsx
+│     └─ PopupTest.tsx
+├─ progressBarKey/
+│  ├─ ProgressBarKey.css.ts
+│  ├─ ProgressBarKey.tsx
+│  └─ ProgressBarKey.types.ts
+├─ text/
+│  ├─ HeadingText.css.ts
+│  └─ HeadingText.tsx
+├─ textField/
+│  ├─ TextField.css.ts
+│  └─ TextField.tsx
+├─ titleStep/
+│  ├─ TitleStep.css.ts
+│  └─ TitleStep.tsx
+└─ toast/
+   ├─ Toast.css.ts
+   ├─ Toast.tsx
+   ├─ ToastTest.tsx
+   └─ useToast.tsx
+```
