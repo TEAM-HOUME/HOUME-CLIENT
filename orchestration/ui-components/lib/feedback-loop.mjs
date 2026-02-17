@@ -172,7 +172,7 @@ async function askYesNo(rl, question, defaultValue = false) {
     if (lower === 'n' || lower === 'no') {
       return false;
     }
-    console.log('[ui-components] 입력 형식 오류: y 또는 n으로 입력해 주세요');
+    console.log('입력 형식 오류: y 또는 n으로 입력해 주세요');
   }
 }
 
@@ -195,16 +195,11 @@ async function askIntentChoice(rl, stage, field, required = false) {
 
   while (true) {
     const answer = String(
-      (await askLine(
-        rl,
-        `[ui-components] [${stage}] 선택값 (Enter=미지정): `
-      )) ?? ''
+      (await askLine(rl, '  - 선택값 (Enter=미지정): ')) ?? ''
     ).trim();
     if (!answer) {
       if (required) {
-        console.log(
-          `[ui-components] [${stage}] 입력 필요: ${field.label}은(는) 필수 항목입니다`
-        );
+        console.log(`입력 필요: ${field.label}은(는) 필수 항목입니다`);
         continue;
       }
       return '';
@@ -212,9 +207,7 @@ async function askIntentChoice(rl, stage, field, required = false) {
     if (field.options[answer]) {
       return field.options[answer];
     }
-    console.log(
-      `[ui-components] [${stage}] 입력 형식 오류: ${field.label}은 제시된 번호로 입력해 주세요`
-    );
+    console.log(`입력 형식 오류: ${field.label}은 제시된 번호로 입력해 주세요`);
   }
 }
 
@@ -235,9 +228,7 @@ async function askAssetModeChoice(rl, stage) {
     if (answer === '3') {
       return 'error';
     }
-    console.log(
-      `[ui-components] [${stage}] 입력 형식 오류: 1, 2, 3 중 하나를 입력해 주세요`
-    );
+    console.log('입력 형식 오류: 1, 2, 3 중 하나를 입력해 주세요');
   }
 }
 
@@ -408,7 +399,7 @@ function printIntentOverrideSummary(stage, overrides) {
   }
   console.log(`[ui-components] [${stage}] 구조화 보강 적용`);
   for (const [key, value] of Object.entries(normalized)) {
-    console.log(`[ui-components] [${stage}]   - ${key}: ${value}`);
+    console.log(`  - ${key}: ${value}`);
   }
 }
 
@@ -419,7 +410,7 @@ function printAssetOverrideSummary(stage, overrides) {
   }
   console.log(`[ui-components] [${stage}] 구조화 보강 적용`);
   for (const [key, value] of Object.entries(normalized)) {
-    console.log(`[ui-components] [${stage}]   - ${key}: ${value}`);
+    console.log(`  - ${key}: ${value}`);
   }
 }
 
@@ -460,11 +451,7 @@ async function collectIntentStructuredOverrides(
 
   const askOptionalStructured =
     optionalFields.length > 0 &&
-    (await askYesNo(
-      rl,
-      `[ui-components] [${stage}] 선택 구조화 항목도 입력하시겠습니까? (y/N): `,
-      false
-    ));
+    (await askYesNo(rl, '선택 구조화 항목도 입력하시겠습니까? (y/N): ', false));
 
   if (askOptionalStructured) {
     for (const field of optionalFields) {
@@ -481,15 +468,13 @@ async function collectIntentStructuredOverrides(
       ctaTarget = String(
         (await askLine(
           rl,
-          `[ui-components] [${stage}] CTA 대상 경로/의미 입력${ctaRequired ? ' [필수]' : ''} (Enter=미지정): `
+          `CTA 대상 경로/의미 입력${ctaRequired ? ' [필수]' : ''} (Enter=미지정): `
         )) ?? ''
       ).trim();
       if (!ctaRequired || ctaTarget) {
         break;
       }
-      console.log(
-        `[ui-components] [${stage}] 입력 필요: CTA 대상은 필수 항목입니다`
-      );
+      console.log('입력 필요: CTA 대상은 필수 항목입니다');
     }
     if (ctaTarget) {
       overrides.cta_target = ctaTarget;
@@ -502,15 +487,13 @@ async function collectIntentStructuredOverrides(
       unknownResolution = String(
         (await askLine(
           rl,
-          `[ui-components] [${stage}] unknown 모호점 해소 지시 [필수] (예: 기존 TOAST_TYPE.NAVIGATE 재사용): `
+          'unknown 모호점 해소 지시 [필수] (예: 기존 TOAST_TYPE.NAVIGATE 재사용): '
         )) ?? ''
       ).trim();
       if (unknownResolution) {
         break;
       }
-      console.log(
-        `[ui-components] [${stage}] 입력 필요: unknown 모호점 해소 지시는 필수입니다`
-      );
+      console.log('입력 필요: unknown 모호점 해소 지시는 필수입니다');
     }
     overrides.unknown_resolution = unknownResolution;
   }
@@ -538,7 +521,7 @@ async function collectAssetStructuredOverrides(rl, stage) {
 
   const useAdvancedOptions = await askYesNo(
     rl,
-    `[ui-components] [${stage}] 고급 옵션(후보 수/timeout/게이트 모드)도 조정하시겠습니까? (y/N): `,
+    '고급 옵션(후보 수/timeout/게이트 모드)도 조정하시겠습니까? (y/N): ',
     false
   );
 
@@ -602,20 +585,18 @@ export async function promptRetryDecision(
 ) {
   const stageLabel = STAGE_LABELS[stage] || stage;
   const remaining = Math.max(0, maxAttempts - attempt);
-  const retryQuestion = `[ui-components] [${stage}] 재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
-  const noteQuestion = `[ui-components] [${stage}] 자유 보강 지시 입력 (선택, Enter=생략): `;
+  const retryQuestion = `재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
+  const noteQuestion = '자유 보강 지시 입력 (선택, Enter=생략): ';
   const parsedError = splitErrorDetails(errorMessage);
   console.log(
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts})`
   );
   if (parsedError.summary) {
-    console.log(`[ui-components] [${stage}] - 사유: ${parsedError.summary}`);
+    console.log(`- 사유: ${parsedError.summary}`);
   }
   if (parsedError.details.length > 0) {
     parsedError.details.forEach((detail, index) => {
-      console.log(
-        `[ui-components] [${stage}]   - 상세 ${index + 1}: ${detail}`
-      );
+      console.log(`  - 상세 ${index + 1}: ${detail}`);
     });
   }
 
@@ -651,9 +632,7 @@ export async function promptRetryDecision(
       const retryAnswer = await askLine(rl, retryQuestion);
       parsedDecision = parseRetryChoice(retryAnswer);
       if (!parsedDecision) {
-        console.log(
-          `[ui-components] [${stage}] 입력 형식 오류: y 또는 n으로 입력해 주세요`
-        );
+        console.log('입력 형식 오류: y 또는 n으로 입력해 주세요');
       }
     }
 

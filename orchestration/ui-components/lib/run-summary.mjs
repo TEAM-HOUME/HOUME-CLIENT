@@ -1,4 +1,4 @@
-import { formatNumber, truncateText } from './step-utils.mjs';
+import { formatNumber } from './step-utils.mjs';
 
 function createFigmaMcpToolUsageSummary() {
   return {
@@ -196,10 +196,7 @@ export function summarizeStepOutput(name, output) {
     const changedCount = Array.isArray(output.changedFiles)
       ? output.changedFiles.length
       : 0;
-    const summary = output.summary
-      ? `, 요약=${truncateText(output.summary, 80)}`
-      : '';
-    return `변경 파일=${changedCount}개${summary}`;
+    return `변경 파일=${changedCount}개`;
   }
   if (name === 'gate-changed-paths') {
     return `검사 파일=${output.checkedFiles}개`;
@@ -210,6 +207,18 @@ export function summarizeStepOutput(name, output) {
   return '';
 }
 
+function printMultilineValue(label, value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) {
+    return;
+  }
+  console.log(`- ${label}:`);
+  const lines = raw.split(/\r?\n/);
+  for (const line of lines) {
+    console.log(`  ${line}`);
+  }
+}
+
 export function logStepDetails(name, output, traceRecords) {
   if (!output || typeof output !== 'object' || output.skipped) {
     return;
@@ -217,7 +226,7 @@ export function logStepDetails(name, output, traceRecords) {
 
   if (name === 'extract-figma-scope' && output.rationale) {
     console.log('- 상세');
-    console.log(`- 스코프 판단: ${truncateText(output.rationale, 200)}`);
+    printMultilineValue('스코프 판단', output.rationale);
   }
 
   if (name === 'extract-intent') {
@@ -267,7 +276,7 @@ export function logStepDetails(name, output, traceRecords) {
     console.log('- 상세');
     if (Array.isArray(output.reasons) && output.reasons.length > 0) {
       output.reasons.forEach((reason, index) => {
-        console.log(`- 판정 근거 ${index + 1}: ${truncateText(reason, 200)}`);
+        printMultilineValue(`판정 근거 ${index + 1}`, reason);
       });
     }
     if (
@@ -275,7 +284,7 @@ export function logStepDetails(name, output, traceRecords) {
       output.suggestedActions.length > 0
     ) {
       output.suggestedActions.forEach((action, index) => {
-        console.log(`- 권장 조치 ${index + 1}: ${truncateText(action, 160)}`);
+        printMultilineValue(`권장 조치 ${index + 1}`, action);
       });
     }
   }
@@ -283,12 +292,12 @@ export function logStepDetails(name, output, traceRecords) {
   if (name === 'run-agent-implementation') {
     console.log('- 상세');
     if (output.summary) {
-      console.log(`- 에이전트 요약: ${truncateText(output.summary, 220)}`);
+      printMultilineValue('에이전트 요약', output.summary);
     }
 
     if (Array.isArray(output.notes) && output.notes.length > 0) {
       output.notes.forEach((note, index) => {
-        console.log(`- 에이전트 노트 ${index + 1}: ${note}`);
+        printMultilineValue(`에이전트 노트 ${index + 1}`, note);
       });
     }
   }
@@ -296,14 +305,14 @@ export function logStepDetails(name, output, traceRecords) {
   if (name === 'resolve-component-plan') {
     console.log('- 상세');
     if (output.rationale) {
-      console.log(`- 계획 근거: ${truncateText(output.rationale, 220)}`);
+      printMultilineValue('계획 근거', output.rationale);
     }
     if (
       Array.isArray(output.behaviorQuestions) &&
       output.behaviorQuestions.length > 0
     ) {
       output.behaviorQuestions.forEach((question, index) => {
-        console.log(`- 동작 확인 질문 ${index + 1}: ${question}`);
+        printMultilineValue(`동작 확인 질문 ${index + 1}`, question);
       });
     }
   }
