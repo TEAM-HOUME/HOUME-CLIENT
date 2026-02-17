@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 
 import { truncateText } from './step-utils.mjs';
@@ -20,8 +21,39 @@ function isInteractiveTerminal() {
   return Boolean(process.stdin.isTTY);
 }
 
+function readProcessField(fieldName) {
+  const result = spawnSync(
+    'ps',
+    ['-o', `${fieldName}=`, '-p', String(process.pid)],
+    {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }
+  );
+  if (result.status !== 0) {
+    return null;
+  }
+  const value = String(result.stdout || '').trim();
+  return value || null;
+}
+
+function isForegroundProcessGroup() {
+  if (!isInteractiveTerminal()) {
+    return false;
+  }
+  if (process.platform === 'win32') {
+    return true;
+  }
+  const pgid = readProcessField('pgid');
+  const tpgid = readProcessField('tpgid');
+  if (!pgid || !tpgid) {
+    return true;
+  }
+  return pgid === tpgid;
+}
+
 function createPromptInterface(stage) {
-  if (isInteractiveTerminal()) {
+  if (isInteractiveTerminal() && isForegroundProcessGroup()) {
     return {
       rl: createInterface({
         input: process.stdin,
@@ -33,8 +65,14 @@ function createPromptInterface(stage) {
       source: 'stdin/stdout',
     };
   }
+  if (!isInteractiveTerminal()) {
+    console.log(
+      `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 자동 재시도로 진행합니다`
+    );
+    return null;
+  }
   console.log(
-    `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 인터랙티브 터미널에서 실행해 주세요`
+    `[ui-components] [${stage}] 현재 프로세스가 foreground가 아니어서 입력을 받을 수 없습니다. 자동 재시도로 진행합니다`
   );
   return null;
 }
@@ -91,6 +129,7 @@ export async function promptRetryDecision(
 
   const promptInterface = createPromptInterface(stage);
   if (!promptInterface) {
+    const autoNote = `Auto retry due unavailable interactive input. Previous error: ${truncateText(errorMessage, 220)}`;
     recordFeedbackHistory(context, {
       stage,
       attempt,
@@ -100,15 +139,18 @@ export async function promptRetryDecision(
       questions: [retryQuestion],
       answers: {
         retryAnswerRaw: null,
-        note: null,
+        note: autoNote,
       },
-      retry: false,
+      retry: true,
       inputSource: 'none',
-      reason: 'input_unavailable',
+      reason: 'auto_retry_input_unavailable',
     });
+    console.log(
+      `[ui-components] [${stage}] 입력 없이 자동 재시도합니다 (${attempt + 1}/${maxAttempts})`
+    );
     return {
-      retry: false,
-      note: '',
+      retry: true,
+      note: autoNote,
     };
   }
 
