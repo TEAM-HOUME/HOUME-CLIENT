@@ -1,4 +1,3 @@
-import { createReadStream, createWriteStream } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 
 import { truncateText } from './step-utils.mjs';
@@ -23,47 +22,20 @@ function isInteractiveTerminal() {
 
 function createPromptInterface(stage) {
   if (isInteractiveTerminal()) {
-    const output = process.stdout.isTTY ? process.stdout : process.stderr;
     return {
       rl: createInterface({
         input: process.stdin,
-        output,
-        terminal: Boolean(output.isTTY),
+        output: process.stdout,
+        terminal: Boolean(process.stdout.isTTY),
       }),
       dispose() {},
-      source: output === process.stdout ? 'stdin/stdout' : 'stdin/stderr',
+      source: 'stdin/stdout',
     };
   }
-
-  const enableTtyFallback =
-    process.env.UI_COMPONENTS_PROMPT_TTY_FALLBACK === '1';
-  if (!enableTtyFallback) {
-    console.log(
-      `[ui-components] [${stage}] 입력 채널이 비대화형입니다. stdin TTY에서 실행하거나 UI_COMPONENTS_PROMPT_TTY_FALLBACK=1을 사용하세요`
-    );
-    return null;
-  }
-
-  try {
-    const ttyInput = createReadStream('/dev/tty');
-    const ttyOutput = createWriteStream('/dev/tty');
-    return {
-      rl: createInterface({
-        input: ttyInput,
-        output: ttyOutput,
-      }),
-      dispose() {
-        ttyInput.destroy();
-        ttyOutput.end();
-      },
-      source: '/dev/tty',
-    };
-  } catch {
-    console.log(
-      `[ui-components] [${stage}] 입력 채널을 열 수 없어 종료합니다 (/dev/tty unavailable)`
-    );
-    return null;
-  }
+  console.log(
+    `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 인터랙티브 터미널에서 실행해 주세요`
+  );
+  return null;
 }
 
 function normalizeRetryAnswer(value) {
@@ -121,11 +93,6 @@ export async function promptRetryDecision(
   const { rl, dispose, source } = promptInterface;
 
   try {
-    if (source === '/dev/tty') {
-      console.log(
-        `[ui-components] [${stage}] non-TTY 환경 감지: /dev/tty로 입력을 받습니다`
-      );
-    }
     const retryAnswer = await rl.question(retryQuestion);
     const retry = normalizeRetryAnswer(retryAnswer);
     if (!retry) {

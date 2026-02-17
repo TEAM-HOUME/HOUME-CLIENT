@@ -34,6 +34,15 @@ import { stepVerify } from './steps/verify.mjs';
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
 const PLANNED_STEP_COUNT = 13;
 
+function configureTerminalSignalGuards() {
+  if (!process.stdin.isTTY) {
+    return;
+  }
+  // Job-control stop signal guard
+  process.on('SIGTTOU', () => {});
+  process.on('SIGTTIN', () => {});
+}
+
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
   return {
     runId,
@@ -165,6 +174,7 @@ async function executePipeline(context) {
 }
 
 async function main() {
+  configureTerminalSignalGuards();
   const args = parseArgs(process.argv);
   if (!args.scenarioArg) {
     console.error(
