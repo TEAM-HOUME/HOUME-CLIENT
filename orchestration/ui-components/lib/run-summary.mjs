@@ -133,7 +133,7 @@ export function summarizeStepOutput(name, output) {
     return `유형=${output.componentKind}, 역할=${output.role}, 상태=${output.state || '(none)'}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 모호점=${ambiguityCount}개`;
   }
   if (name === 'gate-intent') {
-    return `모드=${output.mode}, 상태=${output.status}, 신뢰도=${Number(output.confidence || 0).toFixed(2)} (기준 ${Number(output.minConfidence || 0).toFixed(2)})`;
+    return `상태=${output.status}, 신뢰도=${Number(output.confidence || 0).toFixed(2)} (기준 ${Number(output.minConfidence || 0).toFixed(2)})`;
   }
   if (name === 'gate-figma-scope') {
     return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계`;
@@ -148,7 +148,7 @@ export function summarizeStepOutput(name, output) {
     return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3`;
   }
   if (name === 'gate-design-tokens') {
-    return `모드=${output.mode}, 상태=${output.status}, 토큰=${output.totalTokens}개`;
+    return `상태=${output.status}, 토큰=${output.totalTokens}개`;
   }
   if (name === 'resolve-component-plan') {
     return `계획=${output.action}, 대상=${output.targetPath}, 소스=${output.source}`;
