@@ -48,6 +48,9 @@ function normalizeConfidence(value) {
 
 function buildPrompt(context) {
   const intent = context.scenario.intent;
+  const feedbackNotes = Array.isArray(context.feedbackLoop?.intent)
+    ? context.feedbackLoop.intent.filter(Boolean)
+    : [];
   const hintLines = [];
   if (intent.pageHint) {
     hintLines.push(`- page hint: ${intent.pageHint}`);
@@ -71,6 +74,10 @@ function buildPrompt(context) {
     `Brief: ${intent.brief}`,
     hintLines.length > 0 ? 'Optional hints:' : 'Optional hints: (none)',
     ...hintLines,
+    feedbackNotes.length > 0
+      ? 'Retry clarification notes (highest priority):'
+      : 'Retry clarification notes: (none)',
+    ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
     '',
     'Rules:',
     '- Keep this read-only and do not edit files.',

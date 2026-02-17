@@ -22,12 +22,14 @@ import { stepRunAgent } from './steps/run-agent-implementation.mjs';
 import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = Object.freeze({
+  intent: 3,
   plan: 3,
   implement: 3,
   verify: 3,
 });
 
 const STAGE_LABELS = Object.freeze({
+  intent: '의도',
   plan: '계획',
   implement: '구현',
   verify: '검증',
@@ -243,14 +245,7 @@ function summarizeStepOutput(name, output) {
   }
 
   if (name === 'preflight') {
-    if (output.skipMcpCheck) {
-      return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=skip`;
-    }
-    const probe = output.mcpProbe;
-    if (probe && typeof probe === 'object') {
-      return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=ok(${probe.probeTool}@${probe.nodeId}), auth-env=${probe.authTokenEnv || '(none)'}`;
-    }
-    return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=unknown`;
+    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})`;
   }
   if (name === 'extract-figma-scope') {
     const parentDepth = Array.isArray(output.parentChain)
@@ -524,6 +519,39 @@ async function runPlanWithFeedbackLoop(context) {
   }
 }
 
+async function runIntentWithFeedbackLoop(context) {
+  for (let attempt = 1; attempt <= RETRY_LIMITS.intent; attempt += 1) {
+    try {
+      runStep(context, 'extract-intent', stepExtractIntent);
+      runStep(context, 'gate-intent', stepGateIntent);
+      return;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (attempt >= RETRY_LIMITS.intent) {
+        throw error;
+      }
+
+      const decision = await promptRetryDecision(
+        'intent',
+        attempt,
+        RETRY_LIMITS.intent,
+        errorMessage
+      );
+      if (!decision.retry) {
+        throw error;
+      }
+
+      appendFeedback(
+        context,
+        'intent',
+        decision.note ||
+          `Previous intent failure: ${truncateText(errorMessage, 240)}`
+      );
+    }
+  }
+}
+
 async function runImplementationWithFeedbackLoop(context) {
   let verifyAttempt = 0;
 
@@ -701,7 +729,7 @@ async function main() {
   const args = parseArgs(process.argv);
   if (!args.scenarioArg) {
     console.error(
-      '[ui-components] 사용법: pnpm ui:run --scenario orchestration/ui-components/scenarios/<name>.yml [--dry-run] [--approve-visual] [--skip-mcp-check] [--skip-verify] [--open-storybook]'
+      '[ui-components] 사용법: pnpm ui:run --scenario orchestration/ui-components/scenarios/<name>.yml [--dry-run] [--approve-visual] [--skip-verify] [--open-storybook]'
     );
     process.exit(1);
   }
@@ -753,6 +781,7 @@ async function main() {
     figmaMcpToolUsage: null,
     agentTokenUsage: null,
     feedbackLoop: {
+      intent: [],
       plan: [],
       implement: [],
       verify: [],
@@ -763,8 +792,7 @@ async function main() {
 
   try {
     runStep(context, 'preflight', stepPreflight);
-    runStep(context, 'extract-intent', stepExtractIntent);
-    runStep(context, 'gate-intent', stepGateIntent);
+    await runIntentWithFeedbackLoop(context);
     runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
     runStep(context, 'gate-figma-scope', stepGateFigmaScope);
     runStep(
