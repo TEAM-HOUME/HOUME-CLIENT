@@ -1,5 +1,3 @@
-import type { JSX } from 'react';
-
 import { type ToastContentProps } from 'react-toastify';
 
 import { TOAST_TYPE, type ToastType } from '@/shared/types/toast';
@@ -18,15 +16,8 @@ interface ToastProps {
   // +) toast.dismiss(id): 토스트 컴포넌트 외부에서 닫기, closeToast(): 컴포넌트 내부에서 닫기
 }
 
-const ICON_MAP: Record<ToastType, JSX.Element> = {
-  [TOAST_TYPE.INFO]: <></>,
-  [TOAST_TYPE.NAVIGATE]: <></>,
-  [TOAST_TYPE.WARNING]: <WarningIcon />,
-};
-
 const TOAST_LAYOUT_STYLE = {
-  width: 'calc(100vw - 3.2rem)',
-  minWidth: '343px',
+  width: 'min(calc(100vw - 3.2rem), 40.8rem)',
   maxWidth: '408px',
   height: '44px',
 } as const;
@@ -41,9 +32,11 @@ const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
     }
   };
 
+  const icon = type === TOAST_TYPE.WARNING ? <WarningIcon /> : null;
+
   return (
     <div className={styles.container} style={TOAST_LAYOUT_STYLE}>
-      {ICON_MAP[type]}
+      {icon}
       <span
         className={styles.text({
           type: type === TOAST_TYPE.NAVIGATE ? 'navigate' : undefined,

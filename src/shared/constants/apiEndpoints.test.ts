@@ -25,12 +25,12 @@ function extractDeepValues(obj: any): string[] {
 }
 
 // 중첩 객체의 leaf(string/function) 개수를 계산하는 헬퍼
-function countLeafNodes(obj: any): number {
+function countLeafNodes(obj: unknown): number {
   if (typeof obj === 'string' || typeof obj === 'function') {
     return 1;
   }
   if (typeof obj === 'object' && obj !== null) {
-    return Object.values(obj).reduce(
+    return Object.values(obj as Record<string, unknown>).reduce<number>(
       (acc, value) => acc + countLeafNodes(value),
       0
     );

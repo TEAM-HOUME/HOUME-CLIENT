@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { AGENT_COMMAND_MAP, CODEX_SAFE_CONFIG } from './constants.mjs';
@@ -68,31 +68,6 @@ function shellEscape(value) {
 
 function runShellCommand(commandLine, options = {}) {
   return runCommandInternal('zsh', ['-lic', commandLine], options);
-}
-
-function prepareCodexHomePath(context) {
-  const codexHomePath = resolve(context.artifactsDir, 'codex-home');
-  mkdirSync(codexHomePath, { recursive: true });
-
-  const sourceHome =
-    process.env.CODEX_HOME ||
-    (process.env.HOME ? resolve(process.env.HOME, '.codex') : null);
-
-  if (!sourceHome) {
-    return codexHomePath;
-  }
-
-  const sourceAuthPath = resolve(sourceHome, 'auth.json');
-  const targetAuthPath = resolve(codexHomePath, 'auth.json');
-  if (existsSync(sourceAuthPath) && !existsSync(targetAuthPath)) {
-    try {
-      copyFileSync(sourceAuthPath, targetAuthPath);
-    } catch {
-      // Auth copy best effort
-    }
-  }
-
-  return codexHomePath;
 }
 
 export function resolveAgentRuntime(scenario) {
@@ -557,8 +532,6 @@ export function invokeAgentWithSchema(
   const claudePermissionMode = options.claudePermissionMode || 'plan';
 
   if (context.scenario.engine === 'codex') {
-    const codexHomePath = prepareCodexHomePath(context);
-
     const schemaPath = resolve(
       context.artifactsDir,
       `${context.runId}-${purpose}-schema.json`
@@ -582,10 +555,6 @@ export function invokeAgentWithSchema(
       {
         cwd: context.rootPath,
         timeoutMs,
-        env: {
-          ...process.env,
-          CODEX_HOME: codexHomePath,
-        },
       }
     );
 
