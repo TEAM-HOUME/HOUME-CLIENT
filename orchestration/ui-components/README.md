@@ -2,27 +2,6 @@
 
 Single-command pipeline for turning a Figma node into a validated UI component change.
 
-## Why This Exists
-
-- Personal prompt/alias differences made UI implementation outcomes drift across team members.
-- Figma node links alone are often ambiguous, so intent/scope decisions needed explicit contracts.
-- UI component work needs guardrails before merge (`changed paths`, `verify`, `behavior gate`) instead of implicit trust in one-shot generation.
-- Team-level reproducibility required a run artifact trail (`agent-trace`, direct MCP logs, report index) and stable pass/fail criteria.
-
-## Why Gate Orchestration (Not Just Skills or Custom Commands)
-
-- Skills and custom shell commands are useful helpers, but they do not enforce stage-by-stage contracts or deterministic gates.
-- This orchestration fixes the execution contract in code: scenario schema, JSON-schema agent outputs, local gate checks, retry policy, and retention policy.
-- The same `pnpm ui:run ...` command works for everyone, independent of personal shell aliases; runtime uses `codexf` when available and falls back to `codex`.
-- Ambiguous interaction behavior is intentionally stopped by gate policy, so humans approve only the risky decision points.
-
-## Harness Implementation Model
-
-- Control plane: `run.mjs` defines stage order, fail/warn policy, feedback loops, and report lifecycle.
-- Agent plane: Codex handles intent extraction, scope extraction, planning, and implementation with explicit prompt injection.
-- Tool plane: direct Figma MCP tool calls are logged separately from agent outputs for traceability.
-- Governance plane: gates convert raw outputs into deterministic outcomes (`pass/warn/fail`) with retry and archive behavior.
-
 ## Goal
 
 - Keep design-to-code flow reproducible.
@@ -46,7 +25,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 
 ## Pipeline Stages
 
-- `preflight`: verify CLI + MCP availability.
+- `preflight`: verify required CLI availability and codex runtime.
 - `extract-intent`: parse brief/hints into structured intent.
 - `gate-intent`: validate intent confidence/ambiguity and behavior preconditions.
 - `extract-figma-scope`: parse URL and optionally walk parent scope.
@@ -59,7 +38,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `run-agent-implementation`: implement code changes with injected context docs.
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
-- `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 3 attempts per stage).
+- `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
 - `report`: write run summary JSON.
 
 Default fixed policy:
@@ -154,10 +133,6 @@ sequenceDiagram
   R->>R: parseArgs + readScenario + init context
   R->>A: preflight --version
 
-  opt !--skip-mcp-check
-    R->>A: preflight mcp get (figma server candidates)
-  end
-
   R->>A: intent-resolve prompt (JSON schema)
   A-->>R: page/componentKind/role/state/confidence
 
@@ -209,19 +184,19 @@ stateDiagram-v2
 
   RunningSteps --> Failed: preflight/scope/token/non-retryable fail
   RunningSteps --> IntentRetry: extract-intent or gate-intent fail
-  IntentRetry --> RunningSteps: user confirms retry (<=3)
+  IntentRetry --> RunningSteps: user confirms retry (<=10)
   IntentRetry --> Failed: retry declined/exhausted
 
   RunningSteps --> PlanRetry: resolve-component-plan fail
-  PlanRetry --> RunningSteps: user confirms retry (<=3)
+  PlanRetry --> RunningSteps: user confirms retry (<=10)
   PlanRetry --> Failed: retry declined/exhausted
 
   RunningSteps --> ImplementRetry: implement/path-gate fail
-  ImplementRetry --> RunningSteps: user confirms retry (<=3)
+  ImplementRetry --> RunningSteps: user confirms retry (<=10)
   ImplementRetry --> Failed: retry declined/exhausted
 
   RunningSteps --> VerifyRetry: verify fail
-  VerifyRetry --> RunningSteps: user confirms retry (<=3)
+  VerifyRetry --> RunningSteps: user confirms retry (<=10)
   VerifyRetry --> Failed: retry declined/exhausted
   RunningSteps --> Passed: all steps passed
 

@@ -32,12 +32,14 @@ import { stepRunAgent } from './steps/run-agent-implementation.mjs';
 import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
+const PLANNED_STEP_COUNT = 13;
 
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
   return {
     runId,
     rootPath,
     artifactsDir,
+    plannedStepCount: PLANNED_STEP_COUNT,
     options: args,
     scenario,
     steps: [],
@@ -85,6 +87,7 @@ function printFinalSummary(context, reportResult) {
   ).length;
   const totalSteps = context.steps.length;
 
+  console.log('');
   console.log(`[ui-components] 단계 요약: ${passedSteps}/${totalSteps} 통과`);
   if (context.storybookOpenResult?.status === 'opened') {
     console.log(
@@ -124,9 +127,11 @@ function printFinalSummary(context, reportResult) {
 
   if (context.status === 'failed') {
     console.error(`[ui-components] 실패: ${context.error}`);
+    console.log('');
     return;
   }
   console.log('[ui-components] 파이프라인 완료');
+  console.log('');
 }
 
 async function executePipeline(context) {

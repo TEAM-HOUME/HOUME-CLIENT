@@ -1,3 +1,5 @@
+import { spawn } from 'node:child_process';
+
 import {
   logStepDetails,
   logStepFailureHint,
@@ -5,17 +7,70 @@ import {
 } from './run-summary.mjs';
 import { formatDuration } from './step-utils.mjs';
 
+const HEARTBEAT_INTERVAL_MS = 15_000;
+const HEARTBEAT_STEPS = new Set([
+  'extract-intent',
+  'extract-figma-scope',
+  'extract-figma-mcp-tool-logs',
+  'extract-design-tokens',
+  'resolve-component-plan',
+  'run-agent-implementation',
+  'verify',
+]);
+
+function startStepHeartbeat(stepLabel) {
+  const child = spawn(
+    process.execPath,
+    [
+      '-e',
+      `
+const label = ${JSON.stringify(stepLabel)};
+const started = Date.now();
+setInterval(() => {
+  const elapsedSec = Math.floor((Date.now() - started) / 1000);
+  console.log(\`[ui-components] [\${label}] 진행중... \${elapsedSec}s 경과\`);
+}, ${HEARTBEAT_INTERVAL_MS});
+      `,
+    ],
+    {
+      stdio: ['ignore', 'inherit', 'inherit'],
+    }
+  );
+  return child;
+}
+
+function stopStepHeartbeat(heartbeatProcess) {
+  if (!heartbeatProcess || heartbeatProcess.killed) {
+    return;
+  }
+  heartbeatProcess.kill('SIGTERM');
+}
+
 export function runStep(context, name, handler) {
   const startedAt = new Date().toISOString();
   const startedMs = Date.now();
   const traceCountBefore = context.agentTraceArtifacts.length;
+  const stepIndex = context.steps.length + 1;
+  const plannedStepCount = Number(context.plannedStepCount || 0);
+  const stepCounterText =
+    plannedStepCount > 0
+      ? ` (${stepIndex}/${plannedStepCount})`
+      : ` (${stepIndex})`;
+  const stepLabelForHeartbeat = `${name}${stepCounterText}`;
   const stepLog = {
     name,
+    stepIndex,
+    plannedStepCount: plannedStepCount > 0 ? plannedStepCount : null,
     status: 'running',
     startedAt,
   };
   context.steps.push(stepLog);
-  console.log(`[ui-components] [${name}] 시작`);
+  console.log('');
+  console.log(`[ui-components] [${name}]${stepCounterText} 시작`);
+  const heartbeatProcess =
+    !context.options?.dryRun && HEARTBEAT_STEPS.has(name)
+      ? startStepHeartbeat(stepLabelForHeartbeat)
+      : null;
 
   try {
     const output = handler(context);
@@ -28,6 +83,7 @@ export function runStep(context, name, handler) {
     stepLog.error = error instanceof Error ? error.message : String(error);
     throw error;
   } finally {
+    stopStepHeartbeat(heartbeatProcess);
     stepLog.finishedAt = new Date().toISOString();
     stepLog.durationMs = Date.now() - startedMs;
     const stepTraceRecords =
@@ -37,14 +93,16 @@ export function runStep(context, name, handler) {
     if (stepLog.status === 'passed') {
       const summary = summarizeStepOutput(name, stepLog.output);
       console.log(
-        `[ui-components] [${name}] 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
+        `[ui-components] [${name}]${stepCounterText} 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
       );
       logStepDetails(name, stepLog.output, stepTraceRecords);
+      console.log('');
       return;
     }
     console.log(
-      `[ui-components] [${name}] 실패 (${durationText}) - ${stepLog.error}`
+      `[ui-components] [${name}]${stepCounterText} 실패 (${durationText}) - ${stepLog.error}`
     );
     logStepFailureHint(name, stepTraceRecords);
+    console.log('');
   }
 }

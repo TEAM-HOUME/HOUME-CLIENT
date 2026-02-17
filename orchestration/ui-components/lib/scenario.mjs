@@ -190,7 +190,6 @@ export function parseArgs(argv) {
     scenarioArg,
     dryRun: argv.includes('--dry-run'),
     approveVisual: argv.includes('--approve-visual'),
-    skipMcpCheck: argv.includes('--skip-mcp-check'),
     skipVerify: argv.includes('--skip-verify'),
     openStorybook: argv.includes('--open-storybook'),
   };

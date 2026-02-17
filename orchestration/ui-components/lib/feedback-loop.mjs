@@ -4,10 +4,10 @@ import { createInterface } from 'node:readline/promises';
 import { truncateText } from './step-utils.mjs';
 
 export const DEFAULT_RETRY_LIMITS = Object.freeze({
-  intent: 3,
-  plan: 3,
-  implement: 3,
-  verify: 3,
+  intent: 10,
+  plan: 10,
+  implement: 10,
+  verify: 10,
 });
 
 const STAGE_LABELS = Object.freeze({
