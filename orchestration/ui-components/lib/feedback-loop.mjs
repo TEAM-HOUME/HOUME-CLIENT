@@ -26,7 +26,8 @@ function createPromptInterface(stage) {
       rl: createInterface({
         input: process.stdin,
         output: process.stdout,
-        terminal: Boolean(process.stdout.isTTY),
+        // Plain line reader
+        terminal: false,
       }),
       dispose() {},
       source: 'stdin/stdout',
@@ -36,6 +37,11 @@ function createPromptInterface(stage) {
     `[ui-components] [${stage}] 입력 채널이 비대화형입니다. 인터랙티브 터미널에서 실행해 주세요`
   );
   return null;
+}
+
+async function askLine(rl, question) {
+  process.stdout.write(question);
+  return rl.question('');
 }
 
 function normalizeRetryAnswer(value) {
@@ -93,7 +99,7 @@ export async function promptRetryDecision(
   const { rl, dispose, source } = promptInterface;
 
   try {
-    const retryAnswer = await rl.question(retryQuestion);
+    const retryAnswer = await askLine(rl, retryQuestion);
     const retry = normalizeRetryAnswer(retryAnswer);
     if (!retry) {
       recordFeedbackHistory(context, {
@@ -116,7 +122,7 @@ export async function promptRetryDecision(
       };
     }
 
-    const note = (await rl.question(noteQuestion)).trim();
+    const note = (await askLine(rl, noteQuestion)).trim();
     recordFeedbackHistory(context, {
       stage,
       attempt,
