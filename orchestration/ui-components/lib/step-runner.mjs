@@ -91,7 +91,10 @@ export function runStep(context, name, handler) {
     const durationText = formatDuration(stepLog.durationMs);
     if (stepLog.status === 'passed') {
       const summary = summarizeStepOutput(name, stepLog.output);
-      console.log(`- 통과 (${durationText})${summary ? ` - ${summary}` : ''}`);
+      console.log(`- 통과 (${durationText})`);
+      if (summary) {
+        console.log(`- ${summary}`);
+      }
       logStepDetails(name, stepLog.output, stepTraceRecords);
       console.log(STEP_DIVIDER);
       console.log('');
