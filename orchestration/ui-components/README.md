@@ -226,7 +226,6 @@ agent:
 
 - `target`: explicit single target file path (preferred for deterministic updates)
 - `targets`: legacy list form; only one target is supported in automatic planning
-- `context.ui_rules_docs`: additional docs to inject as coding conventions
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
 - `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)

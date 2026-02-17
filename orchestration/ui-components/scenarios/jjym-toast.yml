@@ -2,19 +2,11 @@ id: jjym-toast
 
 figma:
   url: 'https://www.figma.com/design/87dDqo3EUSFSzXK7f7s5Gs/TEMP?node-id=1-427&m=dev'
-  mcp_endpoint: 'https://mcp.figma.com/mcp'
-  mcp_auth_token_env: 'FIGMA_MCP_ACCESS_TOKEN'
 
 agent:
   engine: codex
 
 target: 'src/shared/components/toast/Toast.tsx'
-
-context:
-  ui_rules_docs:
-    - 'docs/reference/ui-component-design-conventions.md'
-    - 'docs/reference/styling-system.md'
-    - 'docs/reference/component-catalog.md'
 
 verification:
   - storybook

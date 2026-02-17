@@ -10,19 +10,8 @@ const DEFAULT_UI_RULE_DOCS = [
 ];
 const DEFAULT_REQUIRED_VIEWPORTS = ['mobile375', 'mobile440'];
 
-function normalizePath(value) {
-  return String(value ?? '')
-    .trim()
-    .replace(/\\/g, '/')
-    .replace(/^\.\//, '');
-}
-
-function resolveUiRuleDocPaths(rootPath, scenario) {
-  const configured = Array.isArray(scenario?.context?.uiRulesDocs)
-    ? scenario.context.uiRulesDocs.map(normalizePath).filter(Boolean)
-    : [];
-  const candidatePaths = [...new Set([...DEFAULT_UI_RULE_DOCS, ...configured])];
-  const missing = candidatePaths.filter(
+function resolveUiRuleDocPaths(rootPath) {
+  const missing = DEFAULT_UI_RULE_DOCS.filter(
     (path) => !existsSync(resolve(rootPath, path))
   );
 
@@ -30,7 +19,7 @@ function resolveUiRuleDocPaths(rootPath, scenario) {
     fail(`UI rule docs not found: ${missing.join(', ')}`);
   }
 
-  return candidatePaths.map((path) => resolve(rootPath, path));
+  return DEFAULT_UI_RULE_DOCS.map((path) => resolve(rootPath, path));
 }
 
 function extractRequiredViewports(content) {
@@ -67,8 +56,8 @@ function extractRequiredViewports(content) {
   return viewports;
 }
 
-export function readContracts(rootPath, scenario) {
-  const uiRuleDocPaths = resolveUiRuleDocPaths(rootPath, scenario);
+export function readContracts(rootPath) {
+  const uiRuleDocPaths = resolveUiRuleDocPaths(rootPath);
   const uiRuleDocs = uiRuleDocPaths.map((path) => {
     const content = readFileSync(path, 'utf8');
     return {

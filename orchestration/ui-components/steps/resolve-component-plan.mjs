@@ -150,7 +150,7 @@ function enforceBehaviorGate(context, componentPlan) {
 }
 
 export function stepResolveComponent(context) {
-  const contracts = readContracts(context.rootPath, context.scenario);
+  const contracts = readContracts(context.rootPath);
   context.contracts = contracts;
   let componentPlan = null;
 
