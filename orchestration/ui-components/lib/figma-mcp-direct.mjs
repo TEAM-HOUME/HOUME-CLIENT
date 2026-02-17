@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -158,8 +158,10 @@ function sendJsonRpcRequest({
   });
   const durationMs = Date.now() - startedMs;
 
-  const headersRaw = readFileSync(headersPath, 'utf8');
-  const bodyRaw = readFileSync(bodyPath, 'utf8');
+  const headersRaw = existsSync(headersPath)
+    ? readFileSync(headersPath, 'utf8')
+    : '';
+  const bodyRaw = existsSync(bodyPath) ? readFileSync(bodyPath, 'utf8') : '';
   rmSync(tempDir, { recursive: true, force: true });
 
   const responseHeaders = parseHeaders(headersRaw);
@@ -207,7 +209,12 @@ function classifyTransportError(message) {
   return 'failed';
 }
 
-export function classifyJsonRpcCall(callRecord) {
+export function classifyJsonRpcCall(callRecord, options = {}) {
+  const allowMissingPayload =
+    options && typeof options === 'object'
+      ? options.allowMissingPayload === true
+      : false;
+
   if (callRecord.transportError) {
     return {
       status: classifyTransportError(callRecord.transportError),
@@ -231,6 +238,18 @@ export function classifyJsonRpcCall(callRecord) {
 
   const parsed = callRecord.response.parsedJsonRpc;
   if (!parsed || typeof parsed !== 'object') {
+    if (
+      allowMissingPayload &&
+      statusCode !== null &&
+      statusCode >= 200 &&
+      statusCode < 300
+    ) {
+      return {
+        status: 'ok',
+        error: '',
+      };
+    }
+
     return {
       status: 'failed',
       error: 'Missing JSON-RPC response payload',

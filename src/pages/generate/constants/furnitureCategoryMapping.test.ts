@@ -25,9 +25,9 @@ describe('furnitureCategoryMapping', () => {
     expect(codes).toEqual(['MOVABLE_TV']);
   });
 
-  it('finalLabel 의자를 SINGLE_SOFA로 매핑해요', () => {
+  it('finalLabel 의자(Chair)는 비활성화되어 빈 배열을 반환해요', () => {
     const codes = resolveFurnitureCodes({ finalLabel: 'Chair' });
-    expect(codes).toEqual(['SINGLE_SOFA']);
+    expect(codes).toEqual([]);
   });
 
   it('OBJ365 index 12는 리파인 없으면 감지 실패로 처리해요', () => {

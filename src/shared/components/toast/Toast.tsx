@@ -24,6 +24,13 @@ const ICON_MAP: Record<ToastType, JSX.Element> = {
   [TOAST_TYPE.WARNING]: <WarningIcon />,
 };
 
+const TOAST_LAYOUT_STYLE = {
+  width: 'calc(100vw - 3.2rem)',
+  minWidth: '343px',
+  maxWidth: '408px',
+  height: '44px',
+} as const;
+
 const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
   const handleActionClick = () => {
     if (onClick) {
@@ -35,7 +42,7 @@ const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={TOAST_LAYOUT_STYLE}>
       {ICON_MAP[type]}
       <span
         className={styles.text({

@@ -151,7 +151,10 @@ export function stepExtractFigmaMcpToolLogs(context) {
 
   if (session.initializedNotification) {
     const notificationState = classifyJsonRpcCall(
-      session.initializedNotification
+      session.initializedNotification,
+      {
+        allowMissingPayload: true,
+      }
     );
     callArtifacts.push(
       writeCallArtifacts(

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { AGENT_COMMAND_MAP, CODEX_SAFE_CONFIG } from './constants.mjs';
@@ -11,6 +11,7 @@ function runCommandInternal(command, args, options = {}) {
     timeoutMs = 60_000,
     allowFailure = false,
     shell = false,
+    env = process.env,
   } = options;
   const result = spawnSync(command, args, {
     cwd,
@@ -18,6 +19,7 @@ function runCommandInternal(command, args, options = {}) {
     timeout: timeoutMs,
     maxBuffer: 10 * 1024 * 1024,
     shell,
+    env,
   });
 
   const stdout = result.stdout?.trim() ?? '';
@@ -66,6 +68,31 @@ function shellEscape(value) {
 
 function runShellCommand(commandLine, options = {}) {
   return runCommandInternal('zsh', ['-lic', commandLine], options);
+}
+
+function prepareCodexHomePath(context) {
+  const codexHomePath = resolve(context.artifactsDir, 'codex-home');
+  mkdirSync(codexHomePath, { recursive: true });
+
+  const sourceHome =
+    process.env.CODEX_HOME ||
+    (process.env.HOME ? resolve(process.env.HOME, '.codex') : null);
+
+  if (!sourceHome) {
+    return codexHomePath;
+  }
+
+  const sourceAuthPath = resolve(sourceHome, 'auth.json');
+  const targetAuthPath = resolve(codexHomePath, 'auth.json');
+  if (existsSync(sourceAuthPath) && !existsSync(targetAuthPath)) {
+    try {
+      copyFileSync(sourceAuthPath, targetAuthPath);
+    } catch {
+      // Auth copy best effort
+    }
+  }
+
+  return codexHomePath;
 }
 
 export function resolveAgentRuntime(scenario) {
@@ -287,6 +314,118 @@ function parseAgentOutput(text) {
   };
 }
 
+function parseJsonLinesEvents(text) {
+  const lines = String(text ?? '').split(/\r?\n/);
+  const events = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      continue;
+    }
+    try {
+      events.push(JSON.parse(trimmed));
+    } catch {
+      // Non-JSON line
+    }
+  }
+
+  return events;
+}
+
+function extractAgentMessageText(item) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  if (typeof item.text === 'string' && item.text.trim()) {
+    return item.text;
+  }
+
+  if (!Array.isArray(item.content)) {
+    return '';
+  }
+
+  const textParts = item.content
+    .map((entry) => {
+      if (typeof entry === 'string') {
+        return entry;
+      }
+      if (!entry || typeof entry !== 'object') {
+        return '';
+      }
+      if (typeof entry.text === 'string') {
+        return entry.text;
+      }
+      if (typeof entry.content === 'string') {
+        return entry.content;
+      }
+      return '';
+    })
+    .filter(Boolean);
+
+  return textParts.join('\n');
+}
+
+function parseCodexJsonOutput(text) {
+  const events = parseJsonLinesEvents(text);
+  if (events.length === 0) {
+    return parseAgentOutput(text);
+  }
+
+  let usage = null;
+  let parsed = null;
+  let envelope = events[events.length - 1] ?? null;
+
+  for (const event of events) {
+    const eventUsage = extractUsageFromValue(event);
+    if (eventUsage) {
+      usage = eventUsage;
+    }
+  }
+
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    const item = event?.item;
+    if (!item || item.type !== 'agent_message') {
+      continue;
+    }
+
+    const messageText = extractAgentMessageText(item);
+    if (!messageText) {
+      continue;
+    }
+
+    const candidate = extractFirstJson(messageText);
+    if (
+      !candidate ||
+      typeof candidate !== 'object' ||
+      Array.isArray(candidate)
+    ) {
+      continue;
+    }
+
+    parsed = candidate;
+    envelope = event;
+    break;
+  }
+
+  if (!parsed) {
+    const fallback = parseAgentOutput(text);
+    return {
+      parsed: fallback.parsed,
+      usage: usage ?? fallback.usage,
+      envelope: fallback.envelope ?? envelope,
+    };
+  }
+
+  return {
+    parsed,
+    usage,
+    envelope,
+  };
+}
+
 export function parseAgentJsonOutput(text) {
   const output = parseAgentOutput(text);
   if (!output.parsed) {
@@ -418,6 +557,8 @@ export function invokeAgentWithSchema(
   const claudePermissionMode = options.claudePermissionMode || 'plan';
 
   if (context.scenario.engine === 'codex') {
+    const codexHomePath = prepareCodexHomePath(context);
+
     const schemaPath = resolve(
       context.artifactsDir,
       `${context.runId}-${purpose}-schema.json`
@@ -433,6 +574,7 @@ export function invokeAgentWithSchema(
         'exec',
         '-C',
         context.rootPath,
+        '--json',
         '--output-schema',
         schemaPath,
         prompt,
@@ -440,10 +582,14 @@ export function invokeAgentWithSchema(
       {
         cwd: context.rootPath,
         timeoutMs,
+        env: {
+          ...process.env,
+          CODEX_HOME: codexHomePath,
+        },
       }
     );
 
-    const parsedOutput = parseAgentOutput(result.stdout);
+    const parsedOutput = parseCodexJsonOutput(result.stdout);
     const parsed = parsedOutput.parsed;
     recordAgentTrace(context, {
       purpose,

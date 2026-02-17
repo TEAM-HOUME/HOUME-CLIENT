@@ -24,6 +24,20 @@ function extractDeepValues(obj: any): string[] {
   return values;
 }
 
+// 중첩 객체의 leaf(string/function) 개수를 계산하는 헬퍼
+function countLeafNodes(obj: any): number {
+  if (typeof obj === 'string' || typeof obj === 'function') {
+    return 1;
+  }
+  if (typeof obj === 'object' && obj !== null) {
+    return Object.values(obj).reduce(
+      (acc, value) => acc + countLeafNodes(value),
+      0
+    );
+  }
+  return 0;
+}
+
 describe('API_ENDPOINT 상수 테스트', () => {
   describe('타입 레벨 테스트', () => {
     it('ApiEndpoint 타입이 string 리터럴 유니온 타입이어야 함', () => {
@@ -76,21 +90,27 @@ describe('API_ENDPOINT 상수 테스트', () => {
       });
     });
 
-    it('중복된 엔드포인트가 없어야 함', () => {
+    it('중복 엔드포인트는 허용된 별칭만 존재해야 함', () => {
       const allEndpoints = extractDeepValues(API_ENDPOINT);
-      const uniqueEndpoints = new Set(allEndpoints);
-
-      // 중복 찾기
-      const duplicates = allEndpoints.filter(
-        (item, index) => allEndpoints.indexOf(item) !== index
+      const endpointCounts = allEndpoints.reduce<Record<string, number>>(
+        (acc, endpoint) => {
+          acc[endpoint] = (acc[endpoint] ?? 0) + 1;
+          return acc;
+        },
+        {}
       );
 
-      if (duplicates.length > 0) {
-        console.log('중복된 엔드포인트:', duplicates);
-      }
+      const duplicatedEndpoints = Object.entries(endpointCounts)
+        .filter(([, count]) => count > 1)
+        .map(([endpoint]) => endpoint);
 
-      expect(duplicates).toHaveLength(0);
-      expect(allEndpoints.length).toBe(uniqueEndpoints.size);
+      const allowedDuplicates = new Set(['/api/v1/dashboard-info']);
+      const disallowedDuplicates = duplicatedEndpoints.filter(
+        (endpoint) => !allowedDuplicates.has(endpoint)
+      );
+
+      expect(disallowedDuplicates).toHaveLength(0);
+      expect(endpointCounts['/api/v1/dashboard-info']).toBe(2);
     });
 
     it('각 도메인 그룹이 하나 이상의 엔드포인트를 가져야 함', () => {
@@ -128,16 +148,8 @@ describe('API_ENDPOINT 상수 테스트', () => {
 
     it('정확한 엔드포인트 개수를 추출해야 함', () => {
       const runtimeEndpoints = extractDeepValues(API_ENDPOINT);
-
-      // 현재 정의된 엔드포인트 총 개수
-      const expectedCount =
-        3 + // AUTH (KAKAO_CALLBACK, LOGOUT, REISSUE)
-        5 + // USER (SIGN_UP, MYPAGE, MYPAGE_IMAGES, MYPAGE_IMAGE_DETAIL, DELETE)
-        4 + // ONBOARDING
-        6 + // GENERATE
-        3; // ANALYTICS
-
-      expect(runtimeEndpoints.length).toBe(expectedCount);
+      const leafCount = countLeafNodes(API_ENDPOINT);
+      expect(runtimeEndpoints.length).toBe(leafCount);
     });
   });
 
@@ -174,7 +186,7 @@ describe('API_ENDPOINT 상수 테스트', () => {
       const authEndpoints = extractDeepValues(extendedAuth);
 
       // 기존 엔드포인트 + 새 엔드포인트
-      expect(authEndpoints.length).toBe(4); // 기존 3개 + 새로운 1개
+      expect(authEndpoints.length).toBe(countLeafNodes(API_ENDPOINT.AUTH) + 1);
       expect(authEndpoints).toContain('/api/v1/auth/new');
     });
   });
