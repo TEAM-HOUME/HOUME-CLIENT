@@ -207,6 +207,7 @@ export function writeReport(context) {
     figmaScope: context.figmaScope || null,
     figmaScopeGate: context.figmaScopeGate || null,
     resolvedIntent: context.resolvedIntent || null,
+    intentOverrides: context.intentOverrides || null,
     intentGate: context.intentGate || null,
     figmaMcpToolLogs: context.figmaMcpToolLogs || null,
     figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,

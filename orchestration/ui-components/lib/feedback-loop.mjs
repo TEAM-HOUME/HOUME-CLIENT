@@ -17,6 +17,84 @@ const STAGE_LABELS = Object.freeze({
   verify: '검증',
 });
 
+const INTENT_OVERRIDE_FIELDS = Object.freeze([
+  {
+    key: 'trigger_policy',
+    label: '트리거 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'optimistic_success',
+      3: 'after_api_success',
+      4: 'after_server_sync',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 코드 기준',
+      '2) 낙관적 업데이트 성공 시점',
+      '3) API 성공 응답 시점',
+      '4) 서버 동기화 완료 시점',
+    ]),
+  },
+  {
+    key: 'placement_policy',
+    label: '배치 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'bottom_safe_area',
+      3: 'top_safe_area',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 코드 기준',
+      '2) 하단 safe-area 기준',
+      '3) 상단 safe-area 기준',
+    ]),
+  },
+  {
+    key: 'dismiss_policy',
+    label: '닫기 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'auto_3000_with_cta_dismiss',
+      3: 'manual_only',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 코드 기준',
+      '2) 자동 3000ms + CTA 클릭 시 닫힘',
+      '3) 수동 닫기만 허용',
+    ]),
+  },
+  {
+    key: 'concurrency_policy',
+    label: '중복 표시 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'replace_latest',
+      3: 'queue',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 코드 기준',
+      '2) 최신 토스트로 교체',
+      '3) 큐잉 처리',
+    ]),
+  },
+  {
+    key: 'accessibility_policy',
+    label: '접근성 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'aria_polite',
+      3: 'aria_assertive',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 코드 기준',
+      '2) aria-live polite',
+      '3) aria-live assertive',
+    ]),
+  },
+]);
+
+const MAX_FEEDBACK_NOTES_PER_STAGE = 4;
+const MAX_FEEDBACK_NOTE_LENGTH = 280;
+
 function isInteractiveTerminal() {
   return Boolean(process.stdin.isTTY);
 }
@@ -59,6 +137,115 @@ async function askLine(rl, question) {
   return rl.question(question);
 }
 
+async function askIntentChoice(rl, stage, field) {
+  const basePrompt = [
+    `[ui-components] [${stage}] ${field.label} 선택 (Enter=미지정):`,
+    ...field.descriptions.map(
+      (description) => `[ui-components] [${stage}]   - ${description}`
+    ),
+    `[ui-components] [${stage}] 선택값: `,
+  ].join('\n');
+
+  while (true) {
+    const answer = String((await askLine(rl, basePrompt)) ?? '').trim();
+    if (!answer) {
+      return '';
+    }
+    if (field.options[answer]) {
+      return field.options[answer];
+    }
+    console.log(
+      `[ui-components] [${stage}] 입력 형식 오류: ${field.label}은 제시된 번호로 입력해 주세요`
+    );
+  }
+}
+
+function normalizeOverrideObject(rawValue) {
+  if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+    return null;
+  }
+  const normalized = Object.fromEntries(
+    Object.entries(rawValue)
+      .map(([key, value]) => [String(key), String(value ?? '').trim()])
+      .filter(([, value]) => Boolean(value))
+  );
+  if (Object.keys(normalized).length === 0) {
+    return null;
+  }
+  return normalized;
+}
+
+function mergeIntentOverrides(context, overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return null;
+  }
+
+  if (
+    !context.intentOverrides ||
+    typeof context.intentOverrides !== 'object' ||
+    Array.isArray(context.intentOverrides)
+  ) {
+    context.intentOverrides = {};
+  }
+  Object.assign(context.intentOverrides, normalized);
+  return normalized;
+}
+
+function buildIntentOverrideFeedback(overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return '';
+  }
+  const parts = Object.entries(normalized).map(
+    ([key, value]) => `${key}=${value}`
+  );
+  return `Intent override decisions: ${parts.join('; ')}`;
+}
+
+function printIntentOverrideSummary(stage, overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return;
+  }
+  console.log(`[ui-components] [${stage}] 구조화 보강 적용`);
+  for (const [key, value] of Object.entries(normalized)) {
+    console.log(`[ui-components] [${stage}]   - ${key}: ${value}`);
+  }
+}
+
+async function collectIntentStructuredOverrides(rl, stage) {
+  const overrides = {};
+  for (const field of INTENT_OVERRIDE_FIELDS) {
+    const value = await askIntentChoice(rl, stage, field);
+    if (value) {
+      overrides[field.key] = value;
+    }
+  }
+
+  const ctaTarget = String(
+    (await askLine(
+      rl,
+      `[ui-components] [${stage}] CTA 대상 경로/의미 입력 (선택, Enter=미지정): `
+    )) ?? ''
+  ).trim();
+  if (ctaTarget) {
+    overrides.cta_target = ctaTarget;
+  }
+
+  const additionalPrompt = String(
+    (await askLine(
+      rl,
+      `[ui-components] [${stage}] 추가 프롬프트 입력 (선택, Enter=생략): `
+    )) ?? ''
+  ).trim();
+  if (additionalPrompt) {
+    overrides.additional_prompt = additionalPrompt;
+  }
+
+  return overrides;
+}
+
 function parseRetryChoice(rawAnswer) {
   const raw = String(rawAnswer ?? '').trim();
   if (!raw) {
@@ -92,7 +279,7 @@ export async function promptRetryDecision(
   const stageLabel = STAGE_LABELS[stage] || stage;
   const remaining = Math.max(0, maxAttempts - attempt);
   const retryQuestion = `[ui-components] [${stage}] 재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
-  const noteQuestion = `[ui-components] [${stage}] 보강 지시 입력 (선택, Enter=생략): `;
+  const noteQuestion = `[ui-components] [${stage}] 자유 보강 지시 입력 (선택, Enter=생략): `;
   console.log(
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts}) - ${truncateText(errorMessage, 220)}`
   );
@@ -109,6 +296,7 @@ export async function promptRetryDecision(
       answers: {
         retryAnswerRaw: null,
         note: null,
+        structuredOverrides: null,
       },
       retry: false,
       inputSource: 'none',
@@ -146,6 +334,7 @@ export async function promptRetryDecision(
         answers: {
           retryAnswerRaw: parsedDecision.raw,
           note: null,
+          structuredOverrides: null,
         },
         retry: false,
         inputSource: source,
@@ -157,6 +346,19 @@ export async function promptRetryDecision(
     }
 
     const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
+    const structuredOverrides =
+      stage === 'intent'
+        ? await collectIntentStructuredOverrides(rl, stage)
+        : {};
+    const appliedOverrides = mergeIntentOverrides(context, structuredOverrides);
+    if (stage === 'intent') {
+      printIntentOverrideSummary(stage, appliedOverrides);
+    }
+    const intentOverrideFeedback =
+      stage === 'intent' ? buildIntentOverrideFeedback(appliedOverrides) : '';
+    const mergedNote = [note, intentOverrideFeedback]
+      .filter(Boolean)
+      .join(' || ');
     recordFeedbackHistory(context, {
       stage,
       attempt,
@@ -166,14 +368,15 @@ export async function promptRetryDecision(
       questions: [retryQuestion, noteQuestion],
       answers: {
         retryAnswerRaw: parsedDecision.raw,
-        note,
+        note: mergedNote,
+        structuredOverrides: appliedOverrides,
       },
       retry: true,
       inputSource: source,
     });
     return {
       retry: true,
-      note,
+      note: mergedNote,
     };
   } finally {
     rl.close();
@@ -185,7 +388,23 @@ export function appendFeedback(context, stage, value) {
   if (!value || !context.feedbackLoop?.[stage]) {
     return;
   }
-  context.feedbackLoop[stage].push(String(value).trim());
+
+  const normalized = truncateText(
+    String(value).trim(),
+    MAX_FEEDBACK_NOTE_LENGTH
+  );
+  if (!normalized) {
+    return;
+  }
+
+  const target = context.feedbackLoop[stage];
+  if (target.includes(normalized)) {
+    return;
+  }
+  target.push(normalized);
+  if (target.length > MAX_FEEDBACK_NOTES_PER_STAGE) {
+    target.splice(0, target.length - MAX_FEEDBACK_NOTES_PER_STAGE);
+  }
 }
 
 export async function runPlanWithFeedbackLoop(context, options) {

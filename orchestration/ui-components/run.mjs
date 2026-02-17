@@ -66,6 +66,7 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     agentRuntime: null,
     contracts: null,
     resolvedIntent: null,
+    intentOverrides: {},
     intentArtifactPath: null,
     intentGate: null,
     figmaScope: null,

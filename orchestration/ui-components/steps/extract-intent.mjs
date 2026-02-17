@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import { readContracts } from '../lib/contracts.mjs';
 
 const COMPONENT_KIND_ENUM = [
   'toast',
@@ -46,11 +47,49 @@ function normalizeConfidence(value) {
   return Math.min(1, Math.max(0, numeric));
 }
 
+function toStringMap(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([key, rawValue]) => [String(key), String(rawValue ?? '').trim()])
+      .filter(([, mappedValue]) => Boolean(mappedValue))
+  );
+}
+
+function dedupeFeedbackNotes(notes, limit = 2) {
+  if (!Array.isArray(notes)) {
+    return [];
+  }
+  const unique = [];
+  const seen = new Set();
+  for (const note of notes) {
+    const normalized = String(note ?? '').trim();
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    unique.push(normalized);
+  }
+  return unique.slice(-limit);
+}
+
 function buildPrompt(context) {
   const intent = context.scenario.intent;
-  const feedbackNotes = Array.isArray(context.feedbackLoop?.intent)
-    ? context.feedbackLoop.intent.filter(Boolean)
-    : [];
+  const feedbackNotes = dedupeFeedbackNotes(context.feedbackLoop?.intent);
+  const contracts = context.contracts;
+  const uiRuleSources =
+    contracts &&
+    Array.isArray(contracts.sources) &&
+    contracts.sources.length > 0
+      ? contracts.sources.join(', ')
+      : '(none)';
+  const uiRulesContent = String(contracts?.uiRulesContent || '').trim();
+  const intentOverrides = toStringMap(context.intentOverrides);
+  const overrideLines = Object.entries(intentOverrides).map(
+    ([key, value]) => `- ${key}: ${value}`
+  );
   const hintLines = [];
   if (intent.pageHint) {
     hintLines.push(`- page hint: ${intent.pageHint}`);
@@ -78,6 +117,16 @@ function buildPrompt(context) {
       ? 'Retry clarification notes (highest priority):'
       : 'Retry clarification notes: (none)',
     ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
+    overrideLines.length > 0
+      ? 'Structured overrides from user decisions (highest priority):'
+      : 'Structured overrides from user decisions: (none)',
+    ...overrideLines,
+    '',
+    `Project UI rule docs: ${uiRuleSources}`,
+    uiRulesContent
+      ? 'Project UI rules and codebase conventions (authoritative):'
+      : 'Project UI rules and codebase conventions: (none)',
+    uiRulesContent,
     '',
     'Rules:',
     '- Keep this read-only and do not edit files.',
@@ -96,6 +145,10 @@ export function stepExtractIntent(context) {
       skipped: true,
       reason: '--dry-run option',
     };
+  }
+
+  if (!context.contracts) {
+    context.contracts = readContracts(context.rootPath);
   }
 
   const schema = {

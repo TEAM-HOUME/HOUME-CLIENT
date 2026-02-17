@@ -6,6 +6,8 @@ import {
 import { formatDuration } from './step-utils.mjs';
 
 const HEARTBEAT_INTERVAL_MS = 15_000;
+const STEP_DIVIDER =
+  '[ui-components] ------------------------------------------------------------';
 const HEARTBEAT_STEPS = new Set([
   'extract-intent',
   'extract-figma-scope',
@@ -60,6 +62,7 @@ export function runStep(context, name, handler) {
   };
   context.steps.push(stepLog);
   console.log('');
+  console.log(STEP_DIVIDER);
   console.log(
     `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 시작`
   );
@@ -92,6 +95,7 @@ export function runStep(context, name, handler) {
         `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
       );
       logStepDetails(name, stepLog.output, stepTraceRecords);
+      console.log(STEP_DIVIDER);
       console.log('');
       return;
     }
@@ -99,6 +103,7 @@ export function runStep(context, name, handler) {
       `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 실패 (${durationText}) - ${stepLog.error}`
     );
     logStepFailureHint(name, stepTraceRecords);
+    console.log(STEP_DIVIDER);
     console.log('');
   }
 }
