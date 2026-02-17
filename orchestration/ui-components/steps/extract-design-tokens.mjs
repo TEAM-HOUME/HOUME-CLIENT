@@ -1,6 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
+import { createCacheKey, findCachedArtifact } from '../lib/artifact-cache.mjs';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 
 const TOOL_KEYS = ['designContext', 'variableDefs', 'metadata', 'screenshot'];
@@ -16,6 +17,7 @@ const TOKEN_KEYS = [
 const VALID_STATUS = new Set(['ok', 'partial', 'unavailable', 'invalid']);
 const UNAVAILABLE_ERROR_PATTERN =
   /\b(401|403|unauthorized|forbidden|timeout|timed out|connection refused|econn|enotfound|not configured|service unavailable)\b/;
+const CACHE_SCHEMA_VERSION = 'figma-design-tokens-cache.v1';
 
 function normalizeStatus(value) {
   const normalized = String(value ?? '')
@@ -138,6 +140,58 @@ function deriveCaptureStatus(toolRecords, diagnostics, stats) {
   return 'ok';
 }
 
+function buildDocsHash(context) {
+  return createCacheKey({
+    sources: context.contracts?.sources || [],
+    uiRulesContent: context.contracts?.uiRulesContent || '',
+  });
+}
+
+function buildDirectToolsFingerprint(context) {
+  const directTools = context.figmaMcpDirectToolRecords || {};
+  return createCacheKey({
+    get_design_context: {
+      status: directTools.get_design_context?.status || '',
+      output: directTools.get_design_context?.output || '',
+      error: directTools.get_design_context?.error || '',
+    },
+    get_variable_defs: {
+      status: directTools.get_variable_defs?.status || '',
+      output: directTools.get_variable_defs?.output || '',
+      error: directTools.get_variable_defs?.error || '',
+    },
+    get_metadata: {
+      status: directTools.get_metadata?.status || '',
+      output: directTools.get_metadata?.output || '',
+      error: directTools.get_metadata?.error || '',
+    },
+    get_screenshot: {
+      status: directTools.get_screenshot?.status || '',
+      output: directTools.get_screenshot?.output || '',
+      error: directTools.get_screenshot?.error || '',
+    },
+  });
+}
+
+function buildCacheKey(context) {
+  return createCacheKey({
+    schema: CACHE_SCHEMA_VERSION,
+    figmaUrl: context.scenario.figma.url,
+    selectedNodeId: context.figmaScope.selectedNodeId,
+    endpoint: context.scenario.figma.mcpEndpoint,
+    gates: {
+      designTokensMode: context.scenario.gates.designTokensMode,
+      figmaMcpLogsMode: context.scenario.gates.figmaMcpLogsMode,
+      assetCoverageMode: context.scenario.gates.assetCoverageMode,
+      scopeGateMode: context.scenario.gates.scopeGateMode,
+      intentMode: context.scenario.gates.intentMode,
+      intentMinConfidence: context.scenario.gates.intentMinConfidence,
+    },
+    docsHash: buildDocsHash(context),
+    directToolsFingerprint: buildDirectToolsFingerprint(context),
+  });
+}
+
 function buildPrompt(context) {
   const directArtifactPath = context.figmaMcpToolLogsArtifactPath
     ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
@@ -246,6 +300,32 @@ export function stepExtractDesignTokens(context) {
     return {
       skipped: true,
       reason: '`gates.design_tokens_mode` is off',
+    };
+  }
+
+  const cacheKey = buildCacheKey(context);
+  const cached = findCachedArtifact({
+    artifactsDir: context.artifactsDir,
+    suffix: '-design-tokens.json',
+    cacheKey,
+    accept: (data) =>
+      data?.figma?.url === context.scenario.figma.url &&
+      data?.figma?.selectedNodeId === context.figmaScope.selectedNodeId &&
+      data?.stats &&
+      data?.normalized,
+  });
+  if (cached) {
+    context.designTokens = cached.data;
+    context.designTokensArtifactPath = cached.artifactPath;
+    return {
+      status: cached.data.status,
+      totalTokens: cached.data.stats?.totalTokens ?? 0,
+      coreCoverage: cached.data.stats?.coreCoverage ?? 0,
+      warnings: cached.data.diagnostics?.warnings || [],
+      errors: cached.data.diagnostics?.errors || [],
+      source: 'cache',
+      artifactPath: relative(context.rootPath, cached.artifactPath),
+      extractionMessage: null,
     };
   }
 
@@ -370,6 +450,11 @@ export function stepExtractDesignTokens(context) {
 
     capture = {
       schemaVersion: 'figma-mcp-capture.v1',
+      cache: {
+        version: CACHE_SCHEMA_VERSION,
+        key: cacheKey,
+        createdAt: new Date().toISOString(),
+      },
       collectedAt: new Date().toISOString(),
       figma: {
         url: context.scenario.figma.url,
@@ -389,6 +474,11 @@ export function stepExtractDesignTokens(context) {
         ? error.message
         : `Unknown error: ${String(error)}`;
     capture = createFallbackCapture(context, extractionMessage);
+    capture.cache = {
+      version: CACHE_SCHEMA_VERSION,
+      key: cacheKey,
+      createdAt: new Date().toISOString(),
+    };
     if (context.scenario.gates.designTokensMode === 'error') {
       throw error;
     }
@@ -410,6 +500,7 @@ export function stepExtractDesignTokens(context) {
     coreCoverage: capture.stats.coreCoverage,
     warnings: capture.diagnostics.warnings,
     errors: capture.diagnostics.errors,
+    source: 'fresh',
     artifactPath: relative(context.rootPath, artifactPath),
     extractionMessage,
   };

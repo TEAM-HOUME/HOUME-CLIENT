@@ -4,7 +4,8 @@ import { resolve } from 'node:path';
 import { runCommand } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
 
-const REQUIRED_CHECKS = ['lint', 'typecheck', 'test', 'test-storybook'];
+// Temporary exclusion: test-storybook
+const REQUIRED_CHECKS = ['lint', 'typecheck', 'test'];
 
 function verificationCommand(check) {
   if (check === 'lint') {

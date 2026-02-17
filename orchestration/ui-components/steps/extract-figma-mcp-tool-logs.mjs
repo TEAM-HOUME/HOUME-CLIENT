@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
+import { createCacheKey, findCachedArtifact } from '../lib/artifact-cache.mjs';
 import {
   callFigmaMcpTool,
   classifyJsonRpcCall,
@@ -16,6 +17,34 @@ const REQUIRED_FIGMA_TOOLS = [
   'get_metadata',
   'get_screenshot',
 ];
+
+const CACHE_SCHEMA_VERSION = 'figma-mcp-tool-logs-cache.v1';
+
+function buildDocsHash(context) {
+  return createCacheKey({
+    sources: context.contracts?.sources || [],
+    uiRulesContent: context.contracts?.uiRulesContent || '',
+  });
+}
+
+function buildCacheKey(context, nodeId) {
+  return createCacheKey({
+    schema: CACHE_SCHEMA_VERSION,
+    figmaUrl: context.scenario.figma.url,
+    selectedNodeId: nodeId,
+    endpoint: context.scenario.figma.mcpEndpoint,
+    figmaTimeoutMs: context.scenario.figma.timeoutMs,
+    gates: {
+      figmaMcpLogsMode: context.scenario.gates.figmaMcpLogsMode,
+      scopeGateMode: context.scenario.gates.scopeGateMode,
+      intentMode: context.scenario.gates.intentMode,
+      assetCoverageMode: context.scenario.gates.assetCoverageMode,
+      designTokensMode: context.scenario.gates.designTokensMode,
+      intentMinConfidence: context.scenario.gates.intentMinConfidence,
+    },
+    docsHash: buildDocsHash(context),
+  });
+}
 
 function safeFilename(value) {
   return String(value)
@@ -125,6 +154,34 @@ export function stepExtractFigmaMcpToolLogs(context) {
   const endpoint = context.scenario.figma.mcpEndpoint;
   const timeoutMs = context.scenario.figma.timeoutMs;
   const nodeId = context.figmaScope.selectedNodeId;
+  const cacheKey = buildCacheKey(context, nodeId);
+  const cached = findCachedArtifact({
+    artifactsDir: context.artifactsDir,
+    suffix: '-figma-mcp-tool-logs.json',
+    cacheKey,
+    accept: (data) =>
+      data?.selectedNodeId === nodeId &&
+      data?.endpoint === endpoint &&
+      data?.directToolRecords &&
+      typeof data.directToolRecords === 'object' &&
+      Array.isArray(data.calls),
+  });
+  if (cached) {
+    context.figmaMcpToolLogs = cached.data;
+    context.figmaMcpToolLogsArtifactPath = cached.artifactPath;
+    context.figmaMcpDirectToolRecords = cached.data.directToolRecords;
+    return {
+      selectedNodeId: nodeId,
+      authTokenEnv: cached.data.authTokenEnv || null,
+      tools: cached.data.calls.length,
+      okCalls: cached.data.totals?.okCalls ?? 0,
+      failedCalls: cached.data.totals?.failedCalls ?? 0,
+      unavailableCalls: cached.data.totals?.unavailableCalls ?? 0,
+      source: 'cache',
+      artifactPath: relative(context.rootPath, cached.artifactPath),
+    };
+  }
+
   const auth = resolveFigmaMcpAuth(context.scenario);
   const baseDir = resolve(context.artifactsDir, context.runId, 'figma-mcp-raw');
   const assetWriteDir = resolve(baseDir, 'tool-assets');
@@ -271,6 +328,11 @@ export function stepExtractFigmaMcpToolLogs(context) {
     `${context.runId}-figma-mcp-tool-logs.json`
   );
   const summary = {
+    cache: {
+      version: CACHE_SCHEMA_VERSION,
+      key: cacheKey,
+      createdAt: new Date().toISOString(),
+    },
     endpoint,
     authTokenEnv: auth.envName || null,
     sessionId: session.sessionId,
@@ -282,6 +344,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
     calls,
     callArtifacts,
     totals: summarizeToolCalls(calls),
+    directToolRecords,
   };
 
   writeFileSync(summaryPath, JSON.stringify(summary, null, 2), 'utf8');
@@ -297,6 +360,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
     okCalls: summary.totals.okCalls,
     failedCalls: summary.totals.failedCalls,
     unavailableCalls: summary.totals.unavailableCalls,
+    source: 'fresh',
     artifactPath: relative(context.rootPath, summaryPath),
   };
 }

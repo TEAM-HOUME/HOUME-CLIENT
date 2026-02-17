@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
+import { createCacheKey, findCachedArtifact } from '../lib/artifact-cache.mjs';
 import {
   callFigmaMcpTool,
   classifyJsonRpcCall,
@@ -8,6 +9,8 @@ import {
   initializeFigmaMcpSession,
 } from '../lib/figma-mcp-direct.mjs';
 import { resolveFigmaMcpAuth } from '../lib/figma-mcp-auth.mjs';
+
+const CACHE_SCHEMA_VERSION = 'figma-asset-scope-cache.v1';
 
 function normalizeNodeId(rawValue) {
   const normalized = String(rawValue ?? '')
@@ -180,6 +183,43 @@ function createUnavailableCalls(nodeIds, errorMessage) {
   }));
 }
 
+function buildDocsHash(context) {
+  return createCacheKey({
+    sources: context.contracts?.sources || [],
+    uiRulesContent: context.contracts?.uiRulesContent || '',
+  });
+}
+
+function buildCacheKey({
+  context,
+  selectedNodeId,
+  endpoint,
+  maxCandidates,
+  timeoutMs,
+  additionalNodeIds,
+  designContextFingerprint,
+}) {
+  return createCacheKey({
+    schema: CACHE_SCHEMA_VERSION,
+    figmaUrl: context.scenario.figma.url,
+    selectedNodeId,
+    endpoint,
+    maxCandidates,
+    timeoutMs,
+    additionalNodeIds,
+    gates: {
+      assetCoverageMode: context.scenario.gates.assetCoverageMode,
+      figmaMcpLogsMode: context.scenario.gates.figmaMcpLogsMode,
+      designTokensMode: context.scenario.gates.designTokensMode,
+      scopeGateMode: context.scenario.gates.scopeGateMode,
+      intentMode: context.scenario.gates.intentMode,
+      intentMinConfidence: context.scenario.gates.intentMinConfidence,
+    },
+    docsHash: buildDocsHash(context),
+    designContextFingerprint,
+  });
+}
+
 export function stepExtractFigmaAssetScope(context) {
   if (context.options.dryRun) {
     return {
@@ -200,6 +240,10 @@ export function stepExtractFigmaAssetScope(context) {
     context.figmaMcpDirectToolRecords?.get_design_context?.output || '';
   const selectedMetadata =
     context.figmaMcpDirectToolRecords?.get_metadata?.output;
+  const designContextFingerprint = createCacheKey({
+    selectedDesignContext,
+    selectedMetadata: selectedMetadata || '',
+  });
   const selectedGraphicSignals = analyzeGraphicSignals(selectedDesignContext);
   const overrideMaxCandidates = Number(
     context.assetProbeOverrides?.maxCandidates
@@ -242,6 +286,45 @@ export function stepExtractFigmaAssetScope(context) {
   }
 
   const endpoint = context.scenario.figma.mcpEndpoint;
+  const cacheKey = buildCacheKey({
+    context,
+    selectedNodeId,
+    endpoint,
+    maxCandidates,
+    timeoutMs,
+    additionalNodeIds,
+    designContextFingerprint,
+  });
+  const cached = findCachedArtifact({
+    artifactsDir: context.artifactsDir,
+    suffix: '-figma-asset-scope.json',
+    cacheKey,
+    accept: (data) =>
+      data?.figma?.url === context.scenario.figma.url &&
+      data?.figma?.selectedNodeId === selectedNodeId &&
+      data?.config?.endpoint === endpoint &&
+      data?.selectedNode?.nodeId === selectedNodeId &&
+      data?.totals,
+  });
+  if (cached) {
+    context.figmaAssetScope = cached.data;
+    context.figmaAssetScopeArtifactPath = cached.artifactPath;
+    return {
+      status: cached.data.status,
+      candidates: cached.data.selectedNode?.effectiveNodeIds?.length || 0,
+      probed: cached.data.totals?.totalCalls ?? 0,
+      okCalls: cached.data.totals?.okCalls ?? 0,
+      failedCalls: cached.data.totals?.failedCalls ?? 0,
+      unavailableCalls: cached.data.totals?.unavailableCalls ?? 0,
+      selectedGraphicSignal: Boolean(
+        cached.data.selectedNode?.graphicSignals?.hasGraphicSignal
+      ),
+      graphicSignals: cached.data.totals?.graphicSignalCalls ?? 0,
+      source: 'cache',
+      artifactPath: relative(context.rootPath, cached.artifactPath),
+    };
+  }
+
   const baseDir = resolve(
     context.artifactsDir,
     context.runId,
@@ -252,6 +335,11 @@ export function stepExtractFigmaAssetScope(context) {
   if (childNodeIds.length === 0) {
     const capture = {
       schemaVersion: 'figma-asset-scope.v1',
+      cache: {
+        version: CACHE_SCHEMA_VERSION,
+        key: cacheKey,
+        createdAt: new Date().toISOString(),
+      },
       collectedAt: new Date().toISOString(),
       figma: {
         url: context.scenario.figma.url,
@@ -296,6 +384,7 @@ export function stepExtractFigmaAssetScope(context) {
       unavailableCalls: 0,
       selectedGraphicSignal: selectedGraphicSignals.hasGraphicSignal,
       graphicSignals: 0,
+      source: 'fresh',
       artifactPath: relative(context.rootPath, artifactPath),
     };
   }
@@ -348,6 +437,11 @@ export function stepExtractFigmaAssetScope(context) {
   const status = deriveProbeStatus(session.ok, totals, childNodeIds.length);
   const capture = {
     schemaVersion: 'figma-asset-scope.v1',
+    cache: {
+      version: CACHE_SCHEMA_VERSION,
+      key: cacheKey,
+      createdAt: new Date().toISOString(),
+    },
     collectedAt: new Date().toISOString(),
     figma: {
       url: context.scenario.figma.url,
@@ -388,6 +482,7 @@ export function stepExtractFigmaAssetScope(context) {
     unavailableCalls: totals.unavailableCalls,
     selectedGraphicSignal: selectedGraphicSignals.hasGraphicSignal,
     graphicSignals: totals.graphicSignalCalls,
+    source: 'fresh',
     artifactPath: relative(context.rootPath, artifactPath),
   };
 }

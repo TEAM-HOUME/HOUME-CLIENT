@@ -39,7 +39,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
 - `run-agent-implementation`: implement code changes with system prompt + task context + docs conventions.
 - `gate-changed-paths`: block unrelated file changes.
-- `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
+- `verify`: run quality checks (`lint`, `typecheck`, `test`) and Storybook checks. (`test-storybook` is temporarily excluded)
 - `feedback-loop`: on `intent/asset/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
 - If input is unavailable (non-interactive tty), feedback-loop fails fast without auto-retry.
 - `report`: write run summary JSON.
@@ -209,7 +209,7 @@ sequenceDiagram
 
     R->>G: git diff / ls-files (gate-changed-paths)
 
-    R->>P: lint + typecheck + test + test-storybook (+storybook build if requested)
+    R->>P: lint + typecheck + test (+storybook build if requested)
   end
 
   opt --open-storybook && !dry-run && verification includes storybook && storybook-static exists

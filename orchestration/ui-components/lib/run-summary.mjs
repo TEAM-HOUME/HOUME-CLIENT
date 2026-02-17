@@ -172,19 +172,22 @@ export function summarizeStepOutput(name, output) {
     return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계`;
   }
   if (name === 'extract-figma-mcp-tool-logs') {
-    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개`;
+    const sourceText = output.source ? `, 소스=${output.source}` : '';
+    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개${sourceText}`;
   }
   if (name === 'gate-figma-mcp-tool-logs') {
     return `상태=${output.status}, 검사=${output.checkedTools}개, 누락=${output.missingTools?.length ?? 0}개, 오류=${output.badTools?.length ?? 0}개`;
   }
   if (name === 'extract-design-tokens') {
-    return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3`;
+    const sourceText = output.source ? `, 소스=${output.source}` : '';
+    return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3${sourceText}`;
   }
   if (name === 'gate-design-tokens') {
     return `상태=${output.status}, 토큰=${output.totalTokens}개`;
   }
   if (name === 'extract-figma-asset-scope') {
-    return `상태=${output.status}, 후보=${output.candidates}개, 탐색=${output.probed}개, 그래픽신호=${output.graphicSignals}개`;
+    const sourceText = output.source ? `, 소스=${output.source}` : '';
+    return `상태=${output.status}, 후보=${output.candidates}개, 탐색=${output.probed}개, 그래픽신호=${output.graphicSignals}개${sourceText}`;
   }
   if (name === 'gate-figma-asset-coverage') {
     return `상태=${output.status}, 판정=${output.coverageStatus}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 누락=${output.missingCount || 0}개`;
