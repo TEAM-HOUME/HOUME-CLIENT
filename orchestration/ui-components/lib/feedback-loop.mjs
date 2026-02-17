@@ -144,18 +144,30 @@ async function askLine(rl, question) {
   return rl.question(question);
 }
 
+function printStageHeader(stage, title) {
+  console.log(`[ui-components] [${stage}] ${title}`);
+}
+
+function printStageOptions(options) {
+  if (!Array.isArray(options) || options.length === 0) {
+    return;
+  }
+  const content = options.map((option) => `  - ${option}`).join('\n');
+  console.log(content);
+}
+
 async function askIntentChoice(rl, stage, field, required = false) {
   const requiredTag = required ? ' [필수]' : '';
-  const basePrompt = [
-    `[ui-components] [${stage}] ${field.label}${requiredTag} 선택 (Enter=미지정):`,
-    ...field.descriptions.map(
-      (description) => `[ui-components] [${stage}]   - ${description}`
-    ),
-    `[ui-components] [${stage}] 선택값: `,
-  ].join('\n');
+  printStageHeader(stage, `${field.label}${requiredTag} 선택`);
+  printStageOptions(field.descriptions);
 
   while (true) {
-    const answer = String((await askLine(rl, basePrompt)) ?? '').trim();
+    const answer = String(
+      (await askLine(
+        rl,
+        `[ui-components] [${stage}] 선택값 (Enter=미지정): `
+      )) ?? ''
+    ).trim();
     if (!answer) {
       if (required) {
         console.log(
@@ -175,16 +187,16 @@ async function askIntentChoice(rl, stage, field, required = false) {
 }
 
 async function askAssetModeChoice(rl, stage) {
-  const prompt = [
-    `[ui-components] [${stage}] 자산 커버리지 게이트 모드 선택 (Enter=기존 유지):`,
-    `[ui-components] [${stage}]   - 1) 기존 유지`,
-    `[ui-components] [${stage}]   - 2) warn`,
-    `[ui-components] [${stage}]   - 3) error`,
-    `[ui-components] [${stage}] 선택값: `,
-  ].join('\n');
+  printStageHeader(stage, '자산 커버리지 게이트 모드 선택');
+  printStageOptions(['1) 기존 유지', '2) warn', '3) error']);
 
   while (true) {
-    const answer = String((await askLine(rl, prompt)) ?? '').trim();
+    const answer = String(
+      (await askLine(
+        rl,
+        `[ui-components] [${stage}] 선택값 (Enter=기존 유지): `
+      )) ?? ''
+    ).trim();
     if (!answer || answer === '1') {
       return '';
     }
@@ -423,16 +435,6 @@ async function collectIntentStructuredOverrides(
     overrides.cta_target = ctaTarget;
   }
 
-  const additionalPrompt = String(
-    (await askLine(
-      rl,
-      `[ui-components] [${stage}] 추가 프롬프트 입력 (선택, Enter=생략): `
-    )) ?? ''
-  ).trim();
-  if (additionalPrompt) {
-    overrides.additional_prompt = additionalPrompt;
-  }
-
   return overrides;
 }
 
@@ -471,16 +473,6 @@ async function collectAssetStructuredOverrides(rl, stage) {
   const assetCoverageMode = await askAssetModeChoice(rl, stage);
   if (assetCoverageMode) {
     overrides.asset_coverage_mode = assetCoverageMode;
-  }
-
-  const additionalPrompt = String(
-    (await askLine(
-      rl,
-      `[ui-components] [${stage}] 추가 프롬프트 입력 (선택, Enter=생략): `
-    )) ?? ''
-  ).trim();
-  if (additionalPrompt) {
-    overrides.additional_prompt = additionalPrompt;
   }
 
   return overrides;

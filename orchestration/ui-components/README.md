@@ -53,16 +53,16 @@ Default fixed policy:
 
 ## Context Injection Matrix
 
-| Stage                       | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
-| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `preflight`                 | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                            | runtime summary only                                                |
-| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `intentOverrides`, `docs/reference/*` conventions                                    | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
-| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
-| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
-| `extract-design-tokens`     | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                     | `artifacts/*-design-tokens.json`                                    |
-| `extract-figma-asset-scope` | Local direct MCP probe                        | selected node `get_design_context` output + child node-id inference + direct MCP probe (`get_design_context`)                        | `artifacts/*-figma-asset-scope.json`                                |
-| `gate-figma-asset-coverage` | Inline prompt in step code                    | direct MCP logs + asset-scope artifact + screenshot/context consistency rules                                                        | `artifacts/*-figma-asset-coverage.json`                             |
-| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths, `intentOverrides`                                               | `reports/<runId>.json`, `reports/index.jsonl`                       |
+| Stage                       | Prompt Source                                 | Injected Context                                                                                                                      | Output Artifact                                                     |
+| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `preflight`                 | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                             | runtime summary only                                                |
+| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `intentOverrides`, `docs/reference/*` conventions                                     | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
+| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                    | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
+| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify`  | code changes + `agent-trace/*-implement.*`                          |
+| `extract-design-tokens`     | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                      | `artifacts/*-design-tokens.json`                                    |
+| `extract-figma-asset-scope` | Local direct MCP probe                        | selected node `get_design_context` output + child node-id inference + direct MCP probe (`get_design_context`) + `assetProbeOverrides` | `artifacts/*-figma-asset-scope.json`                                |
+| `gate-figma-asset-coverage` | Inline prompt in step code                    | direct MCP logs + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes                      | `artifacts/*-figma-asset-coverage.json`                             |
+| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths, `intentOverrides`, `assetProbeOverrides`                         | `reports/<runId>.json`, `reports/index.jsonl`                       |
 
 ## Orchestration Diagrams
 
@@ -232,6 +232,10 @@ stateDiagram-v2
   IntentRetry --> RunningSteps: user confirms retry (<=10)
   IntentRetry --> Failed: retry declined/exhausted
 
+  RunningSteps --> AssetRetry: asset-scope or asset-coverage fail
+  AssetRetry --> RunningSteps: user confirms retry (<=10)
+  AssetRetry --> Failed: retry declined/exhausted
+
   RunningSteps --> PlanRetry: resolve-component-plan fail
   PlanRetry --> RunningSteps: user confirms retry (<=10)
   PlanRetry --> Failed: retry declined/exhausted
@@ -328,4 +332,6 @@ figma:
 - Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
 - Run report JSON includes `feedbackHistory` (retry question prompts + raw user answers).
 - Run report JSON includes `intentOverrides` (structured user decisions from intent retry loop).
+- Run report JSON includes `assetProbeOverrides` (structured user decisions from asset retry loop).
+- Run report JSON includes `figmaAssetScopeArtifactPath` and `figmaAssetCoverageArtifactPath`.
 - Use `--open-storybook` to open `storybook-static/index.html` after a successful run.

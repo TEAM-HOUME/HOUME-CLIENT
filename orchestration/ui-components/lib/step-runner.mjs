@@ -1,3 +1,5 @@
+import { spawn } from 'node:child_process';
+
 import {
   logStepDetails,
   logStepFailureHint,
@@ -21,18 +23,34 @@ const HEARTBEAT_STEPS = new Set([
 ]);
 
 function startStepHeartbeat(stepLabel) {
-  const started = Date.now();
-  return setInterval(() => {
-    const elapsedSec = Math.floor((Date.now() - started) / 1000);
-    console.log(`[ui-components] [${stepLabel}] 진행중... ${elapsedSec}s 경과`);
-  }, HEARTBEAT_INTERVAL_MS);
+  const script = `
+const label = ${JSON.stringify(stepLabel)};
+const startedAt = Date.now();
+const intervalMs = ${HEARTBEAT_INTERVAL_MS};
+const timer = setInterval(() => {
+  const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
+  console.log(\`[ui-components] [\${label}] 진행중... \${elapsedSec}s 경과\`);
+}, intervalMs);
+const close = () => {
+  clearInterval(timer);
+  process.exit(0);
+};
+process.on('SIGINT', close);
+process.on('SIGTERM', close);
+`;
+
+  const child = spawn(process.execPath, ['-e', script], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+  child.unref();
+  return child;
 }
 
 function stopStepHeartbeat(timer) {
-  if (!timer) {
+  if (!timer || timer.killed) {
     return;
   }
-  clearInterval(timer);
+  timer.kill('SIGTERM');
 }
 
 export function runStep(context, name, handler) {
