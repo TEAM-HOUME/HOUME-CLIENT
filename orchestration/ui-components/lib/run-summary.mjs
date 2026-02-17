@@ -105,10 +105,6 @@ export function formatAgentTokenUsage(summary) {
   return `입력 ${formatNumber(summary.totalInputTokens)}, 출력 ${formatNumber(summary.totalOutputTokens)}, 합계 ${formatNumber(summary.totalTokens)}${missingText}`;
 }
 
-function stepPrefix(name) {
-  return `[ui-components] [${name}]`;
-}
-
 export function summarizeStepOutput(name, output) {
   if (!output || typeof output !== 'object') {
     return '';
@@ -187,77 +183,63 @@ export function logStepDetails(name, output, traceRecords) {
   }
 
   if (name === 'extract-figma-scope' && output.rationale) {
-    console.log(`${stepPrefix(name)} 상세`);
-    console.log(
-      `${stepPrefix(name)}   - 스코프 판단: ${truncateText(output.rationale, 200)}`
-    );
+    console.log('- 상세');
+    console.log(`- 스코프 판단: ${truncateText(output.rationale, 200)}`);
   }
 
   if (name === 'extract-intent') {
-    console.log(`${stepPrefix(name)} 상세`);
+    console.log('- 상세');
     if (output.behaviorNeeded) {
-      console.log(`${stepPrefix(name)}   - 동작정의 필요: 예`);
+      console.log('- 동작정의 필요: 예');
     }
     if (Array.isArray(output.ambiguities) && output.ambiguities.length > 0) {
       output.ambiguities.forEach((ambiguity, index) => {
-        console.log(
-          `${stepPrefix(name)}   - 모호점 ${index + 1}: ${ambiguity}`
-        );
+        console.log(`- 모호점 ${index + 1}: ${ambiguity}`);
       });
     } else {
-      console.log(`${stepPrefix(name)}   - 모호점: 없음`);
+      console.log('- 모호점: 없음');
     }
   }
 
   if (name === 'extract-design-tokens') {
-    console.log(`${stepPrefix(name)} 상세`);
+    console.log('- 상세');
     if (Array.isArray(output.warnings) && output.warnings.length > 0) {
       output.warnings.forEach((warning, index) => {
-        console.log(
-          `${stepPrefix(name)}   - 토큰 경고 ${index + 1}: ${warning}`
-        );
+        console.log(`- 토큰 경고 ${index + 1}: ${warning}`);
       });
     }
 
     if (Array.isArray(output.errors) && output.errors.length > 0) {
       output.errors.forEach((error, index) => {
-        console.log(`${stepPrefix(name)}   - 토큰 오류 ${index + 1}: ${error}`);
+        console.log(`- 토큰 오류 ${index + 1}: ${error}`);
       });
     }
   }
 
   if (name === 'run-agent-implementation') {
-    console.log(`${stepPrefix(name)} 상세`);
+    console.log('- 상세');
     if (output.summary) {
-      console.log(
-        `${stepPrefix(name)}   - 에이전트 요약: ${truncateText(output.summary, 220)}`
-      );
+      console.log(`- 에이전트 요약: ${truncateText(output.summary, 220)}`);
     }
 
     if (Array.isArray(output.notes) && output.notes.length > 0) {
       output.notes.forEach((note, index) => {
-        console.log(
-          `${stepPrefix(name)}   - 에이전트 노트 ${index + 1}: ${note}`
-        );
+        console.log(`- 에이전트 노트 ${index + 1}: ${note}`);
       });
     }
   }
 
   if (name === 'resolve-component-plan') {
-    console.log(`${stepPrefix(name)} 상세`);
+    console.log('- 상세');
     if (output.rationale) {
-      console.log(
-        `${stepPrefix(name)}   - 계획 근거: ${truncateText(output.rationale, 220)}`
-      );
+      console.log(`- 계획 근거: ${truncateText(output.rationale, 220)}`);
     }
     if (
       Array.isArray(output.behaviorQuestions) &&
       output.behaviorQuestions.length > 0
     ) {
       output.behaviorQuestions.forEach((question, index) => {
-        console.log(
-          `${stepPrefix(name)}   - 동작 확인 질문 ${index + 1}: ${question}`
-        );
+        console.log(`- 동작 확인 질문 ${index + 1}: ${question}`);
       });
     }
   }
@@ -272,42 +254,36 @@ export function logStepDetails(name, output, traceRecords) {
     latestTrace.stdoutPath ||
     latestTrace.metadataPath;
   if (tracePath) {
-    console.log(`${stepPrefix(name)}   - trace: ${tracePath}`);
+    console.log(`- trace: ${tracePath}`);
   }
 }
 
 export function logStepFailureHint(name, traceRecords) {
   if (name === 'gate-design-tokens') {
-    console.log(`${stepPrefix(name)} 조치`);
-    console.log(
-      `${stepPrefix(name)}   - design token capture 상태/도구 오류를 artifact에서 확인`
-    );
+    console.log('- 조치');
+    console.log('- design token capture 상태/도구 오류를 artifact에서 확인');
   }
   if (name === 'gate-figma-scope') {
-    console.log(`${stepPrefix(name)} 조치`);
+    console.log('- 조치');
     console.log(
-      `${stepPrefix(name)}   - 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 brief/intent 힌트를 보강하세요`
+      '- 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 brief/intent 힌트를 보강하세요'
     );
   }
   if (name === 'gate-intent') {
-    console.log(`${stepPrefix(name)} 조치`);
+    console.log('- 조치');
+    console.log('- 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요');
+    console.log('- 필수: 현재 블로킹 모호점 카테고리에 해당하는 항목 전부');
     console.log(
-      `${stepPrefix(name)}   - 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요`
+      '- 항목: trigger / placement / dismiss / concurrency / accessibility / CTA 대상'
     );
     console.log(
-      `${stepPrefix(name)}   - 필수: 현재 블로킹 모호점 카테고리에 해당하는 항목 전부`
-    );
-    console.log(
-      `${stepPrefix(name)}   - 항목: trigger / placement / dismiss / concurrency / accessibility / CTA 대상`
-    );
-    console.log(
-      `${stepPrefix(name)}   - 추가 프롬프트는 마지막 질문에 자유 텍스트로 입력 가능합니다`
+      '- 추가 프롬프트는 마지막 질문에 자유 텍스트로 입력 가능합니다'
     );
   }
   if (name === 'gate-figma-mcp-tool-logs') {
-    console.log(`${stepPrefix(name)} 조치`);
+    console.log('- 조치');
     console.log(
-      `${stepPrefix(name)}   - figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인`
+      '- figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
     );
   }
 
@@ -321,6 +297,6 @@ export function logStepFailureHint(name, traceRecords) {
     latestTrace.stdoutPath ||
     latestTrace.metadataPath;
   if (tracePath) {
-    console.log(`${stepPrefix(name)}   - 실패 trace: ${tracePath}`);
+    console.log(`- 실패 trace: ${tracePath}`);
   }
 }

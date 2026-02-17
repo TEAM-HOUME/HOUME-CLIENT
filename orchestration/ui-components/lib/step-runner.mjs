@@ -7,7 +7,7 @@ import { formatDuration } from './step-utils.mjs';
 
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STEP_DIVIDER =
-  '[ui-components] ------------------------------------------------------------';
+  '------------------------------------------------------------';
 const HEARTBEAT_STEPS = new Set([
   'extract-intent',
   'extract-figma-scope',
@@ -62,10 +62,10 @@ export function runStep(context, name, handler) {
   };
   context.steps.push(stepLog);
   console.log('');
+  console.log('[ui-components]');
   console.log(STEP_DIVIDER);
-  console.log(
-    `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 시작`
-  );
+  console.log(`[${name}]${stepCounterText}${stepAttemptText}`);
+  console.log('- 시작');
   const heartbeatProcess =
     !context.options?.dryRun && HEARTBEAT_STEPS.has(name)
       ? startStepHeartbeat(stepLabelForHeartbeat)
@@ -91,17 +91,13 @@ export function runStep(context, name, handler) {
     const durationText = formatDuration(stepLog.durationMs);
     if (stepLog.status === 'passed') {
       const summary = summarizeStepOutput(name, stepLog.output);
-      console.log(
-        `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 통과 (${durationText})${summary ? ` - ${summary}` : ''}`
-      );
+      console.log(`- 통과 (${durationText})${summary ? ` - ${summary}` : ''}`);
       logStepDetails(name, stepLog.output, stepTraceRecords);
       console.log(STEP_DIVIDER);
       console.log('');
       return;
     }
-    console.log(
-      `[ui-components] [${name}]${stepCounterText}${stepAttemptText} 실패 (${durationText}) - ${stepLog.error}`
-    );
+    console.log(`- 실패 (${durationText}) - ${stepLog.error}`);
     logStepFailureHint(name, stepTraceRecords);
     console.log(STEP_DIVIDER);
     console.log('');
