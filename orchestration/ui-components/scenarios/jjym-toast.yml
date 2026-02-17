@@ -7,11 +7,3 @@ agent:
   engine: codex
 
 target: 'src/shared/components/toast/Toast.tsx'
-
-verification:
-  - storybook
-
-gates:
-  require_visual_approval: true
-  figma_mcp_logs_mode: error
-  design_tokens_mode: error

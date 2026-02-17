@@ -38,6 +38,13 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
 - `report`: write run summary JSON.
 
+Default fixed policy:
+
+- `verification` is always `storybook`.
+- `require_visual_approval` is always enabled (`--approve-visual` required).
+- `figma_mcp_logs_mode` is fixed to `error`.
+- `design_tokens_mode` is fixed to `error`.
+
 ## Orchestration Diagrams
 
 ### Step Ownership Map
@@ -215,10 +222,7 @@ agent:
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
 - `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
-- `gates.figma_mcp_logs_mode`: `off|warn|error` (direct MCP log gate)
-- `gates.design_tokens_mode`: `off|warn|error`
 - `gates.allowed_changed_paths`: explicit allowed change paths
-- `gates.require_visual_approval`: require `--approve-visual` when Storybook verification is enabled
 
 ## Behavior Decision Gate
 

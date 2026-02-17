@@ -118,20 +118,6 @@ function parseSectionNumber(sectionLines, key, defaultValue) {
   return Number.isNaN(numeric) ? defaultValue : numeric;
 }
 
-function parseEnumValue(rawValue, allowedValues, defaultValue, fieldName) {
-  if (rawValue === null || rawValue === undefined) {
-    return defaultValue;
-  }
-
-  const normalized = String(rawValue).trim().toLowerCase();
-  if (!allowedValues.includes(normalized)) {
-    fail(
-      `Invalid ${fieldName}: ${rawValue}. Allowed values: ${allowedValues.join(', ')}`
-    );
-  }
-  return normalized;
-}
-
 function parseSectionList(sectionLines, key) {
   const values = [];
   const keyPattern = new RegExp(`^\\s{2}${key}:\\s*$`);
@@ -218,7 +204,6 @@ export function readScenario(pathArg) {
   const target = parseTopLevelScalar(content, 'target');
   const targets = parseTopLevelList(content, 'targets');
   const combinedTargets = [...new Set([target, ...targets].filter(Boolean))];
-  const verification = parseTopLevelList(content, 'verification');
 
   if (!idMatch) {
     fail('Scenario must include top-level `id`.');
@@ -267,29 +252,15 @@ export function readScenario(pathArg) {
       spec: parseSectionScalar(behaviorSection, 'spec', ''),
     },
     gates: {
-      requireVisualApproval: parseSectionBoolean(
-        gatesSection,
-        'require_visual_approval',
-        true
-      ),
-      designTokensMode: parseEnumValue(
-        parseSectionScalar(gatesSection, 'design_tokens_mode', null),
-        ['off', 'warn', 'error'],
-        'error',
-        'gates.design_tokens_mode'
-      ),
-      figmaMcpLogsMode: parseEnumValue(
-        parseSectionScalar(gatesSection, 'figma_mcp_logs_mode', null),
-        ['off', 'warn', 'error'],
-        'error',
-        'gates.figma_mcp_logs_mode'
-      ),
+      requireVisualApproval: true,
+      designTokensMode: 'error',
+      figmaMcpLogsMode: 'error',
       allowedChangedPaths: parseSectionList(
         gatesSection,
         'allowed_changed_paths'
       ),
     },
     targets: combinedTargets,
-    verification: verification.length > 0 ? verification : ['storybook'],
+    verification: ['storybook'],
   };
 }
