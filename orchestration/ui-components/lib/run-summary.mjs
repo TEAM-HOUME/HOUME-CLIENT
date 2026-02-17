@@ -163,7 +163,7 @@ export function summarizeStepOutput(name, output) {
     return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계`;
   }
   if (name === 'extract-figma-mcp-tool-logs') {
-    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개, auth-env=${output.authTokenEnv || '(none)'}`;
+    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개`;
   }
   if (name === 'gate-figma-mcp-tool-logs') {
     return `상태=${output.status}, 검사=${output.checkedTools}개, 누락=${output.missingTools?.length ?? 0}개, 오류=${output.badTools?.length ?? 0}개`;
