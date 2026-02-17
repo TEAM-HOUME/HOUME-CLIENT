@@ -204,6 +204,12 @@ export function writeReport(context) {
     designTokensArtifactPath: context.designTokensArtifactPath
       ? relative(context.rootPath, context.designTokensArtifactPath)
       : null,
+    figmaAssetScopeArtifactPath: context.figmaAssetScopeArtifactPath
+      ? relative(context.rootPath, context.figmaAssetScopeArtifactPath)
+      : null,
+    figmaAssetCoverageArtifactPath: context.figmaAssetCoverageArtifactPath
+      ? relative(context.rootPath, context.figmaAssetCoverageArtifactPath)
+      : null,
     figmaScope: context.figmaScope || null,
     figmaScopeGate: context.figmaScopeGate || null,
     resolvedIntent: context.resolvedIntent || null,
@@ -213,6 +219,8 @@ export function writeReport(context) {
     figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,
     designTokens: context.designTokens || null,
     designTokensGate: context.designTokensGate || null,
+    figmaAssetScope: context.figmaAssetScope || null,
+    figmaAssetCoverageGate: context.figmaAssetCoverageGate || null,
     componentPlan: context.componentPlan || null,
     implementationResult: context.implementationResult || null,
     storybookOpenResult: context.storybookOpenResult || null,

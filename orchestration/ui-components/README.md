@@ -34,6 +34,8 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `gate-figma-mcp-tool-logs`: enforce required direct tool-call quality (`off|warn|error`).
 - `extract-design-tokens`: normalize tokens from logged MCP evidence (+ agent assistance).
 - `gate-design-tokens`: enforce token quality mode (`off|warn|error`).
+- `extract-figma-asset-scope`: probe child node contexts from selected scope to recover icon/image/vector hints.
+- `gate-figma-asset-coverage`: compare screenshot evidence vs extracted context and block on likely graphic-asset miss.
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
 - `run-agent-implementation`: implement code changes with system prompt + task context + docs conventions.
 - `gate-changed-paths`: block unrelated file changes.
@@ -51,14 +53,16 @@ Default fixed policy:
 
 ## Context Injection Matrix
 
-| Stage                      | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
-| -------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `preflight`                | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                            | runtime summary only                                                |
-| `extract-intent`           | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `intentOverrides`, `docs/reference/*` conventions                                    | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
-| `resolve-component-plan`   | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
-| `run-agent-implementation` | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
-| `extract-design-tokens`    | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                     | `artifacts/*-design-tokens.json`                                    |
-| `report`                   | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths, `intentOverrides`                                               | `reports/<runId>.json`, `reports/index.jsonl`                       |
+| Stage                       | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
+| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `preflight`                 | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                            | runtime summary only                                                |
+| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `intentOverrides`, `docs/reference/*` conventions                                    | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
+| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
+| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
+| `extract-design-tokens`     | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                     | `artifacts/*-design-tokens.json`                                    |
+| `extract-figma-asset-scope` | Local direct MCP probe                        | selected node `get_design_context` output + child node-id inference + direct MCP probe (`get_design_context`)                        | `artifacts/*-figma-asset-scope.json`                                |
+| `gate-figma-asset-coverage` | Inline prompt in step code                    | direct MCP logs + asset-scope artifact + screenshot/context consistency rules                                                        | `artifacts/*-figma-asset-coverage.json`                             |
+| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths, `intentOverrides`                                               | `reports/<runId>.json`, `reports/index.jsonl`                       |
 
 ## Orchestration Diagrams
 
@@ -75,6 +79,8 @@ Default fixed policy:
 | `gate-figma-mcp-tool-logs`    | Gate                 | Local code                                         |
 | `extract-design-tokens`       | Extraction           | Agent CLI (normalization) + logged MCP evidence    |
 | `gate-design-tokens`          | Gate                 | Local code                                         |
+| `extract-figma-asset-scope`   | Extraction           | Local direct MCP HTTP calls                        |
+| `gate-figma-asset-coverage`   | Gate                 | Agent CLI + Local gate policy                      |
 | `resolve-component-plan`      | Planning + Gate      | Agent CLI + local behavior guard                   |
 | `run-agent-implementation`    | Implementation       | Agent CLI                                          |
 | `gate-changed-paths`          | Gate                 | Local git diff                                     |
@@ -105,7 +111,10 @@ flowchart TD
 
   G --> H{{gate-design-tokens}}
   H -- fail --> Z1
-  H -- pass/warn --> I[resolve-component-plan]
+  H -- pass/warn --> HA[extract-figma-asset-scope]
+  HA --> HB{{gate-figma-asset-coverage}}
+  HB -- fail --> Z1
+  HB -- pass/warn --> I[resolve-component-plan]
 
   I -- fail --> IR[feedback: plan retry]
   IR --> I
@@ -124,7 +133,7 @@ flowchart TD
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,DG,F,H,L,O gate;
+  class D,DG,F,H,HB,L,O gate;
   class DI,E,K agent;
   class A,B,C,P,Q,Z1,I,DR,IR,KR,VR local;
 ```
@@ -175,6 +184,13 @@ sequenceDiagram
   opt !dry-run && design_tokens_mode != off
     R->>A: design-tokens normalization prompt (JSON schema)
     A-->>R: normalized tokens + diagnostics
+  end
+
+  opt !dry-run && figma.asset_probe_enabled=true
+    R->>M: child asset probe (get_design_context on inferred child node ids)
+    M-->>R: child asset context evidence
+    R->>A: asset coverage gate (screenshot/context consistency)
+    A-->>R: covered/missing/unknown + rationale
   end
 
   R->>A: resolve-component-plan prompt (intent + artifacts + docs sources + plan feedback)
@@ -265,11 +281,15 @@ figma:
 - `gates.intent_mode`: intent gate strictness (`warn|error`, default `error`)
 - `gates.intent_min_confidence`: minimum intent confidence (`0.0~1.0`, default `0.75`)
 - `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
+- `gates.asset_coverage_mode`: screenshot/context asset coverage strictness (`off|warn|error`, default `error`)
 - `figma.mcp_endpoint`: direct MCP endpoint for preflight/logging/capture (default: `http://127.0.0.1:3845/mcp`)
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
 - `figma.auto_parent`: if `true`, scope extraction agent can walk parent chain (`default: true`)
 - `figma.parent_hops_max`: maximum parent hops during auto scope selection (`default: 3`)
 - `figma.scope_node_id`: explicit scope override to skip agent scope walk
+- `figma.asset_probe_enabled`: enable child asset probe stage (`default: true`)
+- `figma.asset_probe_max_candidates`: max inferred child node ids to probe (`default: 8`)
+- `figma.asset_probe_timeout_ms`: timeout per child probe call (`default: figma.timeout_ms`)
 - `gates.allowed_changed_paths`: explicit allowed change paths
 
 ## Scope Gate Behavior

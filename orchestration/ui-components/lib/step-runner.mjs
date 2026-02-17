@@ -13,6 +13,8 @@ const HEARTBEAT_STEPS = new Set([
   'extract-figma-scope',
   'extract-figma-mcp-tool-logs',
   'extract-design-tokens',
+  'extract-figma-asset-scope',
+  'gate-figma-asset-coverage',
   'resolve-component-plan',
   'run-agent-implementation',
   'verify',

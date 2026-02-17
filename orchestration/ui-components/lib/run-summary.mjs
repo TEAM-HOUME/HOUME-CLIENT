@@ -67,19 +67,27 @@ function accumulateFigmaMcpToolCall(summary, toolName, status) {
 
 export function buildFigmaMcpToolUsageSummary(context) {
   const summary = createFigmaMcpToolUsageSummary();
+  const hasDirectLogCalls = Array.isArray(context.figmaMcpToolLogs?.calls);
 
-  if (Array.isArray(context.figmaMcpToolLogs?.calls)) {
+  if (hasDirectLogCalls) {
     for (const call of context.figmaMcpToolLogs.calls) {
       accumulateFigmaMcpToolCall(summary, call.tool, call.status);
     }
-    return summary;
   }
 
-  const designTools = context.designTokens?.tools;
-  if (designTools && typeof designTools === 'object') {
-    for (const [key, value] of Object.entries(designTools)) {
-      const toolName = value?.tool || key;
-      accumulateFigmaMcpToolCall(summary, toolName, value?.status);
+  if (Array.isArray(context.figmaAssetScope?.calls)) {
+    for (const call of context.figmaAssetScope.calls) {
+      accumulateFigmaMcpToolCall(summary, call.tool, call.status);
+    }
+  }
+
+  if (!hasDirectLogCalls) {
+    const designTools = context.designTokens?.tools;
+    if (designTools && typeof designTools === 'object') {
+      for (const [key, value] of Object.entries(designTools)) {
+        const toolName = value?.tool || key;
+        accumulateFigmaMcpToolCall(summary, toolName, value?.status);
+      }
     }
   }
 
@@ -174,6 +182,12 @@ export function summarizeStepOutput(name, output) {
   if (name === 'gate-design-tokens') {
     return `상태=${output.status}, 토큰=${output.totalTokens}개`;
   }
+  if (name === 'extract-figma-asset-scope') {
+    return `상태=${output.status}, 후보=${output.candidates}개, 탐색=${output.probed}개, 그래픽신호=${output.graphicSignals}개`;
+  }
+  if (name === 'gate-figma-asset-coverage') {
+    return `상태=${output.status}, 판정=${output.coverageStatus}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 누락=${output.missingCount || 0}개`;
+  }
   if (name === 'resolve-component-plan') {
     return `계획=${output.action}, 대상=${output.targetPath}, 소스=${output.source}`;
   }
@@ -230,6 +244,37 @@ export function logStepDetails(name, output, traceRecords) {
     if (Array.isArray(output.errors) && output.errors.length > 0) {
       output.errors.forEach((error, index) => {
         console.log(`- 토큰 오류 ${index + 1}: ${error}`);
+      });
+    }
+  }
+
+  if (name === 'extract-figma-asset-scope') {
+    console.log('- 상세');
+    if (output.selectedGraphicSignal) {
+      console.log('- 기준 노드 그래픽 신호: 있음');
+    } else {
+      console.log('- 기준 노드 그래픽 신호: 없음');
+    }
+    if (output.failedCalls > 0 || output.unavailableCalls > 0) {
+      console.log(
+        `- 탐색 실패: 실패 ${output.failedCalls || 0}개, 미가용 ${output.unavailableCalls || 0}개`
+      );
+    }
+  }
+
+  if (name === 'gate-figma-asset-coverage') {
+    console.log('- 상세');
+    if (Array.isArray(output.reasons) && output.reasons.length > 0) {
+      output.reasons.forEach((reason, index) => {
+        console.log(`- 판정 근거 ${index + 1}: ${truncateText(reason, 200)}`);
+      });
+    }
+    if (
+      Array.isArray(output.suggestedActions) &&
+      output.suggestedActions.length > 0
+    ) {
+      output.suggestedActions.forEach((action, index) => {
+        console.log(`- 권장 조치 ${index + 1}: ${truncateText(action, 160)}`);
       });
     }
   }
@@ -312,6 +357,15 @@ export function logStepFailureHint(context, name, traceRecords) {
     console.log('- 조치');
     console.log(
       '- figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
+    );
+  }
+  if (name === 'gate-figma-asset-coverage') {
+    console.log('- 조치');
+    console.log(
+      '- 스크린샷 대비 자산 누락으로 판정되었습니다. figma.scope_node_id 확장 또는 asset probe 후보 수 조정 필요'
+    );
+    console.log(
+      '- 관련 아티팩트: artifacts/*-figma-asset-scope.json, artifacts/*-figma-asset-coverage.json'
     );
   }
 

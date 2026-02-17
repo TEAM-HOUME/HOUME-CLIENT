@@ -221,6 +221,18 @@ export function readScenario(pathArg) {
     fail('Scenario must include top-level `brief`.');
   }
   const scenarioId = createScenarioId(figmaUrl, brief);
+  const figmaTimeoutMs = parseSectionNumber(
+    figmaSection,
+    'timeout_ms',
+    DEFAULT_FIGMA_TIMEOUT_MS
+  );
+  const assetProbeMaxCandidates = clamp(
+    Math.trunc(
+      parseSectionNumber(figmaSection, 'asset_probe_max_candidates', 8)
+    ),
+    1,
+    24
+  );
   const intentMinConfidence = clamp(
     parseSectionNumber(gatesSection, 'intent_min_confidence', 0.75),
     0,
@@ -247,11 +259,7 @@ export function readScenario(pathArg) {
       url: figmaUrl,
       autoParent: parseSectionBoolean(figmaSection, 'auto_parent', true),
       parentHopsMax: parseSectionNumber(figmaSection, 'parent_hops_max', 3),
-      timeoutMs: parseSectionNumber(
-        figmaSection,
-        'timeout_ms',
-        DEFAULT_FIGMA_TIMEOUT_MS
-      ),
+      timeoutMs: figmaTimeoutMs,
       mcpEndpoint: parseSectionScalar(
         figmaSection,
         'mcp_endpoint',
@@ -263,6 +271,17 @@ export function readScenario(pathArg) {
         null
       ),
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
+      assetProbeEnabled: parseSectionBoolean(
+        figmaSection,
+        'asset_probe_enabled',
+        true
+      ),
+      assetProbeMaxCandidates,
+      assetProbeTimeoutMs: parseSectionNumber(
+        figmaSection,
+        'asset_probe_timeout_ms',
+        figmaTimeoutMs
+      ),
     },
     behavior: {
       confirmed: parseSectionBoolean(behaviorSection, 'confirmed', false),
@@ -272,6 +291,12 @@ export function readScenario(pathArg) {
       requireVisualApproval: true,
       designTokensMode: 'error',
       figmaMcpLogsMode: 'error',
+      assetCoverageMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'asset_coverage_mode', null),
+        ['off', 'warn', 'error'],
+        'error',
+        'gates.asset_coverage_mode'
+      ),
       scopeGateMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'scope_gate_mode', null),
         ['warn', 'error'],

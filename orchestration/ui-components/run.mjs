@@ -18,9 +18,11 @@ import { maybeOpenStorybook } from './lib/storybook.mjs';
 import { runStep } from './lib/step-runner.mjs';
 import { formatNumber } from './lib/step-utils.mjs';
 import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
+import { stepExtractFigmaAssetScope } from './steps/extract-figma-asset-scope.mjs';
 import { stepExtractFigmaMcpToolLogs } from './steps/extract-figma-mcp-tool-logs.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
 import { stepExtractIntent } from './steps/extract-intent.mjs';
+import { stepGateAssetCoverage } from './steps/gate-figma-asset-coverage.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
 import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
 import { stepGateFigmaMcpToolLogs } from './steps/gate-figma-mcp-tool-logs.mjs';
@@ -32,7 +34,7 @@ import { stepRunAgent } from './steps/run-agent-implementation.mjs';
 import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
-const PLANNED_STEP_COUNT = 13;
+const PLANNED_STEP_COUNT = 15;
 const STEP_DISPLAY_ORDER = Object.freeze({
   preflight: 1,
   'extract-intent': 2,
@@ -43,10 +45,12 @@ const STEP_DISPLAY_ORDER = Object.freeze({
   'gate-figma-mcp-tool-logs': 7,
   'extract-design-tokens': 8,
   'gate-design-tokens': 9,
-  'resolve-component-plan': 10,
-  'run-agent-implementation': 11,
-  'gate-changed-paths': 12,
-  verify: 13,
+  'extract-figma-asset-scope': 10,
+  'gate-figma-asset-coverage': 11,
+  'resolve-component-plan': 12,
+  'run-agent-implementation': 13,
+  'gate-changed-paths': 14,
+  verify: 15,
 });
 
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
@@ -79,6 +83,10 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     designTokensArtifactPath: null,
     designTokens: null,
     designTokensGate: null,
+    figmaAssetScopeArtifactPath: null,
+    figmaAssetScope: null,
+    figmaAssetCoverageArtifactPath: null,
+    figmaAssetCoverageGate: null,
     componentPlan: null,
     implementationResult: null,
     storybookOpenResult: null,
@@ -166,6 +174,8 @@ async function executePipeline(context) {
   runStep(context, 'gate-figma-mcp-tool-logs', stepGateFigmaMcpToolLogs);
   runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
   runStep(context, 'gate-design-tokens', stepGateDesignTokens);
+  runStep(context, 'extract-figma-asset-scope', stepExtractFigmaAssetScope);
+  runStep(context, 'gate-figma-asset-coverage', stepGateAssetCoverage);
   await runPlanWithFeedbackLoop(context, {
     retryLimits: RETRY_LIMITS,
     runStep,
