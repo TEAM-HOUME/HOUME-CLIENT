@@ -14,7 +14,7 @@ export const CODEX_SAFE_CONFIG = [
   '-m',
   'gpt-5.3-codex',
   '-c',
-  'model_reasoning_effort="medium"',
+  'model_reasoning_effort="high"',
 ];
 
 export const DEFAULT_FIGMA_TIMEOUT_MS = 600_000;
