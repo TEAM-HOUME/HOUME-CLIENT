@@ -24,7 +24,7 @@ export function stepGateFigmaMcpToolLogs(context) {
 
   const logs = context.figmaMcpToolLogs;
   if (!logs) {
-    gateFailureOrWarning(context, 'Figma MCP raw tool logs are missing.');
+    gateFailureOrWarning(context, 'Figma MCP 원본 도구 로그가 없습니다.');
     context.figmaMcpToolLogsGate = {
       mode: context.scenario.gates.figmaMcpLogsMode,
       status: 'missing',
@@ -46,7 +46,7 @@ export function stepGateFigmaMcpToolLogs(context) {
   if (missingTools.length > 0) {
     gateFailureOrWarning(
       context,
-      `Missing required Figma MCP tool calls: ${missingTools.join(', ')}`
+      `필수 Figma MCP 도구 호출이 누락되었습니다: ${missingTools.join(', ')}`
     );
   }
 
@@ -69,7 +69,7 @@ export function stepGateFigmaMcpToolLogs(context) {
       .join(', ');
     gateFailureOrWarning(
       context,
-      `Figma MCP tool calls did not pass quality gate: ${detail}`
+      `Figma MCP 도구 호출이 품질 게이트를 통과하지 못했습니다: ${detail}`
     );
   }
 

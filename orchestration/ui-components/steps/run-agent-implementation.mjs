@@ -133,6 +133,7 @@ export function stepRunAgent(context) {
       : '- Verify feedback: (none)',
     '',
     '# Output',
+    '- summary and notes must be written in Korean.',
     'Return JSON that matches the schema.',
   ].filter(Boolean);
 

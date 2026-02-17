@@ -135,6 +135,7 @@ function buildPrompt(context) {
     '- Use role enum values exactly.',
     '- confidence must be between 0 and 1.',
     '- Put unresolved aspects in ambiguities.',
+    '- summary and ambiguities must be written in Korean.',
     'Return JSON only matching the schema.',
   ].join('\n');
 }

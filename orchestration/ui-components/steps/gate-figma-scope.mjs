@@ -35,7 +35,7 @@ export function stepGateFigmaScope(context) {
 
   const scope = context.figmaScope;
   if (!scope) {
-    fail('Figma scope is missing in context.');
+    fail('Figma 스코프 정보가 컨텍스트에 없습니다.');
   }
 
   const parentDepth = Array.isArray(scope.parentChain)
@@ -59,7 +59,7 @@ export function stepGateFigmaScope(context) {
 
   if (scopeVerdict === 'too_broad') {
     if (cannotNarrowFurther) {
-      const message = `Selected scope remains broad at parent-hop limit (${parentDepth}/${context.scenario.figma.parentHopsMax}). Proceeding with warning because cannotNarrowFurther=true.`;
+      const message = `선택 스코프가 상위 탐색 한계(${parentDepth}/${context.scenario.figma.parentHopsMax})에서도 넓게 유지됩니다. cannotNarrowFurther=true 이므로 경고로 진행합니다.`;
       context.warnings.push(message);
       context.figmaScopeGate = {
         mode,
@@ -75,7 +75,7 @@ export function stepGateFigmaScope(context) {
     failOrWarn(
       context,
       mode,
-      `Selected scope is too broad (node ${scope.selectedNodeId}). Narrow the node or provide figma.scope_node_id explicitly.`
+      `선택 스코프가 너무 넓습니다 (node ${scope.selectedNodeId}). 노드 범위를 더 좁히거나 figma.scope_node_id를 명시해 주세요.`
     );
     context.figmaScopeGate = {
       mode,
@@ -92,7 +92,7 @@ export function stepGateFigmaScope(context) {
     failOrWarn(
       context,
       mode,
-      `Selected scope is too narrow (node ${scope.selectedNodeId}). Expand to a parent node or set figma.scope_node_id explicitly.`
+      `선택 스코프가 너무 좁습니다 (node ${scope.selectedNodeId}). 상위 노드로 확장하거나 figma.scope_node_id를 명시해 주세요.`
     );
     context.figmaScopeGate = {
       mode,
@@ -108,7 +108,7 @@ export function stepGateFigmaScope(context) {
   failOrWarn(
     context,
     mode,
-    `Scope verdict is unknown for node ${scope.selectedNodeId}. Review scope rationale and scenario intent.`
+    `node ${scope.selectedNodeId}의 scope verdict가 unknown입니다. 스코프 근거와 시나리오 intent를 확인해 주세요.`
   );
   context.figmaScopeGate = {
     mode,

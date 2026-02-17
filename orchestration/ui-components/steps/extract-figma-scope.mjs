@@ -32,6 +32,7 @@ function buildScopePrompt(context, figmaMeta) {
     '- too_broad: selected node still includes unrelated UI scope.',
     '- too_narrow: selected node misses required UI pieces for this component.',
     '- unknown: cannot determine confidently.',
+    '- rationale must be written in Korean.',
     '',
     'Do not edit any code or files.',
     'Return JSON only that matches the schema.',
@@ -60,7 +61,7 @@ export function stepExtractFigmaScope(context) {
   ) {
     if (context.options.dryRun) {
       context.warnings.push(
-        'auto_parent is enabled but --dry-run was used, so input node-id was kept.'
+        'auto_parent가 활성화되어 있지만 --dry-run 실행으로 입력 node-id를 그대로 사용했습니다.'
       );
     } else {
       const schema = {

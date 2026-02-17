@@ -31,7 +31,7 @@ function probeFigmaMcp(context) {
   });
   if (!session.ok) {
     fail(
-      `Figma MCP initialize probe failed at ${endpoint}: ${session.initializeState.error}.`
+      `Figma MCP 초기화 점검에 실패했습니다. endpoint=${endpoint}, 원인=${session.initializeState.error}.`
     );
   }
 
@@ -45,7 +45,7 @@ function probeFigmaMcp(context) {
   const toolsListState = classifyJsonRpcCall(toolsListCall);
   if (toolsListState.status !== 'ok') {
     fail(
-      `Figma MCP tools/list probe failed at ${endpoint}: ${toolsListState.error}.`
+      `Figma MCP tools/list 점검에 실패했습니다. endpoint=${endpoint}, 원인=${toolsListState.error}.`
     );
   }
 
@@ -61,7 +61,7 @@ function probeFigmaMcp(context) {
   );
   if (missingTools.length > 0) {
     fail(
-      `Figma MCP required tools are missing at ${endpoint}: ${missingTools.join(', ')}`
+      `Figma MCP 필수 도구가 누락되었습니다. endpoint=${endpoint}, 누락=${missingTools.join(', ')}`
     );
   }
 
@@ -76,7 +76,7 @@ export function stepPreflight(context) {
   const requiredCommands = [...REQUIRED_BASE_COMMANDS];
   const missing = requiredCommands.filter((command) => !hasCommand(command));
   if (missing.length > 0) {
-    fail(`Missing required command(s): ${missing.join(', ')}`);
+    fail(`필수 명령어가 없습니다: ${missing.join(', ')}`);
   }
 
   context.agentRuntime = resolveAgentRuntime(context.scenario);

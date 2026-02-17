@@ -26,7 +26,7 @@ export function stepGateDesignTokens(context) {
   if (!capture) {
     gateFailureOrWarning(
       context,
-      'Design token capture is missing in context.'
+      '디자인 토큰 캡처 결과가 컨텍스트에 없습니다.'
     );
     context.designTokensGate = {
       mode: context.scenario.gates.designTokensMode,
@@ -40,17 +40,17 @@ export function stepGateDesignTokens(context) {
   if (capture.status === 'invalid') {
     gateFailureOrWarning(
       context,
-      'Design token capture status is invalid (schema/parse issue).'
+      '디자인 토큰 캡처 상태가 invalid입니다 (스키마/파싱 이슈).'
     );
   } else if (capture.status === 'unavailable') {
     gateFailureOrWarning(
       context,
-      'Design token capture status is unavailable (MCP/tool failure).'
+      '디자인 토큰 캡처를 사용할 수 없습니다 (MCP/도구 실패).'
     );
   } else if (capture.status === 'partial') {
     gateFailureOrWarning(
       context,
-      'Design token capture status is partial (insufficient core token coverage).'
+      '디자인 토큰 캡처 상태가 partial입니다 (코어 토큰 커버리지 부족).'
     );
   }
 

@@ -78,6 +78,7 @@ function buildPrompt(context) {
     '- covered: visual assets are sufficiently represented in current context.',
     '- missing: screenshot shows visible graphic assets not represented in context.',
     '- unknown: cannot decide confidently from available evidence.',
+    '- missingElements, reasons, suggestedActions must be written in Korean.',
     '- Do not edit files.',
     '- Return JSON only that matches the schema.',
   ].join('\n');
@@ -91,7 +92,7 @@ function createFallbackAssessment(message) {
     contextHasGraphicAsset: false,
     missingElements: [],
     reasons: [message],
-    suggestedActions: ['Check artifacts and rerun'],
+    suggestedActions: ['아티팩트를 확인한 뒤 다시 실행하세요'],
   };
 }
 
@@ -112,11 +113,7 @@ export function stepGateAssetCoverage(context) {
   }
 
   if (!context.figmaAssetScope) {
-    failOrWarn(
-      context,
-      mode,
-      'Figma asset scope extraction result is missing.'
-    );
+    failOrWarn(context, mode, 'Figma 자산 스코프 추출 결과가 없습니다.');
     context.figmaAssetCoverageGate = {
       mode,
       status: mode === 'error' ? 'blocked' : 'missing-warning',
@@ -131,7 +128,7 @@ export function stepGateAssetCoverage(context) {
     failOrWarn(
       context,
       mode,
-      'Figma asset scope extraction is unavailable (MCP/tool failure).'
+      'Figma 자산 스코프 추출을 사용할 수 없습니다 (MCP/도구 실패).'
     );
   }
 
@@ -189,7 +186,7 @@ export function stepGateAssetCoverage(context) {
     failOrWarn(
       context,
       mode,
-      `Asset coverage assessment failed: ${extractionMessage}`
+      `자산 커버리지 판정에 실패했습니다: ${extractionMessage}`
     );
   }
 
@@ -230,14 +227,14 @@ export function stepGateAssetCoverage(context) {
     failOrWarn(
       context,
       mode,
-      `Visual asset coverage mismatch detected: ${assessment.missingElements.join(' | ') || 'screenshot/context inconsistency'}`
+      `시각 자산 커버리지 불일치가 감지되었습니다: ${assessment.missingElements.join(' | ') || '스크린샷/컨텍스트 불일치'}`
     );
   } else if (assessment.coverageStatus === 'unknown') {
     status = mode === 'error' ? 'blocked' : 'unknown-warning';
     failOrWarn(
       context,
       mode,
-      `Visual asset coverage is unknown: ${assessment.reasons.join(' | ') || 'insufficient evidence'}`
+      `시각 자산 커버리지를 확정할 수 없습니다: ${assessment.reasons.join(' | ') || '근거 부족'}`
     );
   }
 

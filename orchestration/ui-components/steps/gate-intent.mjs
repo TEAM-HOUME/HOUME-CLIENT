@@ -142,7 +142,7 @@ export function stepGateIntent(context) {
 
   const intent = context.resolvedIntent;
   if (!intent) {
-    const message = 'Resolved intent is missing in context.';
+    const message = '해석된 intent가 컨텍스트에 없습니다.';
     if (context.scenario.gates.intentMode === 'error') {
       fail(message);
     }
@@ -178,19 +178,19 @@ export function stepGateIntent(context) {
 
   if (missingFields.length > 0) {
     blockingIssues.push(
-      `Intent fields are missing: ${missingFields.join(', ')}`
+      `Intent 필드가 누락되었습니다: ${missingFields.join(', ')}`
     );
   }
 
   if (intent.componentKind === 'unknown') {
     blockingIssues.push(
-      'Intent componentKind is unknown. Clarify the component role in brief/intent hints.'
+      'Intent componentKind가 unknown입니다. brief/intent 힌트로 컴포넌트 역할을 명확히 지정해 주세요.'
     );
   }
 
   if (intent.confidence < context.scenario.gates.intentMinConfidence) {
     blockingIssues.push(
-      `Intent confidence is low (${intent.confidence.toFixed(2)} < ${context.scenario.gates.intentMinConfidence.toFixed(2)}).`
+      `Intent 신뢰도가 낮습니다 (${intent.confidence.toFixed(2)} < ${context.scenario.gates.intentMinConfidence.toFixed(2)}).`
     );
   }
 
@@ -198,13 +198,13 @@ export function stepGateIntent(context) {
     splitAmbiguities(context, intent);
   if (blockingAmbiguities.length > 0) {
     blockingIssues.push(
-      `Intent ambiguities require clarification: ${blockingAmbiguities.join(' | ')}`
+      `Intent 모호점 확인이 필요합니다: ${blockingAmbiguities.join(' | ')}`
     );
   }
   if (advisoryAmbiguities.length > 0) {
     pushWarning(
       context,
-      `Intent advisory ambiguities auto-resolved by profile/override: ${advisoryAmbiguities.join(' | ')}`
+      `Intent 권고 모호점은 프로필/오버라이드로 자동 해소되었습니다: ${advisoryAmbiguities.join(' | ')}`
     );
   }
 
@@ -214,7 +214,7 @@ export function stepGateIntent(context) {
     !context.scenario.behavior.confirmed;
   if (requiresBehaviorConfirmation) {
     blockingIssues.push(
-      `New interaction behavior requires confirmation. Set behavior.confirmed=true and provide behavior.spec. componentKind=${intent.componentKind}`
+      `신규 인터랙션 동작 정의 확인이 필요합니다. behavior.confirmed=true 및 behavior.spec를 지정해 주세요. componentKind=${intent.componentKind}`
     );
   }
 
@@ -225,7 +225,7 @@ export function stepGateIntent(context) {
     !context.scenario.behavior.spec.trim();
   if (missingBehaviorSpec) {
     blockingIssues.push(
-      `behavior.confirmed=true but behavior.spec is empty. Provide behavior spec for interactive component (${intent.componentKind}).`
+      `behavior.confirmed=true 이지만 behavior.spec가 비어 있습니다. 인터랙션 컴포넌트(${intent.componentKind}) 동작 정의를 입력해 주세요.`
     );
   }
 

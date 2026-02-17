@@ -120,6 +120,7 @@ function buildResolvePrompt(context, contracts) {
     '- Prefer reusing/updating existing components and story files.',
     '- Choose target path inside src/shared/components when possible.',
     '- If no similar component exists and behavior definition is required (modal/sheet/dialog-like), set requiresBehaviorConfirmation=true.',
+    '- rationale and behaviorQuestions must be written in Korean.',
     '- Do not edit files.',
     '- Return JSON only.',
     ...feedbackSection,
@@ -177,13 +178,13 @@ function enforceBehaviorGate(context, componentPlan) {
         ? ` Open questions: ${componentPlan.behaviorQuestions.join(' | ')}`
         : '';
     fail(
-      `Behavior definition required for new interactive component. Confirm in scenario.behavior.confirmed=true and provide behavior.spec.${questionText}`
+      `신규 인터랙션 컴포넌트의 동작 정의 확인이 필요합니다. scenario.behavior.confirmed=true 및 behavior.spec를 지정해 주세요.${questionText}`
     );
   }
 
   if (!context.scenario.behavior.spec.trim()) {
     fail(
-      'scenario.behavior.confirmed=true but behavior.spec is empty. Add explicit behavior spec before implementation.'
+      'scenario.behavior.confirmed=true 이지만 behavior.spec가 비어 있습니다. 구현 전에 명시적 동작 정의를 추가해 주세요.'
     );
   }
 }
@@ -201,7 +202,9 @@ export function stepResolveComponent(context) {
   const planFromAgent = invokeResolveAgent(context, contracts);
   const normalizedTargetPath = normalizePath(planFromAgent.targetPath);
   if (!normalizedTargetPath) {
-    fail('resolve-component-plan agent returned empty targetPath.');
+    fail(
+      'resolve-component-plan 에이전트가 비어 있는 targetPath를 반환했습니다.'
+    );
   }
   const targetExists = existsSync(
     resolve(context.rootPath, normalizedTargetPath)
@@ -221,16 +224,18 @@ export function stepResolveComponent(context) {
 
   if (!['update', 'create'].includes(componentPlan.action)) {
     fail(
-      `resolve-component-plan returned invalid action: ${componentPlan.action}`
+      `resolve-component-plan이 잘못된 action을 반환했습니다: ${componentPlan.action}`
     );
   }
 
   if (!componentPlan.targetPath.startsWith('src/')) {
-    fail(`Target path must be under src/: ${componentPlan.targetPath}.`);
+    fail(`targetPath는 src/ 하위여야 합니다: ${componentPlan.targetPath}.`);
   }
 
   if (componentPlan.action === 'update' && !componentPlan.targetExists) {
-    fail(`Planned update target does not exist: ${componentPlan.targetPath}.`);
+    fail(
+      `update 대상으로 계획된 파일이 존재하지 않습니다: ${componentPlan.targetPath}.`
+    );
   }
 
   enforceBehaviorGate(context, componentPlan);

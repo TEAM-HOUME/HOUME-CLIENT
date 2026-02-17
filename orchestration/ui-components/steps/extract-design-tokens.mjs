@@ -158,6 +158,7 @@ function buildPrompt(context) {
     '- Put unmatched values in normalized.extras.',
     '- Every token item must include name/value/source/nodeId/note (empty string allowed).',
     '- Do not invent values that are not present in tool outputs.',
+    '- diagnostics.warnings and diagnostics.errors must be written in Korean.',
     'Return JSON only that matches the schema.',
   ].join('\n');
 }
@@ -391,9 +392,7 @@ export function stepExtractDesignTokens(context) {
     if (context.scenario.gates.designTokensMode === 'error') {
       throw error;
     }
-    context.warnings.push(
-      `Design token extraction warning: ${extractionMessage}`
-    );
+    context.warnings.push(`디자인 토큰 추출 경고: ${extractionMessage}`);
   }
 
   const artifactPath = resolve(
