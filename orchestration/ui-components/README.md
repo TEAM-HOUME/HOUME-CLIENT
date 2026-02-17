@@ -38,6 +38,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `run-agent-implementation`: implement code changes with injected context docs.
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
+- `feedback-loop`: on `plan/implement/verify` failure, ask terminal input and retry (max 3 attempts per stage).
 - `report`: write run summary JSON.
 
 Default fixed policy:
@@ -182,7 +183,18 @@ stateDiagram-v2
   [*] --> Initialized
   Initialized --> RunningSteps: runStep(step)
 
-  RunningSteps --> Failed: any step throws
+  RunningSteps --> Failed: non-retryable step throws
+  RunningSteps --> PlanRetry: resolve-component-plan fail
+  PlanRetry --> RunningSteps: user confirms retry (<=3)
+  PlanRetry --> Failed: retry declined/exhausted
+
+  RunningSteps --> ImplementRetry: implement/path-gate fail
+  ImplementRetry --> RunningSteps: user confirms retry (<=3)
+  ImplementRetry --> Failed: retry declined/exhausted
+
+  RunningSteps --> VerifyRetry: verify fail
+  VerifyRetry --> RunningSteps: user confirms retry (<=3)
+  VerifyRetry --> Failed: retry declined/exhausted
   RunningSteps --> Passed: all steps passed
 
   Passed --> StorybookOpenAttempt: maybeOpenStorybook()
@@ -246,4 +258,6 @@ figma:
 - Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.
 - For remote MCP, set a bearer token env (`FIGMA_MCP_ACCESS_TOKEN` by default, or custom via `figma.mcp_auth_token_env`).
 - Run report includes `figmaMcpToolUsage` and `agentTokenUsage` summaries.
+- `reports/index.jsonl` is auto-generated every run for quick team summary.
+- Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
 - Use `--open-storybook` to open `storybook-static/index.html` after a successful run.

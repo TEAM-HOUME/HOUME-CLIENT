@@ -86,6 +86,17 @@ function buildResolvePrompt(context, contracts) {
   const uiRuleSources = contracts.sources?.length
     ? contracts.sources.join(', ')
     : '(none)';
+  const feedbackNotes = Array.isArray(context.feedbackLoop?.plan)
+    ? context.feedbackLoop.plan.filter(Boolean)
+    : [];
+  const feedbackSection =
+    feedbackNotes.length > 0
+      ? [
+          '',
+          'Retry feedback (apply strictly):',
+          ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
+        ]
+      : [];
 
   return [
     'You are planning a UI component implementation in read-only mode.',
@@ -111,6 +122,7 @@ function buildResolvePrompt(context, contracts) {
     '- If no similar component exists and behavior definition is required (modal/sheet/dialog-like), set requiresBehaviorConfirmation=true.',
     '- Do not edit files.',
     '- Return JSON only.',
+    ...feedbackSection,
   ].join('\n');
 }
 

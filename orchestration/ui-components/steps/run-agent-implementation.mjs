@@ -74,6 +74,12 @@ export function stepRunAgent(context) {
   }
 
   const systemPrompt = readSystemPrompt(context.rootPath);
+  const implementFeedback = Array.isArray(context.feedbackLoop?.implement)
+    ? context.feedbackLoop.implement.filter(Boolean)
+    : [];
+  const verifyFeedback = Array.isArray(context.feedbackLoop?.verify)
+    ? context.feedbackLoop.verify.filter(Boolean)
+    : [];
   const promptSections = [
     systemPrompt,
     '# Task',
@@ -117,6 +123,14 @@ export function stepRunAgent(context) {
     '- Follow existing project conventions and patterns.',
     '- Prefer updating existing component structure over redesign.',
     '- Do not edit unrelated files.',
+    '',
+    '# Feedback Loop Notes',
+    implementFeedback.length > 0
+      ? `- Implement feedback: ${implementFeedback.join(' || ')}`
+      : '- Implement feedback: (none)',
+    verifyFeedback.length > 0
+      ? `- Verify feedback: ${verifyFeedback.join(' || ')}`
+      : '- Verify feedback: (none)',
     '',
     '# Output',
     'Return JSON that matches the schema.',

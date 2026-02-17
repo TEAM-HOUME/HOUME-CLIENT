@@ -1,4 +1,5 @@
 reports/*.json
+reports/*.jsonl
 artifacts/*
 !reports/.gitkeep
 !artifacts/.gitkeep

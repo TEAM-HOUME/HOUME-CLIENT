@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
 
 import { runCommand } from './lib/agent.mjs';
@@ -19,6 +20,18 @@ import { stepPreflight } from './steps/preflight.mjs';
 import { stepResolveComponent } from './steps/resolve-component-plan.mjs';
 import { stepRunAgent } from './steps/run-agent-implementation.mjs';
 import { stepVerify } from './steps/verify.mjs';
+
+const RETRY_LIMITS = Object.freeze({
+  plan: 3,
+  implement: 3,
+  verify: 3,
+});
+
+const STAGE_LABELS = Object.freeze({
+  plan: '계획',
+  implement: '구현',
+  verify: '검증',
+});
 
 function formatDuration(durationMs) {
   if (durationMs < 1_000) {
@@ -153,6 +166,72 @@ function formatAgentTokenUsage(summary) {
   const missingText =
     missingCount > 0 ? `, 미수집 ${formatNumber(missingCount)}회` : '';
   return `입력 ${formatNumber(summary.totalInputTokens)}, 출력 ${formatNumber(summary.totalOutputTokens)}, 합계 ${formatNumber(summary.totalTokens)}${missingText}`;
+}
+
+function isInteractiveTerminal() {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+function normalizeRetryAnswer(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  return !(normalized === 'n' || normalized === 'no');
+}
+
+async function promptRetryDecision(stage, attempt, maxAttempts, errorMessage) {
+  const stageLabel = STAGE_LABELS[stage] || stage;
+  const remaining = Math.max(0, maxAttempts - attempt);
+  console.log(
+    `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts}) - ${truncateText(errorMessage, 220)}`
+  );
+
+  if (!isInteractiveTerminal()) {
+    console.log(
+      `[ui-components] [${stage}] non-TTY 환경이라 입력 없이 종료합니다`
+    );
+    return {
+      retry: false,
+      note: '',
+    };
+  }
+
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    const retryAnswer = await rl.question(
+      `[ui-components] [${stage}] 재시도하시겠습니까? (Y/n, 남은 ${remaining}회): `
+    );
+    const retry = normalizeRetryAnswer(retryAnswer);
+    if (!retry) {
+      return {
+        retry: false,
+        note: '',
+      };
+    }
+
+    const note = (
+      await rl.question(
+        `[ui-components] [${stage}] 보강 지시를 입력하세요 (없으면 Enter): `
+      )
+    ).trim();
+    return {
+      retry: true,
+      note,
+    };
+  } finally {
+    rl.close();
+  }
+}
+
+function appendFeedback(context, stage, value) {
+  if (!value || !context.feedbackLoop?.[stage]) {
+    return;
+  }
+  context.feedbackLoop[stage].push(String(value).trim());
 }
 
 function summarizeStepOutput(name, output) {
@@ -414,6 +493,126 @@ function runStep(context, name, handler) {
   }
 }
 
+async function runPlanWithFeedbackLoop(context) {
+  for (let attempt = 1; attempt <= RETRY_LIMITS.plan; attempt += 1) {
+    try {
+      runStep(context, 'resolve-component-plan', stepResolveComponent);
+      return;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (attempt >= RETRY_LIMITS.plan) {
+        throw error;
+      }
+
+      const decision = await promptRetryDecision(
+        'plan',
+        attempt,
+        RETRY_LIMITS.plan,
+        errorMessage
+      );
+      if (!decision.retry) {
+        throw error;
+      }
+      appendFeedback(
+        context,
+        'plan',
+        decision.note ||
+          `Previous plan failure: ${truncateText(errorMessage, 240)}`
+      );
+    }
+  }
+}
+
+async function runImplementationWithFeedbackLoop(context) {
+  let verifyAttempt = 0;
+
+  for (
+    let implementAttempt = 1;
+    implementAttempt <= RETRY_LIMITS.implement;
+    implementAttempt += 1
+  ) {
+    try {
+      runStep(context, 'run-agent-implementation', stepRunAgent);
+      runStep(context, 'gate-changed-paths', stepGateChangedPaths);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (implementAttempt >= RETRY_LIMITS.implement) {
+        throw error;
+      }
+
+      const decision = await promptRetryDecision(
+        'implement',
+        implementAttempt,
+        RETRY_LIMITS.implement,
+        errorMessage
+      );
+      if (!decision.retry) {
+        throw error;
+      }
+      appendFeedback(
+        context,
+        'implement',
+        decision.note ||
+          `Previous implement/path-gate failure: ${truncateText(errorMessage, 240)}`
+      );
+      continue;
+    }
+
+    if (context.options.skipVerify) {
+      runStep(context, 'verify', () => {
+        return {
+          skipped: true,
+          reason: '--skip-verify option',
+        };
+      });
+      return;
+    }
+
+    try {
+      runStep(context, 'verify', stepVerify);
+      return;
+    } catch (error) {
+      verifyAttempt += 1;
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (verifyAttempt >= RETRY_LIMITS.verify) {
+        throw error;
+      }
+
+      const decision = await promptRetryDecision(
+        'verify',
+        verifyAttempt,
+        RETRY_LIMITS.verify,
+        errorMessage
+      );
+      if (!decision.retry) {
+        throw error;
+      }
+
+      appendFeedback(
+        context,
+        'verify',
+        decision.note ||
+          `Previous verify failure: ${truncateText(errorMessage, 240)}`
+      );
+      appendFeedback(
+        context,
+        'implement',
+        `Fix verify failure before next validation: ${truncateText(errorMessage, 240)}`
+      );
+      if (decision.note) {
+        appendFeedback(context, 'implement', decision.note);
+      }
+    }
+  }
+
+  throw new Error(
+    `Implementation retry limit exceeded (${RETRY_LIMITS.implement}).`
+  );
+}
+
 function maybeOpenStorybook(context) {
   if (!context.options.openStorybook) {
     return {
@@ -498,7 +697,7 @@ function maybeOpenStorybook(context) {
   };
 }
 
-function main() {
+async function main() {
   const args = parseArgs(process.argv);
   if (!args.scenarioArg) {
     console.error(
@@ -553,6 +752,11 @@ function main() {
     verificationResults: [],
     figmaMcpToolUsage: null,
     agentTokenUsage: null,
+    feedbackLoop: {
+      plan: [],
+      implement: [],
+      verify: [],
+    },
   };
 
   let exitCode = 0;
@@ -571,18 +775,8 @@ function main() {
     runStep(context, 'gate-figma-mcp-tool-logs', stepGateFigmaMcpToolLogs);
     runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
     runStep(context, 'gate-design-tokens', stepGateDesignTokens);
-    runStep(context, 'resolve-component-plan', stepResolveComponent);
-    runStep(context, 'run-agent-implementation', stepRunAgent);
-    runStep(context, 'gate-changed-paths', stepGateChangedPaths);
-    runStep(context, 'verify', (stepContext) => {
-      if (stepContext.options.skipVerify) {
-        return {
-          skipped: true,
-          reason: '--skip-verify option',
-        };
-      }
-      return stepVerify(stepContext);
-    });
+    await runPlanWithFeedbackLoop(context);
+    await runImplementationWithFeedbackLoop(context);
     context.status = 'passed';
     context.storybookOpenResult = maybeOpenStorybook(context);
   } catch (error) {
@@ -592,7 +786,8 @@ function main() {
   }
 
   context.figmaMcpToolUsage = buildFigmaMcpToolUsageSummary(context);
-  const reportPath = writeReport(context);
+  const reportResult = writeReport(context);
+  const reportPath = reportResult.reportPath;
   const passedSteps = context.steps.filter(
     (step) => step.status === 'passed'
   ).length;
@@ -624,6 +819,14 @@ function main() {
     console.log(`[ui-components] 에이전트 토큰: ${agentTokenUsageText}`);
   }
   console.log(
+    `[ui-components] 리포트 인덱스: ${relative(context.rootPath, reportResult.indexPath)} (${reportResult.indexEntryCount}건)`
+  );
+  if (reportResult.retention.removedReportCount > 0) {
+    console.log(
+      `[ui-components] 정리: 리포트 ${reportResult.retention.removedReportCount}건, 아티팩트 엔트리 ${reportResult.retention.removedArtifactEntries}건 삭제 (보관 기준: 최근 7일/최근 10런)`
+    );
+  }
+  console.log(
     `[ui-components] 리포트: ${relative(context.rootPath, reportPath)}`
   );
 
@@ -636,4 +839,9 @@ function main() {
   process.exit(exitCode);
 }
 
-main();
+main().catch((error) => {
+  console.error(
+    `[ui-components] 치명적 오류: ${error instanceof Error ? error.message : String(error)}`
+  );
+  process.exit(1);
+});
