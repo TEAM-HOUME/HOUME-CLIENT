@@ -224,10 +224,7 @@ async function askAssetModeChoice(rl, stage) {
 
   while (true) {
     const answer = String(
-      (await askLine(
-        rl,
-        `[ui-components] [${stage}] 선택값 (Enter=기존 유지): `
-      )) ?? ''
+      (await askLine(rl, '  - 선택값 (Enter=기존 유지): ')) ?? ''
     ).trim();
     if (!answer || answer === '1') {
       return '';
@@ -244,8 +241,8 @@ async function askAssetModeChoice(rl, stage) {
   }
 }
 
-async function askOptionalPositiveInteger(rl, stage, label, hint) {
-  const prompt = `[ui-components] [${stage}] ${label} 입력 (선택, Enter=기존 유지${hint ? `, ${hint}` : ''}): `;
+async function askOptionalPositiveIntegerCompact(rl, label, hint) {
+  const prompt = `  - ${label} (선택${hint ? `, ${hint}` : ''}): `;
   while (true) {
     const answer = String((await askLine(rl, prompt)) ?? '').trim();
     if (!answer) {
@@ -256,7 +253,7 @@ async function askOptionalPositiveInteger(rl, stage, label, hint) {
       return String(numeric);
     }
     console.log(
-      `[ui-components] [${stage}] 입력 형식 오류: 1 이상의 정수로 입력해 주세요`
+      '[ui-components] 입력 형식 오류: 1 이상의 정수로 입력해 주세요'
     );
   }
 }
@@ -523,39 +520,51 @@ async function collectIntentStructuredOverrides(
 
 async function collectAssetStructuredOverrides(rl, stage) {
   const overrides = {};
+  printStageHeader(stage, '자산 재시도 입력');
+  printStageOptions([
+    '필수 아님: 기본값 유지 시 Enter로 모두 건너뛸 수 있습니다',
+    '권장: 먼저 추가 탐색 노드 ID만 입력하고 재시도',
+  ]);
+
   const additionalNodeIds = String(
     (await askLine(
       rl,
-      `[ui-components] [${stage}] 추가 탐색 노드 ID 입력 (선택, 콤마/공백 구분, 예: 1:427 1:428): `
+      '  - 추가 탐색 노드 ID (선택, 콤마/공백 구분, 예: 1:427 1:428): '
     )) ?? ''
   ).trim();
   if (additionalNodeIds) {
     overrides.asset_additional_node_ids = additionalNodeIds;
   }
 
-  const maxCandidates = await askOptionalPositiveInteger(
+  const useAdvancedOptions = await askYesNo(
     rl,
-    stage,
-    'asset probe 후보 수',
-    '권장 4~16'
+    `[ui-components] [${stage}] 고급 옵션(후보 수/timeout/게이트 모드)도 조정하시겠습니까? (y/N): `,
+    false
   );
-  if (maxCandidates) {
-    overrides.asset_probe_max_candidates = maxCandidates;
-  }
 
-  const timeoutMs = await askOptionalPositiveInteger(
-    rl,
-    stage,
-    'asset probe timeout(ms)',
-    '예: 120000'
-  );
-  if (timeoutMs) {
-    overrides.asset_probe_timeout_ms = timeoutMs;
-  }
+  if (useAdvancedOptions) {
+    const maxCandidates = await askOptionalPositiveIntegerCompact(
+      rl,
+      'asset probe 후보 수',
+      'Enter=기존 유지, 권장 4~16'
+    );
+    if (maxCandidates) {
+      overrides.asset_probe_max_candidates = maxCandidates;
+    }
 
-  const assetCoverageMode = await askAssetModeChoice(rl, stage);
-  if (assetCoverageMode) {
-    overrides.asset_coverage_mode = assetCoverageMode;
+    const timeoutMs = await askOptionalPositiveIntegerCompact(
+      rl,
+      'asset probe timeout(ms)',
+      'Enter=기존 유지, 예: 120000'
+    );
+    if (timeoutMs) {
+      overrides.asset_probe_timeout_ms = timeoutMs;
+    }
+
+    const assetCoverageMode = await askAssetModeChoice(rl, stage);
+    if (assetCoverageMode) {
+      overrides.asset_coverage_mode = assetCoverageMode;
+    }
   }
 
   return overrides;

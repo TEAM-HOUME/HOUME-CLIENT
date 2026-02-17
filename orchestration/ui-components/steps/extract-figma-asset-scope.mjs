@@ -27,17 +27,55 @@ function normalizeNodeId(rawValue) {
   return withoutInstancePrefix;
 }
 
-function extractChildNodeIdsFromDesignContext(text) {
-  const matches = String(text ?? '').matchAll(
-    /data-node-id=["']([^"']+)["']/gi
-  );
-  const unique = new Set();
+function collectNodeIdsByPattern(sourceText, unique, pattern, groupIndex = 1) {
+  const matches = String(sourceText ?? '').matchAll(pattern);
   for (const match of matches) {
-    const normalized = normalizeNodeId(match[1]);
+    const candidate = match[groupIndex];
+    const normalized = normalizeNodeId(candidate);
     if (normalized) {
       unique.add(normalized);
     }
   }
+}
+
+function extractChildNodeIdsFromText(text) {
+  const sourceText = String(text ?? '');
+  const unique = new Set();
+
+  // Design context attribute
+  collectNodeIdsByPattern(
+    sourceText,
+    unique,
+    /data-node-id=["']([^"']+)["']/gi
+  );
+
+  // Alternate attribute/JSON-like key
+  collectNodeIdsByPattern(sourceText, unique, /node-id=["']([^"']+)["']/gi);
+  collectNodeIdsByPattern(
+    sourceText,
+    unique,
+    /["']node-id["']\s*:\s*["']([^"']+)["']/gi
+  );
+  collectNodeIdsByPattern(
+    sourceText,
+    unique,
+    /["']nodeId["']\s*:\s*["']([^"']+)["']/g
+  );
+  collectNodeIdsByPattern(
+    sourceText,
+    unique,
+    /\bnodeId\s*=\s*["']([^"']+)["']/g
+  );
+
+  // Conservative fallback for plain embedded ids
+  if (unique.size === 0) {
+    collectNodeIdsByPattern(
+      sourceText,
+      unique,
+      /(?:^|[^0-9])((?:i)?\d+[:\-]\d+)(?!\d)/g
+    );
+  }
+
   return [...unique];
 }
 
@@ -71,7 +109,7 @@ function analyzeGraphicSignals(text) {
   const hasIconKeyword = /\bicon\b|\bic_|\blogo\b|\bglyph\b|\bsymbol\b/.test(
     lower
   );
-  const nestedNodeIds = extractChildNodeIdsFromDesignContext(sourceText);
+  const nestedNodeIds = extractChildNodeIdsFromText(sourceText);
   const assetPathCount = countMatches(sourceText, /tool-assets\//gi);
 
   return {
@@ -160,6 +198,8 @@ export function stepExtractFigmaAssetScope(context) {
   const selectedNodeId = context.figmaScope?.selectedNodeId || '';
   const selectedDesignContext =
     context.figmaMcpDirectToolRecords?.get_design_context?.output || '';
+  const selectedMetadata =
+    context.figmaMcpDirectToolRecords?.get_metadata?.output;
   const selectedGraphicSignals = analyzeGraphicSignals(selectedDesignContext);
   const overrideMaxCandidates = Number(
     context.assetProbeOverrides?.maxCandidates
@@ -175,14 +215,31 @@ export function stepExtractFigmaAssetScope(context) {
       : context.scenario.figma.assetProbeTimeoutMs;
   const additionalNodeIds = normalizeNodeIdList(
     context.assetProbeOverrides?.additionalNodeIds
-  ).filter((nodeId) => nodeId !== selectedNodeId);
+  );
 
-  const inferredChildNodeIds = extractChildNodeIdsFromDesignContext(
-    selectedDesignContext
-  ).filter((nodeId) => nodeId !== selectedNodeId);
-  const childNodeIds = [
-    ...new Set([...inferredChildNodeIds, ...additionalNodeIds]),
-  ].slice(0, maxCandidates);
+  const inferredChildNodeIds = [
+    ...new Set([
+      ...extractChildNodeIdsFromText(selectedDesignContext),
+      ...extractChildNodeIdsFromText(selectedMetadata),
+    ]),
+  ].filter((nodeId) => nodeId !== selectedNodeId);
+  const prioritizedCandidates = [...additionalNodeIds, ...inferredChildNodeIds];
+  const childNodeIds = [];
+  const uniqueNodeIds = new Set();
+  for (const nodeId of prioritizedCandidates) {
+    if (uniqueNodeIds.has(nodeId)) {
+      continue;
+    }
+    uniqueNodeIds.add(nodeId);
+    childNodeIds.push(nodeId);
+    if (childNodeIds.length >= maxCandidates) {
+      break;
+    }
+  }
+
+  if (childNodeIds.length === 0 && selectedNodeId) {
+    childNodeIds.push(selectedNodeId);
+  }
 
   const endpoint = context.scenario.figma.mcpEndpoint;
   const baseDir = resolve(

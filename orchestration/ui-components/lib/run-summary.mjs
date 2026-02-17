@@ -363,7 +363,13 @@ export function logStepFailureHint(context, name, traceRecords) {
   if (name === 'gate-figma-asset-coverage') {
     console.log('- 조치');
     console.log(
-      '- 스크린샷 대비 자산 누락으로 판정되었습니다. figma.scope_node_id 확장 또는 asset probe 후보 수 조정 필요'
+      '- 스크린샷 대비 자산 누락으로 판정되었습니다. 추가 탐색 노드 ID를 먼저 보강해 재시도하세요'
+    );
+    console.log(
+      '- 현재 선택 노드 ID(예: 1:427)도 추가 탐색 노드로 입력할 수 있습니다'
+    );
+    console.log(
+      '- 후보 수/timeout/게이트 모드는 고급 옵션이며 기본값으로도 먼저 재시도 가능합니다'
     );
     console.log(
       '- 관련 아티팩트: artifacts/*-figma-asset-scope.json, artifacts/*-figma-asset-coverage.json'
