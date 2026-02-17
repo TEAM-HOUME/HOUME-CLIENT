@@ -5,6 +5,7 @@ import { splitErrorDetails, truncateText } from './step-utils.mjs';
 
 export const DEFAULT_RETRY_LIMITS = Object.freeze({
   intent: 10,
+  asset: 10,
   plan: 10,
   implement: 10,
   verify: 10,
@@ -12,6 +13,7 @@ export const DEFAULT_RETRY_LIMITS = Object.freeze({
 
 const STAGE_LABELS = Object.freeze({
   intent: '의도',
+  asset: '자산 커버리지',
   plan: '계획',
   implement: '구현',
   verify: '검증',
@@ -172,6 +174,81 @@ async function askIntentChoice(rl, stage, field, required = false) {
   }
 }
 
+async function askAssetModeChoice(rl, stage) {
+  const prompt = [
+    `[ui-components] [${stage}] 자산 커버리지 게이트 모드 선택 (Enter=기존 유지):`,
+    `[ui-components] [${stage}]   - 1) 기존 유지`,
+    `[ui-components] [${stage}]   - 2) warn`,
+    `[ui-components] [${stage}]   - 3) error`,
+    `[ui-components] [${stage}] 선택값: `,
+  ].join('\n');
+
+  while (true) {
+    const answer = String((await askLine(rl, prompt)) ?? '').trim();
+    if (!answer || answer === '1') {
+      return '';
+    }
+    if (answer === '2') {
+      return 'warn';
+    }
+    if (answer === '3') {
+      return 'error';
+    }
+    console.log(
+      `[ui-components] [${stage}] 입력 형식 오류: 1, 2, 3 중 하나를 입력해 주세요`
+    );
+  }
+}
+
+async function askOptionalPositiveInteger(rl, stage, label, hint) {
+  const prompt = `[ui-components] [${stage}] ${label} 입력 (선택, Enter=기존 유지${hint ? `, ${hint}` : ''}): `;
+  while (true) {
+    const answer = String((await askLine(rl, prompt)) ?? '').trim();
+    if (!answer) {
+      return '';
+    }
+    const numeric = Number(answer);
+    if (Number.isInteger(numeric) && numeric > 0) {
+      return String(numeric);
+    }
+    console.log(
+      `[ui-components] [${stage}] 입력 형식 오류: 1 이상의 정수로 입력해 주세요`
+    );
+  }
+}
+
+function normalizeNodeId(rawValue) {
+  const normalized = String(rawValue ?? '')
+    .trim()
+    .replace(/-/g, ':');
+  if (!normalized) {
+    return null;
+  }
+  const tail = normalized.includes(';')
+    ? normalized.split(';').at(-1) || ''
+    : normalized;
+  const withoutInstancePrefix = tail.replace(/^i(?=\d+:\d+$)/i, '');
+  if (!/^\d+:\d+$/.test(withoutInstancePrefix)) {
+    return null;
+  }
+  return withoutInstancePrefix;
+}
+
+function normalizeNodeIdList(rawValue) {
+  const tokens = String(rawValue ?? '')
+    .split(/[,\s]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const unique = new Set();
+  for (const token of tokens) {
+    const normalized = normalizeNodeId(token);
+    if (normalized) {
+      unique.add(normalized);
+    }
+  }
+  return [...unique];
+}
+
 function normalizeOverrideObject(rawValue) {
   if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
     return null;
@@ -204,6 +281,63 @@ function mergeIntentOverrides(context, overrides) {
   return normalized;
 }
 
+function mergeAssetOverrides(context, overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return null;
+  }
+
+  if (
+    !context.assetProbeOverrides ||
+    typeof context.assetProbeOverrides !== 'object' ||
+    Array.isArray(context.assetProbeOverrides)
+  ) {
+    context.assetProbeOverrides = {
+      additionalNodeIds: [],
+      maxCandidates: null,
+      timeoutMs: null,
+    };
+  }
+
+  if (normalized.asset_additional_node_ids) {
+    const list = normalizeNodeIdList(normalized.asset_additional_node_ids);
+    context.assetProbeOverrides.additionalNodeIds = list;
+    normalized.asset_additional_node_ids = list.join(',');
+  }
+
+  if (normalized.asset_probe_max_candidates) {
+    const maxCandidates = Number(normalized.asset_probe_max_candidates);
+    if (Number.isInteger(maxCandidates) && maxCandidates > 0) {
+      context.assetProbeOverrides.maxCandidates = maxCandidates;
+      normalized.asset_probe_max_candidates = String(maxCandidates);
+    } else {
+      delete normalized.asset_probe_max_candidates;
+    }
+  }
+
+  if (normalized.asset_probe_timeout_ms) {
+    const timeoutMs = Number(normalized.asset_probe_timeout_ms);
+    if (Number.isInteger(timeoutMs) && timeoutMs > 0) {
+      context.assetProbeOverrides.timeoutMs = timeoutMs;
+      normalized.asset_probe_timeout_ms = String(timeoutMs);
+    } else {
+      delete normalized.asset_probe_timeout_ms;
+    }
+  }
+
+  if (normalized.asset_coverage_mode) {
+    const mode = String(normalized.asset_coverage_mode).trim().toLowerCase();
+    if (mode === 'warn' || mode === 'error' || mode === 'off') {
+      context.scenario.gates.assetCoverageMode = mode;
+      normalized.asset_coverage_mode = mode;
+    } else {
+      delete normalized.asset_coverage_mode;
+    }
+  }
+
+  return normalized;
+}
+
 function buildIntentOverrideFeedback(overrides) {
   const normalized = normalizeOverrideObject(overrides);
   if (!normalized) {
@@ -215,7 +349,29 @@ function buildIntentOverrideFeedback(overrides) {
   return `Intent override decisions: ${parts.join('; ')}`;
 }
 
+function buildAssetOverrideFeedback(overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return '';
+  }
+  const parts = Object.entries(normalized).map(
+    ([key, value]) => `${key}=${value}`
+  );
+  return `Asset override decisions: ${parts.join('; ')}`;
+}
+
 function printIntentOverrideSummary(stage, overrides) {
+  const normalized = normalizeOverrideObject(overrides);
+  if (!normalized) {
+    return;
+  }
+  console.log(`[ui-components] [${stage}] 구조화 보강 적용`);
+  for (const [key, value] of Object.entries(normalized)) {
+    console.log(`[ui-components] [${stage}]   - ${key}: ${value}`);
+  }
+}
+
+function printAssetOverrideSummary(stage, overrides) {
   const normalized = normalizeOverrideObject(overrides);
   if (!normalized) {
     return;
@@ -265,6 +421,56 @@ async function collectIntentStructuredOverrides(
   }
   if (ctaTarget) {
     overrides.cta_target = ctaTarget;
+  }
+
+  const additionalPrompt = String(
+    (await askLine(
+      rl,
+      `[ui-components] [${stage}] 추가 프롬프트 입력 (선택, Enter=생략): `
+    )) ?? ''
+  ).trim();
+  if (additionalPrompt) {
+    overrides.additional_prompt = additionalPrompt;
+  }
+
+  return overrides;
+}
+
+async function collectAssetStructuredOverrides(rl, stage) {
+  const overrides = {};
+  const additionalNodeIds = String(
+    (await askLine(
+      rl,
+      `[ui-components] [${stage}] 추가 탐색 노드 ID 입력 (선택, 콤마/공백 구분, 예: 1:427 1:428): `
+    )) ?? ''
+  ).trim();
+  if (additionalNodeIds) {
+    overrides.asset_additional_node_ids = additionalNodeIds;
+  }
+
+  const maxCandidates = await askOptionalPositiveInteger(
+    rl,
+    stage,
+    'asset probe 후보 수',
+    '권장 4~16'
+  );
+  if (maxCandidates) {
+    overrides.asset_probe_max_candidates = maxCandidates;
+  }
+
+  const timeoutMs = await askOptionalPositiveInteger(
+    rl,
+    stage,
+    'asset probe timeout(ms)',
+    '예: 120000'
+  );
+  if (timeoutMs) {
+    overrides.asset_probe_timeout_ms = timeoutMs;
+  }
+
+  const assetCoverageMode = await askAssetModeChoice(rl, stage);
+  if (assetCoverageMode) {
+    overrides.asset_coverage_mode = assetCoverageMode;
   }
 
   const additionalPrompt = String(
@@ -408,16 +614,27 @@ export async function promptRetryDecision(
             stage,
             requiredIntentCategories
           )
-        : {};
-    const appliedOverrides = mergeIntentOverrides(context, structuredOverrides);
+        : stage === 'asset'
+          ? await collectAssetStructuredOverrides(rl, stage)
+          : {};
+    const appliedOverrides =
+      stage === 'intent'
+        ? mergeIntentOverrides(context, structuredOverrides)
+        : stage === 'asset'
+          ? mergeAssetOverrides(context, structuredOverrides)
+          : null;
     if (stage === 'intent') {
       printIntentOverrideSummary(stage, appliedOverrides);
+    } else if (stage === 'asset') {
+      printAssetOverrideSummary(stage, appliedOverrides);
     }
-    const intentOverrideFeedback =
-      stage === 'intent' ? buildIntentOverrideFeedback(appliedOverrides) : '';
-    const mergedNote = [note, intentOverrideFeedback]
-      .filter(Boolean)
-      .join(' || ');
+    const structuredFeedback =
+      stage === 'intent'
+        ? buildIntentOverrideFeedback(appliedOverrides)
+        : stage === 'asset'
+          ? buildAssetOverrideFeedback(appliedOverrides)
+          : '';
+    const mergedNote = [note, structuredFeedback].filter(Boolean).join(' || ');
     recordFeedbackHistory(context, {
       stage,
       attempt,
@@ -495,6 +712,47 @@ export async function runPlanWithFeedbackLoop(context, options) {
         'plan',
         decision.note ||
           `Previous plan failure: ${truncateText(errorMessage, 240)}`
+      );
+    }
+  }
+}
+
+export async function runAssetCoverageWithFeedbackLoop(context, options) {
+  const {
+    retryLimits,
+    runStep,
+    stepExtractFigmaAssetScope,
+    stepGateAssetCoverage,
+  } = options;
+
+  for (let attempt = 1; attempt <= retryLimits.asset; attempt += 1) {
+    try {
+      runStep(context, 'extract-figma-asset-scope', stepExtractFigmaAssetScope);
+      runStep(context, 'gate-figma-asset-coverage', stepGateAssetCoverage);
+      return;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (attempt >= retryLimits.asset) {
+        throw error;
+      }
+
+      const decision = await promptRetryDecision(
+        context,
+        'asset',
+        attempt,
+        retryLimits.asset,
+        errorMessage
+      );
+      if (!decision.retry) {
+        throw error;
+      }
+
+      appendFeedback(
+        context,
+        'asset',
+        decision.note ||
+          `Previous asset coverage failure: ${truncateText(errorMessage, 240)}`
       );
     }
   }

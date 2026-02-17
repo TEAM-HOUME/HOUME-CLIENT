@@ -40,6 +40,9 @@ function failOrWarn(context, mode, message) {
 
 function buildPrompt(context) {
   const intent = context.resolvedIntent || {};
+  const feedbackNotes = Array.isArray(context.feedbackLoop?.asset)
+    ? context.feedbackLoop.asset.filter(Boolean)
+    : [];
   const figmaLogsPath = context.figmaMcpToolLogsArtifactPath
     ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
     : '(missing)';
@@ -57,6 +60,14 @@ function buildPrompt(context) {
     'Use these artifacts:',
     `- Direct MCP log summary: ${figmaLogsPath}`,
     `- Child asset probe result: ${assetScopePath}`,
+    '',
+    ...(feedbackNotes.length > 0
+      ? [
+          'Retry feedback notes:',
+          ...feedbackNotes.map((note, index) => `- ${index + 1}. ${note}`),
+          '',
+        ]
+      : []),
     '',
     'Task:',
     '- Inspect screenshot evidence from MCP logs for the selected node.',

@@ -41,6 +41,20 @@ function extractChildNodeIdsFromDesignContext(text) {
   return [...unique];
 }
 
+function normalizeNodeIdList(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+  const unique = new Set();
+  for (const value of values) {
+    const normalized = normalizeNodeId(value);
+    if (normalized) {
+      unique.add(normalized);
+    }
+  }
+  return [...unique];
+}
+
 function countMatches(text, regex) {
   const matches = String(text ?? '').match(regex);
   return matches ? matches.length : 0;
@@ -147,14 +161,30 @@ export function stepExtractFigmaAssetScope(context) {
   const selectedDesignContext =
     context.figmaMcpDirectToolRecords?.get_design_context?.output || '';
   const selectedGraphicSignals = analyzeGraphicSignals(selectedDesignContext);
-  const childNodeIds = extractChildNodeIdsFromDesignContext(
+  const overrideMaxCandidates = Number(
+    context.assetProbeOverrides?.maxCandidates
+  );
+  const maxCandidates =
+    Number.isInteger(overrideMaxCandidates) && overrideMaxCandidates > 0
+      ? overrideMaxCandidates
+      : context.scenario.figma.assetProbeMaxCandidates;
+  const overrideTimeoutMs = Number(context.assetProbeOverrides?.timeoutMs);
+  const timeoutMs =
+    Number.isInteger(overrideTimeoutMs) && overrideTimeoutMs > 0
+      ? overrideTimeoutMs
+      : context.scenario.figma.assetProbeTimeoutMs;
+  const additionalNodeIds = normalizeNodeIdList(
+    context.assetProbeOverrides?.additionalNodeIds
+  ).filter((nodeId) => nodeId !== selectedNodeId);
+
+  const inferredChildNodeIds = extractChildNodeIdsFromDesignContext(
     selectedDesignContext
-  )
-    .filter((nodeId) => nodeId !== selectedNodeId)
-    .slice(0, context.scenario.figma.assetProbeMaxCandidates);
+  ).filter((nodeId) => nodeId !== selectedNodeId);
+  const childNodeIds = [
+    ...new Set([...inferredChildNodeIds, ...additionalNodeIds]),
+  ].slice(0, maxCandidates);
 
   const endpoint = context.scenario.figma.mcpEndpoint;
-  const timeoutMs = context.scenario.figma.assetProbeTimeoutMs;
   const baseDir = resolve(
     context.artifactsDir,
     context.runId,
@@ -171,14 +201,16 @@ export function stepExtractFigmaAssetScope(context) {
         selectedNodeId,
       },
       config: {
-        maxCandidates: context.scenario.figma.assetProbeMaxCandidates,
+        maxCandidates,
         timeoutMs,
         endpoint,
       },
       selectedNode: {
         nodeId: selectedNodeId,
         graphicSignals: selectedGraphicSignals,
-        inferredChildNodeIds: [],
+        inferredChildNodeIds,
+        additionalNodeIds,
+        effectiveNodeIds: [],
       },
       calls: [],
       totals: {
@@ -265,14 +297,16 @@ export function stepExtractFigmaAssetScope(context) {
       selectedNodeId,
     },
     config: {
-      maxCandidates: context.scenario.figma.assetProbeMaxCandidates,
+      maxCandidates,
       timeoutMs,
       endpoint,
     },
     selectedNode: {
       nodeId: selectedNodeId,
       graphicSignals: selectedGraphicSignals,
-      inferredChildNodeIds: childNodeIds,
+      inferredChildNodeIds,
+      additionalNodeIds,
+      effectiveNodeIds: childNodeIds,
     },
     calls,
     totals,

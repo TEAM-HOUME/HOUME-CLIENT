@@ -40,7 +40,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `run-agent-implementation`: implement code changes with system prompt + task context + docs conventions.
 - `gate-changed-paths`: block unrelated file changes.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
-- `feedback-loop`: on `intent/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
+- `feedback-loop`: on `intent/asset/plan/implement/verify` failure, ask terminal input and retry (max 10 attempts per stage).
 - If input is unavailable (non-interactive tty), feedback-loop fails fast without auto-retry.
 - `report`: write run summary JSON.
 
@@ -113,7 +113,8 @@ flowchart TD
   H -- fail --> Z1
   H -- pass/warn --> HA[extract-figma-asset-scope]
   HA --> HB{{gate-figma-asset-coverage}}
-  HB -- fail --> Z1
+  HB -- fail --> HR[feedback: asset retry + structured overrides]
+  HR --> HA
   HB -- pass/warn --> I[resolve-component-plan]
 
   I -- fail --> IR[feedback: plan retry]
@@ -135,7 +136,7 @@ flowchart TD
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
   class D,DG,F,H,HB,L,O gate;
   class DI,E,K agent;
-  class A,B,C,P,Q,Z1,I,DR,IR,KR,VR local;
+  class A,B,C,P,Q,Z1,I,DR,HR,IR,KR,VR local;
 ```
 
 ### Agent vs Tool Sequence
@@ -191,6 +192,12 @@ sequenceDiagram
     M-->>R: child asset context evidence
     R->>A: asset coverage gate (screenshot/context consistency)
     A-->>R: covered/missing/unknown + rationale
+    alt asset gate blocked
+      R->>U: retry prompt (y/n + asset structured overrides)
+      U-->>R: optional node ids + probe configs + mode
+      R->>M: child asset probe retry
+      R->>A: asset coverage gate retry
+    end
   end
 
   R->>A: resolve-component-plan prompt (intent + artifacts + docs sources + plan feedback)

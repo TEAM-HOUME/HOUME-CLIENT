@@ -4,6 +4,7 @@ import { relative, resolve } from 'node:path';
 import { getChangedFiles } from './lib/git-gates.mjs';
 import {
   DEFAULT_RETRY_LIMITS,
+  runAssetCoverageWithFeedbackLoop,
   runImplementationWithFeedbackLoop,
   runIntentWithFeedbackLoop,
   runPlanWithFeedbackLoop,
@@ -98,11 +99,17 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     agentTokenUsage: null,
     feedbackLoop: {
       intent: [],
+      asset: [],
       plan: [],
       implement: [],
       verify: [],
     },
     feedbackHistory: [],
+    assetProbeOverrides: {
+      additionalNodeIds: [],
+      maxCandidates: null,
+      timeoutMs: null,
+    },
   };
 }
 
@@ -174,8 +181,12 @@ async function executePipeline(context) {
   runStep(context, 'gate-figma-mcp-tool-logs', stepGateFigmaMcpToolLogs);
   runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
   runStep(context, 'gate-design-tokens', stepGateDesignTokens);
-  runStep(context, 'extract-figma-asset-scope', stepExtractFigmaAssetScope);
-  runStep(context, 'gate-figma-asset-coverage', stepGateAssetCoverage);
+  await runAssetCoverageWithFeedbackLoop(context, {
+    retryLimits: RETRY_LIMITS,
+    runStep,
+    stepExtractFigmaAssetScope,
+    stepGateAssetCoverage,
+  });
   await runPlanWithFeedbackLoop(context, {
     retryLimits: RETRY_LIMITS,
     runStep,
