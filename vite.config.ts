@@ -73,21 +73,42 @@ export default defineConfig({
     ],
   },
   resolve: {
+    dedupe: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime',
+      'react-dom/client',
+    ],
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@pages': path.resolve(__dirname, 'src/pages'),
-      '@layout': path.resolve(__dirname, 'src/layout'),
-      '@routes': path.resolve(__dirname, 'src/routes'),
-      '@stories': path.resolve(__dirname, 'src/stories'),
-      '@shared': path.resolve(__dirname, 'src/shared'),
-      '@apis': path.resolve(__dirname, 'src/shared/apis'),
-      '@assets': path.resolve(__dirname, 'src/shared/assets'),
-      '@components': path.resolve(__dirname, 'src/shared/components'),
-      '@constants': path.resolve(__dirname, 'src/shared/constants'),
-      '@hooks': path.resolve(__dirname, 'src/shared/hooks'),
-      '@styles': path.resolve(__dirname, 'src/shared/styles'),
-      '@types': path.resolve(__dirname, 'src/shared/types'),
-      '@utils': path.resolve(__dirname, 'src/shared/utils'),
+      react: path.resolve(dirname, 'node_modules/react'),
+      'react-dom': path.resolve(dirname, 'node_modules/react-dom'),
+      'react/jsx-runtime': path.resolve(
+        dirname,
+        'node_modules/react/jsx-runtime.js'
+      ),
+      'react/jsx-dev-runtime': path.resolve(
+        dirname,
+        'node_modules/react/jsx-dev-runtime.js'
+      ),
+      'react-dom/client': path.resolve(
+        dirname,
+        'node_modules/react-dom/client.js'
+      ),
+      '@': path.resolve(dirname, 'src'),
+      '@pages': path.resolve(dirname, 'src/pages'),
+      '@layout': path.resolve(dirname, 'src/layout'),
+      '@routes': path.resolve(dirname, 'src/routes'),
+      '@stories': path.resolve(dirname, 'src/stories'),
+      '@shared': path.resolve(dirname, 'src/shared'),
+      '@apis': path.resolve(dirname, 'src/shared/apis'),
+      '@assets': path.resolve(dirname, 'src/shared/assets'),
+      '@components': path.resolve(dirname, 'src/shared/components'),
+      '@constants': path.resolve(dirname, 'src/shared/constants'),
+      '@hooks': path.resolve(dirname, 'src/shared/hooks'),
+      '@styles': path.resolve(dirname, 'src/shared/styles'),
+      '@types': path.resolve(dirname, 'src/shared/types'),
+      '@utils': path.resolve(dirname, 'src/shared/utils'),
     },
   },
 });

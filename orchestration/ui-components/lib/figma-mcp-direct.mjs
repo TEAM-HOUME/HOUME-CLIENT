@@ -120,6 +120,7 @@ function parseJsonRpcBody(bodyRaw, contentType) {
 function sendJsonRpcRequest({
   endpoint,
   sessionId,
+  authToken,
   payload,
   timeoutMs,
   acceptHeader = DEFAULT_ACCEPT_HEADER,
@@ -140,6 +141,9 @@ function sendJsonRpcRequest({
 
   if (sessionId) {
     args.push('-H', `mcp-session-id: ${sessionId}`);
+  }
+  if (authToken) {
+    args.push('-H', `authorization: Bearer ${authToken}`);
   }
 
   args.push(
@@ -325,7 +329,7 @@ export function extractToolTextOutput(callRecord) {
   return JSON.stringify(parsed.result, null, 2);
 }
 
-export function initializeFigmaMcpSession({ endpoint, timeoutMs }) {
+export function initializeFigmaMcpSession({ endpoint, timeoutMs, authToken }) {
   const initializePayload = {
     jsonrpc: '2.0',
     id: 1,
@@ -343,6 +347,7 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs }) {
   const initializeCall = sendJsonRpcRequest({
     endpoint,
     sessionId: null,
+    authToken,
     payload: initializePayload,
     timeoutMs,
   });
@@ -367,6 +372,7 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs }) {
   const initializedNotification = sendJsonRpcRequest({
     endpoint,
     sessionId,
+    authToken,
     payload: initializedNotificationPayload,
     timeoutMs,
   });
@@ -384,12 +390,14 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs }) {
 export function listFigmaMcpTools({
   endpoint,
   sessionId,
+  authToken,
   timeoutMs,
   requestId = 2,
 }) {
   return sendJsonRpcRequest({
     endpoint,
     sessionId,
+    authToken,
     payload: {
       jsonrpc: '2.0',
       id: requestId,
@@ -403,6 +411,7 @@ export function listFigmaMcpTools({
 export function callFigmaMcpTool({
   endpoint,
   sessionId,
+  authToken,
   timeoutMs,
   requestId,
   toolName,
@@ -411,6 +420,7 @@ export function callFigmaMcpTool({
   return sendJsonRpcRequest({
     endpoint,
     sessionId,
+    authToken,
     payload: {
       jsonrpc: '2.0',
       id: requestId,

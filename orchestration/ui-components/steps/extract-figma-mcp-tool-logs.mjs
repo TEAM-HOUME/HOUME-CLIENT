@@ -8,6 +8,7 @@ import {
   initializeFigmaMcpSession,
   listFigmaMcpTools,
 } from '../lib/figma-mcp-direct.mjs';
+import { resolveFigmaMcpAuth } from '../lib/figma-mcp-auth.mjs';
 
 const REQUIRED_FIGMA_TOOLS = [
   'get_design_context',
@@ -124,6 +125,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
   const endpoint = context.scenario.figma.mcpEndpoint;
   const timeoutMs = context.scenario.figma.timeoutMs;
   const nodeId = context.figmaScope.selectedNodeId;
+  const auth = resolveFigmaMcpAuth(context.scenario);
   const baseDir = resolve(context.artifactsDir, context.runId, 'figma-mcp-raw');
   const assetWriteDir = resolve(baseDir, 'tool-assets');
   mkdirSync(baseDir, { recursive: true });
@@ -136,6 +138,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
   const session = initializeFigmaMcpSession({
     endpoint,
     timeoutMs,
+    authToken: auth.token,
   });
   callArtifacts.push(
     writeCallArtifacts(
@@ -175,6 +178,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
     const toolsListCall = listFigmaMcpTools({
       endpoint,
       sessionId: session.sessionId,
+      authToken: auth.token,
       timeoutMs,
       requestId: order + 100,
     });
@@ -227,6 +231,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
     const callRecord = callFigmaMcpTool({
       endpoint,
       sessionId: session.sessionId,
+      authToken: auth.token,
       timeoutMs,
       requestId: order + 100,
       toolName,
@@ -267,6 +272,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
   );
   const summary = {
     endpoint,
+    authTokenEnv: auth.envName || null,
     sessionId: session.sessionId,
     mode: context.scenario.gates.figmaMcpLogsMode,
     selectedNodeId: nodeId,
@@ -286,6 +292,7 @@ export function stepExtractFigmaMcpToolLogs(context) {
 
   return {
     selectedNodeId: nodeId,
+    authTokenEnv: auth.envName || null,
     tools: calls.length,
     okCalls: summary.totals.okCalls,
     failedCalls: summary.totals.failedCalls,

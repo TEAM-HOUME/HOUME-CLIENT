@@ -15,4 +15,10 @@ export const CODEX_SAFE_CONFIG = ['-c', 'model_reasoning_effort="high"'];
 
 export const DEFAULT_FIGMA_TIMEOUT_MS = 600_000;
 
-export const DEFAULT_FIGMA_MCP_ENDPOINT = 'http://127.0.0.1:3845/mcp';
+export const DEFAULT_FIGMA_MCP_ENDPOINT = 'https://mcp.figma.com/mcp';
+
+export const FIGMA_MCP_AUTH_TOKEN_ENV_CANDIDATES = [
+  'FIGMA_MCP_ACCESS_TOKEN',
+  'FIGMA_ACCESS_TOKEN',
+  'FIGMA_OAUTH_TOKEN',
+];

@@ -1,5 +1,6 @@
 import { type ToastContentProps } from 'react-toastify';
 
+import { fontStyle } from '@/shared/styles/fontStyle';
 import { TOAST_TYPE, type ToastType } from '@/shared/types/toast';
 
 import WarningIcon from '@assets/icn_warning_toast.svg?react';
@@ -18,8 +19,17 @@ interface ToastProps {
 
 const TOAST_LAYOUT_STYLE = {
   width: 'min(calc(100vw - 3.2rem), 40.8rem)',
-  maxWidth: '408px',
   height: '44px',
+  alignItems: 'center',
+} as const;
+
+const NAVIGATE_TEXT_STYLE = {
+  ...fontStyle('body_r_14'),
+} as const;
+
+const ACTION_STYLE = {
+  marginLeft: 'auto',
+  flexShrink: 0,
 } as const;
 
 const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
@@ -33,14 +43,16 @@ const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
   };
 
   const icon = type === TOAST_TYPE.WARNING ? <WarningIcon /> : null;
+  const isNavigateType = type === TOAST_TYPE.NAVIGATE;
 
   return (
     <div className={styles.container} style={TOAST_LAYOUT_STYLE}>
       {icon}
       <span
         className={styles.text({
-          type: type === TOAST_TYPE.NAVIGATE ? 'navigate' : undefined,
+          type: isNavigateType ? 'navigate' : undefined,
         })}
+        style={isNavigateType ? NAVIGATE_TEXT_STYLE : undefined}
       >
         {text}
       </span>
@@ -49,6 +61,7 @@ const Toast = ({ text, type, onClick, closeToast }: ToastProps) => {
           type="button"
           className={styles.action}
           onClick={handleActionClick}
+          style={ACTION_STYLE}
         >
           보러가기
         </button>

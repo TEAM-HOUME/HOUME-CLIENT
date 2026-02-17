@@ -226,10 +226,11 @@ agent:
 
 - `target`: explicit single target file path (preferred for deterministic updates)
 - `targets`: legacy list form; only one target is supported in automatic planning
-- `context.ui_rules_docs`: docs to inject as coding conventions
+- `context.ui_rules_docs`: additional docs to inject as coding conventions
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
-- `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging
+- `figma.mcp_endpoint`: direct MCP endpoint for raw tool logging (default: `https://mcp.figma.com/mcp`)
+- `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
 - `gates.figma_mcp_logs_mode`: `off|warn|error` (direct MCP log gate)
 - `gates.design_tokens_mode`: `off|warn|error`
 - `gates.code_connect_mode`: `off|warn|error`
@@ -244,7 +245,9 @@ agent:
 ## Notes
 
 - Prompt files in `prompts/` are explicitly injected by `ui:run`.
+- Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
 - Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
 - Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.
+- For remote MCP, set a bearer token env (`FIGMA_MCP_ACCESS_TOKEN` by default, or custom via `figma.mcp_auth_token_env`).
 - Run report includes `figmaMcpToolUsage` and `agentTokenUsage` summaries.
 - Use `--open-storybook` to open `storybook-static/index.html` after a successful run.

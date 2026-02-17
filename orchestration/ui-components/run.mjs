@@ -174,7 +174,14 @@ function summarizeStepOutput(name, output) {
   }
 
   if (name === 'preflight') {
-    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})`;
+    if (output.skipMcpCheck) {
+      return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=skip`;
+    }
+    const probe = output.mcpProbe;
+    if (probe && typeof probe === 'object') {
+      return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=ok(${probe.probeTool}@${probe.nodeId}), auth-env=${probe.authTokenEnv || '(none)'}`;
+    }
+    return `엔진=${output.engine}, 실행=${output.command}(${output.mode}), mcp-probe=unknown`;
   }
   if (name === 'extract-figma-scope') {
     const parentDepth = Array.isArray(output.parentChain)
@@ -186,7 +193,7 @@ function summarizeStepOutput(name, output) {
     return `상태=${output.status}, 협소=${output.isNarrow ? '예' : '아니오'}, 상위탐색=${output.parentDepth}단계`;
   }
   if (name === 'extract-figma-mcp-tool-logs') {
-    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개`;
+    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개, auth-env=${output.authTokenEnv || '(none)'}`;
   }
   if (name === 'gate-figma-mcp-tool-logs') {
     return `상태=${output.status}, 검사=${output.checkedTools}개, 누락=${output.missingTools?.length ?? 0}개, 오류=${output.badTools?.length ?? 0}개`;
@@ -424,14 +431,35 @@ function maybeOpenStorybook(context) {
     };
   }
 
-  const storybookIndexPath = resolve(
+  let storybookIndexPath = resolve(
     context.rootPath,
     'storybook-static/index.html'
   );
   if (!existsSync(storybookIndexPath)) {
+    const buildResult = runCommand('pnpm', ['build-storybook'], {
+      cwd: context.rootPath,
+      timeoutMs: 900_000,
+      allowFailure: true,
+    });
+    if (buildResult.exitCode !== 0) {
+      const reason =
+        buildResult.stderr || buildResult.stdout || 'build-storybook failed';
+      context.warnings.push(`Storybook 빌드 실패: ${reason}`);
+      return {
+        status: 'failed',
+        reason: `Storybook build failed: ${reason}`,
+      };
+    }
+    storybookIndexPath = resolve(
+      context.rootPath,
+      'storybook-static/index.html'
+    );
+  }
+
+  if (!existsSync(storybookIndexPath)) {
     return {
-      status: 'skipped',
-      reason: '`storybook-static/index.html`이 없음',
+      status: 'failed',
+      reason: '`storybook-static/index.html` 생성 실패',
     };
   }
 
@@ -470,7 +498,7 @@ function main() {
   const args = parseArgs(process.argv);
   if (!args.scenarioArg) {
     console.error(
-      '[ui-components] 사용법: pnpm ui:run --scenario orchestration/ui-components/scenarios/<name>.yml [--dry-run] [--approve-visual] [--skip-mcp-check] [--open-storybook]'
+      '[ui-components] 사용법: pnpm ui:run --scenario orchestration/ui-components/scenarios/<name>.yml [--dry-run] [--approve-visual] [--skip-mcp-check] [--skip-verify] [--open-storybook]'
     );
     process.exit(1);
   }
@@ -542,7 +570,15 @@ function main() {
     runStep(context, 'gate-changed-paths', stepGateChangedPaths);
     runStep(context, 'extract-code-connect-map', stepExtractCodeConnectMap);
     runStep(context, 'gate-code-connect', stepGateCodeConnect);
-    runStep(context, 'verify', stepVerify);
+    runStep(context, 'verify', (stepContext) => {
+      if (stepContext.options.skipVerify) {
+        return {
+          skipped: true,
+          reason: '--skip-verify option',
+        };
+      }
+      return stepVerify(stepContext);
+    });
     context.status = 'passed';
     context.storybookOpenResult = maybeOpenStorybook(context);
   } catch (error) {

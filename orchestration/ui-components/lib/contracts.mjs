@@ -6,6 +6,7 @@ import { fail } from './errors.mjs';
 const DEFAULT_UI_RULE_DOCS = [
   'docs/reference/ui-component-design-conventions.md',
   'docs/reference/styling-system.md',
+  'docs/reference/component-catalog.md',
 ];
 const DEFAULT_REQUIRED_VIEWPORTS = ['mobile375', 'mobile440'];
 
@@ -20,8 +21,7 @@ function resolveUiRuleDocPaths(rootPath, scenario) {
   const configured = Array.isArray(scenario?.context?.uiRulesDocs)
     ? scenario.context.uiRulesDocs.map(normalizePath).filter(Boolean)
     : [];
-  const candidatePaths =
-    configured.length > 0 ? configured : DEFAULT_UI_RULE_DOCS;
+  const candidatePaths = [...new Set([...DEFAULT_UI_RULE_DOCS, ...configured])];
   const missing = candidatePaths.filter(
     (path) => !existsSync(resolve(rootPath, path))
   );

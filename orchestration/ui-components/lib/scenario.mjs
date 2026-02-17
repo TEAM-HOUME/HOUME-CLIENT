@@ -190,6 +190,7 @@ export function parseArgs(argv) {
     dryRun: argv.includes('--dry-run'),
     approveVisual: argv.includes('--approve-visual'),
     skipMcpCheck: argv.includes('--skip-mcp-check'),
+    skipVerify: argv.includes('--skip-verify'),
     openStorybook: argv.includes('--open-storybook'),
   };
 }
@@ -250,6 +251,11 @@ export function readScenario(pathArg) {
         figmaSection,
         'mcp_endpoint',
         DEFAULT_FIGMA_MCP_ENDPOINT
+      ),
+      mcpAuthTokenEnv: parseSectionScalar(
+        figmaSection,
+        'mcp_auth_token_env',
+        null
       ),
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
     },
