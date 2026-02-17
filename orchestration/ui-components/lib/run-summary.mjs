@@ -294,9 +294,11 @@ export function logStepFailureHint(name, traceRecords) {
     console.log(
       `${stepPrefix(name)}   - 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요`
     );
-    console.log(`${stepPrefix(name)}   - 필수: trigger 정책, CTA 대상`);
     console.log(
-      `${stepPrefix(name)}   - 선택: placement/dismiss/concurrency/accessibility`
+      `${stepPrefix(name)}   - 필수: 현재 블로킹 모호점 카테고리에 해당하는 항목 전부`
+    );
+    console.log(
+      `${stepPrefix(name)}   - 항목: trigger / placement / dismiss / concurrency / accessibility / CTA 대상`
     );
     console.log(
       `${stepPrefix(name)}   - 추가 프롬프트는 마지막 질문에 자유 텍스트로 입력 가능합니다`

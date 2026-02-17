@@ -8,20 +8,6 @@ const INTERACTION_COMPONENT_KINDS = new Set([
   'drawer',
 ]);
 
-const DEFAULTABLE_COMPONENT_KINDS = new Set([
-  'toast',
-  'snackbar',
-  'banner',
-  'chip',
-]);
-
-const DEFAULTABLE_AMBIGUITY_CATEGORIES = new Set([
-  'placement',
-  'dismiss',
-  'concurrency',
-  'accessibility',
-]);
-
 function classifyAmbiguityCategory(ambiguity) {
   const text = String(ambiguity ?? '').toLowerCase();
   if (
@@ -97,24 +83,24 @@ function hasIntentOverride(context, category) {
 function splitAmbiguities(context, intent) {
   const blockingAmbiguities = [];
   const advisoryAmbiguities = [];
+  const blockingCategories = new Set();
 
   for (const ambiguity of intent.ambiguities) {
     const category = classifyAmbiguityCategory(ambiguity);
     const hasOverride = hasIntentOverride(context, category);
-    const defaultableByKind =
-      DEFAULTABLE_COMPONENT_KINDS.has(intent.componentKind) &&
-      DEFAULTABLE_AMBIGUITY_CATEGORIES.has(category);
 
-    if (hasOverride || defaultableByKind) {
+    if (hasOverride) {
       advisoryAmbiguities.push(ambiguity);
       continue;
     }
     blockingAmbiguities.push(ambiguity);
+    blockingCategories.add(category);
   }
 
   return {
     blockingAmbiguities,
     advisoryAmbiguities,
+    blockingCategories: [...blockingCategories],
   };
 }
 
@@ -195,10 +181,8 @@ export function stepGateIntent(context) {
     );
   }
 
-  const { blockingAmbiguities, advisoryAmbiguities } = splitAmbiguities(
-    context,
-    intent
-  );
+  const { blockingAmbiguities, advisoryAmbiguities, blockingCategories } =
+    splitAmbiguities(context, intent);
   if (blockingAmbiguities.length > 0) {
     blockingIssues.push(
       `Intent ambiguities require clarification: ${blockingAmbiguities.join(' | ')}`
@@ -246,6 +230,7 @@ export function stepGateIntent(context) {
     ambiguities: intent.ambiguities,
     blockingAmbiguities,
     advisoryAmbiguities,
+    blockingCategories,
     requiresBehaviorConfirmation,
     missingBehaviorSpec,
   };

@@ -20,6 +20,7 @@ const STAGE_LABELS = Object.freeze({
 const INTENT_OVERRIDE_FIELDS = Object.freeze([
   {
     key: 'trigger_policy',
+    category: 'trigger',
     label: '트리거 정책',
     options: Object.freeze({
       1: 'follow_existing',
@@ -36,6 +37,7 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
   },
   {
     key: 'placement_policy',
+    category: 'placement',
     label: '배치 정책',
     options: Object.freeze({
       1: 'follow_existing',
@@ -50,6 +52,7 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
   },
   {
     key: 'dismiss_policy',
+    category: 'dismiss',
     label: '닫기 정책',
     options: Object.freeze({
       1: 'follow_existing',
@@ -64,6 +67,7 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
   },
   {
     key: 'concurrency_policy',
+    category: 'concurrency',
     label: '중복 표시 정책',
     options: Object.freeze({
       1: 'follow_existing',
@@ -78,6 +82,7 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
   },
   {
     key: 'accessibility_policy',
+    category: 'accessibility',
     label: '접근성 정책',
     options: Object.freeze({
       1: 'follow_existing',
@@ -137,9 +142,10 @@ async function askLine(rl, question) {
   return rl.question(question);
 }
 
-async function askIntentChoice(rl, stage, field) {
+async function askIntentChoice(rl, stage, field, required = false) {
+  const requiredTag = required ? ' [필수]' : '';
   const basePrompt = [
-    `[ui-components] [${stage}] ${field.label} 선택 (Enter=미지정):`,
+    `[ui-components] [${stage}] ${field.label}${requiredTag} 선택 (Enter=미지정):`,
     ...field.descriptions.map(
       (description) => `[ui-components] [${stage}]   - ${description}`
     ),
@@ -149,6 +155,12 @@ async function askIntentChoice(rl, stage, field) {
   while (true) {
     const answer = String((await askLine(rl, basePrompt)) ?? '').trim();
     if (!answer) {
+      if (required) {
+        console.log(
+          `[ui-components] [${stage}] 입력 필요: ${field.label}은(는) 필수 항목입니다`
+        );
+        continue;
+      }
       return '';
     }
     if (field.options[answer]) {
@@ -214,21 +226,43 @@ function printIntentOverrideSummary(stage, overrides) {
   }
 }
 
-async function collectIntentStructuredOverrides(rl, stage) {
+async function collectIntentStructuredOverrides(
+  rl,
+  stage,
+  requiredCategories = []
+) {
+  const requiredSet = new Set(
+    Array.isArray(requiredCategories) ? requiredCategories : []
+  );
   const overrides = {};
   for (const field of INTENT_OVERRIDE_FIELDS) {
-    const value = await askIntentChoice(rl, stage, field);
+    const value = await askIntentChoice(
+      rl,
+      stage,
+      field,
+      requiredSet.has(field.category)
+    );
     if (value) {
       overrides[field.key] = value;
     }
   }
 
-  const ctaTarget = String(
-    (await askLine(
-      rl,
-      `[ui-components] [${stage}] CTA 대상 경로/의미 입력 (선택, Enter=미지정): `
-    )) ?? ''
-  ).trim();
+  const ctaRequired = requiredSet.has('cta');
+  let ctaTarget = '';
+  while (true) {
+    ctaTarget = String(
+      (await askLine(
+        rl,
+        `[ui-components] [${stage}] CTA 대상 경로/의미 입력${ctaRequired ? ' [필수]' : ''} (Enter=미지정): `
+      )) ?? ''
+    ).trim();
+    if (!ctaRequired || ctaTarget) {
+      break;
+    }
+    console.log(
+      `[ui-components] [${stage}] 입력 필요: CTA 대상은 필수 항목입니다`
+    );
+  }
   if (ctaTarget) {
     overrides.cta_target = ctaTarget;
   }
@@ -346,9 +380,23 @@ export async function promptRetryDecision(
     }
 
     const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
+    const requiredIntentCategories =
+      stage === 'intent' &&
+      Array.isArray(context.intentGate?.blockingCategories)
+        ? context.intentGate.blockingCategories
+        : [];
+    if (stage === 'intent' && requiredIntentCategories.length > 0) {
+      console.log(
+        `[ui-components] [${stage}] 현재 블로킹 모호점 카테고리: ${requiredIntentCategories.join(', ')}`
+      );
+    }
     const structuredOverrides =
       stage === 'intent'
-        ? await collectIntentStructuredOverrides(rl, stage)
+        ? await collectIntentStructuredOverrides(
+            rl,
+            stage,
+            requiredIntentCategories
+          )
         : {};
     const appliedOverrides = mergeIntentOverrides(context, structuredOverrides);
     if (stage === 'intent') {
