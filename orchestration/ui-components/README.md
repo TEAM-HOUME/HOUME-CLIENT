@@ -35,8 +35,6 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
 - `run-agent-implementation`: implement code changes with injected context docs.
 - `gate-changed-paths`: block unrelated file changes.
-- `extract-code-connect-map`: collect Code Connect mapping evidence.
-- `gate-code-connect`: compare mapping paths with planned target.
 - `verify`: run quality checks (`lint`, `typecheck`, `test`, `test-storybook`) and Storybook checks.
 - `report`: write run summary JSON.
 
@@ -56,8 +54,6 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 | `resolve-component-plan`      | Planning + Gate      | Local code, optional Agent CLI                  |
 | `run-agent-implementation`    | Implementation       | Agent CLI                                       |
 | `gate-changed-paths`          | Gate                 | Local git diff                                  |
-| `extract-code-connect-map`    | Extraction           | Agent CLI + Figma MCP                           |
-| `gate-code-connect`           | Gate                 | Local code                                      |
 | `verify`                      | Gate                 | Local `pnpm` checks                             |
 | `report`                      | Finalization         | Local filesystem                                |
 
@@ -88,12 +84,8 @@ flowchart TD
   J -- missing behavior spec --> Z1
 
   K --> L{{gate-changed-paths}}
-  L -- pass --> M[extract-code-connect-map]
+  L -- pass --> O[verify]
   L -- fail --> Z1
-
-  M --> N{{gate-code-connect}}
-  N -- pass/warn --> O[verify]
-  N -- fail --> Z1
 
   O -- pass --> P[optional open-storybook]
   O -- fail --> Z1
@@ -102,8 +94,8 @@ flowchart TD
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,F,H,J,L,N,O gate;
-  class E,K,M agent;
+  class D,F,H,J,L,O gate;
+  class E,K agent;
   class A,B,C,P,Q,Z1,I local;
 ```
 
@@ -156,13 +148,6 @@ sequenceDiagram
     A-->>R: summary + changedFiles + notes
 
     R->>G: git diff / ls-files (gate-changed-paths)
-
-    opt code_connect_mode != off
-      R->>A: code-connect-map prompt
-      A->>M: code connect lookup
-      M-->>A: mapping evidence
-      A-->>R: mapping list + status
-    end
 
     R->>P: lint + typecheck + test + test-storybook (+storybook build if requested)
   end
@@ -232,7 +217,6 @@ agent:
 - `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
 - `gates.figma_mcp_logs_mode`: `off|warn|error` (direct MCP log gate)
 - `gates.design_tokens_mode`: `off|warn|error`
-- `gates.code_connect_mode`: `off|warn|error`
 - `gates.allowed_changed_paths`: explicit allowed change paths
 - `gates.require_visual_approval`: require `--approve-visual` when Storybook verification is enabled
 

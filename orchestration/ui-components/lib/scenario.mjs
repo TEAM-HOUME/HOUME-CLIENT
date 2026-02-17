@@ -275,19 +275,13 @@ export function readScenario(pathArg) {
       designTokensMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'design_tokens_mode', null),
         ['off', 'warn', 'error'],
-        'warn',
+        'error',
         'gates.design_tokens_mode'
-      ),
-      codeConnectMode: parseEnumValue(
-        parseSectionScalar(gatesSection, 'code_connect_mode', null),
-        ['off', 'warn', 'error'],
-        'warn',
-        'gates.code_connect_mode'
       ),
       figmaMcpLogsMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'figma_mcp_logs_mode', null),
         ['off', 'warn', 'error'],
-        'warn',
+        'error',
         'gates.figma_mcp_logs_mode'
       ),
       allowedChangedPaths: parseSectionList(

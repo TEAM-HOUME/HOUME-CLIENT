@@ -13,6 +13,5 @@ verification:
 
 gates:
   require_visual_approval: true
-  figma_mcp_logs_mode: warn
-  design_tokens_mode: warn
-  code_connect_mode: warn
+  figma_mcp_logs_mode: error
+  design_tokens_mode: error

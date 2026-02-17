@@ -12,8 +12,6 @@ import { stepExtractFigmaMcpToolLogs } from './steps/extract-figma-mcp-tool-logs
 import { stepGateFigmaMcpToolLogs } from './steps/gate-figma-mcp-tool-logs.mjs';
 import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
 import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
-import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
-import { stepGateCodeConnect } from './steps/gate-code-connect.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
 import { stepPreflight } from './steps/preflight.mjs';
 import { stepResolveComponent } from './steps/resolve-component-plan.mjs';
@@ -129,16 +127,6 @@ function buildFigmaMcpToolUsageSummary(context) {
     }
   }
 
-  const codeConnectEnabled =
-    !context.options.dryRun && context.scenario.gates.codeConnectMode !== 'off';
-  if (codeConnectEnabled && context.codeConnectMap) {
-    accumulateFigmaMcpToolCall(
-      summary,
-      'get_code_connect_map',
-      context.codeConnectMap.status
-    );
-  }
-
   return summary;
 }
 
@@ -218,12 +206,6 @@ function summarizeStepOutput(name, output) {
   }
   if (name === 'gate-changed-paths') {
     return `검사 파일=${output.checkedFiles}개`;
-  }
-  if (name === 'extract-code-connect-map') {
-    return `상태=${output.status}, 매핑=${output.mappings}개`;
-  }
-  if (name === 'gate-code-connect') {
-    return `모드=${output.mode}, 불일치=${output.mismatches?.length ?? 0}개`;
   }
   if (name === 'verify') {
     return `검증=${output.checks}개, 통과=${output.passed ? '예' : '아니오'}`;
@@ -305,18 +287,6 @@ function logStepDetails(name, output, traceRecords) {
     ) {
       console.log(
         `${stepPrefix(name)} └ 동작 확인 질문: 외 ${output.behaviorQuestions.length - questions.length}건`
-      );
-    }
-  }
-
-  if (name === 'extract-code-connect-map') {
-    const notes = compactArray(output.notes, 2);
-    for (const note of notes) {
-      console.log(`${stepPrefix(name)} └ 코드커넥트 노트: ${note}`);
-    }
-    if (Array.isArray(output.notes) && output.notes.length > notes.length) {
-      console.log(
-        `${stepPrefix(name)} └ 코드커넥트 노트: 외 ${output.notes.length - notes.length}건`
       );
     }
   }
@@ -537,9 +507,6 @@ function main() {
     designTokensArtifactPath: null,
     designTokens: null,
     designTokensGate: null,
-    codeConnectArtifactPath: null,
-    codeConnectMap: null,
-    codeConnectGate: null,
     componentPlan: null,
     implementationResult: null,
     storybookOpenResult: null,
@@ -568,8 +535,6 @@ function main() {
     runStep(context, 'resolve-component-plan', stepResolveComponent);
     runStep(context, 'run-agent-implementation', stepRunAgent);
     runStep(context, 'gate-changed-paths', stepGateChangedPaths);
-    runStep(context, 'extract-code-connect-map', stepExtractCodeConnectMap);
-    runStep(context, 'gate-code-connect', stepGateCodeConnect);
     runStep(context, 'verify', (stepContext) => {
       if (stepContext.options.skipVerify) {
         return {

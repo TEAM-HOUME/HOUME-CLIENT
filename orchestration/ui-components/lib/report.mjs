@@ -41,17 +41,12 @@ export function writeReport(context) {
     designTokensArtifactPath: context.designTokensArtifactPath
       ? relative(context.rootPath, context.designTokensArtifactPath)
       : null,
-    codeConnectArtifactPath: context.codeConnectArtifactPath
-      ? relative(context.rootPath, context.codeConnectArtifactPath)
-      : null,
     figmaScope: context.figmaScope || null,
     figmaScopeGate: context.figmaScopeGate || null,
     figmaMcpToolLogs: context.figmaMcpToolLogs || null,
     figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,
     designTokens: context.designTokens || null,
     designTokensGate: context.designTokensGate || null,
-    codeConnectMap: context.codeConnectMap || null,
-    codeConnectGate: context.codeConnectGate || null,
     componentPlan: context.componentPlan || null,
     implementationResult: context.implementationResult || null,
     storybookOpenResult: context.storybookOpenResult || null,
