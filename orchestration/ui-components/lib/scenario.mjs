@@ -2,6 +2,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { DEFAULT_FIGMA_TIMEOUT_MS } from './constants.mjs';
+import { DEFAULT_FIGMA_MCP_ENDPOINT } from './constants.mjs';
 import { fail } from './errors.mjs';
 
 function stripQuotes(value) {
@@ -245,6 +246,11 @@ export function readScenario(pathArg) {
         'timeout_ms',
         DEFAULT_FIGMA_TIMEOUT_MS
       ),
+      mcpEndpoint: parseSectionScalar(
+        figmaSection,
+        'mcp_endpoint',
+        DEFAULT_FIGMA_MCP_ENDPOINT
+      ),
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
     },
     context: {
@@ -271,6 +277,12 @@ export function readScenario(pathArg) {
         ['off', 'warn', 'error'],
         'warn',
         'gates.code_connect_mode'
+      ),
+      figmaMcpLogsMode: parseEnumValue(
+        parseSectionScalar(gatesSection, 'figma_mcp_logs_mode', null),
+        ['off', 'warn', 'error'],
+        'warn',
+        'gates.figma_mcp_logs_mode'
       ),
       allowedChangedPaths: parseSectionList(
         gatesSection,

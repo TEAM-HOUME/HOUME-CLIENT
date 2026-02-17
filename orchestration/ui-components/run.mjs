@@ -8,6 +8,8 @@ import { createRunId, writeReport } from './lib/report.mjs';
 import { parseArgs, readScenario } from './lib/scenario.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
 import { stepGateFigmaScope } from './steps/gate-figma-scope.mjs';
+import { stepExtractFigmaMcpToolLogs } from './steps/extract-figma-mcp-tool-logs.mjs';
+import { stepGateFigmaMcpToolLogs } from './steps/gate-figma-mcp-tool-logs.mjs';
 import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
 import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
 import { stepExtractCodeConnectMap } from './steps/extract-code-connect-map.mjs';
@@ -112,6 +114,13 @@ function accumulateFigmaMcpToolCall(summary, toolName, status) {
 function buildFigmaMcpToolUsageSummary(context) {
   const summary = createFigmaMcpToolUsageSummary();
 
+  if (Array.isArray(context.figmaMcpToolLogs?.calls)) {
+    for (const call of context.figmaMcpToolLogs.calls) {
+      accumulateFigmaMcpToolCall(summary, call.tool, call.status);
+    }
+    return summary;
+  }
+
   const designTools = context.designTokens?.tools;
   if (designTools && typeof designTools === 'object') {
     for (const [key, value] of Object.entries(designTools)) {
@@ -175,6 +184,12 @@ function summarizeStepOutput(name, output) {
   }
   if (name === 'gate-figma-scope') {
     return `상태=${output.status}, 협소=${output.isNarrow ? '예' : '아니오'}, 상위탐색=${output.parentDepth}단계`;
+  }
+  if (name === 'extract-figma-mcp-tool-logs') {
+    return `도구=${output.tools}개, 성공=${output.okCalls}개, 실패=${output.failedCalls}개, 미가용=${output.unavailableCalls}개`;
+  }
+  if (name === 'gate-figma-mcp-tool-logs') {
+    return `상태=${output.status}, 검사=${output.checkedTools}개, 누락=${output.missingTools?.length ?? 0}개, 오류=${output.badTools?.length ?? 0}개`;
   }
   if (name === 'extract-design-tokens') {
     return `상태=${output.status}, 토큰=${output.totalTokens}개, 코어커버리지=${output.coreCoverage}/3`;
@@ -322,6 +337,11 @@ function logStepFailureHint(name, traceRecords) {
   if (name === 'gate-figma-scope') {
     console.log(
       `${stepPrefix(name)} └ 조치: 노드가 넓게 선택됐습니다. figma.scope_node_id 지정 또는 노드 범위 축소 필요`
+    );
+  }
+  if (name === 'gate-figma-mcp-tool-logs') {
+    console.log(
+      `${stepPrefix(name)} └ 조치: figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인`
     );
   }
 
@@ -482,6 +502,10 @@ function main() {
     figmaScope: null,
     designContextArtifactPath: null,
     figmaScopeGate: null,
+    figmaMcpToolLogs: null,
+    figmaMcpToolLogsArtifactPath: null,
+    figmaMcpToolLogsGate: null,
+    figmaMcpDirectToolRecords: null,
     designTokensArtifactPath: null,
     designTokens: null,
     designTokensGate: null,
@@ -505,6 +529,12 @@ function main() {
     runStep(context, 'preflight', stepPreflight);
     runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
     runStep(context, 'gate-figma-scope', stepGateFigmaScope);
+    runStep(
+      context,
+      'extract-figma-mcp-tool-logs',
+      stepExtractFigmaMcpToolLogs
+    );
+    runStep(context, 'gate-figma-mcp-tool-logs', stepGateFigmaMcpToolLogs);
     runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
     runStep(context, 'gate-design-tokens', stepGateDesignTokens);
     runStep(context, 'resolve-component-plan', stepResolveComponent);

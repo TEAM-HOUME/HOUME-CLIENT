@@ -136,28 +136,34 @@ function deriveCaptureStatus(toolRecords, diagnostics, stats) {
 }
 
 function buildPrompt(context) {
+  const directArtifactPath = context.figmaMcpToolLogsArtifactPath
+    ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
+    : null;
   return [
-    'You are collecting Figma MCP evidence for design token extraction.',
-    `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
+    'You are normalizing design tokens from existing Figma MCP evidence.',
+    `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
-    '',
-    'Required tool usage order:',
-    '1) get_design_context',
-    '2) get_variable_defs',
-    '3) get_metadata',
-    '4) get_screenshot',
+    directArtifactPath
+      ? `Use this direct MCP raw log artifact as the source of truth: ${directArtifactPath}`
+      : 'Direct MCP raw log artifact is unavailable.',
     '',
     'Rules:',
+    '- Do not call MCP tools in this step.',
     '- Keep outputs read-only and do not edit code or files.',
-    '- Store each tool response in raw.<tool>.output as plain text.',
-    '- If a tool fails/unavailable, set raw.<tool>.status and error without guessing.',
-    '- For screenshot output, do not include binary image payloads.',
+    '- Preserve raw.<tool> status/output/error from the provided evidence.',
     '- Normalize tokens into: colors, typography, spacing, radius, size.',
     '- Put unmatched values in normalized.extras.',
     '- Every token item must include name/value/source/nodeId/note (empty string allowed).',
     '- Do not invent values that are not present in tool outputs.',
     'Return JSON only that matches the schema.',
   ].join('\n');
+}
+
+function directToolRecordToCaptureRecord(record, fallbackToolName) {
+  if (!record || typeof record !== 'object') {
+    return null;
+  }
+  return normalizeToolRecord(record, fallbackToolName);
 }
 
 function createFallbackCapture(context, message) {
@@ -319,17 +325,29 @@ export function stepExtractDesignTokens(context) {
       context.scenario.figma.timeoutMs
     );
 
+    const directTools = context.figmaMcpDirectToolRecords || null;
     const tools = {
-      designContext: normalizeToolRecord(
-        result.raw?.designContext,
-        'get_design_context'
-      ),
-      variableDefs: normalizeToolRecord(
-        result.raw?.variableDefs,
-        'get_variable_defs'
-      ),
-      metadata: normalizeToolRecord(result.raw?.metadata, 'get_metadata'),
-      screenshot: normalizeToolRecord(result.raw?.screenshot, 'get_screenshot'),
+      designContext:
+        directToolRecordToCaptureRecord(
+          directTools?.get_design_context,
+          'get_design_context'
+        ) ||
+        normalizeToolRecord(result.raw?.designContext, 'get_design_context'),
+      variableDefs:
+        directToolRecordToCaptureRecord(
+          directTools?.get_variable_defs,
+          'get_variable_defs'
+        ) || normalizeToolRecord(result.raw?.variableDefs, 'get_variable_defs'),
+      metadata:
+        directToolRecordToCaptureRecord(
+          directTools?.get_metadata,
+          'get_metadata'
+        ) || normalizeToolRecord(result.raw?.metadata, 'get_metadata'),
+      screenshot:
+        directToolRecordToCaptureRecord(
+          directTools?.get_screenshot,
+          'get_screenshot'
+        ) || normalizeToolRecord(result.raw?.screenshot, 'get_screenshot'),
     };
 
     const normalized = {

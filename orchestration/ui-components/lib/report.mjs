@@ -35,6 +35,9 @@ export function writeReport(context) {
     designContextArtifactPath: context.designContextArtifactPath
       ? relative(context.rootPath, context.designContextArtifactPath)
       : null,
+    figmaMcpToolLogsArtifactPath: context.figmaMcpToolLogsArtifactPath
+      ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
+      : null,
     designTokensArtifactPath: context.designTokensArtifactPath
       ? relative(context.rootPath, context.designTokensArtifactPath)
       : null,
@@ -43,6 +46,8 @@ export function writeReport(context) {
       : null,
     figmaScope: context.figmaScope || null,
     figmaScopeGate: context.figmaScopeGate || null,
+    figmaMcpToolLogs: context.figmaMcpToolLogs || null,
+    figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,
     designTokens: context.designTokens || null,
     designTokensGate: context.designTokensGate || null,
     codeConnectMap: context.codeConnectMap || null,

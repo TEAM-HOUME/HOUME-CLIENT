@@ -1,4 +1,4 @@
-export const REQUIRED_BASE_COMMANDS = ['node', 'pnpm'];
+export const REQUIRED_BASE_COMMANDS = ['node', 'pnpm', 'curl'];
 
 export const AGENT_COMMAND_MAP = {
   codex: 'codex',
@@ -14,3 +14,5 @@ export const FIGMA_MCP_SERVER_CANDIDATES = [
 export const CODEX_SAFE_CONFIG = ['-c', 'model_reasoning_effort="high"'];
 
 export const DEFAULT_FIGMA_TIMEOUT_MS = 600_000;
+
+export const DEFAULT_FIGMA_MCP_ENDPOINT = 'http://127.0.0.1:3845/mcp';
