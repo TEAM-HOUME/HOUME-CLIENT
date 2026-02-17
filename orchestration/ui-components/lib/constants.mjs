@@ -2,7 +2,6 @@ export const REQUIRED_BASE_COMMANDS = ['node', 'pnpm', 'curl'];
 
 export const AGENT_COMMAND_MAP = {
   codex: 'codex',
-  claude: 'claude',
 };
 
 export const FIGMA_MCP_SERVER_CANDIDATES = [

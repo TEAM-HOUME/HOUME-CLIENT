@@ -3,19 +3,11 @@ import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 
-function readSystemPrompt(rootPath, engine) {
-  const fileMap = {
-    codex: 'codex.system.md',
-    claude: 'claude.system.md',
-  };
-  const filename = fileMap[engine];
-  if (!filename) {
-    return '';
-  }
+function readSystemPrompt(rootPath) {
   const path = resolve(
     rootPath,
     'orchestration/ui-components/prompts',
-    filename
+    'codex.system.md'
   );
   if (!existsSync(path)) {
     return '';
@@ -41,16 +33,7 @@ function invokeImplementationAgent(context, prompt) {
     additionalProperties: false,
   };
 
-  return invokeAgentWithSchema(
-    context,
-    'implement',
-    prompt,
-    schema,
-    1_200_000,
-    {
-      claudePermissionMode: 'acceptEdits',
-    }
-  );
+  return invokeAgentWithSchema(context, 'implement', prompt, schema, 1_200_000);
 }
 
 function summarizeDesignTokens(context) {
@@ -90,10 +73,7 @@ export function stepRunAgent(context) {
     };
   }
 
-  const systemPrompt = readSystemPrompt(
-    context.rootPath,
-    context.scenario.engine
-  );
+  const systemPrompt = readSystemPrompt(context.rootPath);
   const promptSections = [
     systemPrompt,
     '# Task',

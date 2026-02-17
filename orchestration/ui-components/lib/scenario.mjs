@@ -17,42 +17,6 @@ function stripQuotes(value) {
   return trimmed;
 }
 
-function parseTopLevelList(content, key) {
-  const lines = content.split(/\r?\n/);
-  const sectionPattern = new RegExp(`^${key}:\\s*$`);
-  const values = [];
-  let sectionStart = -1;
-
-  for (let i = 0; i < lines.length; i += 1) {
-    if (sectionPattern.test(lines[i])) {
-      sectionStart = i;
-      break;
-    }
-  }
-
-  if (sectionStart === -1) {
-    return values;
-  }
-
-  for (let i = sectionStart + 1; i < lines.length; i += 1) {
-    const line = lines[i];
-    if (!line.trim() || line.trim().startsWith('#')) {
-      continue;
-    }
-    if (/^\S/.test(line)) {
-      break;
-    }
-
-    const itemMatch = line.match(/^\s*-\s*(.+)\s*$/);
-    if (!itemMatch) {
-      break;
-    }
-    values.push(stripQuotes(itemMatch[1]));
-  }
-
-  return values;
-}
-
 function parseTopLevelScalar(content, key) {
   const scalarMatch = content.match(
     new RegExp(`^${key}:\\s*([^\\n#]+)\\s*$`, 'm')
@@ -246,20 +210,12 @@ export function readScenario(pathArg) {
   const content = readFileSync(scenarioPath, 'utf8');
   const idMatch = content.match(/^id:\s*([^\n#]+)\s*$/m);
   const brief = parseTopLevelScalar(content, 'brief');
-  const agentSection = parseSection(content, 'agent');
   const intentSection = parseSection(content, 'intent');
   const behaviorSection = parseSection(content, 'behavior');
   const figmaSection = parseSection(content, 'figma');
   const gatesSection = parseSection(content, 'gates');
-  const engine = parseSectionScalar(agentSection, 'engine', null);
   const figmaUrl = parseSectionScalar(figmaSection, 'url', null);
-  const target = parseTopLevelScalar(content, 'target');
-  const targets = parseTopLevelList(content, 'targets');
-  const combinedTargets = [...new Set([target, ...targets].filter(Boolean))];
 
-  if (!engine) {
-    fail('Scenario must include `agent.engine`.');
-  }
   if (!figmaUrl) {
     fail('Scenario must include `figma.url`.');
   }
@@ -278,10 +234,10 @@ export function readScenario(pathArg) {
   return {
     path: scenarioPath,
     id: scenarioId,
-    engine,
+    engine: 'codex',
     agent: {
-      command: parseSectionScalar(agentSection, 'command', null),
-      args: parseSectionList(agentSection, 'args'),
+      command: null,
+      args: [],
     },
     intent: {
       brief: stripQuotes(brief),
@@ -342,7 +298,7 @@ export function readScenario(pathArg) {
         'allowed_changed_paths'
       ),
     },
-    targets: combinedTargets,
+    targets: [],
     verification: ['storybook'],
   };
 }

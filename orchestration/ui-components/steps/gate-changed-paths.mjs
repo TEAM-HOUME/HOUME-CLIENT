@@ -23,7 +23,6 @@ function resolveAllowedPatterns(context) {
   const inferred = [
     toDirectoryPattern(context.componentPlan?.targetPath),
     context.componentPlan?.storyPath || null,
-    ...context.scenario.targets,
   ].filter(Boolean);
   return [...new Set(inferred)];
 }

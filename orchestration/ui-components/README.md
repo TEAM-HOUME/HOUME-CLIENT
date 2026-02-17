@@ -11,7 +11,7 @@ Single-command pipeline for turning a Figma node into a validated UI component c
 ## Directory Layout
 
 - `scenarios/`: scenario inputs (`.yml`)
-- `prompts/`: system prompt fragments for Codex/Claude
+- `prompts/`: system prompt fragments for Codex
 - `steps/`: pipeline stages
 - `lib/`: shared runtime helpers
 - `artifacts/`: per-run outputs (local)
@@ -120,7 +120,7 @@ sequenceDiagram
   autonumber
   participant U as User
   participant R as run.mjs
-  participant A as Agent CLI (codex/claude)
+  participant A as Agent CLI (codex)
   participant M as Figma MCP
   participant G as Git
   participant P as pnpm checks
@@ -155,10 +155,8 @@ sequenceDiagram
     A-->>R: normalized tokens + diagnostics
   end
 
-  opt target unresolved
-    R->>A: resolve-component-plan prompt
-    A-->>R: action/targetPath/behavior questions
-  end
+  R->>A: resolve-component-plan prompt
+  A-->>R: action/targetPath/behavior questions
 
   opt !dry-run
     R->>A: implement prompt (system + task + conventions)
@@ -219,18 +217,12 @@ brief: 'Favorite toast on image result page, success state'
 
 figma:
   url: 'https://www.figma.com/design/.../TEMP?node-id=1-427&m=dev'
-
-agent:
-  engine: codex
 ```
 
 ## Scenario Keys (Optional)
 
-- `id`: optional; auto-generated when omitted
 - `brief`: required natural-language context for intent extraction
 - `intent.page|component_kind|role|state|notes`: optional hints for stable intent resolution
-- `target`: explicit single target file path (preferred for deterministic updates)
-- `targets`: legacy list form; only one target is supported in automatic planning
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
 - `gates.intent_mode`: intent gate strictness (`warn|error`, default `error`)

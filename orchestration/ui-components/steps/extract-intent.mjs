@@ -130,10 +130,7 @@ export function stepExtractIntent(context) {
     'intent-resolve',
     buildPrompt(context),
     schema,
-    Math.min(context.scenario.figma.timeoutMs, 180_000),
-    {
-      claudePermissionMode: 'plan',
-    }
+    Math.min(context.scenario.figma.timeoutMs, 180_000)
   );
 
   const resolvedIntent = {

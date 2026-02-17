@@ -31,7 +31,6 @@ export function writeReport(context) {
         state: context.scenario.intent?.stateHint || '',
         notes: context.scenario.intent?.notes || '',
       },
-      targets: context.scenario.targets,
       behavior: context.scenario.behavior,
       verification: context.scenario.verification,
       gates: context.scenario.gates,

@@ -534,11 +534,8 @@ export function invokeAgentWithSchema(
   purpose,
   prompt,
   schema,
-  timeoutMs,
-  options = {}
+  timeoutMs
 ) {
-  const claudePermissionMode = options.claudePermissionMode || 'plan';
-
   if (context.scenario.engine === 'codex') {
     const schemaPath = resolve(
       context.artifactsDir,
@@ -585,51 +582,6 @@ export function invokeAgentWithSchema(
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       fail(
         `Unable to parse JSON output from codex (${purpose}). Output: ${result.stdout.slice(0, 400)}`
-      );
-    }
-    return parsed;
-  }
-
-  if (context.scenario.engine === 'claude') {
-    const result = runAgentCommand(
-      context.agentRuntime,
-      [
-        '-p',
-        '--output-format',
-        'json',
-        '--json-schema',
-        JSON.stringify(schema),
-        '--permission-mode',
-        claudePermissionMode,
-        '--add-dir',
-        context.rootPath,
-        prompt,
-      ],
-      {
-        cwd: context.rootPath,
-        timeoutMs,
-      }
-    );
-
-    const parsedOutput = parseAgentOutput(result.stdout);
-    const parsed = parsedOutput.parsed;
-    recordAgentTrace(context, {
-      purpose,
-      commandLine: result.commandLine,
-      timeoutMs,
-      prompt,
-      schema,
-      stdout: result.stdout,
-      stderr: result.stderr,
-      parsed,
-      usage: parsedOutput.usage,
-      status: parsed ? 'parsed' : 'parse_failed',
-    });
-    recordAgentTokenUsage(context, purpose, parsedOutput.usage);
-
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      fail(
-        `Unable to parse JSON output from claude (${purpose}). Output: ${result.stdout.slice(0, 400)}`
       );
     }
     return parsed;

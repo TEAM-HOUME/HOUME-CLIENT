@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
-import { inferTargetFromScenario, readContracts } from '../lib/contracts.mjs';
+import { readContracts } from '../lib/contracts.mjs';
 import { fail } from '../lib/errors.mjs';
 
 const INTERACTION_KEYWORDS = [
@@ -147,10 +147,7 @@ function invokeResolveAgent(context, contracts) {
     'resolve-component-plan',
     buildResolvePrompt(context, contracts),
     schema,
-    Math.min(context.scenario.figma.timeoutMs, 300_000),
-    {
-      claudePermissionMode: 'plan',
-    }
+    Math.min(context.scenario.figma.timeoutMs, 300_000)
   );
 }
 
@@ -182,83 +179,26 @@ function enforceBehaviorGate(context, componentPlan) {
 export function stepResolveComponent(context) {
   const contracts = readContracts(context.rootPath);
   context.contracts = contracts;
-  let componentPlan = null;
-
-  if (context.scenario.targets.length === 1) {
-    const onlyTarget = context.scenario.targets[0];
-    const targetExists = existsSync(resolve(context.rootPath, onlyTarget));
-    componentPlan = createPlan({
-      source: 'scenario',
-      action: targetExists ? 'update' : 'create',
-      targetPath: onlyTarget,
-      targetExists,
-      storyPath: null,
-      rationale: 'single explicit target from scenario',
-      requiresBehaviorConfirmation: requiresBehaviorConfirmation(
-        context,
-        onlyTarget,
-        targetExists
-      ),
-      behaviorQuestions: [],
-    });
-  } else if (context.scenario.targets.length > 1) {
-    fail(
-      `Multiple targets are not supported in automatic planning. Keep one target only. targets=${context.scenario.targets.join(', ')}`
-    );
+  const planFromAgent = invokeResolveAgent(context, contracts);
+  const normalizedTargetPath = normalizePath(planFromAgent.targetPath);
+  if (!normalizedTargetPath) {
+    fail('resolve-component-plan agent returned empty targetPath.');
   }
-
-  if (!componentPlan) {
-    const inferredTarget = inferTargetFromScenario(
-      context.rootPath,
-      context.scenario.id
-    );
-    if (inferredTarget) {
-      const targetExists = existsSync(
-        resolve(context.rootPath, inferredTarget)
-      );
-      componentPlan = createPlan({
-        source: 'inferred',
-        action: targetExists ? 'update' : 'create',
-        targetPath: inferredTarget,
-        targetExists,
-        storyPath: null,
-        rationale: 'path inferred from scenario id tokens',
-        requiresBehaviorConfirmation: requiresBehaviorConfirmation(
-          context,
-          inferredTarget,
-          targetExists
-        ),
-        behaviorQuestions: [],
-      });
-    }
-  }
-
-  if (!componentPlan) {
-    const planFromAgent = invokeResolveAgent(context, contracts);
-    const normalizedTargetPath = normalizePath(planFromAgent.targetPath);
-    if (!normalizedTargetPath) {
-      fail('resolve-component-plan agent returned empty targetPath.');
-    }
-    const targetExists = existsSync(
-      resolve(context.rootPath, normalizedTargetPath)
-    );
-    componentPlan = createPlan({
-      source: 'agent-plan',
-      action: targetExists ? 'update' : String(planFromAgent.action).trim(),
-      targetPath: normalizedTargetPath,
-      targetExists,
-      storyPath: normalizePath(planFromAgent.storyPath || ''),
-      rationale: String(planFromAgent.rationale || ''),
-      requiresBehaviorConfirmation:
-        Boolean(planFromAgent.requiresBehaviorConfirmation) ||
-        requiresBehaviorConfirmation(
-          context,
-          normalizedTargetPath,
-          targetExists
-        ),
-      behaviorQuestions: planFromAgent.behaviorQuestions,
-    });
-  }
+  const targetExists = existsSync(
+    resolve(context.rootPath, normalizedTargetPath)
+  );
+  const componentPlan = createPlan({
+    source: 'agent-plan',
+    action: targetExists ? 'update' : String(planFromAgent.action).trim(),
+    targetPath: normalizedTargetPath,
+    targetExists,
+    storyPath: normalizePath(planFromAgent.storyPath || ''),
+    rationale: String(planFromAgent.rationale || ''),
+    requiresBehaviorConfirmation:
+      Boolean(planFromAgent.requiresBehaviorConfirmation) ||
+      requiresBehaviorConfirmation(context, normalizedTargetPath, targetExists),
+    behaviorQuestions: planFromAgent.behaviorQuestions,
+  });
 
   if (!['update', 'create'].includes(componentPlan.action)) {
     fail(
@@ -267,15 +207,11 @@ export function stepResolveComponent(context) {
   }
 
   if (!componentPlan.targetPath.startsWith('src/')) {
-    fail(
-      `Target path must be under src/: ${componentPlan.targetPath}. Add explicit scenario.target if needed.`
-    );
+    fail(`Target path must be under src/: ${componentPlan.targetPath}.`);
   }
 
   if (componentPlan.action === 'update' && !componentPlan.targetExists) {
-    fail(
-      `Planned update target does not exist: ${componentPlan.targetPath}. Set scenario.target to existing file or create plan.`
-    );
+    fail(`Planned update target does not exist: ${componentPlan.targetPath}.`);
   }
 
   enforceBehaviorGate(context, componentPlan);

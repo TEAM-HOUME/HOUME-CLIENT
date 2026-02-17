@@ -1,10 +1,4 @@
-id: jjym-toast
 brief: 'Image generation result page favorite toast in success state'
 
 figma:
   url: 'https://www.figma.com/design/87dDqo3EUSFSzXK7f7s5Gs/TEMP?node-id=1-427&m=dev'
-
-agent:
-  engine: codex
-
-target: 'src/shared/components/toast/Toast.tsx'
