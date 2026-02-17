@@ -51,6 +51,8 @@ export function writeReport(context) {
     implementationResult: context.implementationResult || null,
     storybookOpenResult: context.storybookOpenResult || null,
     agentTraceArtifacts: context.agentTraceArtifacts || [],
+    figmaMcpToolUsage: context.figmaMcpToolUsage || null,
+    agentTokenUsage: context.agentTokenUsage || null,
     newChangedFiles: context.newChangedFiles || [],
     verificationResults: context.verificationResults || [],
     warnings: context.warnings,

@@ -155,20 +155,149 @@ function extractFirstJson(text) {
   return null;
 }
 
-export function parseAgentJsonOutput(text) {
-  const parsed = extractFirstJson(text);
-  if (!parsed) {
+function toFiniteNumber(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+  return number;
+}
+
+function normalizeUsageObject(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return null;
   }
 
-  if (typeof parsed.result === 'string') {
-    const nested = extractFirstJson(parsed.result);
-    if (nested) {
-      return nested;
+  const inputTokens =
+    toFiniteNumber(value.input_tokens) ??
+    toFiniteNumber(value.prompt_tokens) ??
+    toFiniteNumber(value.inputTokens) ??
+    toFiniteNumber(value.promptTokens);
+
+  const outputTokens =
+    toFiniteNumber(value.output_tokens) ??
+    toFiniteNumber(value.completion_tokens) ??
+    toFiniteNumber(value.outputTokens) ??
+    toFiniteNumber(value.completionTokens);
+
+  let totalTokens =
+    toFiniteNumber(value.total_tokens) ?? toFiniteNumber(value.totalTokens);
+  if (totalTokens === null && (inputTokens !== null || outputTokens !== null)) {
+    totalTokens = (inputTokens ?? 0) + (outputTokens ?? 0);
+  }
+
+  if (inputTokens === null && outputTokens === null && totalTokens === null) {
+    return null;
+  }
+
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens,
+  };
+}
+
+function extractUsageFromValue(value, depth = 0) {
+  if (!value || depth > 5) {
+    return null;
+  }
+
+  const directUsage = normalizeUsageObject(value);
+  if (directUsage) {
+    return directUsage;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const usage = extractUsageFromValue(item, depth + 1);
+      if (usage) {
+        return usage;
+      }
+    }
+    return null;
+  }
+
+  if (typeof value === 'object') {
+    const usageKeyCandidates = [
+      'usage',
+      'token_usage',
+      'tokenUsage',
+      'metrics',
+    ];
+    for (const key of usageKeyCandidates) {
+      if (!(key in value)) {
+        continue;
+      }
+      const usage = extractUsageFromValue(value[key], depth + 1);
+      if (usage) {
+        return usage;
+      }
+    }
+
+    for (const nestedValue of Object.values(value)) {
+      if (!nestedValue || typeof nestedValue !== 'object') {
+        continue;
+      }
+      const usage = extractUsageFromValue(nestedValue, depth + 1);
+      if (usage) {
+        return usage;
+      }
     }
   }
 
-  return parsed;
+  return null;
+}
+
+function parseAgentOutput(text) {
+  const envelope = extractFirstJson(text);
+  if (!envelope) {
+    return {
+      parsed: null,
+      usage: null,
+      envelope: null,
+    };
+  }
+
+  let parsed = envelope;
+  if (
+    envelope &&
+    typeof envelope === 'object' &&
+    !Array.isArray(envelope) &&
+    'result' in envelope
+  ) {
+    const resultValue = envelope.result;
+    if (typeof resultValue === 'string') {
+      parsed = extractFirstJson(resultValue);
+    } else if (
+      resultValue &&
+      typeof resultValue === 'object' &&
+      !Array.isArray(resultValue)
+    ) {
+      parsed = resultValue;
+    } else {
+      parsed = null;
+    }
+  }
+
+  const usage = extractUsageFromValue(envelope);
+  return {
+    parsed,
+    usage,
+    envelope,
+  };
+}
+
+export function parseAgentJsonOutput(text) {
+  const output = parseAgentOutput(text);
+  if (!output.parsed) {
+    return null;
+  }
+
+  if (typeof output.parsed !== 'object' || Array.isArray(output.parsed)) {
+    return null;
+  }
+
+  return output.parsed;
 }
 
 function ensureAgentTraceDir(context) {
@@ -208,6 +337,7 @@ function recordAgentTrace(context, trace) {
     timeoutMs: trace.timeoutMs,
     schema: trace.schema,
     status: trace.status,
+    usage: trace.usage ?? null,
   });
   writeArtifact(promptPath, trace.prompt);
   writeArtifact(stdoutPath, trace.stdout ?? '');
@@ -227,9 +357,54 @@ function recordAgentTrace(context, trace) {
       trace.parsed !== null && trace.parsed !== undefined
         ? relative(context.rootPath, parsedPath)
         : null,
+    usage: trace.usage ?? null,
   };
   context.agentTraceArtifacts.push(record);
   return record;
+}
+
+function ensureAgentTokenUsage(context) {
+  if (context.agentTokenUsage) {
+    return context.agentTokenUsage;
+  }
+  context.agentTokenUsage = {
+    records: [],
+    totalInputTokens: 0,
+    totalOutputTokens: 0,
+    totalTokens: 0,
+    missingCount: 0,
+  };
+  return context.agentTokenUsage;
+}
+
+function recordAgentTokenUsage(context, purpose, usage) {
+  const summary = ensureAgentTokenUsage(context);
+  const hasUsage =
+    usage &&
+    (usage.inputTokens !== null ||
+      usage.outputTokens !== null ||
+      usage.totalTokens !== null);
+
+  if (!hasUsage) {
+    summary.missingCount += 1;
+    summary.records.push({
+      purpose,
+      inputTokens: null,
+      outputTokens: null,
+      totalTokens: null,
+    });
+    return;
+  }
+
+  summary.totalInputTokens += usage.inputTokens ?? 0;
+  summary.totalOutputTokens += usage.outputTokens ?? 0;
+  summary.totalTokens += usage.totalTokens ?? 0;
+  summary.records.push({
+    purpose,
+    inputTokens: usage.inputTokens ?? null,
+    outputTokens: usage.outputTokens ?? null,
+    totalTokens: usage.totalTokens ?? null,
+  });
 }
 
 export function invokeAgentWithSchema(
@@ -268,7 +443,8 @@ export function invokeAgentWithSchema(
       }
     );
 
-    const parsed = parseAgentJsonOutput(result.stdout);
+    const parsedOutput = parseAgentOutput(result.stdout);
+    const parsed = parsedOutput.parsed;
     recordAgentTrace(context, {
       purpose,
       commandLine: result.commandLine,
@@ -278,10 +454,12 @@ export function invokeAgentWithSchema(
       stdout: result.stdout,
       stderr: result.stderr,
       parsed,
+      usage: parsedOutput.usage,
       status: parsed ? 'parsed' : 'parse_failed',
     });
+    recordAgentTokenUsage(context, purpose, parsedOutput.usage);
 
-    if (!parsed) {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       fail(
         `Unable to parse JSON output from codex (${purpose}). Output: ${result.stdout.slice(0, 400)}`
       );
@@ -310,7 +488,8 @@ export function invokeAgentWithSchema(
       }
     );
 
-    const parsed = parseAgentJsonOutput(result.stdout);
+    const parsedOutput = parseAgentOutput(result.stdout);
+    const parsed = parsedOutput.parsed;
     recordAgentTrace(context, {
       purpose,
       commandLine: result.commandLine,
@@ -320,10 +499,12 @@ export function invokeAgentWithSchema(
       stdout: result.stdout,
       stderr: result.stderr,
       parsed,
+      usage: parsedOutput.usage,
       status: parsed ? 'parsed' : 'parse_failed',
     });
+    recordAgentTokenUsage(context, purpose, parsedOutput.usage);
 
-    if (!parsed) {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       fail(
         `Unable to parse JSON output from claude (${purpose}). Output: ${result.stdout.slice(0, 400)}`
       );

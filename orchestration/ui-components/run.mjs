@@ -44,6 +44,118 @@ function compactArray(values, maxItems = 3) {
   return values.slice(0, maxItems).map((value) => truncateText(value, 180));
 }
 
+function createFigmaMcpToolUsageSummary() {
+  return {
+    totalCalls: 0,
+    successCalls: 0,
+    failedCalls: 0,
+    unavailableCalls: 0,
+    callsByTool: {},
+  };
+}
+
+function normalizeMcpOutcome(status) {
+  const normalized = String(status ?? '')
+    .trim()
+    .toLowerCase();
+  if (
+    normalized === 'ok' ||
+    normalized === 'partial' ||
+    normalized === 'no_mapping'
+  ) {
+    return 'success';
+  }
+  if (normalized === 'unavailable') {
+    return 'unavailable';
+  }
+  return 'failed';
+}
+
+function accumulateFigmaMcpToolCall(summary, toolName, status) {
+  const normalizedToolName = String(toolName || 'unknown_tool').trim();
+  const normalizedStatus = String(status ?? 'unknown')
+    .trim()
+    .toLowerCase();
+  const outcome = normalizeMcpOutcome(normalizedStatus);
+
+  if (!summary.callsByTool[normalizedToolName]) {
+    summary.callsByTool[normalizedToolName] = {
+      calls: 0,
+      successCalls: 0,
+      failedCalls: 0,
+      unavailableCalls: 0,
+      statuses: {},
+    };
+  }
+
+  const toolSummary = summary.callsByTool[normalizedToolName];
+  toolSummary.calls += 1;
+  toolSummary.statuses[normalizedStatus] =
+    (toolSummary.statuses[normalizedStatus] ?? 0) + 1;
+
+  summary.totalCalls += 1;
+  if (outcome === 'success') {
+    summary.successCalls += 1;
+    toolSummary.successCalls += 1;
+    return;
+  }
+  if (outcome === 'unavailable') {
+    summary.unavailableCalls += 1;
+    toolSummary.unavailableCalls += 1;
+    return;
+  }
+
+  summary.failedCalls += 1;
+  toolSummary.failedCalls += 1;
+}
+
+function buildFigmaMcpToolUsageSummary(context) {
+  const summary = createFigmaMcpToolUsageSummary();
+
+  const designTools = context.designTokens?.tools;
+  if (designTools && typeof designTools === 'object') {
+    for (const [key, value] of Object.entries(designTools)) {
+      const toolName = value?.tool || key;
+      accumulateFigmaMcpToolCall(summary, toolName, value?.status);
+    }
+  }
+
+  const codeConnectEnabled =
+    !context.options.dryRun && context.scenario.gates.codeConnectMode !== 'off';
+  if (codeConnectEnabled && context.codeConnectMap) {
+    accumulateFigmaMcpToolCall(
+      summary,
+      'get_code_connect_map',
+      context.codeConnectMap.status
+    );
+  }
+
+  return summary;
+}
+
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString('en-US');
+}
+
+function formatAgentTokenUsage(summary) {
+  if (
+    !summary ||
+    !Array.isArray(summary.records) ||
+    summary.records.length === 0
+  ) {
+    return null;
+  }
+
+  const missingCount = summary.missingCount ?? 0;
+  if (missingCount === summary.records.length) {
+    return `사용량 미수집 (호출 ${summary.records.length}회)`;
+  }
+
+  const missingText =
+    missingCount > 0 ? `, 미수집 ${formatNumber(missingCount)}회` : '';
+  return `입력 ${formatNumber(summary.totalInputTokens)}, 출력 ${formatNumber(summary.totalOutputTokens)}, 합계 ${formatNumber(summary.totalTokens)}${missingText}`;
+}
+
 function summarizeStepOutput(name, output) {
   if (!output || typeof output !== 'object') {
     return '';
@@ -383,6 +495,8 @@ function main() {
     initialChangedFiles: getChangedFiles(rootPath),
     newChangedFiles: [],
     verificationResults: [],
+    figmaMcpToolUsage: null,
+    agentTokenUsage: null,
   };
 
   let exitCode = 0;
@@ -407,6 +521,7 @@ function main() {
     exitCode = 1;
   }
 
+  context.figmaMcpToolUsage = buildFigmaMcpToolUsageSummary(context);
   const reportPath = writeReport(context);
   const passedSteps = context.steps.filter(
     (step) => step.status === 'passed'
@@ -428,6 +543,15 @@ function main() {
   }
   if (context.warnings.length > 0) {
     console.log(`[ui-components] 경고: ${context.warnings.length}건`);
+  }
+  if (context.figmaMcpToolUsage.totalCalls > 0) {
+    console.log(
+      `[ui-components] Figma MCP 도구 호출: 총 ${formatNumber(context.figmaMcpToolUsage.totalCalls)}회 (성공 ${formatNumber(context.figmaMcpToolUsage.successCalls)}, 실패 ${formatNumber(context.figmaMcpToolUsage.failedCalls)}, 미가용 ${formatNumber(context.figmaMcpToolUsage.unavailableCalls)})`
+    );
+  }
+  const agentTokenUsageText = formatAgentTokenUsage(context.agentTokenUsage);
+  if (agentTokenUsageText) {
+    console.log(`[ui-components] 에이전트 토큰: ${agentTokenUsageText}`);
   }
   console.log(
     `[ui-components] 리포트: ${relative(context.rootPath, reportPath)}`
