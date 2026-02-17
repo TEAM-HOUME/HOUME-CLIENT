@@ -195,7 +195,6 @@ export function readScenario(pathArg) {
   const content = readFileSync(scenarioPath, 'utf8');
   const idMatch = content.match(/^id:\s*([^\n#]+)\s*$/m);
   const agentSection = parseSection(content, 'agent');
-  const contextSection = parseSection(content, 'context');
   const behaviorSection = parseSection(content, 'behavior');
   const figmaSection = parseSection(content, 'figma');
   const gatesSection = parseSection(content, 'gates');
@@ -243,9 +242,6 @@ export function readScenario(pathArg) {
         null
       ),
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
-    },
-    context: {
-      uiRulesDocs: parseSectionList(contextSection, 'ui_rules_docs'),
     },
     behavior: {
       confirmed: parseSectionBoolean(behaviorSection, 'confirmed', false),
