@@ -97,6 +97,21 @@ const INTENT_OVERRIDE_FIELDS = Object.freeze([
       '3) aria-live assertive',
     ]),
   },
+  {
+    key: 'type_mapping_policy',
+    category: 'type',
+    label: '타입 매핑 정책',
+    options: Object.freeze({
+      1: 'follow_existing',
+      2: 'map_success_to_navigate',
+      3: 'add_success_type',
+    }),
+    descriptions: Object.freeze([
+      '1) 기존 타입 재사용',
+      '2) success를 NAVIGATE 타입에 매핑',
+      '3) SUCCESS 타입 신규 추가',
+    ]),
+  },
 ]);
 
 const MAX_FEEDBACK_NOTES_PER_STAGE = 4;
@@ -448,12 +463,11 @@ async function collectIntentStructuredOverrides(
 
   const askOptionalStructured =
     optionalFields.length > 0 &&
-    (hasKnownStructuredRequired ||
-      (await askYesNo(
-        rl,
-        `[ui-components] [${stage}] 선택 구조화 항목도 입력하시겠습니까? (y/N): `,
-        false
-      )));
+    (await askYesNo(
+      rl,
+      `[ui-components] [${stage}] 선택 구조화 항목도 입력하시겠습니까? (y/N): `,
+      false
+    ));
 
   if (askOptionalStructured) {
     for (const field of optionalFields) {
@@ -465,22 +479,43 @@ async function collectIntentStructuredOverrides(
   }
 
   let ctaTarget = '';
-  while (true) {
-    ctaTarget = String(
-      (await askLine(
-        rl,
-        `[ui-components] [${stage}] CTA 대상 경로/의미 입력${ctaRequired ? ' [필수]' : ''} (Enter=미지정): `
-      )) ?? ''
-    ).trim();
-    if (!ctaRequired || ctaTarget) {
-      break;
+  if (ctaRequired || askOptionalStructured) {
+    while (true) {
+      ctaTarget = String(
+        (await askLine(
+          rl,
+          `[ui-components] [${stage}] CTA 대상 경로/의미 입력${ctaRequired ? ' [필수]' : ''} (Enter=미지정): `
+        )) ?? ''
+      ).trim();
+      if (!ctaRequired || ctaTarget) {
+        break;
+      }
+      console.log(
+        `[ui-components] [${stage}] 입력 필요: CTA 대상은 필수 항목입니다`
+      );
     }
-    console.log(
-      `[ui-components] [${stage}] 입력 필요: CTA 대상은 필수 항목입니다`
-    );
+    if (ctaTarget) {
+      overrides.cta_target = ctaTarget;
+    }
   }
-  if (ctaTarget) {
-    overrides.cta_target = ctaTarget;
+
+  if (requiredSet.has('unknown')) {
+    let unknownResolution = '';
+    while (true) {
+      unknownResolution = String(
+        (await askLine(
+          rl,
+          `[ui-components] [${stage}] unknown 모호점 해소 지시 [필수] (예: 기존 TOAST_TYPE.NAVIGATE 재사용): `
+        )) ?? ''
+      ).trim();
+      if (unknownResolution) {
+        break;
+      }
+      console.log(
+        `[ui-components] [${stage}] 입력 필요: unknown 모호점 해소 지시는 필수입니다`
+      );
+    }
+    overrides.unknown_resolution = unknownResolution;
   }
 
   return overrides;

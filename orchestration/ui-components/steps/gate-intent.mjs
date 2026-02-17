@@ -38,6 +38,13 @@ function classifyAmbiguityCategory(ambiguity) {
   ) {
     return 'cta';
   }
+  if (
+    /(toast_type|toas?t type|enum|variant|mapping|type mapping|type policy|타입 매핑|타입 정책|토스트 타입|성공 타입|navigate 타입)/.test(
+      text
+    )
+  ) {
+    return 'type';
+  }
   if (/(concurrency|queue|stack|replace|중복|연속)/.test(text)) {
     return 'concurrency';
   }
@@ -76,6 +83,12 @@ function hasIntentOverride(context, category) {
   }
   if (category === 'accessibility') {
     return Boolean(overrides.accessibility_policy);
+  }
+  if (category === 'type') {
+    return Boolean(overrides.type_mapping_policy);
+  }
+  if (category === 'unknown') {
+    return Boolean(overrides.unknown_resolution);
   }
   return false;
 }

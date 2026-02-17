@@ -118,6 +118,7 @@ function describeBlockingCategories(categories) {
     trigger: 'trigger 정책',
     placement: '배치 정책',
     dismiss: '닫기 정책',
+    type: '타입 매핑 정책',
     concurrency: '중복 표시 정책',
     accessibility: '접근성 정책',
     cta: 'CTA 대상',
