@@ -144,6 +144,23 @@ async function askLine(rl, question) {
   return rl.question(question);
 }
 
+async function askYesNo(rl, question, defaultValue = false) {
+  while (true) {
+    const answer = String((await askLine(rl, question)) ?? '').trim();
+    if (!answer) {
+      return defaultValue;
+    }
+    const lower = answer.toLowerCase();
+    if (lower === 'y' || lower === 'yes') {
+      return true;
+    }
+    if (lower === 'n' || lower === 'no') {
+      return false;
+    }
+    console.log('[ui-components] 입력 형식 오류: y 또는 n으로 입력해 주세요');
+  }
+}
+
 function printStageHeader(stage, title) {
   console.log(`[ui-components] [${stage}] ${title}`);
 }
@@ -403,19 +420,50 @@ async function collectIntentStructuredOverrides(
     Array.isArray(requiredCategories) ? requiredCategories : []
   );
   const overrides = {};
-  for (const field of INTENT_OVERRIDE_FIELDS) {
-    const value = await askIntentChoice(
-      rl,
-      stage,
-      field,
-      requiredSet.has(field.category)
-    );
+  const requiredFields = INTENT_OVERRIDE_FIELDS.filter((field) =>
+    requiredSet.has(field.category)
+  );
+  const optionalFields = INTENT_OVERRIDE_FIELDS.filter(
+    (field) => !requiredSet.has(field.category)
+  );
+
+  for (const field of requiredFields) {
+    const value = await askIntentChoice(rl, stage, field, true);
     if (value) {
       overrides[field.key] = value;
     }
   }
 
   const ctaRequired = requiredSet.has('cta');
+  const hasKnownStructuredRequired = requiredFields.length > 0 || ctaRequired;
+  if (!hasKnownStructuredRequired && requiredSet.has('unknown')) {
+    printStageHeader(
+      stage,
+      '현재 블로킹 모호점은 구조화 항목으로 매핑되지 않았습니다 (unknown)'
+    );
+    printStageOptions([
+      '자유 보강 지시에서 구체 정책(예: 타입 매핑/기존 타입 재사용 여부)을 직접 입력해 주세요',
+    ]);
+  }
+
+  const askOptionalStructured =
+    optionalFields.length > 0 &&
+    (hasKnownStructuredRequired ||
+      (await askYesNo(
+        rl,
+        `[ui-components] [${stage}] 선택 구조화 항목도 입력하시겠습니까? (y/N): `,
+        false
+      )));
+
+  if (askOptionalStructured) {
+    for (const field of optionalFields) {
+      const value = await askIntentChoice(rl, stage, field, false);
+      if (value) {
+        overrides[field.key] = value;
+      }
+    }
+  }
+
   let ctaTarget = '';
   while (true) {
     ctaTarget = String(
@@ -588,7 +636,6 @@ export async function promptRetryDecision(
       };
     }
 
-    const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
     const requiredIntentCategories =
       stage === 'intent' &&
       Array.isArray(context.intentGate?.blockingCategories)
@@ -620,6 +667,7 @@ export async function promptRetryDecision(
     } else if (stage === 'asset') {
       printAssetOverrideSummary(stage, appliedOverrides);
     }
+    const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
     const structuredFeedback =
       stage === 'intent'
         ? buildIntentOverrideFeedback(appliedOverrides)

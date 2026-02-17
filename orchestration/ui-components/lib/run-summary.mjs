@@ -350,7 +350,7 @@ export function logStepFailureHint(context, name, traceRecords) {
       );
     }
     console.log(
-      '- 추가 프롬프트는 마지막 질문에 자유 텍스트로 입력 가능합니다'
+      '- 자유 보강 지시는 마지막 질문에서 자유 텍스트로 입력 가능합니다'
     );
   }
   if (name === 'gate-figma-mcp-tool-logs') {
