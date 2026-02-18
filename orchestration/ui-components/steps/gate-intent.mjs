@@ -6,27 +6,69 @@ import {
 } from '../lib/behavior-guidance.mjs';
 import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
 
+function isToolingMetaAmbiguity(text) {
+  return /(code connect|would you like to connect code components|connect code components|mcp auth|mcp token|access token|tool availability|도구 연결|코드 커넥트)/.test(
+    text
+  );
+}
+
+function isDeferredFigmaAmbiguity(text) {
+  const hasFigmaOrDesignSignal =
+    /(figma|피그마|node-id|노드[\s-]*id|노드\s*수치|노드\s*기준|디자인\s*수치|디자인\s*값|px|치수|여백|padding|margin|spacing|버튼\s*위치|오버레이|overlay|opacity|투명도|강도|에셋|asset|파일\s*경로|포맷|해상도|svg|png|jpg|jpeg)/.test(
+      text
+    );
+  const hasAssetMappingSignal =
+    /(에셋\s*매핑|asset\s*mapping|파일\s*매핑|경로\s*매핑)/.test(text);
+  const hasDeferredSignal =
+    /(후속\s*단계|다음\s*단계|추후|최종\s*확정|확정\s*필요|확인\s*필요|기준으로\s*확정|기준으로\s*결정)/.test(
+      text
+    );
+
+  if (hasAssetMappingSignal) {
+    return true;
+  }
+  if (hasFigmaOrDesignSignal && hasDeferredSignal) {
+    return true;
+  }
+  if (
+    /(cta\s*텍스트|타이포|text\s*label)/.test(text) &&
+    /(figma|피그마)/.test(text)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function splitAmbiguities(intent) {
   const blockingAmbiguities = [];
   const advisoryAmbiguities = [];
+  const deferredAmbiguities = [];
+  const blockingCategories = [];
+  const advisoryCategories = [];
 
   for (const ambiguity of intent.ambiguities) {
     const text = String(ambiguity ?? '').toLowerCase();
-    const isToolingMetaAmbiguity =
-      /(code connect|would you like to connect code components|connect code components|mcp auth|mcp token|access token|tool availability|도구 연결|코드 커넥트)/.test(
-        text
-      );
-    if (isToolingMetaAmbiguity) {
+    if (isToolingMetaAmbiguity(text)) {
       advisoryAmbiguities.push(ambiguity);
+      advisoryCategories.push('tooling_meta');
+      continue;
+    }
+    if (isDeferredFigmaAmbiguity(text)) {
+      advisoryAmbiguities.push(ambiguity);
+      deferredAmbiguities.push(ambiguity);
+      advisoryCategories.push('deferred_figma');
       continue;
     }
     blockingAmbiguities.push(ambiguity);
+    blockingCategories.push('unresolved_intent');
   }
 
   return {
     blockingAmbiguities,
     advisoryAmbiguities,
-    blockingCategories: [],
+    deferredAmbiguities,
+    blockingCategories,
+    advisoryCategories,
   };
 }
 
@@ -69,6 +111,9 @@ export function stepGateIntent(context) {
       ambiguities: [],
       blockingAmbiguities: [],
       advisoryAmbiguities: [],
+      deferredAmbiguities: [],
+      blockingCategories: [],
+      advisoryCategories: [],
     };
     return context.intentGate;
   }
@@ -107,17 +152,31 @@ export function stepGateIntent(context) {
     );
   }
 
-  const { blockingAmbiguities, advisoryAmbiguities, blockingCategories } =
-    splitAmbiguities(intent);
+  const {
+    blockingAmbiguities,
+    advisoryAmbiguities,
+    deferredAmbiguities,
+    blockingCategories,
+    advisoryCategories,
+  } = splitAmbiguities(intent);
   if (blockingAmbiguities.length > 0) {
     blockingIssues.push(
       `Intent 모호점 확인이 필요합니다: ${blockingAmbiguities.join(' | ')}`
     );
   }
   if (advisoryAmbiguities.length > 0) {
+    const categories = [...new Set(advisoryCategories)];
+    const categoryLabel =
+      categories.length > 0 ? categories.join(', ') : 'advisory';
     pushWarning(
       context,
-      `Intent 권고 모호점(도구/연동 메타)은 구현 블로킹에서 제외되었습니다: ${advisoryAmbiguities.join(' | ')}`
+      `Intent 권고 모호점(${categoryLabel}): ${advisoryAmbiguities.join(' | ')}`
+    );
+  }
+  if (deferredAmbiguities.length > 0) {
+    pushWarning(
+      context,
+      `후속 Figma 단계에서 확인할 모호점으로 이관되었습니다: ${deferredAmbiguities.join(' | ')}`
     );
   }
 
@@ -163,7 +222,9 @@ export function stepGateIntent(context) {
     ambiguities: intent.ambiguities,
     blockingAmbiguities,
     advisoryAmbiguities,
+    deferredAmbiguities,
     blockingCategories,
+    advisoryCategories,
     requiresBehaviorConfirmation,
     missingBehaviorSpec,
   };

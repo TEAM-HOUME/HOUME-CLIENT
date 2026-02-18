@@ -180,6 +180,8 @@ function buildPrompt(context) {
     '- Use role enum values exactly.',
     '- confidence must be between 0 and 1.',
     '- Put unresolved aspects in ambiguities.',
+    '- If intent classification is already possible, do not raise Figma-dependent visual details as blocking ambiguities (e.g., px spacing/position, overlay intensity, exact asset file mapping/path/format).',
+    '- Defer Figma-dependent visual confirmation to later Figma stages.',
     '- summary and ambiguities must be written in Korean only.',
     'Return JSON only matching the schema.',
   ].join('\n');
