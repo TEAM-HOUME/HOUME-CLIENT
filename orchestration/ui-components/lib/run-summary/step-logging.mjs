@@ -56,12 +56,15 @@ export function logStepDetails(name, output, traceRecords) {
         printMultilineValue('코드베이스 기본정책', output.codebaseDefaultNote);
       }
     }
-    if (Array.isArray(output.ambiguities) && output.ambiguities.length > 0) {
-      output.ambiguities.forEach((ambiguity, index) => {
-        console.log(`- 모호점 ${index + 1}: ${ambiguity}`);
-      });
-    } else {
+    const ambiguityCount = Array.isArray(output.ambiguities)
+      ? output.ambiguities.length
+      : 0;
+    if (ambiguityCount === 0) {
       console.log('- 모호점: 없음');
+    } else {
+      console.log(
+        `- 모호점: ${ambiguityCount}개 (상세는 gate-intent에서 확인)`
+      );
     }
   }
 

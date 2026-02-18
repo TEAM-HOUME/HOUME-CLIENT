@@ -47,9 +47,13 @@ export async function promptRetryDecision(
     console.log(`- 사유: ${parsedError.summary}`);
   }
   if (parsedError.details.length > 0) {
-    parsedError.details.forEach((detail, index) => {
-      console.log(`  - 상세 ${index + 1}: ${detail}`);
-    });
+    if (stage === 'intent') {
+      console.log('  - 상세: 직전 [gate-intent] 블록 참고');
+    } else {
+      parsedError.details.forEach((detail, index) => {
+        console.log(`  - 상세 ${index + 1}: ${detail}`);
+      });
+    }
   }
   if (stage === 'intent' && intentGuidance) {
     console.log('[ui-components] [intent] 코드베이스 참고 정보');
