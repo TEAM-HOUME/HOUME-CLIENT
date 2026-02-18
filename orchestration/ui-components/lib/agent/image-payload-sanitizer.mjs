@@ -6,6 +6,11 @@ function normalizeLength(value) {
   return Math.trunc(numeric);
 }
 
+const LARGE_PAYLOAD_LINE_LENGTH = 2048;
+const DATA_URI_PATTERN = /data:image\/[a-z0-9.+-]+;base64,/i;
+const TRUNCATED_PAYLOAD_PATTERN = /tokens truncated/i;
+const BASE64_LINE_PATTERN = /^[A-Za-z0-9+/=\s]+$/;
+
 export function buildImagePayloadRedaction({ length = 0, mimeType = '' } = {}) {
   const normalizedLength = normalizeLength(length);
   const normalizedMimeType = String(mimeType || '').trim();
@@ -21,6 +26,50 @@ export function redactImagePayloadText(value) {
     return '';
   }
   return buildImagePayloadRedaction({ length: text.length });
+}
+
+function hasLargeBase64LikeLine(text) {
+  const lines = String(text || '').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.length < LARGE_PAYLOAD_LINE_LENGTH) {
+      continue;
+    }
+    if (!BASE64_LINE_PATTERN.test(trimmed)) {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+function detectCommandPayloadReason(text) {
+  const normalized = String(text || '');
+  if (!normalized) {
+    return '';
+  }
+  if (TRUNCATED_PAYLOAD_PATTERN.test(normalized)) {
+    return 'truncated_payload';
+  }
+  if (DATA_URI_PATTERN.test(normalized)) {
+    return 'inline_data_uri';
+  }
+  if (hasLargeBase64LikeLine(normalized)) {
+    return 'base64_like_line';
+  }
+  return '';
+}
+
+function sanitizeCommandExecutionOutput(value) {
+  const text = String(value || '');
+  if (!text) {
+    return text;
+  }
+  const reason = detectCommandPayloadReason(text);
+  if (!reason) {
+    return text;
+  }
+  return `[command output omitted reason=${reason} length=${text.length}]`;
 }
 
 export function sanitizeImagePayloadValue(value) {
@@ -41,6 +90,14 @@ export function sanitizeImagePayloadValue(value) {
       length: value.data.length,
       mimeType: value.mimeType,
     });
+  }
+  if (
+    value.type === 'command_execution' &&
+    typeof value.aggregated_output === 'string'
+  ) {
+    sanitized.aggregated_output = sanitizeCommandExecutionOutput(
+      value.aggregated_output
+    );
   }
 
   return sanitized;
