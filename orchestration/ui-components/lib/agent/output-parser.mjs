@@ -133,6 +133,7 @@ function parseAgentOutput(text) {
       parsed: null,
       usage: null,
       envelope: null,
+      mcpToolCalls: [],
     };
   }
 
@@ -162,6 +163,7 @@ function parseAgentOutput(text) {
     parsed,
     usage,
     envelope,
+    mcpToolCalls: [],
   };
 }
 
@@ -182,6 +184,105 @@ function parseJsonLinesEvents(text) {
   }
 
   return events;
+}
+
+function extractMcpToolOutput(item) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  const result = item.result;
+  if (!result || typeof result !== 'object') {
+    return '';
+  }
+
+  const content = Array.isArray(result.content) ? result.content : [];
+  const chunks = [];
+
+  for (const entry of content) {
+    if (entry?.type === 'text' && typeof entry.text === 'string') {
+      chunks.push(entry.text);
+      continue;
+    }
+
+    if (entry?.type === 'image') {
+      const length = entry?.data ? String(entry.data).length : 0;
+      const mimeType = entry?.mimeType || 'unknown';
+      chunks.push(
+        `[image payload omitted mimeType=${mimeType} length=${length}]`
+      );
+    }
+  }
+
+  if (chunks.length > 0) {
+    return chunks.join('\n');
+  }
+
+  return JSON.stringify(result, null, 2);
+}
+
+function normalizeMcpCallStatus(item) {
+  const rawStatus = String(item?.status ?? '')
+    .trim()
+    .toLowerCase();
+
+  if (rawStatus === 'in_progress') {
+    return 'in_progress';
+  }
+
+  if (rawStatus === 'completed') {
+    if (item?.error || item?.result?.isError === true) {
+      return 'failed';
+    }
+    return 'ok';
+  }
+
+  if (rawStatus === 'failed') {
+    return 'failed';
+  }
+
+  if (rawStatus === 'cancelled') {
+    return 'unavailable';
+  }
+
+  return rawStatus || 'failed';
+}
+
+function extractMcpToolCallsFromEvents(events) {
+  const calls = [];
+
+  for (const event of events) {
+    const item = event?.item;
+    if (!item || item.type !== 'mcp_tool_call') {
+      continue;
+    }
+
+    if (event?.type !== 'item.completed') {
+      continue;
+    }
+
+    const normalizedStatus = normalizeMcpCallStatus(item);
+    if (normalizedStatus === 'in_progress') {
+      continue;
+    }
+
+    calls.push({
+      server: String(item.server || '').trim(),
+      tool: String(item.tool || '').trim(),
+      status: normalizedStatus,
+      rawStatus: String(item.status || '')
+        .trim()
+        .toLowerCase(),
+      nodeId:
+        item?.arguments && typeof item.arguments === 'object'
+          ? String(item.arguments.nodeId || '').trim()
+          : '',
+      error: String(item.error || '').trim(),
+      output: extractMcpToolOutput(item),
+    });
+  }
+
+  return calls;
 }
 
 function extractAgentMessageText(item) {
@@ -228,6 +329,8 @@ export function parseCodexJsonOutput(text) {
   let parsed = null;
   let envelope = events[events.length - 1] ?? null;
 
+  const mcpToolCalls = extractMcpToolCallsFromEvents(events);
+
   for (const event of events) {
     const eventUsage = extractUsageFromValue(event);
     if (eventUsage) {
@@ -267,6 +370,8 @@ export function parseCodexJsonOutput(text) {
       parsed: fallback.parsed,
       usage: usage ?? fallback.usage,
       envelope: fallback.envelope ?? envelope,
+      mcpToolCalls:
+        mcpToolCalls.length > 0 ? mcpToolCalls : fallback.mcpToolCalls || [],
     };
   }
 
@@ -274,6 +379,7 @@ export function parseCodexJsonOutput(text) {
     parsed,
     usage,
     envelope,
+    mcpToolCalls,
   };
 }
 

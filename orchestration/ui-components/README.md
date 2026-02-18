@@ -25,16 +25,16 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 
 ## Pipeline Stages
 
-- `preflight`: verify required CLI availability, codex runtime, and direct Figma MCP probe (`initialize` + `tools/list` + required tools).
+- `preflight`: verify required CLI availability and codex runtime.
 - `extract-intent`: resolve structured intent from brief/hints + docs conventions + retry context.
 - `gate-intent`: validate confidence/fields and split ambiguities into `blocking` vs `advisory`.
 - `extract-figma-scope`: parse URL and optionally walk parent scope.
 - `gate-figma-scope`: enforce `scopeVerdict` (`sufficient|too_broad|too_narrow|unknown`) with mode (`warn|error`).
-- `extract-figma-mcp-tool-logs`: call Figma MCP directly and store raw request/response logs.
-- `gate-figma-mcp-tool-logs`: enforce required direct tool-call quality (`off|warn|error`).
-- `extract-design-tokens`: normalize tokens from logged MCP evidence (+ agent assistance).
+- `extract-figma-mcp-tool-logs`: Codex가 Figma MCP를 호출해 필수 도구 증거를 수집합니다.
+- `gate-figma-mcp-tool-logs`: 필수 도구 호출 품질(`off|warn|error`)을 검증합니다.
+- `extract-design-tokens`: Codex 기반으로 토큰을 정규화합니다(증거 부족 시 MCP 추가 호출 허용).
 - `gate-design-tokens`: enforce token quality mode (`off|warn|error`).
-- `extract-figma-asset-scope`: probe child node contexts from selected scope to recover icon/image/vector hints.
+- `extract-figma-asset-scope`: Codex가 child node MCP 탐색을 수행해 asset context를 확장합니다.
 - `gate-figma-asset-coverage`: compare screenshot evidence vs extracted context and block on likely graphic-asset miss.
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
 - `run-agent-implementation`: implement code changes with system prompt + task context + docs conventions.
@@ -53,16 +53,16 @@ Default fixed policy:
 
 ## Context Injection Matrix
 
-| Stage                       | Prompt Source                                 | Injected Context                                                                                                                            | Output Artifact                                                     |
-| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `preflight`                 | None (local check)                            | required commands, codex runtime, `figma.mcp_endpoint`, MCP `initialize/tools/list` probe                                                   | runtime summary only                                                |
-| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `docs/reference/*` conventions                                                              | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
-| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                          | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
-| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify`        | code changes + `agent-trace/*-implement.*`                          |
-| `extract-design-tokens`     | Inline prompt in step code                    | direct MCP log artifact path + direct tool records (`figmaMcpDirectToolRecords`)                                                            | `artifacts/*-design-tokens.json`                                    |
-| `extract-figma-asset-scope` | Local direct MCP probe                        | selected node `get_design_context` output + child node-id inference + direct MCP probe (`get_design_context`) + scenario asset probe config | `artifacts/*-figma-asset-scope.json`                                |
-| `gate-figma-asset-coverage` | Inline prompt in step code                    | direct MCP logs + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes                            | `artifacts/*-figma-asset-coverage.json`                             |
-| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths                                                                         | `reports/<runId>.json`, `reports/index.jsonl`                       |
+| Stage                       | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
+| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `preflight`                 | None (local check)                            | required commands, codex runtime                                                                                                     | runtime summary only                                                |
+| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `docs/reference/*` conventions                                                       | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
+| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
+| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
+| `extract-design-tokens`     | Inline prompt in step code                    | MCP evidence artifact + tool records + docs conventions                                                                              | `artifacts/*-design-tokens.json`                                    |
+| `extract-figma-asset-scope` | Inline prompt in step code                    | selected node evidence + child node-id inference + Codex MCP probe + scenario asset probe config                                     | `artifacts/*-figma-asset-scope.json`                                |
+| `gate-figma-asset-coverage` | Inline prompt in step code                    | MCP evidence artifact + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes               | `artifacts/*-figma-asset-coverage.json`                             |
+| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths                                                                  | `reports/<runId>.json`, `reports/index.jsonl`                       |
 
 ## Orchestration Diagrams
 
@@ -70,16 +70,16 @@ Default fixed policy:
 
 | Step                          | Type                 | Primary Runtime                                    |
 | ----------------------------- | -------------------- | -------------------------------------------------- |
-| `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version + direct MCP probe |
+| `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version                    |
 | `extract-intent`              | Extraction           | Agent CLI                                          |
 | `gate-intent`                 | Gate                 | Local code                                         |
 | `extract-figma-scope`         | Extraction           | Agent CLI + Figma MCP (conditional)                |
 | `gate-figma-scope`            | Gate                 | Local code                                         |
-| `extract-figma-mcp-tool-logs` | Extraction           | Local direct MCP HTTP calls                        |
+| `extract-figma-mcp-tool-logs` | Extraction           | Agent CLI + Figma MCP                              |
 | `gate-figma-mcp-tool-logs`    | Gate                 | Local code                                         |
-| `extract-design-tokens`       | Extraction           | Agent CLI (normalization) + logged MCP evidence    |
+| `extract-design-tokens`       | Extraction           | Agent CLI + Figma MCP (+ evidence-aware normalize) |
 | `gate-design-tokens`          | Gate                 | Local code                                         |
-| `extract-figma-asset-scope`   | Extraction           | Local direct MCP HTTP calls                        |
+| `extract-figma-asset-scope`   | Extraction           | Agent CLI + Figma MCP                              |
 | `gate-figma-asset-coverage`   | Gate                 | Agent CLI + Local gate policy                      |
 | `resolve-component-plan`      | Planning + Gate      | Agent CLI + local behavior guard                   |
 | `run-agent-implementation`    | Implementation       | Agent CLI                                          |
@@ -293,8 +293,7 @@ figma:
 - `gates.intent_min_confidence`: minimum intent confidence (`0.0~1.0`, default `0.75`)
 - `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
 - `gates.asset_coverage_mode`: screenshot/context asset coverage strictness (`off|warn|error`, default `error`)
-- `figma.mcp_endpoint`: direct MCP endpoint for preflight/logging/capture (default: `http://127.0.0.1:3845/mcp`)
-- `figma.mcp_auth_token_env`: env var name for remote MCP bearer token (example: `FIGMA_MCP_ACCESS_TOKEN`)
+- `figma.mcp_endpoint`: local desktop MCP endpoint (fixed default: `http://127.0.0.1:3845/mcp`)
 - `figma.auto_parent`: if `true`, scope extraction agent can walk parent chain (`default: true`)
 - `figma.parent_hops_max`: maximum parent hops during auto scope selection (`default: 3`)
 - `figma.scope_node_id`: explicit scope override to skip agent scope walk
@@ -325,9 +324,10 @@ figma:
 - Codex invocation pins model/runtime overrides: `-m gpt-5.3-codex` and `-c model_reasoning_effort="medium"`.
 - Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
 - Per-agent prompt/stdout/stderr/parsed JSON are saved in `artifacts/<runId>/agent-trace/`.
-- Direct Figma MCP request/response logs are saved under `artifacts/<runId>/figma-mcp-raw/`.
-- For remote MCP endpoint, set a bearer token env (`FIGMA_MCP_ACCESS_TOKEN` by default, or custom via `figma.mcp_auth_token_env`).
+- Codex MCP traces are saved in `artifacts/<runId>/agent-trace/*stdout.txt` (`mcp_tool_call` events).
+- MCP guardrails are fixed in code: per-stage max calls/failures + per-run total max calls.
 - Run report includes `figmaMcpToolUsage` and `agentTokenUsage` summaries.
+- Run report includes `agentMcpToolUsage` (purpose별 MCP 호출 상세).
 - `reports/index.jsonl` is auto-generated every run for quick team summary.
 - Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
 - Run report JSON includes `feedbackHistory` (retry question prompts + raw user answers).

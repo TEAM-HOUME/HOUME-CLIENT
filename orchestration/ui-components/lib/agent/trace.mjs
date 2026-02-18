@@ -107,3 +107,119 @@ export function recordAgentTokenUsage(context, purpose, usage) {
     totalTokens: usage.totalTokens ?? null,
   });
 }
+
+function ensureAgentMcpToolUsage(context) {
+  if (context.agentMcpToolUsage) {
+    return context.agentMcpToolUsage;
+  }
+  context.agentMcpToolUsage = {
+    records: [],
+    totalCalls: 0,
+    successCalls: 0,
+    failedCalls: 0,
+    unavailableCalls: 0,
+  };
+  return context.agentMcpToolUsage;
+}
+
+function normalizeMcpOutcome(status) {
+  const normalized = String(status ?? '')
+    .trim()
+    .toLowerCase();
+  if (
+    normalized === 'ok' ||
+    normalized === 'partial' ||
+    normalized === 'no_mapping'
+  ) {
+    return 'success';
+  }
+  if (normalized === 'unavailable') {
+    return 'unavailable';
+  }
+  return 'failed';
+}
+
+export function recordAgentMcpToolUsage(context, purpose, calls) {
+  const summary = ensureAgentMcpToolUsage(context);
+  const normalizedCalls = Array.isArray(calls)
+    ? calls
+        .map((call) => ({
+          purpose,
+          server: String(call?.server || '').trim(),
+          tool: String(call?.tool || '').trim(),
+          status: String(call?.status || '')
+            .trim()
+            .toLowerCase(),
+          rawStatus: String(call?.rawStatus || '')
+            .trim()
+            .toLowerCase(),
+          nodeId: String(call?.nodeId || '').trim(),
+          error: String(call?.error || '').trim(),
+          output: String(call?.output || ''),
+        }))
+        .filter((call) => Boolean(call.tool))
+    : [];
+
+  const record = {
+    purpose,
+    totalCalls: normalizedCalls.length,
+    successCalls: 0,
+    failedCalls: 0,
+    unavailableCalls: 0,
+    callsByTool: {},
+    calls: normalizedCalls,
+  };
+
+  for (const call of normalizedCalls) {
+    if (!record.callsByTool[call.tool]) {
+      record.callsByTool[call.tool] = {
+        calls: 0,
+        successCalls: 0,
+        failedCalls: 0,
+        unavailableCalls: 0,
+        statuses: {},
+      };
+    }
+
+    const toolSummary = record.callsByTool[call.tool];
+    toolSummary.calls += 1;
+    toolSummary.statuses[call.status] =
+      (toolSummary.statuses[call.status] ?? 0) + 1;
+
+    const outcome = normalizeMcpOutcome(call.status);
+    if (outcome === 'success') {
+      record.successCalls += 1;
+      toolSummary.successCalls += 1;
+      continue;
+    }
+    if (outcome === 'unavailable') {
+      record.unavailableCalls += 1;
+      toolSummary.unavailableCalls += 1;
+      continue;
+    }
+    record.failedCalls += 1;
+    toolSummary.failedCalls += 1;
+  }
+
+  summary.totalCalls += record.totalCalls;
+  summary.successCalls += record.successCalls;
+  summary.failedCalls += record.failedCalls;
+  summary.unavailableCalls += record.unavailableCalls;
+  summary.records.push(record);
+}
+
+export function getLatestAgentMcpUsageRecord(context, purpose) {
+  const records = context?.agentMcpToolUsage?.records;
+  if (!Array.isArray(records) || records.length === 0) {
+    return null;
+  }
+
+  for (let i = records.length - 1; i >= 0; i -= 1) {
+    const record = records[i];
+    if (!purpose || record.purpose === purpose) {
+      return record;
+    }
+  }
+
+  return null;
+}

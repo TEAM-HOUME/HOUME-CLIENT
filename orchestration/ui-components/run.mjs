@@ -98,6 +98,7 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     verificationResults: [],
     figmaMcpToolUsage: null,
     agentTokenUsage: null,
+    agentMcpToolUsage: null,
     feedbackLoop: {
       intent: [],
       asset: [],

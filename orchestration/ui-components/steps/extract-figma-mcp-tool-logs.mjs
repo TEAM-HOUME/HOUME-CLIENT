@@ -1,24 +1,121 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { findCachedArtifact } from '../lib/artifact-cache.mjs';
 import {
-  callFigmaMcpTool,
-  classifyJsonRpcCall,
-  initializeFigmaMcpSession,
-  listFigmaMcpTools,
-} from '../lib/figma-mcp-direct.mjs';
+  getLatestAgentMcpUsageRecord,
+  invokeAgentWithSchema,
+} from '../lib/agent.mjs';
 import {
-  CACHE_SCHEMA_VERSION,
-  REQUIRED_FIGMA_TOOLS,
-} from './figma-mcp-tool-logs/constants.mjs';
+  enforceMcpGuardrails,
+  FIGMA_REQUIRED_TOOLS,
+} from '../lib/mcp-guardrails.mjs';
+import { CACHE_SCHEMA_VERSION } from './figma-mcp-tool-logs/constants.mjs';
 import {
   buildCacheKey,
   buildStepOutput,
   summarizeToolCalls,
-  toToolRecord,
-  writeCallArtifacts,
 } from './figma-mcp-tool-logs/helpers.mjs';
+
+function normalizeCallStatus(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  if (
+    normalized === 'ok' ||
+    normalized === 'failed' ||
+    normalized === 'unavailable'
+  ) {
+    return normalized;
+  }
+  if (normalized === 'partial' || normalized === 'no_mapping') {
+    return 'ok';
+  }
+  return 'failed';
+}
+
+function buildPrompt(context, nodeId) {
+  return [
+    'You are collecting Figma MCP evidence for one implementation node.',
+    `Figma URL: ${context.scenario.figma.url}`,
+    `Node ID: ${nodeId}`,
+    '',
+    'Required tool calls (minimum once each):',
+    ...FIGMA_REQUIRED_TOOLS.map((tool) => `- ${tool}`),
+    '',
+    'Rules:',
+    '- Use Figma MCP tools directly in this step.',
+    '- Keep the tool-call count minimal and avoid unrelated nodes.',
+    '- Do not edit files.',
+    '- Return JSON only matching schema.',
+    '- notes must be written in Korean.',
+  ].join('\n');
+}
+
+function buildSchema() {
+  return {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        enum: ['captured'],
+      },
+      notes: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+    },
+    required: ['status', 'notes'],
+    additionalProperties: false,
+  };
+}
+
+function selectLatestCallByTool(calls, toolName) {
+  for (let i = calls.length - 1; i >= 0; i -= 1) {
+    if (calls[i]?.tool === toolName) {
+      return calls[i];
+    }
+  }
+  return null;
+}
+
+function toLogCall(call) {
+  return {
+    tool: call.tool,
+    status: normalizeCallStatus(call.status),
+    error: String(call.error || ''),
+    durationMs: 0,
+    httpStatus: null,
+    nodeId: String(call.nodeId || ''),
+  };
+}
+
+function toToolRecord(toolName, call) {
+  if (!call) {
+    return {
+      tool: toolName,
+      status: 'unavailable',
+      output: '',
+      error: 'Required tool call missing in agent trace',
+    };
+  }
+
+  return {
+    tool: toolName,
+    status: normalizeCallStatus(call.status),
+    output: String(call.output || ''),
+    error: String(call.error || ''),
+  };
+}
+
+function writeSummary(context, summary) {
+  const summaryPath = resolve(
+    context.artifactsDir,
+    `${context.runId}-figma-mcp-tool-logs.json`
+  );
+  writeFileSync(summaryPath, JSON.stringify(summary, null, 2), 'utf8');
+  return summaryPath;
+}
 
 function resolveCachedSummary(context, cacheKey, nodeId, endpoint) {
   return findCachedArtifact({
@@ -32,96 +129,6 @@ function resolveCachedSummary(context, cacheKey, nodeId, endpoint) {
       typeof data.directToolRecords === 'object' &&
       Array.isArray(data.calls),
   });
-}
-
-function writeSummary(context, summary) {
-  const summaryPath = resolve(
-    context.artifactsDir,
-    `${context.runId}-figma-mcp-tool-logs.json`
-  );
-  writeFileSync(summaryPath, JSON.stringify(summary, null, 2), 'utf8');
-  return summaryPath;
-}
-
-function createUnavailableCall(toolName, errorMessage) {
-  return {
-    tool: toolName,
-    status: 'unavailable',
-    error: errorMessage,
-  };
-}
-
-function collectRequiredToolCalls({
-  context,
-  endpoint,
-  timeoutMs,
-  nodeId,
-  session,
-  baseDir,
-  assetWriteDir,
-  startOrder,
-}) {
-  let order = startOrder;
-  const callArtifacts = [];
-  const calls = [];
-  const directToolRecords = {};
-
-  for (const toolName of REQUIRED_FIGMA_TOOLS) {
-    if (!session.ok) {
-      const errorMessage =
-        session.initializeState.error || 'MCP initialize failed';
-      calls.push(createUnavailableCall(toolName, errorMessage));
-      directToolRecords[toolName] = {
-        tool: toolName,
-        status: 'unavailable',
-        output: '',
-        error: errorMessage,
-      };
-      continue;
-    }
-
-    const callRecord = callFigmaMcpTool({
-      endpoint,
-      sessionId: session.sessionId,
-      timeoutMs,
-      requestId: order + 100,
-      toolName,
-      toolArguments:
-        toolName === 'get_design_context'
-          ? {
-              nodeId,
-              clientLanguages: 'typescript',
-              clientFrameworks: 'react',
-              dirForAssetWrites: assetWriteDir,
-            }
-          : {
-              nodeId,
-              clientLanguages: 'typescript',
-              clientFrameworks: 'react',
-            },
-    });
-    const state = classifyJsonRpcCall(callRecord);
-    callArtifacts.push(
-      writeCallArtifacts(context, baseDir, order, toolName, callRecord, state)
-    );
-    order += 1;
-
-    calls.push({
-      tool: toolName,
-      status: state.status,
-      error: state.error,
-      durationMs: callRecord.response.durationMs,
-      httpStatus: callRecord.response.statusCode,
-    });
-    directToolRecords[toolName] = toToolRecord(toolName, callRecord, state);
-  }
-
-  return {
-    order,
-    callArtifacts,
-    calls,
-    directToolRecords,
-  };
 }
 
 export function stepExtractFigmaMcpToolLogs(context) {
@@ -158,97 +165,36 @@ export function stepExtractFigmaMcpToolLogs(context) {
     );
   }
 
-  const baseDir = resolve(context.artifactsDir, context.runId, 'figma-mcp-raw');
-  const assetWriteDir = resolve(baseDir, 'tool-assets');
-  mkdirSync(baseDir, { recursive: true });
-  mkdirSync(assetWriteDir, { recursive: true });
-
-  let order = 1;
-  const callArtifacts = [];
-
-  const session = initializeFigmaMcpSession({
-    endpoint,
-    timeoutMs,
-  });
-  callArtifacts.push(
-    writeCallArtifacts(
-      context,
-      baseDir,
-      order,
-      'initialize',
-      session.initializeCall,
-      session.initializeState
-    )
-  );
-  order += 1;
-
-  if (session.initializedNotification) {
-    const notificationState = classifyJsonRpcCall(
-      session.initializedNotification,
-      {
-        allowMissingPayload: true,
-      }
-    );
-    callArtifacts.push(
-      writeCallArtifacts(
-        context,
-        baseDir,
-        order,
-        'notifications-initialized',
-        session.initializedNotification,
-        notificationState
-      )
-    );
-    order += 1;
-  }
-
-  let toolsList = null;
-  let availableTools = [];
-  if (session.ok) {
-    const toolsListCall = listFigmaMcpTools({
-      endpoint,
-      sessionId: session.sessionId,
-      timeoutMs,
-      requestId: order + 100,
-    });
-    const toolsListState = classifyJsonRpcCall(toolsListCall);
-    callArtifacts.push(
-      writeCallArtifacts(
-        context,
-        baseDir,
-        order,
-        'tools-list',
-        toolsListCall,
-        toolsListState
-      )
-    );
-    order += 1;
-
-    toolsList = {
-      status: toolsListState.status,
-      error: toolsListState.error,
-    };
-
-    availableTools = Array.isArray(
-      toolsListCall.response.parsedJsonRpc?.result?.tools
-    )
-      ? toolsListCall.response.parsedJsonRpc.result.tools.map(
-          (tool) => tool.name
-        )
-      : [];
-  }
-
-  const toolCallBundle = collectRequiredToolCalls({
+  invokeAgentWithSchema(
     context,
-    endpoint,
-    timeoutMs,
-    nodeId,
-    session,
-    baseDir,
-    assetWriteDir,
-    startOrder: order,
-  });
-  callArtifacts.push(...toolCallBundle.callArtifacts);
+    'figma-mcp-tool-logs',
+    buildPrompt(context, nodeId),
+    buildSchema(),
+    timeoutMs
+  );
+  enforceMcpGuardrails(context, 'figma-mcp-tool-logs');
+
+  const usageRecord = getLatestAgentMcpUsageRecord(
+    context,
+    'figma-mcp-tool-logs'
+  );
+  const figmaCalls = Array.isArray(usageRecord?.calls)
+    ? usageRecord.calls.filter((call) => {
+        const server = String(call.server || '')
+          .trim()
+          .toLowerCase();
+        return !server || server === 'figma';
+      })
+    : [];
+
+  const calls = figmaCalls.map(toLogCall);
+  const directToolRecords = Object.fromEntries(
+    FIGMA_REQUIRED_TOOLS.map((toolName) => [
+      toolName,
+      toToolRecord(toolName, selectLatestCallByTool(figmaCalls, toolName)),
+    ])
+  );
+  const totals = summarizeToolCalls(calls);
 
   const summary = {
     cache: {
@@ -257,29 +203,27 @@ export function stepExtractFigmaMcpToolLogs(context) {
       createdAt: new Date().toISOString(),
     },
     endpoint,
-    sessionId: session.sessionId,
+    sessionId: null,
     mode: context.scenario.gates.figmaMcpLogsMode,
     selectedNodeId: nodeId,
-    requiredTools: REQUIRED_FIGMA_TOOLS,
-    availableTools,
-    toolsList,
-    calls: toolCallBundle.calls,
-    callArtifacts,
-    totals: summarizeToolCalls(toolCallBundle.calls),
-    directToolRecords: toolCallBundle.directToolRecords,
+    requiredTools: FIGMA_REQUIRED_TOOLS,
+    availableTools: FIGMA_REQUIRED_TOOLS.filter(
+      (tool) => selectLatestCallByTool(figmaCalls, tool) !== null
+    ),
+    toolsList: {
+      status: 'ok',
+      error: '',
+    },
+    calls,
+    callArtifacts: [],
+    totals,
+    directToolRecords,
   };
 
   const summaryPath = writeSummary(context, summary);
   context.figmaMcpToolLogs = summary;
   context.figmaMcpToolLogsArtifactPath = summaryPath;
-  context.figmaMcpDirectToolRecords = toolCallBundle.directToolRecords;
+  context.figmaMcpDirectToolRecords = directToolRecords;
 
-  return buildStepOutput(
-    context,
-    nodeId,
-    toolCallBundle.calls,
-    summary.totals,
-    'fresh',
-    summaryPath
-  );
+  return buildStepOutput(context, nodeId, calls, totals, 'fresh', summaryPath);
 }

@@ -1,19 +1,17 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { createCacheKey, findCachedArtifact } from '../lib/artifact-cache.mjs';
 import {
-  callFigmaMcpTool,
-  classifyJsonRpcCall,
-  extractToolTextOutput,
-  initializeFigmaMcpSession,
-} from '../lib/figma-mcp-direct.mjs';
+  getLatestAgentMcpUsageRecord,
+  invokeAgentWithSchema,
+} from '../lib/agent.mjs';
+import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
 import {
   analyzeGraphicSignals,
   buildCacheKey,
   createCapture,
   createNoCandidatesCapture,
-  createUnavailableCalls,
   deriveProbeStatus,
   extractChildNodeIdsFromText,
   summarizeCalls,
@@ -43,6 +41,73 @@ function buildEffectiveChildNodeIds(
     childNodeIds.push(selectedNodeId);
   }
   return childNodeIds;
+}
+
+function buildPrompt(context, selectedNodeId, childNodeIds) {
+  return [
+    'You are probing Figma child-node asset context using MCP.',
+    `Figma URL: ${context.scenario.figma.url}`,
+    `Selected node-id: ${selectedNodeId}`,
+    '',
+    'Task:',
+    '- Call get_design_context for the selected node first.',
+    '- Then call get_design_context for candidate child nodes listed below (in order).',
+    '- Stop when candidates are exhausted.',
+    '',
+    'Candidate child node-ids:',
+    ...(childNodeIds.length > 0
+      ? childNodeIds.map((nodeId) => `- ${nodeId}`)
+      : ['- (none)']),
+    '',
+    'Rules:',
+    '- Use only get_design_context in this step.',
+    '- Keep calls focused on listed node-ids.',
+    '- Do not edit files.',
+    '- Return JSON only matching schema.',
+    '- notes must be written in Korean.',
+  ].join('\n');
+}
+
+function buildSchema() {
+  return {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        enum: ['probed'],
+      },
+      notes: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+    },
+    required: ['status', 'notes'],
+    additionalProperties: false,
+  };
+}
+
+function normalizeNodeId(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .replace(/-/g, ':');
+  return /^\d+:\d+$/.test(normalized) ? normalized : '';
+}
+
+function normalizeCallStatus(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  if (
+    normalized === 'ok' ||
+    normalized === 'failed' ||
+    normalized === 'unavailable'
+  ) {
+    return normalized;
+  }
+  if (normalized === 'partial' || normalized === 'no_mapping') {
+    return 'ok';
+  }
+  return 'failed';
 }
 
 function buildStepOutput(context, capture, artifactPath, source, candidates) {
@@ -137,13 +202,6 @@ export function stepExtractFigmaAssetScope(context) {
     );
   }
 
-  const baseDir = resolve(
-    context.artifactsDir,
-    context.runId,
-    'figma-asset-scope'
-  );
-  mkdirSync(baseDir, { recursive: true });
-
   let capture;
   if (childNodeIds.length === 0) {
     capture = createNoCandidatesCapture({
@@ -158,48 +216,50 @@ export function stepExtractFigmaAssetScope(context) {
       endpoint,
     });
   } else {
-    const session = initializeFigmaMcpSession({
-      endpoint,
-      timeoutMs,
+    invokeAgentWithSchema(
+      context,
+      'figma-asset-scope',
+      buildPrompt(context, selectedNodeId, childNodeIds),
+      buildSchema(),
+      timeoutMs
+    );
+    enforceMcpGuardrails(context, 'figma-asset-scope', {
+      maxCalls: Math.max(8, childNodeIds.length + 8),
     });
 
-    let calls = [];
-    if (!session.ok) {
-      const initializeError =
-        session.initializeState?.error ||
-        'MCP initialize failed during asset probe';
-      calls = createUnavailableCalls(childNodeIds, initializeError);
-    } else {
-      calls = childNodeIds.map((nodeId, index) => {
-        const requestId = 500 + index;
-        const callRecord = callFigmaMcpTool({
-          endpoint,
-          sessionId: session.sessionId,
-          timeoutMs,
-          requestId,
-          toolName: 'get_design_context',
-          toolArguments: {
-            nodeId,
-            clientLanguages: 'typescript',
-            clientFrameworks: 'react',
-            dirForAssetWrites: baseDir,
-          },
-        });
-        const state = classifyJsonRpcCall(callRecord);
-        const output = extractToolTextOutput(callRecord);
-        return {
-          nodeId,
-          tool: 'get_design_context',
-          status: state.status,
-          error: state.error,
-          durationMs: callRecord.response.durationMs,
-          graphicSignals: analyzeGraphicSignals(output),
-        };
-      });
-    }
+    const usageRecord = getLatestAgentMcpUsageRecord(
+      context,
+      'figma-asset-scope'
+    );
+    const calls = Array.isArray(usageRecord?.calls)
+      ? usageRecord.calls
+          .filter((call) => {
+            const server = String(call.server || '')
+              .trim()
+              .toLowerCase();
+            return (
+              (!server || server === 'figma') &&
+              call.tool === 'get_design_context'
+            );
+          })
+          .map((call) => ({
+            nodeId: normalizeNodeId(call.nodeId),
+            tool: 'get_design_context',
+            status: normalizeCallStatus(call.status),
+            error: String(call.error || ''),
+            durationMs: 0,
+            graphicSignals: analyzeGraphicSignals(call.output),
+          }))
+          .filter((call) => Boolean(call.nodeId))
+      : [];
 
+    const probedNodeIds = [...new Set(calls.map((call) => call.nodeId))];
+    const effectiveNodeIds = probedNodeIds.filter(
+      (nodeId) => nodeId !== selectedNodeId
+    );
     const totals = summarizeCalls(calls);
-    const status = deriveProbeStatus(session.ok, totals, childNodeIds.length);
+    const status = deriveProbeStatus(true, totals, probedNodeIds.length);
+
     capture = createCapture({
       cacheKey,
       context,
@@ -207,7 +267,7 @@ export function stepExtractFigmaAssetScope(context) {
       selectedGraphicSignals,
       inferredChildNodeIds,
       additionalNodeIds,
-      childNodeIds,
+      childNodeIds: effectiveNodeIds,
       calls,
       totals,
       status,

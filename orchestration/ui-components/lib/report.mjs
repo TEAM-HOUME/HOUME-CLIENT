@@ -226,6 +226,7 @@ export function writeReport(context) {
     agentTraceArtifacts: context.agentTraceArtifacts || [],
     figmaMcpToolUsage: context.figmaMcpToolUsage || null,
     agentTokenUsage: context.agentTokenUsage || null,
+    agentMcpToolUsage: context.agentMcpToolUsage || null,
     newChangedFiles: context.newChangedFiles || [],
     verificationResults: context.verificationResults || [],
     feedbackLoop: context.feedbackLoop || null,

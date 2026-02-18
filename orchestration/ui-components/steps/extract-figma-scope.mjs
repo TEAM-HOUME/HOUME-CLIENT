@@ -3,6 +3,7 @@ import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { parseFigmaUrl, validateDesignContext } from '../lib/figma.mjs';
+import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
 
 const SCOPE_VERDICT_ENUM = ['sufficient', 'too_broad', 'too_narrow', 'unknown'];
 
@@ -96,6 +97,7 @@ export function stepExtractFigmaScope(context) {
         schema,
         context.scenario.figma.timeoutMs
       );
+      enforceMcpGuardrails(context, 'figma-scope');
 
       scope.selectedNodeId = String(scopeResult.selectedNodeId)
         .trim()

@@ -67,6 +67,26 @@ function accumulateFigmaMcpToolCall(summary, toolName, status) {
 
 export function buildFigmaMcpToolUsageSummary(context) {
   const summary = createFigmaMcpToolUsageSummary();
+  const agentRecords = context?.agentMcpToolUsage?.records;
+
+  if (Array.isArray(agentRecords) && agentRecords.length > 0) {
+    for (const record of agentRecords) {
+      if (!Array.isArray(record?.calls)) {
+        continue;
+      }
+      for (const call of record.calls) {
+        const server = String(call?.server || '')
+          .trim()
+          .toLowerCase();
+        if (server && server !== 'figma') {
+          continue;
+        }
+        accumulateFigmaMcpToolCall(summary, call?.tool, call?.status);
+      }
+    }
+    return summary;
+  }
+
   const hasDirectLogCalls = Array.isArray(context.figmaMcpToolLogs?.calls);
 
   if (hasDirectLogCalls) {

@@ -1,4 +1,4 @@
-export const REQUIRED_BASE_COMMANDS = ['node', 'pnpm', 'curl'];
+export const REQUIRED_BASE_COMMANDS = ['node', 'pnpm'];
 
 export const AGENT_COMMAND_MAP = {
   codex: 'codex',

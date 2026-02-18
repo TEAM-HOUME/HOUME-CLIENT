@@ -152,7 +152,7 @@ export function logStepFailureHint(context, name, traceRecords) {
   if (name === 'gate-figma-mcp-tool-logs') {
     console.log('- 조치');
     console.log(
-      '- figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
+      '- figma MCP 도구 로그 아티팩트(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
     );
   }
   if (name === 'gate-figma-asset-coverage') {

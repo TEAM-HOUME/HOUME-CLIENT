@@ -2,7 +2,6 @@ import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { createCacheKey } from '../../lib/artifact-cache.mjs';
-import { extractToolTextOutput } from '../../lib/figma-mcp-direct.mjs';
 import { CACHE_SCHEMA_VERSION } from './constants.mjs';
 
 function buildDocsHash(context) {
@@ -117,15 +116,6 @@ export function summarizeToolCalls(toolCalls) {
   }
 
   return summary;
-}
-
-export function toToolRecord(toolName, callRecord, state) {
-  return {
-    tool: toolName,
-    status: state.status === 'ok' ? 'ok' : state.status,
-    output: extractToolTextOutput(callRecord),
-    error: state.error || '',
-  };
 }
 
 export function buildStepOutput(

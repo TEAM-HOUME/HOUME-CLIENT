@@ -14,9 +14,15 @@ import {
   parseAgentJsonOutput,
   parseCodexJsonOutput,
 } from './agent/output-parser.mjs';
-import { recordAgentTokenUsage, recordAgentTrace } from './agent/trace.mjs';
+import {
+  getLatestAgentMcpUsageRecord,
+  recordAgentMcpToolUsage,
+  recordAgentTokenUsage,
+  recordAgentTrace,
+} from './agent/trace.mjs';
 
 export {
+  getLatestAgentMcpUsageRecord,
   hasAlias,
   hasCommand,
   parseAgentJsonOutput,
@@ -74,6 +80,7 @@ export function invokeAgentWithSchema(
       status: parsed ? 'parsed' : 'parse_failed',
     });
     recordAgentTokenUsage(context, purpose, parsedOutput.usage);
+    recordAgentMcpToolUsage(context, purpose, parsedOutput.mcpToolCalls);
 
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       fail(

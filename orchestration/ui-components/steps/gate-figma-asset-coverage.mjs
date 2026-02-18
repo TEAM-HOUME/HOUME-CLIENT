@@ -3,6 +3,7 @@ import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
+import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
 
 const COVERAGE_STATUS_VALUES = new Set(['covered', 'missing', 'unknown']);
 
@@ -177,6 +178,7 @@ export function stepGateAssetCoverage(context) {
       schema,
       context.scenario.figma.timeoutMs
     );
+    enforceMcpGuardrails(context, 'figma-asset-coverage');
   } catch (error) {
     extractionMessage =
       error instanceof Error

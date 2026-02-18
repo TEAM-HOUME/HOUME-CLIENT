@@ -68,15 +68,16 @@ export function buildPrompt(context) {
     ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
     : null;
   return [
-    'You are normalizing design tokens from existing Figma MCP evidence.',
+    'You are normalizing design tokens for a Figma implementation scope.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
     directArtifactPath
-      ? `Use this direct MCP raw log artifact as the source of truth: ${directArtifactPath}`
-      : 'Direct MCP raw log artifact is unavailable.',
+      ? `Use this MCP evidence artifact first: ${directArtifactPath}`
+      : 'MCP evidence artifact is unavailable. Use Figma MCP tools if needed.',
     '',
     'Rules:',
-    '- Do not call MCP tools in this step.',
+    '- If evidence is missing or incomplete, call Figma MCP tools directly.',
+    '- Required minimum coverage: get_design_context, get_variable_defs, get_metadata, get_screenshot.',
     '- Keep outputs read-only and do not edit code or files.',
     '- Preserve raw.<tool> status/output/error from the provided evidence.',
     '- Normalize tokens into: colors, typography, spacing, radius, size.',

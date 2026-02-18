@@ -3,6 +3,7 @@ import { relative, resolve } from 'node:path';
 
 import { findCachedArtifact } from '../lib/artifact-cache.mjs';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
 import {
   buildCacheKey,
   buildCaptureFromAgentResult,
@@ -86,6 +87,7 @@ export function stepExtractDesignTokens(context) {
       buildSchema(),
       context.scenario.figma.timeoutMs
     );
+    enforceMcpGuardrails(context, 'design-tokens');
     capture = buildCaptureFromAgentResult(context, result, cacheKey);
   } catch (error) {
     extractionMessage =
