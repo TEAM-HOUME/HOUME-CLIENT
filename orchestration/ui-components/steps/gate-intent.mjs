@@ -8,112 +8,27 @@ const INTERACTION_COMPONENT_KINDS = new Set([
   'drawer',
 ]);
 
-function classifyAmbiguityCategory(ambiguity) {
-  const text = String(ambiguity ?? '').toLowerCase();
-  if (
-    /(trigger|event source|event hook|optimistic|api success|server-confirmed|트리거|시점)/.test(
-      text
-    )
-  ) {
-    return 'trigger';
-  }
-  if (
-    /(placement|safe-area|offset|bottom|top|keyboard|배치|하단|상단|세이프에어리어)/.test(
-      text
-    )
-  ) {
-    return 'placement';
-  }
-  if (
-    /(dismiss|auto-hide|auto dismiss|manual close|swipe|outside tap|닫힘|닫기)/.test(
-      text
-    )
-  ) {
-    return 'dismiss';
-  }
-  if (
-    /(cta|route|navigation|deep-link|target|보러가기|이동 대상|위시리스트)/.test(
-      text
-    )
-  ) {
-    return 'cta';
-  }
-  if (
-    /(toast_type|toas?t type|enum|variant|mapping|type mapping|type policy|타입 매핑|타입 정책|토스트 타입|성공 타입|navigate 타입)/.test(
-      text
-    )
-  ) {
-    return 'type';
-  }
-  if (/(concurrency|queue|stack|replace|중복|연속)/.test(text)) {
-    return 'concurrency';
-  }
-  if (
-    /(accessibility|aria|screen-reader|focus handling|keyboard interaction|접근성)/.test(
-      text
-    )
-  ) {
-    return 'accessibility';
-  }
-  return 'unknown';
-}
-
-function hasIntentOverride(context, category) {
-  const overrides =
-    context.intentOverrides &&
-    typeof context.intentOverrides === 'object' &&
-    !Array.isArray(context.intentOverrides)
-      ? context.intentOverrides
-      : {};
-
-  if (category === 'trigger') {
-    return Boolean(overrides.trigger_policy);
-  }
-  if (category === 'placement') {
-    return Boolean(overrides.placement_policy);
-  }
-  if (category === 'dismiss') {
-    return Boolean(overrides.dismiss_policy);
-  }
-  if (category === 'cta') {
-    return Boolean(overrides.cta_target);
-  }
-  if (category === 'concurrency') {
-    return Boolean(overrides.concurrency_policy);
-  }
-  if (category === 'accessibility') {
-    return Boolean(overrides.accessibility_policy);
-  }
-  if (category === 'type') {
-    return Boolean(overrides.type_mapping_policy);
-  }
-  if (category === 'unknown') {
-    return Boolean(overrides.unknown_resolution);
-  }
-  return false;
-}
-
-function splitAmbiguities(context, intent) {
+function splitAmbiguities(intent) {
   const blockingAmbiguities = [];
   const advisoryAmbiguities = [];
-  const blockingCategories = new Set();
 
   for (const ambiguity of intent.ambiguities) {
-    const category = classifyAmbiguityCategory(ambiguity);
-    const hasOverride = hasIntentOverride(context, category);
-
-    if (hasOverride) {
+    const text = String(ambiguity ?? '').toLowerCase();
+    const isToolingMetaAmbiguity =
+      /(code connect|would you like to connect code components|connect code components|mcp auth|mcp token|access token|tool availability|도구 연결|코드 커넥트)/.test(
+        text
+      );
+    if (isToolingMetaAmbiguity) {
       advisoryAmbiguities.push(ambiguity);
       continue;
     }
     blockingAmbiguities.push(ambiguity);
-    blockingCategories.add(category);
   }
 
   return {
     blockingAmbiguities,
     advisoryAmbiguities,
-    blockingCategories: [...blockingCategories],
+    blockingCategories: [],
   };
 }
 
@@ -195,7 +110,7 @@ export function stepGateIntent(context) {
   }
 
   const { blockingAmbiguities, advisoryAmbiguities, blockingCategories } =
-    splitAmbiguities(context, intent);
+    splitAmbiguities(intent);
   if (blockingAmbiguities.length > 0) {
     blockingIssues.push(
       `Intent 모호점 확인이 필요합니다: ${blockingAmbiguities.join(' | ')}`
@@ -204,7 +119,7 @@ export function stepGateIntent(context) {
   if (advisoryAmbiguities.length > 0) {
     pushWarning(
       context,
-      `Intent 권고 모호점은 프로필/오버라이드로 자동 해소되었습니다: ${advisoryAmbiguities.join(' | ')}`
+      `Intent 권고 모호점(도구/연동 메타)은 구현 블로킹에서 제외되었습니다: ${advisoryAmbiguities.join(' | ')}`
     );
   }
 

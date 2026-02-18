@@ -10,6 +10,7 @@ import { formatDuration, splitErrorDetails } from './step-utils.mjs';
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STEP_DIVIDER =
   '------------------------------------------------------------';
+const HEARTBEAT_TEMPLATE = '[{label}] 진행중... {elapsed}s 경과';
 const HEARTBEAT_STEPS = new Set([
   'extract-intent',
   'extract-figma-scope',
@@ -25,11 +26,15 @@ const HEARTBEAT_STEPS = new Set([
 function startStepHeartbeat(stepLabel) {
   const script = `
 const label = ${JSON.stringify(stepLabel)};
+const template = ${JSON.stringify(HEARTBEAT_TEMPLATE)};
 const startedAt = Date.now();
 const intervalMs = ${HEARTBEAT_INTERVAL_MS};
 const timer = setInterval(() => {
   const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
-  console.log(\`[ui-components] [\${label}] 진행중... \${elapsedSec}s 경과\`);
+  const message = template
+    .replace('{label}', label)
+    .replace('{elapsed}', String(elapsedSec));
+  console.log(message);
 }, intervalMs);
 const close = () => {
   clearInterval(timer);

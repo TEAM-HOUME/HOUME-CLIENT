@@ -1,22 +1,3 @@
-function describeBlockingCategories(categories) {
-  const map = {
-    trigger: 'trigger 정책',
-    placement: '배치 정책',
-    dismiss: '닫기 정책',
-    type: '타입 매핑 정책',
-    concurrency: '중복 표시 정책',
-    accessibility: '접근성 정책',
-    cta: 'CTA 대상',
-    unknown: '기타 모호점',
-  };
-
-  if (!Array.isArray(categories) || categories.length === 0) {
-    return [];
-  }
-
-  return categories.map((category) => map[category] || category);
-}
-
 function printMultilineValue(label, value) {
   const raw = String(value ?? '').trim();
   if (!raw) {
@@ -159,24 +140,13 @@ export function logStepFailureHint(context, name, traceRecords) {
     );
   }
   if (name === 'gate-intent') {
-    const blockingCategories = describeBlockingCategories(
-      context?.intentGate?.blockingCategories
-    );
     console.log('- 조치');
-    console.log('- 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요');
-    if (blockingCategories.length > 0) {
-      console.log('- 필수 항목:');
-      blockingCategories.forEach((category, index) => {
-        console.log(`  - ${index + 1}. ${category}`);
-      });
-    } else {
-      console.log('- 필수 항목: 블로킹 모호점 카테고리에 해당하는 항목');
-      console.log(
-        '  - trigger / placement / dismiss / concurrency / accessibility / CTA 대상'
-      );
-    }
+    console.log('- 재시도 시 y 입력 후, 위 상세 항목을 한 번에 보강해 주세요');
     console.log(
-      '- 자유 보강 지시는 마지막 질문에서 자유 텍스트로 입력 가능합니다'
+      '- 권장 포맷: 트리거/배치/닫힘/CTA/중복/접근성 중 필요한 항목만 자유 텍스트로 명시'
+    );
+    console.log(
+      '- 예: "보러가기는 /mypage/favorites, 자동닫힘 3000ms, 중복은 최신 교체"'
     );
   }
   if (name === 'gate-figma-mcp-tool-logs') {

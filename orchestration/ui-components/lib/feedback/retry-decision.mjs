@@ -1,16 +1,6 @@
 import { splitErrorDetails } from '../step-utils.mjs';
 import { STAGE_LABELS } from './constants.mjs';
 import { createPromptInterface, askLine } from './prompt-io.mjs';
-import {
-  buildAssetOverrideFeedback,
-  buildIntentOverrideFeedback,
-  collectAssetStructuredOverrides,
-  collectIntentStructuredOverrides,
-  mergeAssetOverrides,
-  mergeIntentOverrides,
-  printAssetOverrideSummary,
-  printIntentOverrideSummary,
-} from './overrides.mjs';
 
 function parseRetryChoice(rawAnswer) {
   const raw = String(rawAnswer ?? '').trim();
@@ -33,56 +23,6 @@ function recordFeedbackHistory(context, entry) {
     return;
   }
   context.feedbackHistory.push(entry);
-}
-
-function applyStructuredOverrides(context, stage, structuredOverrides) {
-  if (stage === 'intent') {
-    const applied = mergeIntentOverrides(context, structuredOverrides);
-    printIntentOverrideSummary(stage, applied);
-    return {
-      appliedOverrides: applied,
-      structuredFeedback: buildIntentOverrideFeedback(applied),
-    };
-  }
-
-  if (stage === 'asset') {
-    const applied = mergeAssetOverrides(context, structuredOverrides);
-    printAssetOverrideSummary(stage, applied);
-    return {
-      appliedOverrides: applied,
-      structuredFeedback: buildAssetOverrideFeedback(applied),
-    };
-  }
-
-  return {
-    appliedOverrides: null,
-    structuredFeedback: '',
-  };
-}
-
-async function collectStructuredOverrides(context, rl, stage) {
-  const requiredIntentCategories =
-    stage === 'intent' && Array.isArray(context.intentGate?.blockingCategories)
-      ? context.intentGate.blockingCategories
-      : [];
-
-  if (stage === 'intent' && requiredIntentCategories.length > 0) {
-    console.log(
-      `[ui-components] [${stage}] 현재 블로킹 모호점 카테고리: ${requiredIntentCategories.join(', ')}`
-    );
-  }
-
-  if (stage === 'intent') {
-    return collectIntentStructuredOverrides(
-      rl,
-      stage,
-      requiredIntentCategories
-    );
-  }
-  if (stage === 'asset') {
-    return collectAssetStructuredOverrides(rl, stage);
-  }
-  return {};
 }
 
 export async function promptRetryDecision(
@@ -121,7 +61,6 @@ export async function promptRetryDecision(
       answers: {
         retryAnswerRaw: null,
         note: null,
-        structuredOverrides: null,
       },
       retry: false,
       inputSource: 'none',
@@ -157,7 +96,6 @@ export async function promptRetryDecision(
         answers: {
           retryAnswerRaw: parsedDecision.raw,
           note: null,
-          structuredOverrides: null,
         },
         retry: false,
         inputSource: source,
@@ -168,18 +106,7 @@ export async function promptRetryDecision(
       };
     }
 
-    const structuredOverrides = await collectStructuredOverrides(
-      context,
-      rl,
-      stage
-    );
-    const { appliedOverrides, structuredFeedback } = applyStructuredOverrides(
-      context,
-      stage,
-      structuredOverrides
-    );
     const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
-    const mergedNote = [note, structuredFeedback].filter(Boolean).join(' || ');
 
     recordFeedbackHistory(context, {
       stage,
@@ -190,15 +117,14 @@ export async function promptRetryDecision(
       questions: [retryQuestion, noteQuestion],
       answers: {
         retryAnswerRaw: parsedDecision.raw,
-        note: mergedNote,
-        structuredOverrides: appliedOverrides,
+        note,
       },
       retry: true,
       inputSource: source,
     });
     return {
       retry: true,
-      note: mergedNote,
+      note,
     };
   } finally {
     rl.close();

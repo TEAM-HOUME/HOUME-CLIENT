@@ -131,11 +131,14 @@ function buildPrompt(context) {
     'Rules:',
     '- Keep this read-only and do not edit files.',
     '- Return structured intent for UI implementation only.',
+    '- Focus on UI behavior/spec gaps only; do not mention tooling/setup topics.',
+    '- Do not ask for or suggest Code Connect integration.',
+    '- Do not include MCP auth/token/tool availability as ambiguities.',
     '- Use componentKind enum values exactly.',
     '- Use role enum values exactly.',
     '- confidence must be between 0 and 1.',
     '- Put unresolved aspects in ambiguities.',
-    '- summary and ambiguities must be written in Korean.',
+    '- summary and ambiguities must be written in Korean only.',
     'Return JSON only matching the schema.',
   ].join('\n');
 }
