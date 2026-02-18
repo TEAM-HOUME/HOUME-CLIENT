@@ -71,7 +71,6 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     agentRuntime: null,
     contracts: null,
     resolvedIntent: null,
-    intentOverrides: {},
     intentArtifactPath: null,
     intentGate: null,
     figmaScope: null,
@@ -105,11 +104,6 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
       verify: [],
     },
     feedbackHistory: [],
-    assetProbeOverrides: {
-      additionalNodeIds: [],
-      maxCandidates: null,
-      timeoutMs: null,
-    },
   };
 }
 

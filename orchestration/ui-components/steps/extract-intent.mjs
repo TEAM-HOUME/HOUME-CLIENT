@@ -47,17 +47,6 @@ function normalizeConfidence(value) {
   return Math.min(1, Math.max(0, numeric));
 }
 
-function toStringMap(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return {};
-  }
-  return Object.fromEntries(
-    Object.entries(value)
-      .map(([key, rawValue]) => [String(key), String(rawValue ?? '').trim()])
-      .filter(([, mappedValue]) => Boolean(mappedValue))
-  );
-}
-
 function dedupeFeedbackNotes(notes, limit = 2) {
   if (!Array.isArray(notes)) {
     return [];
@@ -86,10 +75,6 @@ function buildPrompt(context) {
       ? contracts.sources.join(', ')
       : '(none)';
   const uiRulesContent = String(contracts?.uiRulesContent || '').trim();
-  const intentOverrides = toStringMap(context.intentOverrides);
-  const overrideLines = Object.entries(intentOverrides).map(
-    ([key, value]) => `- ${key}: ${value}`
-  );
   const hintLines = [];
   if (intent.pageHint) {
     hintLines.push(`- page hint: ${intent.pageHint}`);
@@ -117,10 +102,6 @@ function buildPrompt(context) {
       ? 'Retry clarification notes (highest priority):'
       : 'Retry clarification notes: (none)',
     ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
-    overrideLines.length > 0
-      ? 'Structured overrides from user decisions (highest priority):'
-      : 'Structured overrides from user decisions: (none)',
-    ...overrideLines,
     '',
     `Project UI rule docs: ${uiRuleSources}`,
     uiRulesContent

@@ -17,7 +17,6 @@ import {
   createUnavailableCalls,
   deriveProbeStatus,
   extractChildNodeIdsFromText,
-  normalizeNodeIdList,
   summarizeCalls,
 } from './figma-asset-scope/helpers.mjs';
 
@@ -45,14 +44,6 @@ function buildEffectiveChildNodeIds(
     childNodeIds.push(selectedNodeId);
   }
   return childNodeIds;
-}
-
-function getNumericOverride(value, fallback) {
-  const numeric = Number(value);
-  if (Number.isInteger(numeric) && numeric > 0) {
-    return numeric;
-  }
-  return fallback;
 }
 
 function buildStepOutput(context, capture, artifactPath, source, candidates) {
@@ -98,17 +89,9 @@ export function stepExtractFigmaAssetScope(context) {
   });
   const selectedGraphicSignals = analyzeGraphicSignals(selectedDesignContext);
 
-  const maxCandidates = getNumericOverride(
-    context.assetProbeOverrides?.maxCandidates,
-    context.scenario.figma.assetProbeMaxCandidates
-  );
-  const timeoutMs = getNumericOverride(
-    context.assetProbeOverrides?.timeoutMs,
-    context.scenario.figma.assetProbeTimeoutMs
-  );
-  const additionalNodeIds = normalizeNodeIdList(
-    context.assetProbeOverrides?.additionalNodeIds
-  );
+  const maxCandidates = context.scenario.figma.assetProbeMaxCandidates;
+  const timeoutMs = context.scenario.figma.assetProbeTimeoutMs;
+  const additionalNodeIds = [];
   const inferredChildNodeIds = [
     ...new Set([
       ...extractChildNodeIdsFromText(selectedDesignContext),
