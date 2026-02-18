@@ -1,0 +1,205 @@
+function describeBlockingCategories(categories) {
+  const map = {
+    trigger: 'trigger 정책',
+    placement: '배치 정책',
+    dismiss: '닫기 정책',
+    type: '타입 매핑 정책',
+    concurrency: '중복 표시 정책',
+    accessibility: '접근성 정책',
+    cta: 'CTA 대상',
+    unknown: '기타 모호점',
+  };
+
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return [];
+  }
+
+  return categories.map((category) => map[category] || category);
+}
+
+function printMultilineValue(label, value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) {
+    return;
+  }
+  console.log(`- ${label}:`);
+  const lines = raw.split(/\r?\n/);
+  for (const line of lines) {
+    console.log(`  ${line}`);
+  }
+}
+
+function logTraceLine(traceRecords, failure = false) {
+  const latestTrace = traceRecords.at(-1);
+  if (!latestTrace) {
+    return;
+  }
+
+  const tracePath =
+    latestTrace.parsedPath ||
+    latestTrace.stdoutPath ||
+    latestTrace.metadataPath;
+  if (tracePath) {
+    console.log(
+      failure ? `- 실패 trace: ${tracePath}` : `- trace: ${tracePath}`
+    );
+  }
+}
+
+export function logStepDetails(name, output, traceRecords) {
+  if (!output || typeof output !== 'object' || output.skipped) {
+    return;
+  }
+
+  if (name === 'extract-figma-scope' && output.rationale) {
+    console.log('- 상세');
+    printMultilineValue('스코프 판단', output.rationale);
+  }
+
+  if (name === 'extract-intent') {
+    console.log('- 상세');
+    if (output.behaviorNeeded) {
+      console.log('- 동작정의 필요: 예');
+    }
+    if (Array.isArray(output.ambiguities) && output.ambiguities.length > 0) {
+      output.ambiguities.forEach((ambiguity, index) => {
+        console.log(`- 모호점 ${index + 1}: ${ambiguity}`);
+      });
+    } else {
+      console.log('- 모호점: 없음');
+    }
+  }
+
+  if (name === 'extract-design-tokens') {
+    console.log('- 상세');
+    if (Array.isArray(output.warnings) && output.warnings.length > 0) {
+      output.warnings.forEach((warning, index) => {
+        console.log(`- 토큰 경고 ${index + 1}: ${warning}`);
+      });
+    }
+
+    if (Array.isArray(output.errors) && output.errors.length > 0) {
+      output.errors.forEach((error, index) => {
+        console.log(`- 토큰 오류 ${index + 1}: ${error}`);
+      });
+    }
+  }
+
+  if (name === 'extract-figma-asset-scope') {
+    console.log('- 상세');
+    if (output.selectedGraphicSignal) {
+      console.log('- 기준 노드 그래픽 신호: 있음');
+    } else {
+      console.log('- 기준 노드 그래픽 신호: 없음');
+    }
+    if (output.failedCalls > 0 || output.unavailableCalls > 0) {
+      console.log(
+        `- 탐색 실패: 실패 ${output.failedCalls || 0}개, 미가용 ${output.unavailableCalls || 0}개`
+      );
+    }
+  }
+
+  if (name === 'gate-figma-asset-coverage') {
+    console.log('- 상세');
+    if (Array.isArray(output.reasons) && output.reasons.length > 0) {
+      output.reasons.forEach((reason, index) => {
+        printMultilineValue(`판정 근거 ${index + 1}`, reason);
+      });
+    }
+    if (
+      Array.isArray(output.suggestedActions) &&
+      output.suggestedActions.length > 0
+    ) {
+      output.suggestedActions.forEach((action, index) => {
+        printMultilineValue(`권장 조치 ${index + 1}`, action);
+      });
+    }
+  }
+
+  if (name === 'run-agent-implementation') {
+    console.log('- 상세');
+    if (output.summary) {
+      printMultilineValue('에이전트 요약', output.summary);
+    }
+
+    if (Array.isArray(output.notes) && output.notes.length > 0) {
+      output.notes.forEach((note, index) => {
+        printMultilineValue(`에이전트 노트 ${index + 1}`, note);
+      });
+    }
+  }
+
+  if (name === 'resolve-component-plan') {
+    console.log('- 상세');
+    if (output.rationale) {
+      printMultilineValue('계획 근거', output.rationale);
+    }
+    if (
+      Array.isArray(output.behaviorQuestions) &&
+      output.behaviorQuestions.length > 0
+    ) {
+      output.behaviorQuestions.forEach((question, index) => {
+        printMultilineValue(`동작 확인 질문 ${index + 1}`, question);
+      });
+    }
+  }
+
+  logTraceLine(traceRecords, false);
+}
+
+export function logStepFailureHint(context, name, traceRecords) {
+  if (name === 'gate-design-tokens') {
+    console.log('- 조치');
+    console.log('- design token capture 상태/도구 오류를 artifact에서 확인');
+  }
+  if (name === 'gate-figma-scope') {
+    console.log('- 조치');
+    console.log(
+      '- 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 brief/intent 힌트를 보강하세요'
+    );
+  }
+  if (name === 'gate-intent') {
+    const blockingCategories = describeBlockingCategories(
+      context?.intentGate?.blockingCategories
+    );
+    console.log('- 조치');
+    console.log('- 재시도 시 y 입력 후 구조화 입력 항목을 우선 채워주세요');
+    if (blockingCategories.length > 0) {
+      console.log('- 필수 항목:');
+      blockingCategories.forEach((category, index) => {
+        console.log(`  - ${index + 1}. ${category}`);
+      });
+    } else {
+      console.log('- 필수 항목: 블로킹 모호점 카테고리에 해당하는 항목');
+      console.log(
+        '  - trigger / placement / dismiss / concurrency / accessibility / CTA 대상'
+      );
+    }
+    console.log(
+      '- 자유 보강 지시는 마지막 질문에서 자유 텍스트로 입력 가능합니다'
+    );
+  }
+  if (name === 'gate-figma-mcp-tool-logs') {
+    console.log('- 조치');
+    console.log(
+      '- figma MCP 원본 응답 로그(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
+    );
+  }
+  if (name === 'gate-figma-asset-coverage') {
+    console.log('- 조치');
+    console.log(
+      '- 스크린샷 대비 자산 누락으로 판정되었습니다. 추가 탐색 노드 ID를 먼저 보강해 재시도하세요'
+    );
+    console.log(
+      '- 현재 선택 노드 ID(예: 1:427)도 추가 탐색 노드로 입력할 수 있습니다'
+    );
+    console.log(
+      '- 후보 수/timeout/게이트 모드는 고급 옵션이며 기본값으로도 먼저 재시도 가능합니다'
+    );
+    console.log(
+      '- 관련 아티팩트: artifacts/*-figma-asset-scope.json, artifacts/*-figma-asset-coverage.json'
+    );
+  }
+
+  logTraceLine(traceRecords, true);
+}
