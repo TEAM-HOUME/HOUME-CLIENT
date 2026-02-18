@@ -149,7 +149,9 @@ export function logStepDetails(name, output, traceRecords) {
 export function logStepFailureHint(context, name, traceRecords) {
   if (name === 'gate-design-tokens') {
     console.log('- 조치');
-    console.log('- design token capture 상태/도구 오류를 artifact에서 확인');
+    console.log(
+      '- design token capture 상태와 필수 MCP 도구 커버리지(4/4)를 artifact에서 확인'
+    );
   }
   if (name === 'gate-figma-scope') {
     console.log('- 조치');
@@ -165,12 +167,6 @@ export function logStepFailureHint(context, name, traceRecords) {
     );
     console.log(
       '- 예: "보러가기는 /mypage/favorites, 자동닫힘 3000ms, 중복은 최신 교체"'
-    );
-  }
-  if (name === 'gate-figma-mcp-tool-logs') {
-    console.log('- 조치');
-    console.log(
-      '- figma MCP 도구 로그 아티팩트(artifacts/*-figma-mcp-tool-logs.json)에서 실패 도구를 확인'
     );
   }
   if (name === 'gate-figma-asset-coverage') {

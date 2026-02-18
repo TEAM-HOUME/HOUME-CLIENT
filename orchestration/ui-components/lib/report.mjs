@@ -198,9 +198,6 @@ export function writeReport(context) {
     intentArtifactPath: context.intentArtifactPath
       ? relative(context.rootPath, context.intentArtifactPath)
       : null,
-    figmaMcpToolLogsArtifactPath: context.figmaMcpToolLogsArtifactPath
-      ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
-      : null,
     designTokensArtifactPath: context.designTokensArtifactPath
       ? relative(context.rootPath, context.designTokensArtifactPath)
       : null,
@@ -214,8 +211,6 @@ export function writeReport(context) {
     figmaScopeGate: context.figmaScopeGate || null,
     resolvedIntent: context.resolvedIntent || null,
     intentGate: context.intentGate || null,
-    figmaMcpToolLogs: context.figmaMcpToolLogs || null,
-    figmaMcpToolLogsGate: context.figmaMcpToolLogsGate || null,
     designTokens: context.designTokens || null,
     designTokensGate: context.designTokensGate || null,
     figmaAssetScope: context.figmaAssetScope || null,

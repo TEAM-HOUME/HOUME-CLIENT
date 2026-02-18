@@ -16,12 +16,6 @@ const PURPOSE_POLICIES = Object.freeze({
     maxFailedCalls: 4,
     requireCalls: true,
   },
-  'figma-mcp-tool-logs': {
-    maxCalls: 16,
-    maxFailedCalls: 4,
-    requireCalls: true,
-    requiredTools: FIGMA_REQUIRED_TOOLS,
-  },
   'design-tokens': {
     maxCalls: 12,
     maxFailedCalls: 4,

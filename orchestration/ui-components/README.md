@@ -30,10 +30,8 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `gate-intent`: validate confidence/fields and split ambiguities into `blocking` vs `advisory`.
 - `extract-figma-scope`: parse URL and optionally walk parent scope.
 - `gate-figma-scope`: enforce `scopeVerdict` (`sufficient|too_broad|too_narrow|unknown`) with mode (`warn|error`).
-- `extract-figma-mcp-tool-logs`: Codex가 Figma MCP를 호출해 필수 도구 증거를 수집합니다.
-- `gate-figma-mcp-tool-logs`: 필수 도구 호출 품질(`off|warn|error`)을 검증합니다.
-- `extract-design-tokens`: Codex 기반으로 토큰을 정규화합니다(증거 부족 시 MCP 추가 호출 허용).
-- `gate-design-tokens`: enforce token quality mode (`off|warn|error`).
+- `extract-design-tokens`: Codex가 필수 Figma MCP 도구(4/4)를 호출하고 토큰을 정규화합니다.
+- `gate-design-tokens`: enforce MCP tool coverage + token quality mode (`off|warn|error`).
 - `extract-figma-asset-scope`: Codex가 child node MCP 탐색을 수행해 asset context를 확장합니다.
 - `gate-figma-asset-coverage`: compare screenshot evidence vs extracted context and block on likely graphic-asset miss.
 - `resolve-component-plan`: choose reuse/new target and behavior gate.
@@ -48,7 +46,6 @@ Default fixed policy:
 
 - `verification` is always `storybook`.
 - `require_visual_approval` is always enabled (`--approve-visual` required).
-- `figma_mcp_logs_mode` is fixed to `error`.
 - `design_tokens_mode` is fixed to `error`.
 
 ## Context Injection Matrix
@@ -59,7 +56,7 @@ Default fixed policy:
 | `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `docs/reference/*` conventions                                                       | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
 | `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
 | `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
-| `extract-design-tokens`     | Inline prompt in step code                    | MCP evidence artifact + tool records + docs conventions                                                                              | `artifacts/*-design-tokens.json`                                    |
+| `extract-design-tokens`     | Inline prompt in step code                    | selected scope node + direct Figma MCP calls(4 tools) + docs conventions                                                             | `artifacts/*-design-tokens.json`                                    |
 | `extract-figma-asset-scope` | Inline prompt in step code                    | selected node evidence + child node-id inference + Codex MCP probe + scenario asset probe config                                     | `artifacts/*-figma-asset-scope.json`                                |
 | `gate-figma-asset-coverage` | Inline prompt in step code                    | MCP evidence artifact + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes               | `artifacts/*-figma-asset-coverage.json`                             |
 | `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths                                                                  | `reports/<runId>.json`, `reports/index.jsonl`                       |
@@ -68,24 +65,22 @@ Default fixed policy:
 
 ### Step Ownership Map
 
-| Step                          | Type                 | Primary Runtime                                    |
-| ----------------------------- | -------------------- | -------------------------------------------------- |
-| `preflight`                   | Gate + Runtime check | Local shell + Agent CLI version                    |
-| `extract-intent`              | Extraction           | Agent CLI                                          |
-| `gate-intent`                 | Gate                 | Local code                                         |
-| `extract-figma-scope`         | Extraction           | Agent CLI + Figma MCP (conditional)                |
-| `gate-figma-scope`            | Gate                 | Local code                                         |
-| `extract-figma-mcp-tool-logs` | Extraction           | Agent CLI + Figma MCP                              |
-| `gate-figma-mcp-tool-logs`    | Gate                 | Local code                                         |
-| `extract-design-tokens`       | Extraction           | Agent CLI + Figma MCP (+ evidence-aware normalize) |
-| `gate-design-tokens`          | Gate                 | Local code                                         |
-| `extract-figma-asset-scope`   | Extraction           | Agent CLI + Figma MCP                              |
-| `gate-figma-asset-coverage`   | Gate                 | Agent CLI + Local gate policy                      |
-| `resolve-component-plan`      | Planning + Gate      | Agent CLI + local behavior guard                   |
-| `run-agent-implementation`    | Implementation       | Agent CLI                                          |
-| `gate-changed-paths`          | Gate                 | Local git diff                                     |
-| `verify`                      | Gate                 | Local `pnpm` checks                                |
-| `report`                      | Finalization         | Local filesystem                                   |
+| Step                        | Type                 | Primary Runtime                                    |
+| --------------------------- | -------------------- | -------------------------------------------------- |
+| `preflight`                 | Gate + Runtime check | Local shell + Agent CLI version                    |
+| `extract-intent`            | Extraction           | Agent CLI                                          |
+| `gate-intent`               | Gate                 | Local code                                         |
+| `extract-figma-scope`       | Extraction           | Agent CLI + Figma MCP (conditional)                |
+| `gate-figma-scope`          | Gate                 | Local code                                         |
+| `extract-design-tokens`     | Extraction           | Agent CLI + Figma MCP (+ evidence-aware normalize) |
+| `gate-design-tokens`        | Gate                 | Local code                                         |
+| `extract-figma-asset-scope` | Extraction           | Agent CLI + Figma MCP                              |
+| `gate-figma-asset-coverage` | Gate                 | Agent CLI + Local gate policy                      |
+| `resolve-component-plan`    | Planning + Gate      | Agent CLI + local behavior guard                   |
+| `run-agent-implementation`  | Implementation       | Agent CLI                                          |
+| `gate-changed-paths`        | Gate                 | Local git diff                                     |
+| `verify`                    | Gate                 | Local `pnpm` checks                                |
+| `report`                    | Finalization         | Local filesystem                                   |
 
 ### Detailed Orchestration Flow
 
@@ -104,10 +99,7 @@ flowchart TD
 
   S1 --> S2{{gate-figma-scope}}
   S2 -- fail --> Z1
-  S2 -- pass --> M1[extract-figma-mcp-tool-logs]
-  M1 --> M2{{gate-figma-mcp-tool-logs}}
-  M2 -- fail --> Z1
-  M2 -- pass --> T1[extract-design-tokens]
+  S2 -- pass --> T1[extract-design-tokens]
   T1 --> T2{{gate-design-tokens}}
   T2 -- fail --> Z1
   T2 -- pass --> A1[extract-figma-asset-scope]
@@ -134,8 +126,8 @@ flowchart TD
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,I2,S2,M2,T2,A2,C2,V1 gate;
-  class I1,S1,M1,T1,A1,P1,C1 agent;
+  class D,I2,S2,T2,A2,C2,V1 gate;
+  class I1,S1,T1,A1,P1,C1 agent;
   class A,B,C,Z1,Z2,I3,A3,P2,C3,V2,O1 local;
 ```
 
@@ -174,14 +166,8 @@ sequenceDiagram
   A-->>R: selectedNodeId + scope verdict
   R->>R: gate-figma-scope
 
-  R->>A: extract-figma-mcp-tool-logs
+  R->>A: extract-design-tokens (MCP 4-tool capture + normalization)
   A->>M: required MCP tools (context/variables/metadata/screenshot)
-  M-->>A: tool call outputs
-  A-->>R: captured status + notes
-  R->>R: gate-figma-mcp-tool-logs
-
-  R->>A: extract-design-tokens (evidence-aware normalization)
-  A->>M: additional MCP calls if needed
   M-->>A: token evidence
   A-->>R: normalized tokens
   R->>R: gate-design-tokens
@@ -255,11 +241,7 @@ stateDiagram-v2
 
   SCOPE --> SCOPE_GATE
   SCOPE_GATE --> BLOCKED: fail
-  SCOPE_GATE --> MCP_LOGS: pass|warn
-
-  MCP_LOGS --> MCP_LOGS_GATE
-  MCP_LOGS_GATE --> BLOCKED: fail
-  MCP_LOGS_GATE --> TOKENS: pass|warn
+  SCOPE_GATE --> TOKENS: pass|warn
 
   TOKENS --> TOKENS_GATE
   TOKENS_GATE --> BLOCKED: fail

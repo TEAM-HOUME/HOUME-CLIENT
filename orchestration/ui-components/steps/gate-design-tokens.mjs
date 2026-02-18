@@ -1,4 +1,5 @@
 import { fail } from '../lib/errors.mjs';
+import { FIGMA_REQUIRED_TOOLS } from '../lib/mcp-guardrails.mjs';
 
 function gateFailureOrWarning(context, message) {
   if (context.scenario.gates.designTokensMode === 'error') {
@@ -37,6 +38,46 @@ export function stepGateDesignTokens(context) {
     return context.designTokensGate;
   }
 
+  const toolRecords = Object.values(capture.tools || {}).filter(
+    (record) => record && typeof record === 'object'
+  );
+  const toolByName = new Map(
+    toolRecords.map((record) => [String(record.tool || '').trim(), record])
+  );
+  const missingTools = FIGMA_REQUIRED_TOOLS.filter(
+    (toolName) => !toolByName.has(toolName)
+  );
+  const badTools = FIGMA_REQUIRED_TOOLS.map((toolName) => ({
+    tool: toolName,
+    record: toolByName.get(toolName),
+  }))
+    .filter((item) => item.record)
+    .filter(({ record }) => String(record.status || '').toLowerCase() !== 'ok')
+    .map(({ tool, record }) => ({
+      tool,
+      status: String(record.status || ''),
+      error: String(record.error || ''),
+    }));
+
+  if (missingTools.length > 0) {
+    gateFailureOrWarning(
+      context,
+      `필수 Figma MCP 도구 커버리지가 부족합니다: ${missingTools.join(', ')}`
+    );
+  }
+
+  if (badTools.length > 0) {
+    gateFailureOrWarning(
+      context,
+      `필수 Figma MCP 도구 상태가 비정상입니다: ${badTools
+        .map(
+          (item) =>
+            `${item.tool}(${item.status}${item.error ? `: ${item.error}` : ''})`
+        )
+        .join(', ')}`
+    );
+  }
+
   if (capture.status === 'invalid') {
     gateFailureOrWarning(
       context,
@@ -57,6 +98,11 @@ export function stepGateDesignTokens(context) {
   context.designTokensGate = {
     mode: context.scenario.gates.designTokensMode,
     status: capture.status,
+    requiredTools: FIGMA_REQUIRED_TOOLS.length,
+    coveredTools:
+      FIGMA_REQUIRED_TOOLS.length - missingTools.length - badTools.length,
+    missingTools,
+    badTools,
     totalTokens: capture.stats?.totalTokens ?? 0,
     coreCoverage: capture.stats?.coreCoverage ?? 0,
   };

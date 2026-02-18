@@ -281,7 +281,6 @@ export function readScenario(pathArg) {
     gates: {
       requireVisualApproval: true,
       designTokensMode: 'error',
-      figmaMcpLogsMode: 'error',
       assetCoverageMode: parseEnumValue(
         parseSectionScalar(gatesSection, 'asset_coverage_mode', null),
         ['off', 'warn', 'error'],

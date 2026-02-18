@@ -44,8 +44,8 @@ function buildPrompt(context) {
   const feedbackNotes = Array.isArray(context.feedbackLoop?.asset)
     ? context.feedbackLoop.asset.filter(Boolean)
     : [];
-  const figmaLogsPath = context.figmaMcpToolLogsArtifactPath
-    ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
+  const designTokensPath = context.designTokensArtifactPath
+    ? relative(context.rootPath, context.designTokensArtifactPath)
     : '(missing)';
   const assetScopePath = context.figmaAssetScopeArtifactPath
     ? relative(context.rootPath, context.figmaAssetScopeArtifactPath)
@@ -59,7 +59,7 @@ function buildPrompt(context) {
     `Intent: component=${intent.componentKind || 'unknown'}, state=${intent.state || 'unknown'}, role=${intent.role || 'unknown'}`,
     '',
     'Use these artifacts:',
-    `- Direct MCP log summary: ${figmaLogsPath}`,
+    `- Design tokens + MCP evidence: ${designTokensPath}`,
     `- Child asset probe result: ${assetScopePath}`,
     '',
     ...(feedbackNotes.length > 0
@@ -71,7 +71,7 @@ function buildPrompt(context) {
       : []),
     '',
     'Task:',
-    '- Inspect screenshot evidence from MCP logs for the selected node.',
+    '- Inspect screenshot evidence from design-token MCP capture for the selected node.',
     '- Compare visible icon/image/logo/vector presence against extracted context (selected node + child probes).',
     '- Decide whether the current context likely misses visible graphic assets.',
     '',

@@ -20,13 +20,11 @@ import { runStep } from './lib/step-runner.mjs';
 import { formatNumber } from './lib/step-utils.mjs';
 import { stepExtractDesignTokens } from './steps/extract-design-tokens.mjs';
 import { stepExtractFigmaAssetScope } from './steps/extract-figma-asset-scope.mjs';
-import { stepExtractFigmaMcpToolLogs } from './steps/extract-figma-mcp-tool-logs.mjs';
 import { stepExtractFigmaScope } from './steps/extract-figma-scope.mjs';
 import { stepExtractIntent } from './steps/extract-intent.mjs';
 import { stepGateAssetCoverage } from './steps/gate-figma-asset-coverage.mjs';
 import { stepGateChangedPaths } from './steps/gate-changed-paths.mjs';
 import { stepGateDesignTokens } from './steps/gate-design-tokens.mjs';
-import { stepGateFigmaMcpToolLogs } from './steps/gate-figma-mcp-tool-logs.mjs';
 import { stepGateFigmaScope } from './steps/gate-figma-scope.mjs';
 import { stepGateIntent } from './steps/gate-intent.mjs';
 import { stepPreflight } from './steps/preflight.mjs';
@@ -35,7 +33,7 @@ import { stepRunAgent } from './steps/run-agent-implementation.mjs';
 import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
-const PLANNED_STEP_COUNT = 15;
+const PLANNED_STEP_COUNT = 13;
 const STEP_DIVIDER =
   '------------------------------------------------------------';
 const STEP_DISPLAY_ORDER = Object.freeze({
@@ -44,16 +42,14 @@ const STEP_DISPLAY_ORDER = Object.freeze({
   'gate-intent': 3,
   'extract-figma-scope': 4,
   'gate-figma-scope': 5,
-  'extract-figma-mcp-tool-logs': 6,
-  'gate-figma-mcp-tool-logs': 7,
-  'extract-design-tokens': 8,
-  'gate-design-tokens': 9,
-  'extract-figma-asset-scope': 10,
-  'gate-figma-asset-coverage': 11,
-  'resolve-component-plan': 12,
-  'run-agent-implementation': 13,
-  'gate-changed-paths': 14,
-  verify: 15,
+  'extract-design-tokens': 6,
+  'gate-design-tokens': 7,
+  'extract-figma-asset-scope': 8,
+  'gate-figma-asset-coverage': 9,
+  'resolve-component-plan': 10,
+  'run-agent-implementation': 11,
+  'gate-changed-paths': 12,
+  verify: 13,
 });
 
 function createContext(args, scenario, runId, rootPath, artifactsDir) {
@@ -78,9 +74,6 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     figmaScope: null,
     designContextArtifactPath: null,
     figmaScopeGate: null,
-    figmaMcpToolLogs: null,
-    figmaMcpToolLogsArtifactPath: null,
-    figmaMcpToolLogsGate: null,
     figmaMcpDirectToolRecords: null,
     designTokensArtifactPath: null,
     designTokens: null,
@@ -182,8 +175,6 @@ async function executePipeline(context) {
   });
   runStep(context, 'extract-figma-scope', stepExtractFigmaScope);
   runStep(context, 'gate-figma-scope', stepGateFigmaScope);
-  runStep(context, 'extract-figma-mcp-tool-logs', stepExtractFigmaMcpToolLogs);
-  runStep(context, 'gate-figma-mcp-tool-logs', stepGateFigmaMcpToolLogs);
   runStep(context, 'extract-design-tokens', stepExtractDesignTokens);
   runStep(context, 'gate-design-tokens', stepGateDesignTokens);
   await runAssetCoverageWithFeedbackLoop(context, {

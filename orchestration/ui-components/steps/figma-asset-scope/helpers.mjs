@@ -195,7 +195,6 @@ export function buildCacheKey({
     additionalNodeIds,
     gates: {
       assetCoverageMode: context.scenario.gates.assetCoverageMode,
-      figmaMcpLogsMode: context.scenario.gates.figmaMcpLogsMode,
       designTokensMode: context.scenario.gates.designTokensMode,
       scopeGateMode: context.scenario.gates.scopeGateMode,
       intentMode: context.scenario.gates.intentMode,

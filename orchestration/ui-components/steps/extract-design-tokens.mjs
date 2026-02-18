@@ -3,7 +3,10 @@ import { relative, resolve } from 'node:path';
 
 import { findCachedArtifact } from '../lib/artifact-cache.mjs';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
-import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
+import {
+  enforceMcpGuardrails,
+  FIGMA_REQUIRED_TOOLS,
+} from '../lib/mcp-guardrails.mjs';
 import {
   buildCacheKey,
   buildCaptureFromAgentResult,
@@ -25,11 +28,57 @@ function getCachedCapture(context, cacheKey) {
   });
 }
 
+function buildToolCoverage(capture) {
+  const requiredTools = FIGMA_REQUIRED_TOOLS;
+  const toolRecords = Object.values(capture?.tools || {}).filter(
+    (record) => record && typeof record === 'object'
+  );
+  const okTools = new Set(
+    toolRecords
+      .filter((record) => String(record.status || '').toLowerCase() === 'ok')
+      .map((record) => String(record.tool || '').trim())
+      .filter(Boolean)
+  );
+  const coveredTools = requiredTools.filter((tool) => okTools.has(tool));
+  return {
+    requiredTools: requiredTools.length,
+    coveredTools: coveredTools.length,
+  };
+}
+
+function buildDirectToolRecordsFromCapture(capture) {
+  const records = {};
+  const toolRecords = Object.values(capture?.tools || {});
+  for (const record of toolRecords) {
+    const toolName = String(record?.tool || '').trim();
+    if (!toolName) {
+      continue;
+    }
+    records[toolName] = {
+      tool: toolName,
+      status: String(record?.status || '').trim(),
+      output: String(record?.output || ''),
+      error: String(record?.error || ''),
+    };
+  }
+  return records;
+}
+
+function applyCaptureToContext(context, capture, artifactPath) {
+  context.designTokens = capture;
+  context.designTokensArtifactPath = artifactPath;
+  context.figmaMcpDirectToolRecords =
+    buildDirectToolRecordsFromCapture(capture);
+}
+
 function buildStepOutputFromCapture(context, capture, source, artifactPath) {
+  const toolCoverage = buildToolCoverage(capture);
   return {
     status: capture.status,
     totalTokens: capture.stats?.totalTokens ?? 0,
     coreCoverage: capture.stats?.coreCoverage ?? 0,
+    requiredTools: toolCoverage.requiredTools,
+    coveredTools: toolCoverage.coveredTools,
     warnings: capture.diagnostics?.warnings || [],
     errors: capture.diagnostics?.errors || [],
     source,
@@ -43,8 +92,7 @@ function writeCaptureArtifact(context, capture) {
     `${context.runId}-design-tokens.json`
   );
   writeFileSync(artifactPath, JSON.stringify(capture, null, 2), 'utf8');
-  context.designTokens = capture;
-  context.designTokensArtifactPath = artifactPath;
+  applyCaptureToContext(context, capture, artifactPath);
   return artifactPath;
 }
 
@@ -66,8 +114,7 @@ export function stepExtractDesignTokens(context) {
   const cacheKey = buildCacheKey(context);
   const cached = getCachedCapture(context, cacheKey);
   if (cached) {
-    context.designTokens = cached.data;
-    context.designTokensArtifactPath = cached.artifactPath;
+    applyCaptureToContext(context, cached.data, cached.artifactPath);
     return buildStepOutputFromCapture(
       context,
       cached.data,

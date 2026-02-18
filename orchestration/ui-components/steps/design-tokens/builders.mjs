@@ -1,6 +1,7 @@
 import { relative } from 'node:path';
 
 import { createCacheKey } from '../../lib/artifact-cache.mjs';
+import { FIGMA_REQUIRED_TOOLS } from '../../lib/mcp-guardrails.mjs';
 import { CACHE_SCHEMA_VERSION, TOKEN_KEYS, TOOL_KEYS } from './constants.mjs';
 import {
   calculateTokenStats,
@@ -52,7 +53,6 @@ export function buildCacheKey(context) {
     endpoint: context.scenario.figma.mcpEndpoint,
     gates: {
       designTokensMode: context.scenario.gates.designTokensMode,
-      figmaMcpLogsMode: context.scenario.gates.figmaMcpLogsMode,
       assetCoverageMode: context.scenario.gates.assetCoverageMode,
       scopeGateMode: context.scenario.gates.scopeGateMode,
       intentMode: context.scenario.gates.intentMode,
@@ -64,22 +64,20 @@ export function buildCacheKey(context) {
 }
 
 export function buildPrompt(context) {
-  const directArtifactPath = context.figmaMcpToolLogsArtifactPath
-    ? relative(context.rootPath, context.figmaMcpToolLogsArtifactPath)
-    : null;
+  const designContextPath = context.designContextArtifactPath
+    ? relative(context.rootPath, context.designContextArtifactPath)
+    : '(missing)';
   return [
     'You are normalizing design tokens for a Figma implementation scope.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
-    directArtifactPath
-      ? `Use this MCP evidence artifact first: ${directArtifactPath}`
-      : 'MCP evidence artifact is unavailable. Use Figma MCP tools if needed.',
+    `Design context artifact: ${designContextPath}`,
     '',
     'Rules:',
-    '- If evidence is missing or incomplete, call Figma MCP tools directly.',
-    '- Required minimum coverage: get_design_context, get_variable_defs, get_metadata, get_screenshot.',
+    '- In this step, call required Figma MCP tools directly for the selected node.',
+    `- Required tool coverage (all must be called at least once): ${FIGMA_REQUIRED_TOOLS.join(', ')}`,
     '- Keep outputs read-only and do not edit code or files.',
-    '- Preserve raw.<tool> status/output/error from the provided evidence.',
+    '- Preserve raw.<tool> status/output/error from MCP results.',
     '- Normalize tokens into: colors, typography, spacing, radius, size.',
     '- Put unmatched values in normalized.extras.',
     '- Every token item must include name/value/source/nodeId/note (empty string allowed).',

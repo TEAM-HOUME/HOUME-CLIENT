@@ -14,7 +14,6 @@ const HEARTBEAT_TEMPLATE = '[{label}] 진행중... {elapsed}s 경과';
 const HEARTBEAT_STEPS = new Set([
   'extract-intent',
   'extract-figma-scope',
-  'extract-figma-mcp-tool-logs',
   'extract-design-tokens',
   'extract-figma-asset-scope',
   'gate-figma-asset-coverage',

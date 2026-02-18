@@ -87,27 +87,17 @@ export function buildFigmaMcpToolUsageSummary(context) {
     return summary;
   }
 
-  const hasDirectLogCalls = Array.isArray(context.figmaMcpToolLogs?.calls);
-
-  if (hasDirectLogCalls) {
-    for (const call of context.figmaMcpToolLogs.calls) {
-      accumulateFigmaMcpToolCall(summary, call.tool, call.status);
-    }
-  }
-
   if (Array.isArray(context.figmaAssetScope?.calls)) {
     for (const call of context.figmaAssetScope.calls) {
       accumulateFigmaMcpToolCall(summary, call.tool, call.status);
     }
   }
 
-  if (!hasDirectLogCalls) {
-    const designTools = context.designTokens?.tools;
-    if (designTools && typeof designTools === 'object') {
-      for (const [key, value] of Object.entries(designTools)) {
-        const toolName = value?.tool || key;
-        accumulateFigmaMcpToolCall(summary, toolName, value?.status);
-      }
+  const designTools = context.designTokens?.tools;
+  if (designTools && typeof designTools === 'object') {
+    for (const [key, value] of Object.entries(designTools)) {
+      const toolName = value?.tool || key;
+      accumulateFigmaMcpToolCall(summary, toolName, value?.status);
     }
   }
 
