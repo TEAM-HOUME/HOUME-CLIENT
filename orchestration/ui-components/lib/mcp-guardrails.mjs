@@ -30,7 +30,8 @@ const PURPOSE_POLICIES = Object.freeze({
   'figma-asset-coverage': {
     maxCalls: 8,
     maxFailedCalls: 4,
-    requireCalls: false,
+    requireCalls: true,
+    requiredTools: ['get_screenshot'],
   },
 });
 

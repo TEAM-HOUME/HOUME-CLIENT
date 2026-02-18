@@ -206,7 +206,11 @@ function extractMcpToolOutput(item) {
     }
 
     if (entry?.type === 'image') {
-      chunks.push(JSON.stringify(entry, null, 2));
+      const mimeType = String(entry?.mimeType || 'unknown');
+      const length = String(entry?.data || '').length;
+      chunks.push(
+        `[image payload omitted mimeType=${mimeType} length=${length}]`
+      );
     }
   }
 

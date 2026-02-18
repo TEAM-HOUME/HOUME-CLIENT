@@ -83,7 +83,8 @@ function buildPrompt(context) {
       : []),
     '',
     'Task:',
-    '- Inspect screenshot evidence from design-token MCP capture for the selected node.',
+    '- Call get_screenshot for the selected node-id in this step (fresh capture for each attempt).',
+    '- Inspect the newly captured screenshot evidence for the selected node.',
     '- Compare visible icon/image/logo/vector presence against extracted context (selected node + child probes).',
     '- Decide whether the current context likely misses visible graphic assets.',
     '',
@@ -190,7 +191,10 @@ export function stepGateAssetCoverage(context) {
       schema,
       context.scenario.figma.timeoutMs
     );
-    enforceMcpGuardrails(context, 'figma-asset-coverage');
+    enforceMcpGuardrails(context, 'figma-asset-coverage', {
+      requireCalls: true,
+      requiredTools: ['get_screenshot'],
+    });
   } catch (error) {
     extractionMessage =
       error instanceof Error

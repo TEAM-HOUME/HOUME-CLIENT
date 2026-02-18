@@ -40,10 +40,28 @@ function buildDirectToolsFingerprint(context) {
     },
     get_screenshot: {
       status: directTools.get_screenshot?.status || '',
-      output: directTools.get_screenshot?.output || '',
       error: directTools.get_screenshot?.error || '',
     },
   });
+}
+
+function sanitizeScreenshotOutput(output) {
+  const text = String(output || '');
+  if (!text) {
+    return '';
+  }
+
+  return `[screenshot output redacted: base64 payload omitted, length=${text.length}]`;
+}
+
+function sanitizeScreenshotRecord(record) {
+  if (!record || typeof record !== 'object') {
+    return record;
+  }
+  return {
+    ...record,
+    output: sanitizeScreenshotOutput(record.output),
+  };
 }
 
 export function buildCacheKey(context) {
@@ -187,10 +205,15 @@ function buildToolRecords(context, raw = {}) {
         'get_metadata'
       ) || normalizeToolRecord(raw.metadata, 'get_metadata'),
     screenshot:
-      directToolRecordToCaptureRecord(
-        directTools?.get_screenshot,
-        'get_screenshot'
-      ) || normalizeToolRecord(raw.screenshot, 'get_screenshot'),
+      sanitizeScreenshotRecord(
+        directToolRecordToCaptureRecord(
+          directTools?.get_screenshot,
+          'get_screenshot'
+        )
+      ) ||
+      sanitizeScreenshotRecord(
+        normalizeToolRecord(raw.screenshot, 'get_screenshot')
+      ),
   };
 }
 
