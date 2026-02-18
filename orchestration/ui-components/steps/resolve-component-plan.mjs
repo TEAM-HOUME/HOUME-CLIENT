@@ -2,6 +2,11 @@ import { existsSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import {
+  buildBehaviorConfirmationRequiredMessage,
+  buildBehaviorSpecMissingMessage,
+  readBehaviorConfig,
+} from '../lib/behavior-guidance.mjs';
 import { readContracts } from '../lib/contracts.mjs';
 import { fail } from '../lib/errors.mjs';
 import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
@@ -182,19 +187,21 @@ function enforceBehaviorGate(context, componentPlan) {
     return;
   }
 
-  if (!context.scenario.behavior.confirmed) {
-    const questionText =
-      componentPlan.behaviorQuestions.length > 0
-        ? ` Open questions: ${componentPlan.behaviorQuestions.join(' | ')}`
-        : '';
+  const behaviorConfig = readBehaviorConfig(context.scenario);
+  if (!behaviorConfig.confirmed) {
     fail(
-      `신규 인터랙션 컴포넌트의 동작 정의 확인이 필요합니다. scenario.behavior.confirmed=true 및 behavior.spec를 지정해 주세요.${questionText}`
+      buildBehaviorConfirmationRequiredMessage({
+        componentKind: context.resolvedIntent?.componentKind,
+        behaviorQuestions: componentPlan.behaviorQuestions,
+      })
     );
   }
 
-  if (!context.scenario.behavior.spec.trim()) {
+  if (!behaviorConfig.spec) {
     fail(
-      'scenario.behavior.confirmed=true 이지만 behavior.spec가 비어 있습니다. 구현 전에 명시적 동작 정의를 추가해 주세요.'
+      buildBehaviorSpecMissingMessage({
+        componentKind: context.resolvedIntent?.componentKind,
+      })
     );
   }
 }

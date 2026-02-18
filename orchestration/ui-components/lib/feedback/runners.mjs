@@ -1,5 +1,9 @@
 import { promptRetryDecision } from './retry-decision.mjs';
 import { appendFeedback } from './store.mjs';
+import {
+  buildBehaviorRetryHintForConfirmation,
+  buildBehaviorRetryHintForMissingSpec,
+} from '../behavior-guidance.mjs';
 
 function toErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
@@ -20,13 +24,17 @@ function buildIntentRetryHints(context, errorMessage) {
 
   if (gate.requiresBehaviorConfirmation) {
     lines.push(
-      '신규 인터랙션 동작 정의 필요: behavior.confirmed=true, behavior.spec=<구체 동작>'
+      buildBehaviorRetryHintForConfirmation({
+        componentKind: context.resolvedIntent?.componentKind,
+      })
     );
   }
 
   if (gate.missingBehaviorSpec) {
     lines.push(
-      'behavior.spec 누락: 트리거/배치/닫힘/CTA/중복/접근성을 포함해 명시'
+      buildBehaviorRetryHintForMissingSpec({
+        componentKind: context.resolvedIntent?.componentKind,
+      })
     );
   }
 

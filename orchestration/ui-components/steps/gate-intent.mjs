@@ -1,4 +1,9 @@
 import { fail } from '../lib/errors.mjs';
+import {
+  buildBehaviorConfirmationRequiredMessage,
+  buildBehaviorSpecMissingMessage,
+  readBehaviorConfig,
+} from '../lib/behavior-guidance.mjs';
 import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
 
 function splitAmbiguities(intent) {
@@ -116,24 +121,29 @@ export function stepGateIntent(context) {
     );
   }
 
+  const behaviorConfig = readBehaviorConfig(context.scenario);
   const requiresBehaviorConfirmation =
     intent.behaviorNeeded &&
     INTERACTION_COMPONENT_KINDS.has(intent.componentKind) &&
-    !context.scenario.behavior.confirmed;
+    !behaviorConfig.confirmed;
   if (requiresBehaviorConfirmation) {
     blockingIssues.push(
-      `신규 인터랙션 동작 정의 확인이 필요합니다. behavior.confirmed=true 및 behavior.spec를 지정해 주세요. componentKind=${intent.componentKind}`
+      buildBehaviorConfirmationRequiredMessage({
+        componentKind: intent.componentKind,
+      })
     );
   }
 
   const missingBehaviorSpec =
     intent.behaviorNeeded &&
     INTERACTION_COMPONENT_KINDS.has(intent.componentKind) &&
-    context.scenario.behavior.confirmed &&
-    !context.scenario.behavior.spec.trim();
+    behaviorConfig.confirmed &&
+    !behaviorConfig.spec;
   if (missingBehaviorSpec) {
     blockingIssues.push(
-      `behavior.confirmed=true 이지만 behavior.spec가 비어 있습니다. 인터랙션 컴포넌트(${intent.componentKind}) 동작 정의를 입력해 주세요.`
+      buildBehaviorSpecMissingMessage({
+        componentKind: intent.componentKind,
+      })
     );
   }
 
