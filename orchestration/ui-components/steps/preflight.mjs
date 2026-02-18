@@ -5,7 +5,6 @@ import {
   resolveAgentRuntime,
 } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
-import { resolveFigmaMcpAuth } from '../lib/figma-mcp-auth.mjs';
 import {
   classifyJsonRpcCall,
   initializeFigmaMcpSession,
@@ -22,12 +21,10 @@ const REQUIRED_FIGMA_TOOLS = [
 function probeFigmaMcp(context) {
   const endpoint = context.scenario.figma.mcpEndpoint;
   const timeoutMs = Math.min(context.scenario.figma.timeoutMs, 15_000);
-  const auth = resolveFigmaMcpAuth(context.scenario);
 
   const session = initializeFigmaMcpSession({
     endpoint,
     timeoutMs,
-    authToken: auth.token,
   });
   if (!session.ok) {
     fail(
@@ -38,7 +35,6 @@ function probeFigmaMcp(context) {
   const toolsListCall = listFigmaMcpTools({
     endpoint,
     sessionId: session.sessionId,
-    authToken: auth.token,
     timeoutMs,
     requestId: 11,
   });

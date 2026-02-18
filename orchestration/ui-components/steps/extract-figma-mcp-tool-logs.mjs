@@ -8,7 +8,6 @@ import {
   initializeFigmaMcpSession,
   listFigmaMcpTools,
 } from '../lib/figma-mcp-direct.mjs';
-import { resolveFigmaMcpAuth } from '../lib/figma-mcp-auth.mjs';
 import {
   CACHE_SCHEMA_VERSION,
   REQUIRED_FIGMA_TOOLS,
@@ -58,7 +57,6 @@ function collectRequiredToolCalls({
   timeoutMs,
   nodeId,
   session,
-  auth,
   baseDir,
   assetWriteDir,
   startOrder,
@@ -85,7 +83,6 @@ function collectRequiredToolCalls({
     const callRecord = callFigmaMcpTool({
       endpoint,
       sessionId: session.sessionId,
-      authToken: auth.token,
       timeoutMs,
       requestId: order + 100,
       toolName,
@@ -154,7 +151,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
     return buildStepOutput(
       context,
       nodeId,
-      cached.data.authTokenEnv,
       cached.data.calls,
       cached.data.totals,
       'cache',
@@ -162,7 +158,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
     );
   }
 
-  const auth = resolveFigmaMcpAuth(context.scenario);
   const baseDir = resolve(context.artifactsDir, context.runId, 'figma-mcp-raw');
   const assetWriteDir = resolve(baseDir, 'tool-assets');
   mkdirSync(baseDir, { recursive: true });
@@ -174,7 +169,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
   const session = initializeFigmaMcpSession({
     endpoint,
     timeoutMs,
-    authToken: auth.token,
   });
   callArtifacts.push(
     writeCallArtifacts(
@@ -214,7 +208,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
     const toolsListCall = listFigmaMcpTools({
       endpoint,
       sessionId: session.sessionId,
-      authToken: auth.token,
       timeoutMs,
       requestId: order + 100,
     });
@@ -251,7 +244,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
     timeoutMs,
     nodeId,
     session,
-    auth,
     baseDir,
     assetWriteDir,
     startOrder: order,
@@ -265,7 +257,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
       createdAt: new Date().toISOString(),
     },
     endpoint,
-    authTokenEnv: auth.envName || null,
     sessionId: session.sessionId,
     mode: context.scenario.gates.figmaMcpLogsMode,
     selectedNodeId: nodeId,
@@ -286,7 +277,6 @@ export function stepExtractFigmaMcpToolLogs(context) {
   return buildStepOutput(
     context,
     nodeId,
-    auth.envName,
     toolCallBundle.calls,
     summary.totals,
     'fresh',

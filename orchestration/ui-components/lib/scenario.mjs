@@ -260,16 +260,7 @@ export function readScenario(pathArg) {
       autoParent: parseSectionBoolean(figmaSection, 'auto_parent', true),
       parentHopsMax: parseSectionNumber(figmaSection, 'parent_hops_max', 3),
       timeoutMs: figmaTimeoutMs,
-      mcpEndpoint: parseSectionScalar(
-        figmaSection,
-        'mcp_endpoint',
-        DEFAULT_FIGMA_MCP_ENDPOINT
-      ),
-      mcpAuthTokenEnv: parseSectionScalar(
-        figmaSection,
-        'mcp_auth_token_env',
-        null
-      ),
+      mcpEndpoint: DEFAULT_FIGMA_MCP_ENDPOINT,
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),
       assetProbeEnabled: parseSectionBoolean(
         figmaSection,

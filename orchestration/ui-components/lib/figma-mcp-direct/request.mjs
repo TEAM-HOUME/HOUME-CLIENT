@@ -10,7 +10,6 @@ const DEFAULT_ACCEPT_HEADER = 'application/json, text/event-stream';
 export function sendJsonRpcRequest({
   endpoint,
   sessionId,
-  authToken,
   payload,
   timeoutMs,
   acceptHeader = DEFAULT_ACCEPT_HEADER,
@@ -31,9 +30,6 @@ export function sendJsonRpcRequest({
 
   if (sessionId) {
     args.push('-H', `mcp-session-id: ${sessionId}`);
-  }
-  if (authToken) {
-    args.push('-H', `authorization: Bearer ${authToken}`);
   }
 
   args.push(

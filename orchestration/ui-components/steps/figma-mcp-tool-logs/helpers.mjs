@@ -131,7 +131,6 @@ export function toToolRecord(toolName, callRecord, state) {
 export function buildStepOutput(
   context,
   nodeId,
-  authTokenEnv,
   calls,
   totals,
   source,
@@ -139,7 +138,6 @@ export function buildStepOutput(
 ) {
   return {
     selectedNodeId: nodeId,
-    authTokenEnv: authTokenEnv || null,
     tools: calls.length,
     okCalls: totals?.okCalls ?? 0,
     failedCalls: totals?.failedCalls ?? 0,

@@ -8,7 +8,6 @@ import {
   extractToolTextOutput,
   initializeFigmaMcpSession,
 } from '../lib/figma-mcp-direct.mjs';
-import { resolveFigmaMcpAuth } from '../lib/figma-mcp-auth.mjs';
 import {
   analyzeGraphicSignals,
   buildCacheKey,
@@ -159,11 +158,9 @@ export function stepExtractFigmaAssetScope(context) {
       endpoint,
     });
   } else {
-    const auth = resolveFigmaMcpAuth(context.scenario);
     const session = initializeFigmaMcpSession({
       endpoint,
       timeoutMs,
-      authToken: auth.token,
     });
 
     let calls = [];
@@ -178,7 +175,6 @@ export function stepExtractFigmaAssetScope(context) {
         const callRecord = callFigmaMcpTool({
           endpoint,
           sessionId: session.sessionId,
-          authToken: auth.token,
           timeoutMs,
           requestId,
           toolName: 'get_design_context',

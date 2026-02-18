@@ -1,7 +1,7 @@
 import { classifyJsonRpcCall } from './classify.mjs';
 import { sendJsonRpcRequest } from './request.mjs';
 
-export function initializeFigmaMcpSession({ endpoint, timeoutMs, authToken }) {
+export function initializeFigmaMcpSession({ endpoint, timeoutMs }) {
   const initializePayload = {
     jsonrpc: '2.0',
     id: 1,
@@ -19,7 +19,6 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs, authToken }) {
   const initializeCall = sendJsonRpcRequest({
     endpoint,
     sessionId: null,
-    authToken,
     payload: initializePayload,
     timeoutMs,
   });
@@ -44,7 +43,6 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs, authToken }) {
   const initializedNotification = sendJsonRpcRequest({
     endpoint,
     sessionId,
-    authToken,
     payload: initializedNotificationPayload,
     timeoutMs,
   });
@@ -62,14 +60,12 @@ export function initializeFigmaMcpSession({ endpoint, timeoutMs, authToken }) {
 export function listFigmaMcpTools({
   endpoint,
   sessionId,
-  authToken,
   timeoutMs,
   requestId = 2,
 }) {
   return sendJsonRpcRequest({
     endpoint,
     sessionId,
-    authToken,
     payload: {
       jsonrpc: '2.0',
       id: requestId,
@@ -83,7 +79,6 @@ export function listFigmaMcpTools({
 export function callFigmaMcpTool({
   endpoint,
   sessionId,
-  authToken,
   timeoutMs,
   requestId,
   toolName,
@@ -92,7 +87,6 @@ export function callFigmaMcpTool({
   return sendJsonRpcRequest({
     endpoint,
     sessionId,
-    authToken,
     payload: {
       jsonrpc: '2.0',
       id: requestId,
