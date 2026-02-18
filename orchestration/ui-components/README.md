@@ -353,4 +353,4 @@ figma:
 - Auto cleanup runs every execution: keep only recent 7 days or recent 10 runs (reports + linked artifacts).
 - Run report JSON includes `feedbackHistory` (retry question prompts + raw user answers).
 - Run report JSON includes `figmaAssetScopeArtifactPath` and `figmaAssetCoverageArtifactPath`.
-- Use `--open-storybook` to open `storybook-static/index.html` after a successful run.
+- Use `--open-storybook` to open an HTTP Storybook URL (`http://127.0.0.1:6006` by default) after a successful run.

@@ -7,6 +7,7 @@ import { resolveAgentTimeoutMs } from './timeout-budget.mjs';
 import {
   hasAlias,
   hasCommand,
+  runDetachedCommand,
   resolveAgentRuntime,
   runAgentCommand,
   runCommand,
@@ -29,6 +30,7 @@ export {
   parseAgentJsonOutput,
   resolveAgentRuntime,
   runAgentCommand,
+  runDetachedCommand,
   runCommand,
 };
 

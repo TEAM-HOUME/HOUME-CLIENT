@@ -1,4 +1,6 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { closeSync, mkdirSync, openSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 import { AGENT_COMMAND_MAP } from '../constants.mjs';
 import { fail } from '../errors.mjs';
@@ -69,6 +71,51 @@ function buildAgentCommandLine(agentRuntime, commandArgs) {
 
 export function runCommand(command, args, options = {}) {
   return runCommandInternal(command, args, options);
+}
+
+export function runDetachedCommand(command, args, options = {}) {
+  const {
+    cwd = process.cwd(),
+    shell = false,
+    env = process.env,
+    stdoutPath = null,
+    stderrPath = null,
+  } = options;
+  let stdoutFd = null;
+  let stderrFd = null;
+  try {
+    if (stdoutPath) {
+      mkdirSync(dirname(stdoutPath), { recursive: true });
+      stdoutFd = openSync(stdoutPath, 'a');
+    }
+    if (stderrPath) {
+      mkdirSync(dirname(stderrPath), { recursive: true });
+      stderrFd = openSync(stderrPath, 'a');
+    }
+
+    const child = spawn(command, args, {
+      cwd,
+      shell,
+      env,
+      detached: true,
+      stdio: ['ignore', stdoutFd ?? 'ignore', stderrFd ?? stdoutFd ?? 'ignore'],
+    });
+    child.unref();
+    return {
+      pid: Number.isFinite(child.pid) ? child.pid : null,
+    };
+  } catch (error) {
+    fail(
+      `Detached command failed (${command} ${args.join(' ')}): ${error instanceof Error ? error.message : String(error)}`
+    );
+  } finally {
+    if (typeof stdoutFd === 'number') {
+      closeSync(stdoutFd);
+    }
+    if (typeof stderrFd === 'number' && stderrFd !== stdoutFd) {
+      closeSync(stderrFd);
+    }
+  }
 }
 
 export function hasCommand(command) {
