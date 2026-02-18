@@ -16,7 +16,13 @@ export function summarizeStepOutput(name, output) {
       : output.mcpEndpoint && output.mcpTools
         ? `, MCP=${output.mcpEndpoint}, 도구=${output.mcpTools}`
         : '';
-    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})${mcpSummary}`;
+    const model = String(output.model || '').trim();
+    const reasoningEffort = String(output.reasoningEffort || '').trim();
+    const runtimeSummary =
+      model || reasoningEffort
+        ? `\n- 모델=${model || 'unknown'}, 추론=${reasoningEffort || 'unknown'}`
+        : '';
+    return `엔진=${output.engine}, 실행=${output.command}(${output.mode})${mcpSummary}${runtimeSummary}`;
   }
   if (name === 'extract-figma-scope') {
     const parentDepth = Array.isArray(output.parentChain)
