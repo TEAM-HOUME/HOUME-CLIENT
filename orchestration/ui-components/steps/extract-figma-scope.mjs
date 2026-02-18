@@ -8,6 +8,7 @@ import {
   enforceMcpGuardrails,
   getMcpGuardrailPolicy,
 } from '../lib/mcp-guardrails.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 
 const SCOPE_VERDICT_ENUM = ['sufficient', 'too_broad', 'too_narrow', 'unknown'];
 
@@ -64,10 +65,19 @@ function buildScopePrompt(context, figmaMeta, constraints) {
   const maxFailedCalls = Number.isFinite(constraints?.maxFailedCalls)
     ? constraints.maxFailedCalls
     : 4;
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'extract-figma-scope',
+    stagePurpose:
+      'Select an implementation scope node from Figma using MCP evidence.',
+    successCriteria: [
+      'Return selectedNodeId, scopeVerdict, cannotNarrowFurther, rationale.',
+      'Stay within parent traversal and MCP call guardrails.',
+    ],
+  });
   const lines = [
     'You are doing read-only Figma scope selection for implementation.',
-    'Stage: extract-figma-scope',
-    'Purpose: Select an implementation scope node from Figma using MCP evidence.',
+    ...runContextLines,
+    '',
     `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
     `Current node-id: ${figmaMeta.nodeIdNormalized}`,
     `Target component intent: ${intent?.componentKind || 'unknown'} / ${intent?.state || 'unknown'} / ${intent?.role || 'unknown'}`,

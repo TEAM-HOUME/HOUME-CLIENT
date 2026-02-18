@@ -7,6 +7,7 @@ import {
   invokeAgentWithSchema,
 } from '../lib/agent.mjs';
 import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 import {
   analyzeGraphicSignals,
   buildCacheKey,
@@ -44,10 +45,19 @@ function buildEffectiveChildNodeIds(
 }
 
 function buildPrompt(context, selectedNodeId, childNodeIds) {
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'extract-figma-asset-scope',
+    stagePurpose:
+      'Probe child node design contexts needed for asset coverage checks.',
+    successCriteria: [
+      'Probe selected/candidate child nodes with get_design_context only.',
+      'Return schema-valid probe status and Korean notes.',
+    ],
+  });
   return [
     'You are probing Figma child-node asset context using MCP.',
-    'Stage: extract-figma-asset-scope',
-    'Purpose: Probe child node design contexts needed for asset coverage checks.',
+    ...runContextLines,
+    '',
     `Figma URL: ${context.scenario.figma.url}`,
     `Selected node-id: ${selectedNodeId}`,
     '',

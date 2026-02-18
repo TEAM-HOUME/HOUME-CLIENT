@@ -2,6 +2,7 @@ import { relative } from 'node:path';
 
 import { createCacheKey } from '../../lib/artifact-cache.mjs';
 import { FIGMA_REQUIRED_TOOLS } from '../../lib/mcp-guardrails.mjs';
+import { buildRunContextLines } from '../../lib/prompt-run-context.mjs';
 import { CACHE_SCHEMA_VERSION, TOKEN_KEYS, TOOL_KEYS } from './constants.mjs';
 import {
   calculateTokenStats,
@@ -67,10 +68,18 @@ export function buildPrompt(context) {
   const designContextPath = context.designContextArtifactPath
     ? relative(context.rootPath, context.designContextArtifactPath)
     : '(missing)';
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'extract-design-tokens',
+    stagePurpose: 'Normalize token data from required Figma MCP tool outputs.',
+    successCriteria: [
+      'Call all required MCP tools and preserve raw outputs.',
+      'Return normalized token categories with diagnostics.',
+    ],
+  });
   return [
     'You are normalizing design tokens for a Figma implementation scope.',
-    'Stage: extract-design-tokens',
-    'Purpose: Normalize token data from required Figma MCP tool outputs.',
+    ...runContextLines,
+    '',
     `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
     `Design context artifact: ${designContextPath}`,

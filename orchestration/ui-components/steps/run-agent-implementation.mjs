@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 
 function readSystemPrompt(rootPath) {
   const path = resolve(
@@ -80,10 +81,18 @@ export function stepRunAgent(context) {
   const verifyFeedback = Array.isArray(context.feedbackLoop?.verify)
     ? context.feedbackLoop.verify.filter(Boolean)
     : [];
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'run-agent-implementation',
+    stagePurpose:
+      'Implement planned UI changes within the current scenario scope.',
+    successCriteria: [
+      'Apply focused code edits under allowed scope only.',
+      'Return Korean summary/notes and changed file list.',
+    ],
+  });
   const promptSections = [
     systemPrompt,
-    'Stage: run-agent-implementation',
-    'Purpose: Implement planned UI changes within the current scenario scope.',
+    ...runContextLines,
     '',
     '# Task',
     `- Scenario: ${context.scenario.id}`,

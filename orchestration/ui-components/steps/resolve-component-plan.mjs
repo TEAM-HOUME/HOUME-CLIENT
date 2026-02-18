@@ -10,6 +10,7 @@ import {
 import { readContracts } from '../lib/contracts.mjs';
 import { fail } from '../lib/errors.mjs';
 import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 
 const INTERACTION_KEYWORDS = [
   'modal',
@@ -112,11 +113,20 @@ function buildResolvePrompt(context, contracts) {
           ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
         ]
       : [];
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'resolve-component-plan',
+    stagePurpose:
+      'Choose target files and action plan for this implementation.',
+    successCriteria: [
+      'Return schema-valid action, targetPath, rationale, and behaviorQuestions.',
+      'Prefer reuse/update paths aligned with project rules.',
+    ],
+  });
 
   return [
     'You are planning a UI component implementation in read-only mode.',
-    'Stage: resolve-component-plan',
-    'Purpose: Choose target files and action plan for this implementation.',
+    ...runContextLines,
+    '',
     `Scenario id: ${context.scenario.id}`,
     `Brief: ${context.scenario.intent.brief}`,
     `Figma URL: ${context.scenario.figma.url}`,

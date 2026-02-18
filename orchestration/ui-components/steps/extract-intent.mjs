@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 import { readContracts } from '../lib/contracts.mjs';
 import {
   COMPONENT_KIND_ENUM,
@@ -131,11 +132,20 @@ function buildPrompt(context) {
   if (intent.notes) {
     hintLines.push(`- notes: ${intent.notes}`);
   }
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'extract-intent',
+    stagePurpose:
+      'Resolve implementation intent from brief and repository evidence.',
+    successCriteria: [
+      'Return schema-valid intent fields with confidence and ambiguities.',
+      'Provide concrete codebaseReferences (or empty array).',
+    ],
+  });
 
   return [
     'You are resolving implementation intent from a short product brief.',
-    'Stage: extract-intent',
-    'Purpose: Resolve implementation intent from brief and repository evidence.',
+    ...runContextLines,
+    '',
     `Figma URL: ${context.scenario.figma.url}`,
     `Brief: ${intent.brief}`,
     hintLines.length > 0 ? 'Optional hints:' : 'Optional hints: (none)',

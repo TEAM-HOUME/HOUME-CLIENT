@@ -4,6 +4,7 @@ import { relative, resolve } from 'node:path';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
 import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
+import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
 
 const COVERAGE_STATUS_VALUES = new Set(['covered', 'missing', 'unknown']);
 
@@ -50,11 +51,20 @@ function buildPrompt(context) {
   const assetScopePath = context.figmaAssetScopeArtifactPath
     ? relative(context.rootPath, context.figmaAssetScopeArtifactPath)
     : '(missing)';
+  const runContextLines = buildRunContextLines(context, {
+    stageName: 'gate-figma-asset-coverage',
+    stagePurpose:
+      'Judge whether visual assets are covered by current context evidence.',
+    successCriteria: [
+      'Return covered/missing/unknown with confidence.',
+      'Provide Korean reasons and suggestedActions.',
+    ],
+  });
 
   return [
     'You are validating visual asset coverage for a Figma implementation scope.',
-    'Stage: gate-figma-asset-coverage',
-    'Purpose: Judge whether visual assets are covered by current context evidence.',
+    ...runContextLines,
+    '',
     `Figma URL: ${context.scenario.figma.url}`,
     `Scope node-id: ${context.figmaScope.selectedNodeId}`,
     `Brief: ${context.scenario.intent.brief}`,
