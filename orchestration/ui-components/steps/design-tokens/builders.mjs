@@ -69,6 +69,8 @@ export function buildPrompt(context) {
     : '(missing)';
   return [
     'You are normalizing design tokens for a Figma implementation scope.',
+    'Stage: extract-design-tokens',
+    'Purpose: Normalize token data from required Figma MCP tool outputs.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
     `Design context artifact: ${designContextPath}`,

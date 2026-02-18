@@ -66,6 +66,8 @@ function buildScopePrompt(context, figmaMeta, constraints) {
     : 4;
   const lines = [
     'You are doing read-only Figma scope selection for implementation.',
+    'Stage: extract-figma-scope',
+    'Purpose: Select an implementation scope node from Figma using MCP evidence.',
     `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
     `Current node-id: ${figmaMeta.nodeIdNormalized}`,
     `Target component intent: ${intent?.componentKind || 'unknown'} / ${intent?.state || 'unknown'} / ${intent?.role || 'unknown'}`,

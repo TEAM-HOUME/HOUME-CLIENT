@@ -82,6 +82,9 @@ export function stepRunAgent(context) {
     : [];
   const promptSections = [
     systemPrompt,
+    'Stage: run-agent-implementation',
+    'Purpose: Implement planned UI changes within the current scenario scope.',
+    '',
     '# Task',
     `- Scenario: ${context.scenario.id}`,
     `- Brief: ${context.scenario.intent.brief}`,

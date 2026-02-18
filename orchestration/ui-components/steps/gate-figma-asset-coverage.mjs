@@ -53,6 +53,8 @@ function buildPrompt(context) {
 
   return [
     'You are validating visual asset coverage for a Figma implementation scope.',
+    'Stage: gate-figma-asset-coverage',
+    'Purpose: Judge whether visual assets are covered by current context evidence.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Scope node-id: ${context.figmaScope.selectedNodeId}`,
     `Brief: ${context.scenario.intent.brief}`,

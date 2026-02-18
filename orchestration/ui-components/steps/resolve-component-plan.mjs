@@ -115,6 +115,8 @@ function buildResolvePrompt(context, contracts) {
 
   return [
     'You are planning a UI component implementation in read-only mode.',
+    'Stage: resolve-component-plan',
+    'Purpose: Choose target files and action plan for this implementation.',
     `Scenario id: ${context.scenario.id}`,
     `Brief: ${context.scenario.intent.brief}`,
     `Figma URL: ${context.scenario.figma.url}`,

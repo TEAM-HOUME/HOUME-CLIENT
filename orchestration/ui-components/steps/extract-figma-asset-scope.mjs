@@ -46,6 +46,8 @@ function buildEffectiveChildNodeIds(
 function buildPrompt(context, selectedNodeId, childNodeIds) {
   return [
     'You are probing Figma child-node asset context using MCP.',
+    'Stage: extract-figma-asset-scope',
+    'Purpose: Probe child node design contexts needed for asset coverage checks.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Selected node-id: ${selectedNodeId}`,
     '',

@@ -134,6 +134,8 @@ function buildPrompt(context) {
 
   return [
     'You are resolving implementation intent from a short product brief.',
+    'Stage: extract-intent',
+    'Purpose: Resolve implementation intent from brief and repository evidence.',
     `Figma URL: ${context.scenario.figma.url}`,
     `Brief: ${intent.brief}`,
     hintLines.length > 0 ? 'Optional hints:' : 'Optional hints: (none)',
