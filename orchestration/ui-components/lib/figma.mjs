@@ -41,4 +41,7 @@ export function validateDesignContext(context) {
   if (!Array.isArray(context.parentChain)) {
     fail('Design context `parentChain` must be an array.');
   }
+  if (!Array.isArray(context.childChain)) {
+    fail('Design context `childChain` must be an array.');
+  }
 }

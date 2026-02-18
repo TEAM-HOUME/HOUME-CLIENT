@@ -41,6 +41,9 @@ export function stepGateFigmaScope(context) {
   const parentDepth = Array.isArray(scope.parentChain)
     ? scope.parentChain.length
     : 0;
+  const childDepth = Array.isArray(scope.childChain)
+    ? scope.childChain.length
+    : 0;
   const scopeVerdict = normalizeScopeVerdict(scope.scopeVerdict);
   const mode = context.scenario.gates.scopeGateMode;
   const cannotNarrowFurther = Boolean(scope.cannotNarrowFurther);
@@ -53,13 +56,15 @@ export function stepGateFigmaScope(context) {
       cannotNarrowFurther,
       parentDepth,
       parentHopsMax: context.scenario.figma.parentHopsMax,
+      childDepth,
+      childHopsMax: context.scenario.figma.childHopsMax,
     };
     return context.figmaScopeGate;
   }
 
   if (scopeVerdict === 'too_broad') {
     if (cannotNarrowFurther) {
-      const message = `선택 스코프가 상위 탐색 한계(${parentDepth}/${context.scenario.figma.parentHopsMax})에서도 넓게 유지됩니다. cannotNarrowFurther=true 이므로 경고로 진행합니다.`;
+      const message = `선택 스코프가 탐색 한계(상위 ${parentDepth}/${context.scenario.figma.parentHopsMax}, 하위 ${childDepth}/${context.scenario.figma.childHopsMax})에서도 넓게 유지됩니다. cannotNarrowFurther=true 이므로 경고로 진행합니다.`;
       context.warnings.push(message);
       context.figmaScopeGate = {
         mode,
@@ -68,6 +73,8 @@ export function stepGateFigmaScope(context) {
         cannotNarrowFurther,
         parentDepth,
         parentHopsMax: context.scenario.figma.parentHopsMax,
+        childDepth,
+        childHopsMax: context.scenario.figma.childHopsMax,
       };
       return context.figmaScopeGate;
     }
@@ -84,6 +91,8 @@ export function stepGateFigmaScope(context) {
       cannotNarrowFurther,
       parentDepth,
       parentHopsMax: context.scenario.figma.parentHopsMax,
+      childDepth,
+      childHopsMax: context.scenario.figma.childHopsMax,
     };
     return context.figmaScopeGate;
   }
@@ -101,6 +110,8 @@ export function stepGateFigmaScope(context) {
       cannotNarrowFurther,
       parentDepth,
       parentHopsMax: context.scenario.figma.parentHopsMax,
+      childDepth,
+      childHopsMax: context.scenario.figma.childHopsMax,
     };
     return context.figmaScopeGate;
   }
@@ -117,6 +128,8 @@ export function stepGateFigmaScope(context) {
     cannotNarrowFurther,
     parentDepth,
     parentHopsMax: context.scenario.figma.parentHopsMax,
+    childDepth,
+    childHopsMax: context.scenario.figma.childHopsMax,
   };
   return context.figmaScopeGate;
 }

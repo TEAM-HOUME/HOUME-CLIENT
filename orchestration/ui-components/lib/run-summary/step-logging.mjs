@@ -156,7 +156,7 @@ export function logStepFailureHint(context, name, traceRecords) {
   if (name === 'gate-figma-scope') {
     console.log('- 조치');
     console.log(
-      '- 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 brief/intent 힌트를 보강하세요'
+      '- 스코프 판정(scopeVerdict)을 확인하고 figma.scope_node_id 또는 figma.child_hops_max/brief/intent 힌트를 보강하세요'
     );
   }
   if (name === 'gate-intent') {

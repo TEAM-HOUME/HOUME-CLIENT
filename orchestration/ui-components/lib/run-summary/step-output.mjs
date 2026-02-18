@@ -31,7 +31,10 @@ export function summarizeStepOutput(name, output) {
     const parentDepth = Array.isArray(output.parentChain)
       ? output.parentChain.length
       : 0;
-    return `스코프=${output.selectedNodeId}, 소스=${output.source}, 판정=${output.scopeVerdict}, 상위탐색=${parentDepth}단계`;
+    const childDepth = Array.isArray(output.childChain)
+      ? output.childChain.length
+      : 0;
+    return `스코프=${output.selectedNodeId}, 소스=${output.source}, 판정=${output.scopeVerdict}, 상위탐색=${parentDepth}단계, 하위탐색=${childDepth}단계`;
   }
   if (name === 'extract-intent') {
     const ambiguityCount = Array.isArray(output.ambiguities)
@@ -50,7 +53,7 @@ export function summarizeStepOutput(name, output) {
     return `상태=${output.status}, 신뢰도=${Number(output.confidence || 0).toFixed(2)} (기준 ${Number(output.minConfidence || 0).toFixed(2)}), 블로킹=${blockingCount}, 권고=${advisoryCount}`;
   }
   if (name === 'gate-figma-scope') {
-    return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계`;
+    return `상태=${output.status}, 판정=${output.scopeVerdict}, 상위탐색=${output.parentDepth}단계, 하위탐색=${output.childDepth ?? 0}단계`;
   }
   if (name === 'extract-design-tokens') {
     const sourceText = output.source ? `, 소스=${output.source}` : '';

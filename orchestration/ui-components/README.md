@@ -27,7 +27,7 @@ pnpm ui:run --scenario orchestration/ui-components/scenarios/jjym-toast.yml
 - `preflight`: verify required CLI availability and codex runtime.
 - `extract-intent`: resolve structured intent from brief/hints + docs conventions + retry context.
 - `gate-intent`: validate confidence/fields and split ambiguities into `blocking` vs `advisory`.
-- `extract-figma-scope`: parse URL and optionally walk parent scope.
+- `extract-figma-scope`: parse URL and optionally walk parent/child scope.
 - `gate-figma-scope`: enforce `scopeVerdict` (`sufficient|too_broad|too_narrow|unknown`) with mode (`warn|error`).
 - `extract-design-tokens`: Codex가 필수 Figma MCP 도구(4/4)를 호출하고 토큰을 정규화합니다.
 - `gate-design-tokens`: enforce MCP tool coverage + token quality mode (`off|warn|error`).
@@ -159,7 +159,7 @@ sequenceDiagram
     A-->>R: refined intent JSON
   end
 
-  R->>A: extract-figma-scope (optional parent walk)
+  R->>A: extract-figma-scope (optional parent/child walk)
   A->>M: MCP tool calls for scope evidence
   M-->>A: scope evidence
   A-->>R: selectedNodeId + scope verdict
@@ -314,8 +314,9 @@ figma:
 - `gates.scope_gate_mode`: scope gate strictness (`warn|error`, default `warn`)
 - `gates.asset_coverage_mode`: screenshot/context asset coverage strictness (`off|warn|error`, default `error`)
 - `figma.mcp_endpoint`: local desktop MCP endpoint (fixed default: `http://127.0.0.1:3845/mcp`)
-- `figma.auto_parent`: if `true`, scope extraction agent can walk parent chain (`default: true`)
+- `figma.auto_parent`: if `true`, scope extraction agent can walk parent/child chain (`default: true`)
 - `figma.parent_hops_max`: maximum parent hops during auto scope selection (`default: 3`)
+- `figma.child_hops_max`: maximum child hops during auto scope selection (`default: 2`, `max: 2`)
 - `figma.scope_node_id`: explicit scope override to skip agent scope walk
 - `figma.asset_probe_enabled`: enable child asset probe stage (`default: true`)
 - `figma.asset_probe_max_candidates`: max inferred child node ids to probe (`default: 8`)
@@ -326,7 +327,7 @@ figma:
 
 - Gate verdict enum is fixed: `sufficient|too_broad|too_narrow|unknown`.
 - `sufficient` always passes.
-- `too_broad` with `cannotNarrowFurther=true` passes with warning (to avoid false-fail at parent-hop limit).
+- `too_broad` with `cannotNarrowFurther=true` passes with warning (to avoid false-fail at traversal limits).
 - `too_broad|too_narrow|unknown` follow `gates.scope_gate_mode`:
   - `error`: fail the run.
   - `warn`: continue with warning.

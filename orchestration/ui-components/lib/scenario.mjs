@@ -226,6 +226,11 @@ export function readScenario(pathArg) {
     'timeout_ms',
     DEFAULT_FIGMA_TIMEOUT_MS
   );
+  const childHopsMax = clamp(
+    Math.trunc(parseSectionNumber(figmaSection, 'child_hops_max', 2)),
+    0,
+    2
+  );
   const assetProbeMaxCandidates = clamp(
     Math.trunc(
       parseSectionNumber(figmaSection, 'asset_probe_max_candidates', 8)
@@ -259,6 +264,7 @@ export function readScenario(pathArg) {
       url: figmaUrl,
       autoParent: parseSectionBoolean(figmaSection, 'auto_parent', true),
       parentHopsMax: parseSectionNumber(figmaSection, 'parent_hops_max', 3),
+      childHopsMax,
       timeoutMs: figmaTimeoutMs,
       mcpEndpoint: DEFAULT_FIGMA_MCP_ENDPOINT,
       scopeNodeId: parseSectionScalar(figmaSection, 'scope_node_id', null),

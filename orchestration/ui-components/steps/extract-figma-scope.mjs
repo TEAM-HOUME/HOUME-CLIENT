@@ -46,6 +46,23 @@ function normalizeParentChain(parentChain) {
   return normalized;
 }
 
+function normalizeChildChain(childChain) {
+  if (!Array.isArray(childChain)) {
+    return [];
+  }
+  const normalized = [];
+  const seen = new Set();
+  for (const nodeId of childChain) {
+    const value = normalizeNodeId(nodeId);
+    if (!value || seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    normalized.push(value);
+  }
+  return normalized;
+}
+
 function enforceParentHopsLimit(parentChain, parentHopsMax) {
   const maxHops = Number.isFinite(parentHopsMax)
     ? Math.max(0, Math.trunc(parentHopsMax))
@@ -53,6 +70,17 @@ function enforceParentHopsLimit(parentChain, parentHopsMax) {
   if (parentChain.length > maxHops) {
     fail(
       `Scope parentChain 길이가 parent_hops_max를 초과했습니다 (${parentChain.length} > ${maxHops}).`
+    );
+  }
+}
+
+function enforceChildHopsLimit(childChain, childHopsMax) {
+  const maxHops = Number.isFinite(childHopsMax)
+    ? Math.max(0, Math.trunc(childHopsMax))
+    : 0;
+  if (childChain.length > maxHops) {
+    fail(
+      `Scope childChain 길이가 child_hops_max를 초과했습니다 (${childChain.length} > ${maxHops}).`
     );
   }
 }
@@ -70,7 +98,7 @@ function buildScopePrompt(context, figmaMeta, constraints) {
     stagePurpose:
       'Select an implementation scope node from Figma using MCP evidence.',
     successCriteria: [
-      'Return selectedNodeId, scopeVerdict, cannotNarrowFurther, rationale.',
+      'Return selectedNodeId, parentChain, childChain, scopeVerdict, cannotNarrowFurther, rationale.',
       'Stay within parent traversal and MCP call guardrails.',
     ],
   });
@@ -83,6 +111,7 @@ function buildScopePrompt(context, figmaMeta, constraints) {
     `Target component intent: ${intent?.componentKind || 'unknown'} / ${intent?.state || 'unknown'} / ${intent?.role || 'unknown'}`,
     `Brief: ${context.scenario.intent.brief}`,
     `If current node is too narrow for implementation, walk up parent chain up to ${context.scenario.figma.parentHopsMax} levels and select one implementation scope node.`,
+    `If current node is too broad for implementation, walk down child chain up to ${context.scenario.figma.childHopsMax} levels and select one implementation scope node.`,
     '',
     'Verdict rules:',
     '- sufficient: selected node is component-level and implementable directly.',
@@ -93,10 +122,12 @@ function buildScopePrompt(context, figmaMeta, constraints) {
     '',
     'Hard MCP constraints:',
     `- Parent traversal limit: at most ${context.scenario.figma.parentHopsMax} hops from current node.`,
-    '- Allowed targets: current node and strict parent chain only.',
+    `- Child traversal limit: at most ${context.scenario.figma.childHopsMax} hops from current node.`,
+    '- Allowed targets: current node, strict parent chain, and strict child chain only.',
     '- Never query canvas/document root nodes (e.g., 0:1).',
-    '- Never scan siblings, cousins, or unrelated sections.',
+    '- Never scan siblings/cousins/unrelated sections outside the selected parent-or-child path.',
     `- Keep MCP calls in this step <= ${maxCalls}, failed calls <= ${maxFailedCalls}.`,
+    '- If scope is still too broad/narrow after using both traversal limits, return cannotNarrowFurther=true.',
     '- If evidence is insufficient within limits, return scopeVerdict=unknown and cannotNarrowFurther=true.',
     '',
     'Do not edit any code or files.',
@@ -113,6 +144,7 @@ export function stepExtractFigmaScope(context) {
       context.scenario.figma.scopeNodeId || figmaMeta.nodeIdNormalized,
     source: context.scenario.figma.scopeNodeId ? 'scenario' : 'input',
     parentChain: [],
+    childChain: [],
     scopeVerdict: context.scenario.figma.scopeNodeId ? 'sufficient' : 'unknown',
     cannotNarrowFurther: false,
     rationale: context.scenario.figma.scopeNodeId
@@ -137,6 +169,10 @@ export function stepExtractFigmaScope(context) {
             type: 'array',
             items: { type: 'string' },
           },
+          childChain: {
+            type: 'array',
+            items: { type: 'string' },
+          },
           scopeVerdict: {
             type: 'string',
             enum: SCOPE_VERDICT_ENUM,
@@ -147,6 +183,7 @@ export function stepExtractFigmaScope(context) {
         required: [
           'selectedNodeId',
           'parentChain',
+          'childChain',
           'scopeVerdict',
           'cannotNarrowFurther',
           'rationale',
@@ -170,12 +207,18 @@ export function stepExtractFigmaScope(context) {
       const normalizedParentChain = normalizeParentChain(
         scopeResult.parentChain
       );
+      const normalizedChildChain = normalizeChildChain(scopeResult.childChain);
       enforceParentHopsLimit(
         normalizedParentChain,
         context.scenario.figma.parentHopsMax
       );
+      enforceChildHopsLimit(
+        normalizedChildChain,
+        context.scenario.figma.childHopsMax
+      );
       scope.selectedNodeId = normalizeNodeId(scopeResult.selectedNodeId);
       scope.parentChain = normalizedParentChain;
+      scope.childChain = normalizedChildChain;
       scope.scopeVerdict = normalizeScopeVerdict(scopeResult.scopeVerdict);
       scope.cannotNarrowFurther = Boolean(scopeResult.cannotNarrowFurther);
       scope.rationale = String(scopeResult.rationale);
@@ -205,6 +248,7 @@ export function stepExtractFigmaScope(context) {
     cannotNarrowFurther: scope.cannotNarrowFurther,
     rationale: scope.rationale,
     parentChain: scope.parentChain,
+    childChain: scope.childChain,
     artifactPath: relative(context.rootPath, designContextArtifactPath),
   };
 }
