@@ -9,6 +9,33 @@ function toErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
+function applyRuntimeBehaviorSpec(context, stage, decision) {
+  const behaviorSpec = String(decision?.behaviorSpec ?? '').trim();
+  if (!behaviorSpec) {
+    return false;
+  }
+
+  if (
+    !context.scenario.behavior ||
+    typeof context.scenario.behavior !== 'object'
+  ) {
+    context.scenario.behavior = {
+      confirmed: true,
+      spec: behaviorSpec,
+    };
+  } else {
+    context.scenario.behavior.confirmed = true;
+    context.scenario.behavior.spec = behaviorSpec;
+  }
+
+  appendFeedback(
+    context,
+    stage,
+    `세부 동작 명세(런타임 입력): ${behaviorSpec}`
+  );
+  return true;
+}
+
 function buildIntentRetryHints(context, errorMessage) {
   const gate = context.intentGate || {};
   const lines = [];
@@ -71,10 +98,16 @@ export async function runPlanWithFeedbackLoop(context, options) {
       if (!decision.retry) {
         throw error;
       }
+      const appliedBehaviorSpec = applyRuntimeBehaviorSpec(
+        context,
+        'plan',
+        decision
+      );
       appendFeedback(
         context,
         'plan',
-        decision.note || `Previous plan failure: ${errorMessage}`
+        decision.note ||
+          (appliedBehaviorSpec ? '' : `Previous plan failure: ${errorMessage}`)
       );
     }
   }
@@ -143,6 +176,7 @@ export async function runIntentWithFeedbackLoop(context, options) {
       if (!decision.retry) {
         throw error;
       }
+      applyRuntimeBehaviorSpec(context, 'intent', decision);
 
       appendFeedback(
         context,

@@ -41,7 +41,7 @@ export function buildBehaviorConfirmationRequiredMessage({
 }) {
   const messageParts = [
     `${formatInteractionLabel(componentKind)} 세부 동작 명세 확인이 필요합니다.`,
-    '시나리오에서 동작 확정 여부를 true로 설정해 주세요.',
+    '재시도 입력에서 세부 동작 명세를 확정하거나 시나리오에 동작 설정을 지정해 주세요.',
     '동작 상세 설명에 트리거/배치/닫힘/CTA/중복 처리/접근성 기준을 포함해 주세요.',
   ];
   const questions = toBehaviorQuestions(behaviorQuestions);
@@ -61,7 +61,7 @@ export function buildBehaviorSpecMissingMessage({ componentKind }) {
 export function buildBehaviorRetryHintForConfirmation({ componentKind }) {
   return [
     `${formatInteractionLabel(componentKind)} 세부 동작 명세 보강 필요`,
-    '시나리오에서 동작 확정 여부를 true로 설정하고 동작 상세 설명을 작성해 주세요.',
+    '재시도 입력 질문에서 세부 동작 명세를 작성해 다음 시도에 반영해 주세요.',
   ].join(': ');
 }
 

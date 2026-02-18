@@ -40,7 +40,7 @@ export function logStepDetails(name, output, traceRecords) {
   if (name === 'extract-intent') {
     console.log('- 상세');
     if (output.behaviorNeeded) {
-      console.log('- 동작정의 필요: 예');
+      console.log('- 세부 동작 명세 필요: 예');
     }
     if (
       Array.isArray(output.codebaseSummaryLines) &&
@@ -161,9 +161,9 @@ export function logStepFailureHint(context, name, traceRecords) {
   }
   if (name === 'gate-intent') {
     console.log('- 조치');
-    console.log('- 재시도 시 y 입력 후, 위 상세 항목을 한 번에 보강해 주세요');
+    console.log('- 재시도 시 y 입력 후, 세부 동작 명세 질문에 답변해 주세요');
     console.log(
-      '- 권장 포맷: 트리거/배치/닫힘/CTA/중복/접근성 중 필요한 항목을 추가 프롬프트로 명시'
+      '- 권장 포맷: 트리거/배치/닫힘/CTA/중복/접근성 중 필요한 항목을 명시'
     );
     console.log(
       '- 예: "보러가기는 /mypage/favorites, 자동닫힘 3000ms, 중복은 최신 교체"'
