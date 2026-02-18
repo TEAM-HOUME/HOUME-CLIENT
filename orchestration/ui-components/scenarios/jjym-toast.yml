@@ -1,4 +1,0 @@
-brief: '이미지 생성 완료 페이지에서 프로덕트 카드의 찜하기를 눌렀을 때 성공하면 나오는 하단 스낵바 찜하기 토스트,  UI 차이만 수정하고, 나머지는 기존 코드 설정 유지할 것'
-
-figma:
-  url: 'https://www.figma.com/design/87dDqo3EUSFSzXK7f7s5Gs/TEMP?node-id=1-427&m=dev'
