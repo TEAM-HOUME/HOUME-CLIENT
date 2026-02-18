@@ -26,17 +26,6 @@ function recordFeedbackHistory(context, entry) {
   context.feedbackHistory.push(entry);
 }
 
-function parseIntentRetryMode(rawAnswer) {
-  const raw = String(rawAnswer ?? '').trim();
-  if (!raw || raw === '1') {
-    return 'codebase';
-  }
-  if (raw === '2') {
-    return 'manual';
-  }
-  return null;
-}
-
 export async function promptRetryDecision(
   context,
   stage,
@@ -48,8 +37,6 @@ export async function promptRetryDecision(
   const remaining = Math.max(0, maxAttempts - attempt);
   const retryQuestion = `재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
   const noteQuestion = '추가 프롬프트 입력 (선택, Enter=생략): ';
-  const intentModeQuestion =
-    '재시도 방식 선택 (Enter=1): 1) 코드베이스 기준 적용 2) 직접 보강 입력: ';
   const parsedError = splitErrorDetails(errorMessage);
   const intentGuidance =
     stage === 'intent' ? collectIntentCodebaseGuidance(context) : null;
@@ -128,49 +115,14 @@ export async function promptRetryDecision(
       };
     }
 
-    let note = '';
-    let retryMode = 'manual';
+    const note = String((await askLine(rl, noteQuestion)) ?? '').trim();
     const questions = [retryQuestion];
     const answers = {
       retryAnswerRaw: parsedDecision.raw,
-      note: '',
-      retryMode,
-      retryModeRaw: '',
+      note,
     };
 
-    if (stage === 'intent') {
-      let mode = null;
-      while (!mode) {
-        const modeAnswer = await askLine(rl, intentModeQuestion);
-        mode = parseIntentRetryMode(modeAnswer);
-        if (!mode) {
-          console.log('입력 형식 오류: 1 또는 2로 입력해 주세요');
-          continue;
-        }
-
-        answers.retryModeRaw = String(modeAnswer ?? '').trim();
-        retryMode = mode;
-        answers.retryMode = retryMode;
-      }
-
-      questions.push(intentModeQuestion);
-      if (retryMode === 'codebase') {
-        note = String(intentGuidance?.defaultNote || '').trim();
-        if (note) {
-          console.log(
-            '[ui-components] [intent] 코드베이스 기준 보강 지시를 적용합니다'
-          );
-          console.log(`  - ${note}`);
-        }
-      } else {
-        note = String((await askLine(rl, noteQuestion)) ?? '').trim();
-        questions.push(noteQuestion);
-      }
-    } else {
-      note = String((await askLine(rl, noteQuestion)) ?? '').trim();
-      questions.push(noteQuestion);
-    }
-    answers.note = note;
+    questions.push(noteQuestion);
 
     recordFeedbackHistory(context, {
       stage,

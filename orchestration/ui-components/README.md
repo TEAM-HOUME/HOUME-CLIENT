@@ -323,7 +323,7 @@ figma:
 
 - `brief`: required natural-language context for intent extraction
 - `intent.page|component_kind|role|state|notes`: optional hints for stable intent resolution
-- `intent.component_kind` canonical values: `toast|snackbar|banner|tooltip|modal|dialog|bottom_sheet|drawer|sheet|popover|dropdown|menu|tabs|accordion|carousel|chip|card|list_item|empty_state|input|textarea|select|checkbox|radio|switch|progress|skeleton`
+- `intent.component_kind` canonical values: `toast|snackbar|banner|tooltip|modal|dialog|alert|callout|bottom_sheet|drawer|sheet|popover|dropdown|menu|context_menu|tabs|accordion|carousel|pagination|breadcrumb|stepper|combobox|date_picker|time_picker|file_upload|segmented_control|range_slider|chip|card|table|avatar|badge|timeline|tree|calendar|chart|map|list_item|empty_state|input|textarea|select|checkbox|radio|switch|search_bar|filter_bar|filter_chip_group|progress|skeleton|image|icon|illustration|video`
 - `intent.role` canonical values: `global|local|inline` (`unknown` is reserved for unresolved extraction output)
 - `intent.component_kind` / `intent.role` hints accept alias input (Korean/English synonyms) and are normalized to canonical values during extraction
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
