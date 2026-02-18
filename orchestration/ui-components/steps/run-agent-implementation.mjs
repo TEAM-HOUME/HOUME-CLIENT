@@ -1,20 +1,7 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { relative } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { buildRunContextLines } from '../lib/prompt-run-context.mjs';
-
-function readSystemPrompt(rootPath) {
-  const path = resolve(
-    rootPath,
-    'orchestration/ui-components/prompts',
-    'codex.system.md'
-  );
-  if (!existsSync(path)) {
-    return '';
-  }
-  return readFileSync(path, 'utf8').trim();
-}
 
 function invokeImplementationAgent(context, prompt) {
   const schema = {
@@ -74,7 +61,6 @@ export function stepRunAgent(context) {
     };
   }
 
-  const systemPrompt = readSystemPrompt(context.rootPath);
   const implementFeedback = Array.isArray(context.feedbackLoop?.implement)
     ? context.feedbackLoop.implement.filter(Boolean)
     : [];
@@ -91,7 +77,18 @@ export function stepRunAgent(context) {
     ],
   });
   const promptSections = [
-    systemPrompt,
+    `
+# Codex System Prompt (UI Components)
+
+You are implementing UI components from structured scenario inputs.
+
+Hard requirements:
+
+- Follow injected design convention docs from \`docs/\`.
+- Prefer updating existing components over creating new ones.
+- Keep width fluid and preserve fixed height where defined.
+- Run project verification steps after edits.
+`.trim(),
     ...runContextLines,
     '',
     '# Task',

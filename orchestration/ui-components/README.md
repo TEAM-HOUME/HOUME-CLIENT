@@ -11,7 +11,6 @@ Single-command pipeline for turning a Figma node into a validated UI component c
 ## Directory Layout
 
 - `scenarios/`: scenario inputs (`.yml`)
-- `prompts/`: system prompt fragments for Codex
 - `steps/`: pipeline stages
 - `lib/`: shared runtime helpers
 - `artifacts/`: per-run outputs (local)
@@ -50,16 +49,16 @@ Default fixed policy:
 
 ## Context Injection Matrix
 
-| Stage                       | Prompt Source                                 | Injected Context                                                                                                                     | Output Artifact                                                     |
-| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `preflight`                 | None (local check)                            | required commands, codex runtime                                                                                                     | runtime summary only                                                |
-| `extract-intent`            | Inline prompt in step code                    | `brief`, `intent hints`, `feedbackLoop.intent`, `docs/reference/*` conventions                                                       | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
-| `resolve-component-plan`    | Inline prompt in step code                    | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
-| `run-agent-implementation`  | `prompts/codex.system.md` + inline task block | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
-| `extract-design-tokens`     | Inline prompt in step code                    | selected scope node + direct Figma MCP calls(4 tools) + docs conventions                                                             | `artifacts/*-design-tokens.json`                                    |
-| `extract-figma-asset-scope` | Inline prompt in step code                    | selected node evidence + child node-id inference + Codex MCP probe + scenario asset probe config                                     | `artifacts/*-figma-asset-scope.json`                                |
-| `gate-figma-asset-coverage` | Inline prompt in step code                    | MCP evidence artifact + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes               | `artifacts/*-figma-asset-coverage.json`                             |
-| `report`                    | None (local serialization)                    | step logs, warnings, `feedbackHistory`, token usage, artifact paths                                                                  | `reports/<runId>.json`, `reports/index.jsonl`                       |
+| Stage                       | Prompt Source              | Injected Context                                                                                                                     | Output Artifact                                                     |
+| --------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `preflight`                 | None (local check)         | required commands, codex runtime                                                                                                     | runtime summary only                                                |
+| `extract-intent`            | Inline prompt in step code | `brief`, `intent hints`, `feedbackLoop.intent`, `docs/reference/*` conventions                                                       | `artifacts/*-intent.json`, `agent-trace/*-intent-resolve.*`         |
+| `resolve-component-plan`    | Inline prompt in step code | resolved intent, design context/token artifact paths, docs convention sources, `feedbackLoop.plan`                                   | in-memory `componentPlan`, `agent-trace/*-resolve-component-plan.*` |
+| `run-agent-implementation`  | Inline prompt in step code | resolved intent, plan, design context/token artifacts, full docs convention content, `feedbackLoop.implement`, `feedbackLoop.verify` | code changes + `agent-trace/*-implement.*`                          |
+| `extract-design-tokens`     | Inline prompt in step code | selected scope node + direct Figma MCP calls(4 tools) + docs conventions                                                             | `artifacts/*-design-tokens.json`                                    |
+| `extract-figma-asset-scope` | Inline prompt in step code | selected node evidence + child node-id inference + Codex MCP probe + scenario asset probe config                                     | `artifacts/*-figma-asset-scope.json`                                |
+| `gate-figma-asset-coverage` | Inline prompt in step code | MCP evidence artifact + asset-scope artifact + screenshot/context consistency rules + `feedbackLoop.asset` retry notes               | `artifacts/*-figma-asset-coverage.json`                             |
+| `report`                    | None (local serialization) | step logs, warnings, `feedbackHistory`, token usage, artifact paths                                                                  | `reports/<runId>.json`, `reports/index.jsonl`                       |
 
 ## Orchestration Diagrams
 
@@ -340,7 +339,7 @@ figma:
 
 ## Notes
 
-- Prompt files in `prompts/` are explicitly injected by `ui:run`.
+- Stage system prompts are defined inline in each step module.
 - Agent runtime is fixed to Codex (`codexf` preferred, fallback to `codex`).
 - Codex invocation pins model/runtime overrides: `-m gpt-5.3-codex` and `-c model_reasoning_effort="high"`.
 - Baseline UI rule docs are always injected: `docs/reference/ui-component-design-conventions.md`, `docs/reference/styling-system.md`, `docs/reference/component-catalog.md`.
