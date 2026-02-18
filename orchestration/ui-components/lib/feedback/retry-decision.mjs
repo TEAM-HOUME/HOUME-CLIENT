@@ -1,6 +1,5 @@
 import { splitErrorDetails } from '../step-utils.mjs';
 import { STAGE_LABELS } from './constants.mjs';
-import { collectIntentCodebaseGuidance } from './intent-codebase-guidance.mjs';
 import { createPromptInterface, askLine } from './prompt-io.mjs';
 
 function parseRetryChoice(rawAnswer) {
@@ -38,8 +37,6 @@ export async function promptRetryDecision(
   const retryQuestion = `재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
   const noteQuestion = '추가 프롬프트 입력 (선택, Enter=생략): ';
   const parsedError = splitErrorDetails(errorMessage);
-  const intentGuidance =
-    stage === 'intent' ? collectIntentCodebaseGuidance(context) : null;
   console.log(
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts})`
   );
@@ -54,12 +51,6 @@ export async function promptRetryDecision(
         console.log(`  - 상세 ${index + 1}: ${detail}`);
       });
     }
-  }
-  if (stage === 'intent' && intentGuidance) {
-    console.log('[ui-components] [intent] 코드베이스 참고 정보');
-    intentGuidance.summaryLines.forEach((line) => {
-      console.log(`  ${line}`);
-    });
   }
 
   const promptInterface = createPromptInterface(stage);
@@ -138,7 +129,6 @@ export async function promptRetryDecision(
       answers,
       retry: true,
       inputSource: source,
-      contextReferences: intentGuidance?.references || [],
     });
     return {
       retry: true,

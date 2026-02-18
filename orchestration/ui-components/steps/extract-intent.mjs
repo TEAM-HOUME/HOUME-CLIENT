@@ -3,7 +3,6 @@ import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { readContracts } from '../lib/contracts.mjs';
-import { collectIntentCodebaseGuidance } from '../lib/feedback/intent-codebase-guidance.mjs';
 import {
   COMPONENT_KIND_ENUM,
   ROLE_ENUM,
@@ -45,11 +44,56 @@ function dedupeFeedbackNotes(notes, limit = 2) {
   return unique.slice(-limit);
 }
 
+function normalizeCodebaseReferences(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  const normalized = [];
+  const seen = new Set();
+
+  for (const item of values) {
+    if (!item) {
+      continue;
+    }
+
+    let path = '';
+    let reason = '';
+
+    if (typeof item === 'string') {
+      path = item.trim();
+      reason = '코드베이스 참고';
+    } else if (typeof item === 'object') {
+      path = String(item.path ?? '').trim();
+      reason = String(item.reason ?? '').trim();
+    } else {
+      continue;
+    }
+
+    if (!path && !reason) {
+      continue;
+    }
+
+    const normalizedPath = path ? path.replace(/\\/g, '/') : '(unknown)';
+    const normalizedReason = reason || '근거 미기재';
+    const key = `${normalizedPath}::${normalizedReason}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    normalized.push({
+      path: normalizedPath,
+      reason: normalizedReason,
+    });
+  }
+
+  return normalized.slice(0, 5);
+}
+
 function buildPrompt(context) {
   const intent = context.scenario.intent;
   const feedbackNotes = dedupeFeedbackNotes(context.feedbackLoop?.intent);
   const contracts = context.contracts;
-  const codebaseGuidance = collectIntentCodebaseGuidance(context);
   const uiRuleSources =
     contracts &&
     Array.isArray(contracts.sources) &&
@@ -73,14 +117,6 @@ function buildPrompt(context) {
   if (intent.notes) {
     hintLines.push(`- notes: ${intent.notes}`);
   }
-  const codebaseSummaryLines =
-    codebaseGuidance && Array.isArray(codebaseGuidance.summaryLines)
-      ? codebaseGuidance.summaryLines
-      : ['- 코드베이스 스냅샷을 찾지 못했습니다.'];
-  const codebaseDefaultNote =
-    codebaseGuidance && codebaseGuidance.defaultNote
-      ? codebaseGuidance.defaultNote
-      : '';
 
   return [
     'You are resolving implementation intent from a short product brief.',
@@ -99,16 +135,14 @@ function buildPrompt(context) {
       : 'Project UI rules and codebase conventions: (none)',
     uiRulesContent,
     '',
-    'Current codebase baseline snapshot (must be considered first):',
-    ...codebaseSummaryLines,
-    ...(codebaseDefaultNote
-      ? [`- Default policy suggestion: ${codebaseDefaultNote}`]
-      : []),
-    '',
     'Rules:',
     '- Keep this read-only and do not edit files.',
+    '- You must inspect existing code patterns in this repository before finalizing intent.',
+    '- Prioritize relevant files under src/shared/components and src/stories as first-pass evidence.',
+    '- Return codebaseReferences with concrete repository-relative file paths and why each matters.',
+    '- If no relevant file exists, return codebaseReferences as an empty array.',
     '- Return structured intent for UI implementation only.',
-    '- Use the current codebase baseline snapshot as primary behavior fallback when brief/hints are ambiguous.',
+    '- Use existing codebase behavior as primary fallback when brief/hints are ambiguous.',
     '- Focus on UI behavior/spec gaps only; do not mention tooling/setup topics.',
     '- Do not ask for or suggest Code Connect integration.',
     '- Do not include MCP auth/token/tool availability as ambiguities.',
@@ -153,6 +187,18 @@ export function stepExtractIntent(context) {
         type: 'array',
         items: { type: 'string' },
       },
+      codebaseReferences: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            path: { type: 'string' },
+            reason: { type: 'string' },
+          },
+          required: ['path', 'reason'],
+          additionalProperties: false,
+        },
+      },
     },
     required: [
       'page',
@@ -163,6 +209,7 @@ export function stepExtractIntent(context) {
       'behaviorNeeded',
       'confidence',
       'ambiguities',
+      'codebaseReferences',
     ],
     additionalProperties: false,
   };
@@ -174,7 +221,6 @@ export function stepExtractIntent(context) {
     schema,
     Math.min(context.scenario.figma.timeoutMs, 180_000)
   );
-  const codebaseGuidance = collectIntentCodebaseGuidance(context);
 
   const resolvedIntent = {
     brief: context.scenario.intent.brief,
@@ -186,17 +232,11 @@ export function stepExtractIntent(context) {
     behaviorNeeded: Boolean(result.behaviorNeeded),
     confidence: normalizeConfidence(result.confidence),
     ambiguities: normalizeArray(result.ambiguities),
+    codebaseReferences: normalizeCodebaseReferences(result.codebaseReferences),
   };
 
   const intentArtifact = {
     ...resolvedIntent,
-    codebaseGuidance: codebaseGuidance
-      ? {
-          summaryLines: codebaseGuidance.summaryLines,
-          references: codebaseGuidance.references,
-          defaultNote: codebaseGuidance.defaultNote,
-        }
-      : null,
   };
   const artifactPath = resolve(
     context.artifactsDir,
@@ -214,9 +254,10 @@ export function stepExtractIntent(context) {
     confidence: resolvedIntent.confidence,
     ambiguities: resolvedIntent.ambiguities,
     behaviorNeeded: resolvedIntent.behaviorNeeded,
-    codebaseSummaryLines: codebaseGuidance?.summaryLines || [],
-    codebaseReferenceCount: codebaseGuidance?.references?.length || 0,
-    codebaseDefaultNote: codebaseGuidance?.defaultNote || '',
+    codebaseSummaryLines: resolvedIntent.codebaseReferences.map(
+      (item) => `${item.path}: ${item.reason}`
+    ),
+    codebaseReferenceCount: resolvedIntent.codebaseReferences.length,
     artifactPath: relative(context.rootPath, artifactPath),
   };
 }

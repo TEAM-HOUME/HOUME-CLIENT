@@ -52,9 +52,10 @@ export function logStepDetails(name, output, traceRecords) {
       output.codebaseSummaryLines.forEach((line, index) => {
         printMultilineValue(`코드베이스 근거 ${index + 1}`, line);
       });
-      if (output.codebaseDefaultNote) {
-        printMultilineValue('코드베이스 기본정책', output.codebaseDefaultNote);
-      }
+    } else {
+      console.log(
+        '- 코드베이스 참고: 에이전트가 관련 파일 근거를 반환하지 않았습니다.'
+      );
     }
     const ambiguityCount = Array.isArray(output.ambiguities)
       ? output.ambiguities.length

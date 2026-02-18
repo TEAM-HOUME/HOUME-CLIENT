@@ -5,6 +5,41 @@ function toErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
+function buildIntentRetryHints(context, errorMessage) {
+  const gate = context.intentGate || {};
+  const lines = [];
+
+  if (Array.isArray(gate.blockingAmbiguities)) {
+    gate.blockingAmbiguities.slice(0, 5).forEach((item) => {
+      const text = String(item ?? '').trim();
+      if (text) {
+        lines.push(text);
+      }
+    });
+  }
+
+  if (gate.requiresBehaviorConfirmation) {
+    lines.push(
+      '신규 인터랙션 동작 정의 필요: behavior.confirmed=true, behavior.spec=<구체 동작>'
+    );
+  }
+
+  if (gate.missingBehaviorSpec) {
+    lines.push(
+      'behavior.spec 누락: 트리거/배치/닫힘/CTA/중복/접근성을 포함해 명시'
+    );
+  }
+
+  if (lines.length === 0) {
+    lines.push(`직전 실패 요약: ${errorMessage}`);
+  }
+
+  return [
+    '직전 intent 단계 보강 포인트',
+    ...lines.map((line, index) => `${index + 1}. ${line}`),
+  ].join('\n');
+}
+
 export async function runPlanWithFeedbackLoop(context, options) {
   const { retryLimits, runStep, stepResolveComponent } = options;
 
@@ -104,8 +139,11 @@ export async function runIntentWithFeedbackLoop(context, options) {
       appendFeedback(
         context,
         'intent',
-        decision.note || `Previous intent failure: ${errorMessage}`
+        buildIntentRetryHints(context, errorMessage)
       );
+      if (decision.note) {
+        appendFeedback(context, 'intent', decision.note);
+      }
     }
   }
 }
