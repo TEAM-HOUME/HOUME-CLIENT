@@ -1,3 +1,5 @@
+import { buildImagePayloadRedaction } from './image-payload-sanitizer.mjs';
+
 function extractFirstJson(text) {
   const trimmed = text.trim();
   if (!trimmed) {
@@ -206,10 +208,11 @@ function extractMcpToolOutput(item) {
     }
 
     if (entry?.type === 'image') {
-      const mimeType = String(entry?.mimeType || 'unknown');
-      const length = String(entry?.data || '').length;
       chunks.push(
-        `[image payload omitted mimeType=${mimeType} length=${length}]`
+        buildImagePayloadRedaction({
+          mimeType: entry?.mimeType,
+          length: String(entry?.data || '').length,
+        })
       );
     }
   }

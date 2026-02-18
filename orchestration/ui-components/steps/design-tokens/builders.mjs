@@ -1,6 +1,7 @@
 import { relative } from 'node:path';
 
 import { createCacheKey } from '../../lib/artifact-cache.mjs';
+import { redactImagePayloadText } from '../../lib/agent/image-payload-sanitizer.mjs';
 import { FIGMA_REQUIRED_TOOLS } from '../../lib/mcp-guardrails.mjs';
 import { buildRunContextLines } from '../../lib/prompt-run-context.mjs';
 import { CACHE_SCHEMA_VERSION, TOKEN_KEYS, TOOL_KEYS } from './constants.mjs';
@@ -46,12 +47,7 @@ function buildDirectToolsFingerprint(context) {
 }
 
 function sanitizeScreenshotOutput(output) {
-  const text = String(output || '');
-  if (!text) {
-    return '';
-  }
-
-  return `[screenshot output redacted: base64 payload omitted, length=${text.length}]`;
+  return redactImagePayloadText(output);
 }
 
 function sanitizeScreenshotRecord(record) {

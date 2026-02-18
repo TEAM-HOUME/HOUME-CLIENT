@@ -1,5 +1,9 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import {
+  sanitizeImagePayloadJsonLines,
+  sanitizeImagePayloadValue,
+} from './image-payload-sanitizer.mjs';
 
 function ensureAgentTraceDir(context) {
   const dirPath = resolve(context.artifactsDir, context.runId, 'agent-trace');
@@ -14,46 +18,6 @@ function writeArtifact(filePath, content) {
   const serialized =
     typeof content === 'string' ? content : JSON.stringify(content, null, 2);
   writeFileSync(filePath, serialized, 'utf8');
-}
-
-function sanitizeImagePayloadEntry(entry) {
-  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-    return entry;
-  }
-
-  if (entry.type === 'image' && typeof entry.data === 'string') {
-    return {
-      ...entry,
-      data: `[image payload omitted length=${entry.data.length}]`,
-    };
-  }
-
-  const sanitized = {};
-  for (const [key, value] of Object.entries(entry)) {
-    sanitized[key] = sanitizeImagePayloadEntry(value);
-  }
-  return sanitized;
-}
-
-function sanitizeJsonLine(line) {
-  const raw = String(line ?? '');
-  if (!raw.trim()) {
-    return raw;
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-    return JSON.stringify(sanitizeImagePayloadEntry(parsed));
-  } catch {
-    return raw;
-  }
-}
-
-function sanitizeTraceStdout(stdout) {
-  return String(stdout ?? '')
-    .split(/\r?\n/)
-    .map((line) => sanitizeJsonLine(line))
-    .join('\n');
 }
 
 export function recordAgentTrace(context, trace) {
@@ -81,10 +45,10 @@ export function recordAgentTrace(context, trace) {
     usage: trace.usage ?? null,
   });
   writeArtifact(promptPath, trace.prompt);
-  writeArtifact(stdoutPath, sanitizeTraceStdout(trace.stdout));
+  writeArtifact(stdoutPath, sanitizeImagePayloadJsonLines(trace.stdout));
   writeArtifact(stderrPath, trace.stderr ?? '');
   if (trace.parsed !== null && trace.parsed !== undefined) {
-    writeArtifact(parsedPath, trace.parsed);
+    writeArtifact(parsedPath, sanitizeImagePayloadValue(trace.parsed));
   }
 
   const record = {
