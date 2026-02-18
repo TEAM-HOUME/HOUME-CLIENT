@@ -8,7 +8,6 @@ function normalizeLength(value) {
 
 const LARGE_PAYLOAD_LINE_LENGTH = 2048;
 const DATA_URI_PATTERN = /data:image\/[a-z0-9.+-]+;base64,/i;
-const TRUNCATED_PAYLOAD_PATTERN = /tokens truncated/i;
 const BASE64_LINE_PATTERN = /^[A-Za-z0-9+/=\s]+$/;
 
 export function buildImagePayloadRedaction({ length = 0, mimeType = '' } = {}) {
@@ -47,9 +46,6 @@ function detectCommandPayloadReason(text) {
   const normalized = String(text || '');
   if (!normalized) {
     return '';
-  }
-  if (TRUNCATED_PAYLOAD_PATTERN.test(normalized)) {
-    return 'truncated_payload';
   }
   if (DATA_URI_PATTERN.test(normalized)) {
     return 'inline_data_uri';
