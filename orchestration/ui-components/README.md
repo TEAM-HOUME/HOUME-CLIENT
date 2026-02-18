@@ -95,48 +95,48 @@ flowchart TD
   B --> C[Init context + runId]
   C --> D{{preflight}}
 
-  D -- fail --> Z1[write report + fail exit]
-  D -- pass --> DI[extract-intent]
-  DI --> DG{{gate-intent}}
-  DG -- fail --> DR[feedback: intent retry + structured overrides]
-  DR --> DI
-  DG -- pass/ok_with_advisory --> E[extract-figma-scope]
+  D -- fail --> Z1[write report + retention + fail exit]
+  D -- pass --> I1[extract-intent]
+  I1 --> I2{{gate-intent}}
+  I2 -- fail --> I3[feedback: intent retry + structured overrides]
+  I3 --> I1
+  I2 -- pass --> S1[extract-figma-scope]
 
-  E --> F{{gate-figma-scope}}
-  F -- pass/warn --> G0[extract-figma-mcp-tool-logs]
-  G0 --> G1{{gate-figma-mcp-tool-logs}}
-  G1 -- pass/warn --> G[extract-design-tokens]
-  G1 -- fail --> Z1
-  F -- fail --> Z1
+  S1 --> S2{{gate-figma-scope}}
+  S2 -- fail --> Z1
+  S2 -- pass --> M1[extract-figma-mcp-tool-logs]
+  M1 --> M2{{gate-figma-mcp-tool-logs}}
+  M2 -- fail --> Z1
+  M2 -- pass --> T1[extract-design-tokens]
+  T1 --> T2{{gate-design-tokens}}
+  T2 -- fail --> Z1
+  T2 -- pass --> A1[extract-figma-asset-scope]
 
-  G --> H{{gate-design-tokens}}
-  H -- fail --> Z1
-  H -- pass/warn --> HA[extract-figma-asset-scope]
-  HA --> HB{{gate-figma-asset-coverage}}
-  HB -- fail --> HR[feedback: asset retry + structured overrides]
-  HR --> HA
-  HB -- pass/warn --> I[resolve-component-plan]
+  A1 --> A2{{gate-figma-asset-coverage}}
+  A2 -- fail --> A3[feedback: asset retry + structured overrides]
+  A3 --> A1
+  A2 -- pass --> P1[resolve-component-plan]
 
-  I -- fail --> IR[feedback: plan retry]
-  IR --> I
-  I -- pass --> K[run-agent-implementation]
+  P1 -- fail --> P2[feedback: plan retry]
+  P2 --> P1
+  P1 -- pass --> C1[run-agent-implementation]
 
-  K --> L{{gate-changed-paths}}
-  L -- fail --> KR[feedback: implement/path retry]
-  KR --> K
-  L -- pass --> O[verify]
+  C1 --> C2{{gate-changed-paths}}
+  C2 -- fail --> C3[feedback: implement retry]
+  C3 --> C1
+  C2 -- pass --> V1[verify]
 
-  O -- fail --> VR[feedback: verify retry]
-  VR --> K
-  O -- pass --> P[optional open-storybook]
-  P --> Q[write report + success exit]
+  V1 -- fail --> V2[feedback: verify retry]
+  V2 --> C1
+  V1 -- pass --> O1[optional open-storybook]
+  O1 --> Z2[write report + retention + success exit]
 
   classDef gate fill:#ffe8cc,stroke:#d9480f,color:#5c2b00;
   classDef agent fill:#e7f5ff,stroke:#1c7ed6,color:#0b3d91;
   classDef local fill:#f4fce3,stroke:#5c940d,color:#2b5a00;
-  class D,DG,F,H,HB,L,O gate;
-  class DI,E,K agent;
-  class A,B,C,P,Q,Z1,I,DR,HR,IR,KR,VR local;
+  class D,I2,S2,M2,T2,A2,C2,V1 gate;
+  class I1,S1,M1,T1,A1,P1,C1 agent;
+  class A,B,C,Z1,Z2,I3,A3,P2,C3,V2,O1 local;
 ```
 
 ### Agent vs Tool Sequence
@@ -146,77 +146,93 @@ sequenceDiagram
   autonumber
   participant U as User
   participant R as run.mjs
-  participant A as Agent CLI (codex)
-  participant M as Figma MCP
+  participant A as Agent CLI (codexf/codex)
+  participant M as Figma MCP (local)
   participant G as Git
   participant P as pnpm checks
 
-  U->>R: pnpm ui:run --scenario ...
+  U->>R: ui:run --scenario ...
   R->>R: parseArgs + readScenario + init context
-  R->>A: preflight --version
-  R->>M: preflight initialize + tools/list (direct)
-  M-->>R: endpoint/tools health
+  R->>A: preflight (--version)
+  A-->>R: runtime ok
 
-  R->>A: intent-resolve prompt (brief + hints + docs + feedback + overrides)
-  A-->>R: page/componentKind/role/state/confidence
-  R->>R: gate-intent (blocking/advisory split)
+  R->>A: extract-intent (brief + hints + docs + feedback + overrides)
+  A-->>R: structured intent JSON
+  R->>R: gate-intent
 
   alt gate-intent blocked
-    R->>U: retry prompt (y/n + structured choices + extra prompt)
-    U-->>R: override decisions
-    R->>A: intent-resolve retry with merged overrides
-    A-->>R: refined intent
+    R->>U: retry prompt (y/n + structured fields + additional prompt)
+    U-->>R: intent override decisions
+    R->>A: extract-intent retry (override merged)
+    A-->>R: refined intent JSON
   end
 
-  alt auto_parent && !scope_node_id && !dry-run
-    R->>A: figma-scope prompt (JSON schema)
-    A->>M: read scope context
-    M-->>A: scope evidence
-    A-->>R: selectedNodeId/parentChain/scopeVerdict/cannotNarrowFurther
-  else no scope extraction agent call
-    R->>R: use input node-id directly
+  R->>A: extract-figma-scope (optional parent walk)
+  A->>M: MCP tool calls for scope evidence
+  M-->>A: scope evidence
+  A-->>R: selectedNodeId + scope verdict
+  R->>R: gate-figma-scope
+
+  R->>A: extract-figma-mcp-tool-logs
+  A->>M: required MCP tools (context/variables/metadata/screenshot)
+  M-->>A: tool call outputs
+  A-->>R: captured status + notes
+  R->>R: gate-figma-mcp-tool-logs
+
+  R->>A: extract-design-tokens (evidence-aware normalization)
+  A->>M: additional MCP calls if needed
+  M-->>A: token evidence
+  A-->>R: normalized tokens
+  R->>R: gate-design-tokens
+
+  R->>A: extract-figma-asset-scope
+  A->>M: child-node asset probes
+  M-->>A: asset scope evidence
+  A-->>R: asset-scope result
+  R->>A: gate-figma-asset-coverage
+  A->>M: additional checks if needed
+  A-->>R: covered/missing/unknown + rationale
+  R->>R: asset coverage decision
+
+  alt asset gate blocked
+    R->>U: retry prompt (asset structured overrides)
+    U-->>R: probe override decisions
+    R->>A: asset scope + coverage retry
+    A-->>R: refined coverage result
   end
 
-  opt !dry-run && figma_mcp_logs_mode != off
-    R->>M: initialize / tools/list / tools/call (direct)
-    M-->>R: raw MCP responses (logged to artifacts)
+  R->>A: resolve-component-plan (intent + artifacts + docs + plan feedback)
+  A-->>R: action/targetPath/behavior decision
+  alt plan blocked
+    R->>U: retry prompt (plan notes)
+    U-->>R: plan feedback
+    R->>A: resolve-component-plan retry
+    A-->>R: refined plan
   end
 
-  opt !dry-run && design_tokens_mode != off
-    R->>A: design-tokens normalization prompt (JSON schema)
-    A-->>R: normalized tokens + diagnostics
+  R->>A: run-agent-implementation (system prompt + task + docs + feedback)
+  A-->>R: changed files + implementation notes
+  R->>G: git diff / ls-files (gate-changed-paths)
+  alt path gate blocked
+    R->>U: retry prompt (implement notes)
+    U-->>R: implement feedback
+    R->>A: run-agent-implementation retry
+    A-->>R: refined patch
   end
 
-  opt !dry-run && figma.asset_probe_enabled=true
-    R->>M: child asset probe (get_design_context on inferred child node ids)
-    M-->>R: child asset context evidence
-    R->>A: asset coverage gate (screenshot/context consistency)
-    A-->>R: covered/missing/unknown + rationale
-    alt asset gate blocked
-      R->>U: retry prompt (y/n + asset structured overrides)
-      U-->>R: optional node ids + probe configs + mode
-      R->>M: child asset probe retry
-      R->>A: asset coverage gate retry
-    end
+  R->>P: lint + typecheck + test (+storybook checks when enabled)
+  alt verify blocked
+    R->>U: retry prompt (verify notes)
+    U-->>R: verify feedback
+    R->>A: run-agent-implementation retry
+    A-->>R: refined patch
   end
 
-  R->>A: resolve-component-plan prompt (intent + artifacts + docs sources + plan feedback)
-  A-->>R: action/targetPath/behavior questions
-
-  opt !dry-run
-    R->>A: implement prompt (codex.system.md + task + docs + feedback)
-    A-->>R: summary + changedFiles + notes
-
-    R->>G: git diff / ls-files (gate-changed-paths)
-
-    R->>P: lint + typecheck + test (+storybook build if requested)
-  end
-
-  opt --open-storybook && !dry-run && verification includes storybook && storybook-static exists
+  opt --open-storybook and success
     R->>R: open local storybook index
   end
 
-  R->>R: write report JSON
+  R->>R: write report + index.jsonl + retention cleanup
   R-->>U: pass/fail + report path
 ```
 
@@ -224,39 +240,58 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Initialized
-  Initialized --> RunningSteps: runStep(step)
+  [*] --> READY
+  READY --> PREFLIGHT
 
-  RunningSteps --> Failed: preflight/scope/token/non-retryable fail
-  RunningSteps --> IntentRetry: extract-intent or gate-intent fail
-  IntentRetry --> RunningSteps: user confirms retry (<=10)
-  IntentRetry --> Failed: retry declined/exhausted
+  PREFLIGHT --> BLOCKED: fail
+  PREFLIGHT --> INTENT: pass
 
-  RunningSteps --> AssetRetry: asset-scope or asset-coverage fail
-  AssetRetry --> RunningSteps: user confirms retry (<=10)
-  AssetRetry --> Failed: retry declined/exhausted
+  INTENT --> INTENT_GATE
+  INTENT_GATE --> INTENT_RETRY: fail
+  INTENT_RETRY --> INTENT: retry <= 10
+  INTENT_RETRY --> BLOCKED: stop/exhausted
+  INTENT_GATE --> SCOPE: pass
 
-  RunningSteps --> PlanRetry: resolve-component-plan fail
-  PlanRetry --> RunningSteps: user confirms retry (<=10)
-  PlanRetry --> Failed: retry declined/exhausted
+  SCOPE --> SCOPE_GATE
+  SCOPE_GATE --> BLOCKED: fail
+  SCOPE_GATE --> MCP_LOGS: pass|warn
 
-  RunningSteps --> ImplementRetry: implement/path-gate fail
-  ImplementRetry --> RunningSteps: user confirms retry (<=10)
-  ImplementRetry --> Failed: retry declined/exhausted
+  MCP_LOGS --> MCP_LOGS_GATE
+  MCP_LOGS_GATE --> BLOCKED: fail
+  MCP_LOGS_GATE --> TOKENS: pass|warn
 
-  RunningSteps --> VerifyRetry: verify fail
-  VerifyRetry --> RunningSteps: user confirms retry (<=10)
-  VerifyRetry --> Failed: retry declined/exhausted
-  RunningSteps --> Passed: all steps passed
+  TOKENS --> TOKENS_GATE
+  TOKENS_GATE --> BLOCKED: fail
+  TOKENS_GATE --> ASSET_SCOPE: pass|warn
 
-  Passed --> StorybookOpenAttempt: maybeOpenStorybook()
-  Failed --> UsageSummarized: build usage summary
+  ASSET_SCOPE --> ASSET_GATE
+  ASSET_GATE --> ASSET_RETRY: fail
+  ASSET_RETRY --> ASSET_SCOPE: retry <= 10
+  ASSET_RETRY --> BLOCKED: stop/exhausted
+  ASSET_GATE --> PLAN: pass|warn
 
-  StorybookOpenAttempt --> UsageSummarized: opened/skipped/failed
-  UsageSummarized --> Reported: writeReport()
+  PLAN --> PLAN_RETRY: fail
+  PLAN_RETRY --> PLAN: retry <= 10
+  PLAN_RETRY --> BLOCKED: stop/exhausted
+  PLAN --> IMPLEMENT: pass
 
-  Reported --> Finished: print summary + process.exit(code)
-  Finished --> [*]
+  IMPLEMENT --> PATH_GATE
+  PATH_GATE --> IMPLEMENT_RETRY: fail
+  IMPLEMENT_RETRY --> IMPLEMENT: retry <= 10
+  IMPLEMENT_RETRY --> BLOCKED: stop/exhausted
+  PATH_GATE --> VERIFY: pass
+
+  VERIFY --> VERIFY_RETRY: fail
+  VERIFY_RETRY --> IMPLEMENT: retry <= 10
+  VERIFY_RETRY --> BLOCKED: stop/exhausted
+  VERIFY --> DONE: pass
+
+  DONE --> OPEN_STORYBOOK: flag on
+  DONE --> REPORT_RETENTION: flag off
+  OPEN_STORYBOOK --> REPORT_RETENTION
+
+  BLOCKED --> REPORT_RETENTION
+  REPORT_RETENTION --> [*]
 ```
 
 ### Gate Policy State Machine (`warn` vs `error`)
