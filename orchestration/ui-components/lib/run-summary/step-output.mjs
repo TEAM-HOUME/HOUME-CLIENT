@@ -7,8 +7,13 @@ export function summarizeStepOutput(name, output) {
   }
 
   if (name === 'preflight') {
-    const mcpSummary =
-      output.mcpEndpoint && output.mcpTools
+    const hasStructuredMcpCounts =
+      output.mcpEndpoint &&
+      Number.isFinite(output.mcpRequiredToolCount) &&
+      Number.isFinite(output.mcpAvailableToolCount);
+    const mcpSummary = hasStructuredMcpCounts
+      ? `, MCP=${output.mcpEndpoint}, 필수 도구: ${output.mcpSatisfiedRequiredToolCount}/${output.mcpRequiredToolCount}, 전체 도구: ${output.mcpAvailableToolCount}`
+      : output.mcpEndpoint && output.mcpTools
         ? `, MCP=${output.mcpEndpoint}, 도구=${output.mcpTools}`
         : '';
     return `엔진=${output.engine}, 실행=${output.command}(${output.mode})${mcpSummary}`;

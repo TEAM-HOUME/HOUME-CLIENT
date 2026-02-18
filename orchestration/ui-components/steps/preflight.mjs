@@ -59,6 +59,8 @@ function probeFigmaMcp(context) {
   const missingTools = REQUIRED_FIGMA_TOOLS.filter(
     (tool) => !availableTools.includes(tool)
   );
+  const satisfiedRequiredToolCount =
+    REQUIRED_FIGMA_TOOLS.length - missingTools.length;
   if (missingTools.length > 0) {
     fail(
       `Figma MCP 필수 도구가 누락되었습니다. endpoint=${endpoint}, 누락=${missingTools.join(', ')}`
@@ -69,6 +71,7 @@ function probeFigmaMcp(context) {
     endpoint,
     availableToolCount: availableTools.length,
     requiredToolCount: REQUIRED_FIGMA_TOOLS.length,
+    satisfiedRequiredToolCount,
   };
 }
 
@@ -91,5 +94,8 @@ export function stepPreflight(context) {
     mode: context.agentRuntime.mode,
     mcpEndpoint: mcpProbe.endpoint,
     mcpTools: `${mcpProbe.requiredToolCount}/${mcpProbe.availableToolCount}`,
+    mcpRequiredToolCount: mcpProbe.requiredToolCount,
+    mcpSatisfiedRequiredToolCount: mcpProbe.satisfiedRequiredToolCount,
+    mcpAvailableToolCount: mcpProbe.availableToolCount,
   };
 }
