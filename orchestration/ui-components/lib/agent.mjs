@@ -90,7 +90,7 @@ export function invokeAgentWithSchema(
 
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       fail(
-        `Unable to parse JSON output from codex (${purpose}). Output: ${result.stdout.slice(0, 400)}`
+        `Unable to parse JSON output from codex (${purpose}). Output: ${result.stdout}`
       );
     }
     return parsed;

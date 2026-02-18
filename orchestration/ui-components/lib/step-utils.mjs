@@ -10,18 +10,16 @@ export function toSingleLine(value) {
 }
 
 export function truncateText(value, maxLength = 160) {
-  const normalized = toSingleLine(value);
-  if (normalized.length <= maxLength) {
-    return normalized;
-  }
-  return `${normalized.slice(0, maxLength - 1)}…`;
+  void maxLength;
+  return toSingleLine(value);
 }
 
 export function compactArray(values, maxItems = 3) {
+  void maxItems;
   if (!Array.isArray(values)) {
     return [];
   }
-  return values.slice(0, maxItems).map((value) => truncateText(value, 180));
+  return values.map((value) => truncateText(value, 180));
 }
 
 export function formatNumber(value) {

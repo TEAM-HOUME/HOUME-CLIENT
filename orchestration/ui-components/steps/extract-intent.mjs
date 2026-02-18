@@ -28,7 +28,7 @@ function normalizeConfidence(value) {
   return Math.min(1, Math.max(0, numeric));
 }
 
-function dedupeFeedbackNotes(notes, limit = 2) {
+function dedupeFeedbackNotes(notes) {
   if (!Array.isArray(notes)) {
     return [];
   }
@@ -42,7 +42,7 @@ function dedupeFeedbackNotes(notes, limit = 2) {
     seen.add(normalized);
     unique.push(normalized);
   }
-  return unique.slice(-limit);
+  return unique;
 }
 
 function normalizeCodebaseReferences(values) {
@@ -88,7 +88,7 @@ function normalizeCodebaseReferences(values) {
     });
   }
 
-  return normalized.slice(0, 5);
+  return normalized;
 }
 
 function getPreviousCodebaseEvidenceLines(context) {

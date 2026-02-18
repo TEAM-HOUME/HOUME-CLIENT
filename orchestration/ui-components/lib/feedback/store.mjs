@@ -15,7 +15,10 @@ export function appendFeedback(context, stage, value) {
     return;
   }
   target.push(normalized);
-  if (target.length > MAX_FEEDBACK_NOTES_PER_STAGE) {
+  if (
+    Number.isFinite(MAX_FEEDBACK_NOTES_PER_STAGE) &&
+    target.length > MAX_FEEDBACK_NOTES_PER_STAGE
+  ) {
     target.splice(0, target.length - MAX_FEEDBACK_NOTES_PER_STAGE);
   }
 }

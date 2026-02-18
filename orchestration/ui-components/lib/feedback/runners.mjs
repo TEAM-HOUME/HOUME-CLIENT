@@ -67,7 +67,7 @@ function buildIntentRetryHints(context, errorMessage) {
   const lines = [];
 
   if (Array.isArray(gate.blockingAmbiguities)) {
-    gate.blockingAmbiguities.slice(0, 5).forEach((item) => {
+    gate.blockingAmbiguities.forEach((item) => {
       const text = String(item ?? '').trim();
       if (text) {
         lines.push(text);

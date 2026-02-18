@@ -14,4 +14,4 @@ export const STAGE_LABELS = Object.freeze({
   verify: '검증',
 });
 
-export const MAX_FEEDBACK_NOTES_PER_STAGE = 4;
+export const MAX_FEEDBACK_NOTES_PER_STAGE = Number.POSITIVE_INFINITY;

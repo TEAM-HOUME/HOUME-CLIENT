@@ -3,6 +3,14 @@ import { spawnSync } from 'node:child_process';
 import { AGENT_COMMAND_MAP } from '../constants.mjs';
 import { fail } from '../errors.mjs';
 
+function resolveMaxBufferBytes() {
+  const raw = Number(process.env.UI_COMPONENTS_COMMAND_MAX_BUFFER_BYTES);
+  if (Number.isFinite(raw) && raw > 0) {
+    return Math.trunc(raw);
+  }
+  return 256 * 1024 * 1024;
+}
+
 function runCommandInternal(command, args, options = {}) {
   const {
     cwd = process.cwd(),
@@ -16,7 +24,7 @@ function runCommandInternal(command, args, options = {}) {
     cwd,
     encoding: 'utf8',
     timeout: timeoutMs,
-    maxBuffer: 10 * 1024 * 1024,
+    maxBuffer: resolveMaxBufferBytes(),
     shell,
     env,
     detached,
