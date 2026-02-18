@@ -115,13 +115,20 @@ function printFinalSummary(context, reportResult) {
   const passedSteps = context.steps.filter(
     (step) => step.status === 'passed'
   ).length;
-  const totalSteps = context.steps.length;
+  const executedSteps = context.steps.length;
+  const plannedSteps =
+    Number.isFinite(context.plannedStepCount) && context.plannedStepCount > 0
+      ? context.plannedStepCount
+      : executedSteps;
 
   console.log('');
   console.log('[ui-components]');
   console.log(STEP_DIVIDER);
   console.log('[summary]');
-  console.log(`- 단계 요약: ${passedSteps}/${totalSteps} 통과`);
+  console.log(`- 단계 요약(전체 기준): ${passedSteps}/${plannedSteps} 통과`);
+  if (executedSteps !== plannedSteps) {
+    console.log(`- 실행 로그 기준: ${passedSteps}/${executedSteps} 통과`);
+  }
   if (context.storybookOpenResult?.status === 'opened') {
     console.log(`- Storybook 열기: 완료`);
     console.log(`- Storybook URL: ${context.storybookOpenResult.url}`);
