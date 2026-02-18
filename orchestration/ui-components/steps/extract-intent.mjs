@@ -90,9 +90,23 @@ function normalizeCodebaseReferences(values) {
   return normalized.slice(0, 5);
 }
 
+function getPreviousCodebaseEvidenceLines(context) {
+  const attempt = Number(context?.stepAttemptCounts?.['extract-intent'] || 1);
+  if (attempt <= 1) {
+    return [];
+  }
+
+  const previousReferences = normalizeCodebaseReferences(
+    context?.resolvedIntent?.codebaseReferences
+  );
+  return previousReferences.map((item) => `${item.path}: ${item.reason}`);
+}
+
 function buildPrompt(context) {
   const intent = context.scenario.intent;
   const feedbackNotes = dedupeFeedbackNotes(context.feedbackLoop?.intent);
+  const previousCodebaseEvidenceLines =
+    getPreviousCodebaseEvidenceLines(context);
   const contracts = context.contracts;
   const uiRuleSources =
     contracts &&
@@ -128,6 +142,10 @@ function buildPrompt(context) {
       ? 'Retry clarification notes (highest priority):'
       : 'Retry clarification notes: (none)',
     ...feedbackNotes.map((note, index) => `- [${index + 1}] ${note}`),
+    previousCodebaseEvidenceLines.length > 0
+      ? 'Previous attempt codebase evidence (same run, advisory):'
+      : 'Previous attempt codebase evidence: (none)',
+    ...previousCodebaseEvidenceLines.map((line) => `- ${line}`),
     '',
     `Project UI rule docs: ${uiRuleSources}`,
     uiRulesContent
