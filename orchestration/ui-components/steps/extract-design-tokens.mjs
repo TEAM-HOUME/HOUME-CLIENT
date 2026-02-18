@@ -14,6 +14,7 @@ import {
   buildSchema,
   createFallbackCapture,
 } from './design-tokens/builders.mjs';
+import { normalizeStatus as normalizeDesignTokenStatus } from './design-tokens/normalize.mjs';
 
 function getCachedCapture(context, cacheKey) {
   return findCachedArtifact({
@@ -35,7 +36,7 @@ function buildToolCoverage(capture) {
   );
   const okTools = new Set(
     toolRecords
-      .filter((record) => String(record.status || '').toLowerCase() === 'ok')
+      .filter((record) => normalizeDesignTokenStatus(record.status) === 'ok')
       .map((record) => String(record.tool || '').trim())
       .filter(Boolean)
   );
@@ -56,7 +57,7 @@ function buildDirectToolRecordsFromCapture(capture) {
     }
     records[toolName] = {
       tool: toolName,
-      status: String(record?.status || '').trim(),
+      status: normalizeDesignTokenStatus(record?.status),
       output: String(record?.output || ''),
       error: String(record?.error || ''),
     };

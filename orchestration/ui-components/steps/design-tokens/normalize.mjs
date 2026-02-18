@@ -5,14 +5,35 @@ import {
   VALID_STATUS,
 } from './constants.mjs';
 
-function normalizeStatus(value) {
+const STATUS_ALIAS_MAP = Object.freeze({
+  ok: 'ok',
+  success: 'ok',
+  succeeded: 'ok',
+  completed: 'ok',
+  complete: 'ok',
+  done: 'ok',
+  passed: 'ok',
+  pass: 'ok',
+  partial: 'partial',
+  unavailable: 'unavailable',
+  cancelled: 'unavailable',
+  canceled: 'unavailable',
+  invalid: 'invalid',
+  failed: 'invalid',
+  failure: 'invalid',
+  error: 'invalid',
+  errored: 'invalid',
+});
+
+export function normalizeStatus(value) {
   const normalized = String(value ?? '')
     .trim()
     .toLowerCase();
-  if (!VALID_STATUS.has(normalized)) {
+  const canonical = STATUS_ALIAS_MAP[normalized] || normalized;
+  if (!VALID_STATUS.has(canonical)) {
     return 'invalid';
   }
-  return normalized;
+  return canonical;
 }
 
 function normalizeText(value) {

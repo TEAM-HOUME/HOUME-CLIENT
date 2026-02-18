@@ -1,18 +1,13 @@
 import { fail } from '../lib/errors.mjs';
 import { getLatestAgentMcpUsageRecord } from '../lib/agent.mjs';
 import { FIGMA_REQUIRED_TOOLS } from '../lib/mcp-guardrails.mjs';
+import { normalizeStatus } from './design-tokens/normalize.mjs';
 
 function gateFailureOrWarning(context, message) {
   if (context.scenario.gates.designTokensMode === 'error') {
     fail(message);
   }
   context.warnings.push(message);
-}
-
-function normalizeStatus(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase();
 }
 
 function normalizeError(value) {
@@ -126,6 +121,7 @@ export function stepGateDesignTokens(context) {
   }
 
   const toolStates = buildRequiredToolStates(context, capture);
+  const captureStatus = normalizeStatus(capture.status);
   const missingTools = FIGMA_REQUIRED_TOOLS.filter(
     (_, index) => !toolStates[index]
   );
@@ -164,7 +160,7 @@ export function stepGateDesignTokens(context) {
     );
   }
 
-  if (capture.status === 'invalid') {
+  if (captureStatus === 'invalid') {
     const hasDiagnosticsErrors =
       Array.isArray(capture.diagnostics?.errors) &&
       capture.diagnostics.errors.length > 0;
@@ -187,12 +183,12 @@ export function stepGateDesignTokens(context) {
         '디자인 토큰 캡처 status=invalid가 감지됐지만, MCP 호출 기준 필수 도구와 토큰 커버리지는 정상으로 확인되어 진행합니다.'
       );
     }
-  } else if (capture.status === 'unavailable') {
+  } else if (captureStatus === 'unavailable') {
     gateFailureOrWarning(
       context,
       '디자인 토큰 캡처를 사용할 수 없습니다 (MCP/도구 실패).'
     );
-  } else if (capture.status === 'partial') {
+  } else if (captureStatus === 'partial') {
     gateFailureOrWarning(
       context,
       '디자인 토큰 캡처 상태가 partial입니다 (코어 토큰 커버리지 부족).'
@@ -201,7 +197,7 @@ export function stepGateDesignTokens(context) {
 
   context.designTokensGate = {
     mode: context.scenario.gates.designTokensMode,
-    status: capture.status,
+    status: captureStatus,
     requiredTools: FIGMA_REQUIRED_TOOLS.length,
     coveredTools:
       FIGMA_REQUIRED_TOOLS.length - missingTools.length - badTools.length,

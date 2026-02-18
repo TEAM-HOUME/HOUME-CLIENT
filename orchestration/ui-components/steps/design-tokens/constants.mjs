@@ -26,4 +26,4 @@ export const VALID_STATUS = new Set([
 export const UNAVAILABLE_ERROR_PATTERN =
   /\b(401|403|unauthorized|forbidden|timeout|timed out|connection refused|econn|enotfound|not configured|service unavailable)\b/;
 
-export const CACHE_SCHEMA_VERSION = 'figma-design-tokens-cache.v1';
+export const CACHE_SCHEMA_VERSION = 'figma-design-tokens-cache.v2';
