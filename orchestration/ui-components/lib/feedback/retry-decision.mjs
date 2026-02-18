@@ -1,6 +1,6 @@
 import { splitErrorDetails } from '../step-utils.mjs';
 import { STAGE_LABELS } from './constants.mjs';
-import { askLine, askYesNo, createPromptInterface } from './prompt-io.mjs';
+import { askLine, createPromptInterface } from './prompt-io.mjs';
 
 function parseRetryChoice(rawAnswer) {
   const raw = String(rawAnswer ?? '').trim();
@@ -23,73 +23,6 @@ function recordFeedbackHistory(context, entry) {
     return;
   }
   context.feedbackHistory.push(entry);
-}
-
-function includesBehaviorPromptSignal(text) {
-  const normalized = String(text ?? '').toLowerCase();
-  return (
-    normalized.includes('세부 동작 명세') ||
-    normalized.includes('동작 상세 설명') ||
-    normalized.includes('동작 확정')
-  );
-}
-
-function shouldAskBehaviorSpec(context, stage, parsedError) {
-  const errorTexts = [parsedError.summary, ...parsedError.details].filter(
-    Boolean
-  );
-  const hasBehaviorSignal = errorTexts.some((item) =>
-    includesBehaviorPromptSignal(item)
-  );
-
-  if (stage === 'intent') {
-    const gate = context.intentGate || {};
-    const gateNeedsBehavior = Boolean(
-      gate.requiresBehaviorConfirmation || gate.missingBehaviorSpec
-    );
-    return gateNeedsBehavior && hasBehaviorSignal;
-  }
-
-  if (stage !== 'plan') {
-    return false;
-  }
-
-  return hasBehaviorSignal;
-}
-
-async function askBehaviorSpecIfNeeded({
-  context,
-  stage,
-  parsedError,
-  rl,
-  questions,
-  answers,
-}) {
-  if (!shouldAskBehaviorSpec(context, stage, parsedError)) {
-    return '';
-  }
-
-  const shouldApplyQuestion =
-    '세부 동작 명세를 지금 입력해 다음 시도에 반영하시겠습니까? (y/n, Enter=y): ';
-  const shouldApply = await askYesNo(rl, shouldApplyQuestion, true);
-  questions.push(shouldApplyQuestion);
-  answers.applyBehaviorSpec = shouldApply;
-  if (!shouldApply) {
-    answers.behaviorSpec = '';
-    return '';
-  }
-
-  const specQuestion = '세부 동작 명세 입력 (필수, Enter=재입력): ';
-  let behaviorSpec = '';
-  while (!behaviorSpec) {
-    behaviorSpec = String((await askLine(rl, specQuestion)) ?? '').trim();
-    if (!behaviorSpec) {
-      console.log('입력 형식 오류: 세부 동작 명세를 비우지 말고 입력해 주세요');
-    }
-  }
-  questions.push(specQuestion);
-  answers.behaviorSpec = behaviorSpec;
-  return behaviorSpec;
 }
 
 export async function promptRetryDecision(
@@ -132,8 +65,6 @@ export async function promptRetryDecision(
       answers: {
         retryAnswerRaw: null,
         note: null,
-        applyBehaviorSpec: null,
-        behaviorSpec: null,
       },
       retry: false,
       inputSource: 'none',
@@ -142,7 +73,6 @@ export async function promptRetryDecision(
     return {
       retry: false,
       note: '',
-      behaviorSpec: '',
     };
   }
 
@@ -170,8 +100,6 @@ export async function promptRetryDecision(
         answers: {
           retryAnswerRaw: parsedDecision.raw,
           note: null,
-          applyBehaviorSpec: null,
-          behaviorSpec: null,
         },
         retry: false,
         inputSource: source,
@@ -179,7 +107,6 @@ export async function promptRetryDecision(
       return {
         retry: false,
         note: '',
-        behaviorSpec: '',
       };
     }
 
@@ -188,19 +115,9 @@ export async function promptRetryDecision(
     const answers = {
       retryAnswerRaw: parsedDecision.raw,
       note,
-      applyBehaviorSpec: null,
-      behaviorSpec: null,
     };
 
     questions.push(noteQuestion);
-    const behaviorSpec = await askBehaviorSpecIfNeeded({
-      context,
-      stage,
-      parsedError,
-      rl,
-      questions,
-      answers,
-    });
 
     recordFeedbackHistory(context, {
       stage,
@@ -216,7 +133,6 @@ export async function promptRetryDecision(
     return {
       retry: true,
       note,
-      behaviorSpec,
     };
   } finally {
     rl.close();

@@ -37,13 +37,16 @@ export function readBehaviorConfig(scenario) {
 
 export function buildBehaviorConfirmationRequiredMessage({
   componentKind,
+  intentSummary = '',
   behaviorQuestions = [],
 }) {
   const messageParts = [
-    `${formatInteractionLabel(componentKind)} 세부 동작 명세 확인이 필요합니다.`,
-    '재시도 입력에서 세부 동작 명세를 확정하거나 시나리오에 동작 설정을 지정해 주세요.',
-    '동작 상세 설명에 트리거/배치/닫힘/CTA/중복 처리/접근성 기준을 포함해 주세요.',
+    `${formatInteractionLabel(componentKind)} 세부 동작 명세 필요로 판정되었습니다.`,
   ];
+  const normalizedSummary = String(intentSummary ?? '').trim();
+  if (normalizedSummary) {
+    messageParts.push(`intent 근거 ${normalizedSummary}`);
+  }
   const questions = toBehaviorQuestions(behaviorQuestions);
   if (questions.length > 0) {
     messageParts.push(`추가 확인 질문 ${questions.join(' / ')}`);
@@ -51,23 +54,24 @@ export function buildBehaviorConfirmationRequiredMessage({
   return messageParts.join(' | ');
 }
 
-export function buildBehaviorSpecMissingMessage({ componentKind }) {
-  return [
-    `${formatInteractionLabel(componentKind)} 동작 확정은 되었지만 상세 설명이 비어 있습니다.`,
-    '구현 전에 트리거/배치/닫힘/CTA/중복 처리/접근성 기준을 포함해 동작을 작성해 주세요.',
-  ].join(' | ');
+export function buildBehaviorSpecMissingMessage({
+  componentKind,
+  intentSummary = '',
+}) {
+  const messageParts = [
+    `${formatInteractionLabel(componentKind)} 세부 동작 명세가 비어 있습니다.`,
+  ];
+  const normalizedSummary = String(intentSummary ?? '').trim();
+  if (normalizedSummary) {
+    messageParts.push(`intent 근거 ${normalizedSummary}`);
+  }
+  return messageParts.join(' | ');
 }
 
 export function buildBehaviorRetryHintForConfirmation({ componentKind }) {
-  return [
-    `${formatInteractionLabel(componentKind)} 세부 동작 명세 보강 필요`,
-    '재시도 입력 질문에서 세부 동작 명세를 작성해 다음 시도에 반영해 주세요.',
-  ].join(': ');
+  return `${formatInteractionLabel(componentKind)} 세부 동작 명세 필요로 판정됨`;
 }
 
 export function buildBehaviorRetryHintForMissingSpec({ componentKind }) {
-  return [
-    `${formatInteractionLabel(componentKind)} 동작 상세 설명 누락`,
-    '트리거/배치/닫힘/CTA/중복 처리/접근성 기준을 포함해 작성해 주세요.',
-  ].join(': ');
+  return `${formatInteractionLabel(componentKind)} 세부 동작 명세 누락`;
 }

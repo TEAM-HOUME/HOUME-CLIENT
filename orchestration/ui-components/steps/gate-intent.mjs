@@ -130,6 +130,7 @@ export function stepGateIntent(context) {
     blockingIssues.push(
       buildBehaviorConfirmationRequiredMessage({
         componentKind: intent.componentKind,
+        intentSummary: intent.summary,
       })
     );
   }
@@ -143,6 +144,7 @@ export function stepGateIntent(context) {
     blockingIssues.push(
       buildBehaviorSpecMissingMessage({
         componentKind: intent.componentKind,
+        intentSummary: intent.summary,
       })
     );
   }

@@ -161,7 +161,9 @@ export function logStepFailureHint(context, name, traceRecords) {
   }
   if (name === 'gate-intent') {
     console.log('- 조치');
-    console.log('- 재시도 시 y 입력 후, 세부 동작 명세 질문에 답변해 주세요');
+    console.log(
+      '- 재시도 시 y 입력 후, 추가 프롬프트에 세부 동작 명세를 입력해 주세요'
+    );
     console.log(
       '- 권장 포맷: 트리거/배치/닫힘/CTA/중복/접근성 중 필요한 항목을 명시'
     );

@@ -192,6 +192,7 @@ function enforceBehaviorGate(context, componentPlan) {
     fail(
       buildBehaviorConfirmationRequiredMessage({
         componentKind: context.resolvedIntent?.componentKind,
+        intentSummary: context.resolvedIntent?.summary,
         behaviorQuestions: componentPlan.behaviorQuestions,
       })
     );
@@ -201,6 +202,7 @@ function enforceBehaviorGate(context, componentPlan) {
     fail(
       buildBehaviorSpecMissingMessage({
         componentKind: context.resolvedIntent?.componentKind,
+        intentSummary: context.resolvedIntent?.summary,
       })
     );
   }

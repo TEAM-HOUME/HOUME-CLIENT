@@ -9,8 +9,34 @@ function toErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
-function applyRuntimeBehaviorSpec(context, stage, decision) {
-  const behaviorSpec = String(decision?.behaviorSpec ?? '').trim();
+function includesBehaviorPromptSignal(text) {
+  const normalized = String(text ?? '').toLowerCase();
+  return (
+    normalized.includes('세부 동작 명세') ||
+    normalized.includes('동작 상세 설명') ||
+    normalized.includes('동작 확정')
+  );
+}
+
+function shouldApplyBehaviorSpec(context, stage, errorMessage) {
+  if (stage === 'intent') {
+    const gate = context.intentGate || {};
+    return Boolean(
+      gate.requiresBehaviorConfirmation || gate.missingBehaviorSpec
+    );
+  }
+  if (stage === 'plan') {
+    return includesBehaviorPromptSignal(errorMessage);
+  }
+  return false;
+}
+
+function applyRuntimeBehaviorSpec(context, stage, decision, errorMessage) {
+  if (!shouldApplyBehaviorSpec(context, stage, errorMessage)) {
+    return false;
+  }
+
+  const behaviorSpec = String(decision?.note ?? '').trim();
   if (!behaviorSpec) {
     return false;
   }
@@ -31,7 +57,7 @@ function applyRuntimeBehaviorSpec(context, stage, decision) {
   appendFeedback(
     context,
     stage,
-    `세부 동작 명세(런타임 입력): ${behaviorSpec}`
+    `세부 동작 명세(추가 프롬프트 반영): ${behaviorSpec}`
   );
   return true;
 }
@@ -101,14 +127,19 @@ export async function runPlanWithFeedbackLoop(context, options) {
       const appliedBehaviorSpec = applyRuntimeBehaviorSpec(
         context,
         'plan',
-        decision
+        decision,
+        errorMessage
       );
-      appendFeedback(
-        context,
-        'plan',
-        decision.note ||
-          (appliedBehaviorSpec ? '' : `Previous plan failure: ${errorMessage}`)
-      );
+      if (decision.note && !appliedBehaviorSpec) {
+        appendFeedback(context, 'plan', decision.note);
+      }
+      if (!decision.note && !appliedBehaviorSpec) {
+        appendFeedback(
+          context,
+          'plan',
+          `Previous plan failure: ${errorMessage}`
+        );
+      }
     }
   }
 }
@@ -176,14 +207,19 @@ export async function runIntentWithFeedbackLoop(context, options) {
       if (!decision.retry) {
         throw error;
       }
-      applyRuntimeBehaviorSpec(context, 'intent', decision);
+      const appliedBehaviorSpec = applyRuntimeBehaviorSpec(
+        context,
+        'intent',
+        decision,
+        errorMessage
+      );
 
       appendFeedback(
         context,
         'intent',
         buildIntentRetryHints(context, errorMessage)
       );
-      if (decision.note) {
+      if (decision.note && !appliedBehaviorSpec) {
         appendFeedback(context, 'intent', decision.note);
       }
     }
