@@ -16,6 +16,46 @@ function writeArtifact(filePath, content) {
   writeFileSync(filePath, serialized, 'utf8');
 }
 
+function sanitizeImagePayloadEntry(entry) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    return entry;
+  }
+
+  if (entry.type === 'image' && typeof entry.data === 'string') {
+    return {
+      ...entry,
+      data: `[image payload omitted length=${entry.data.length}]`,
+    };
+  }
+
+  const sanitized = {};
+  for (const [key, value] of Object.entries(entry)) {
+    sanitized[key] = sanitizeImagePayloadEntry(value);
+  }
+  return sanitized;
+}
+
+function sanitizeJsonLine(line) {
+  const raw = String(line ?? '');
+  if (!raw.trim()) {
+    return raw;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return JSON.stringify(sanitizeImagePayloadEntry(parsed));
+  } catch {
+    return raw;
+  }
+}
+
+function sanitizeTraceStdout(stdout) {
+  return String(stdout ?? '')
+    .split(/\r?\n/)
+    .map((line) => sanitizeJsonLine(line))
+    .join('\n');
+}
+
 export function recordAgentTrace(context, trace) {
   const traceDir = ensureAgentTraceDir(context);
   const traceIndex = String(context.agentTraceArtifacts.length + 1).padStart(
@@ -41,7 +81,7 @@ export function recordAgentTrace(context, trace) {
     usage: trace.usage ?? null,
   });
   writeArtifact(promptPath, trace.prompt);
-  writeArtifact(stdoutPath, trace.stdout ?? '');
+  writeArtifact(stdoutPath, sanitizeTraceStdout(trace.stdout));
   writeArtifact(stderrPath, trace.stderr ?? '');
   if (trace.parsed !== null && trace.parsed !== undefined) {
     writeArtifact(parsedPath, trace.parsed);
