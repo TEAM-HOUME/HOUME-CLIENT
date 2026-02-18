@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 import { runCommand } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
+import { resolveCommandTimeoutMs } from '../lib/timeout-budget.mjs';
 
 // Temporary exclusion: test-storybook
 const REQUIRED_CHECKS = ['lint', 'typecheck', 'test'];
@@ -41,11 +42,16 @@ export function stepVerify(context) {
 
   for (const check of verificationPlan) {
     const [command, args, timeoutMs] = verificationCommand(check);
+    const effectiveTimeoutMs = resolveCommandTimeoutMs(
+      context,
+      `verify:${check}`,
+      timeoutMs
+    );
     const startedMs = Date.now();
     try {
       runCommand(command, args, {
         cwd: context.rootPath,
-        timeoutMs,
+        timeoutMs: effectiveTimeoutMs,
       });
       verificationResults.push({
         check,

@@ -6,6 +6,7 @@ import {
   summarizeStepOutput,
 } from './run-summary.mjs';
 import { formatDuration, splitErrorDetails } from './step-utils.mjs';
+import { ensurePipelineRemaining } from './timeout-budget.mjs';
 
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STEP_DIVIDER =
@@ -96,6 +97,7 @@ export function runStep(context, name, handler) {
       : null;
 
   try {
+    ensurePipelineRemaining(context, name);
     const output = handler(context);
     stepLog.status = 'passed';
     if (output !== undefined) {

@@ -8,6 +8,7 @@ import {
   resolveAgentRuntime,
 } from '../lib/agent.mjs';
 import { fail } from '../lib/errors.mjs';
+import { resolveCommandTimeoutMs } from '../lib/timeout-budget.mjs';
 
 function resolveCodexRuntimeInfo() {
   const modelIndex = CODEX_SAFE_CONFIG.indexOf('-m');
@@ -40,8 +41,13 @@ export function stepPreflight(context) {
   }
 
   context.agentRuntime = resolveAgentRuntime(context.scenario);
+  const codexVersionTimeoutMs = resolveCommandTimeoutMs(
+    context,
+    'preflight:agent-version',
+    10_000
+  );
   runAgentCommand(context.agentRuntime, ['--version'], {
-    timeoutMs: 10_000,
+    timeoutMs: codexVersionTimeoutMs,
   });
   const runtimeInfo = resolveCodexRuntimeInfo();
 
@@ -51,5 +57,6 @@ export function stepPreflight(context) {
     mode: context.agentRuntime.mode,
     model: runtimeInfo.model,
     reasoningEffort: runtimeInfo.reasoningEffort,
+    pipelineTimeoutMs: context.pipelineTimeoutMs,
   };
 }

@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { runCommand } from './agent.mjs';
+import { resolveCommandTimeoutMs } from './timeout-budget.mjs';
 
 function normalizeUrlCandidate(rawValue) {
   const value = String(rawValue ?? '').trim();
@@ -65,7 +66,7 @@ export function maybeOpenStorybook(context) {
   if (!existsSync(storybookIndexPath)) {
     const buildResult = runCommand('pnpm', ['build-storybook'], {
       cwd: context.rootPath,
-      timeoutMs: 900_000,
+      timeoutMs: resolveCommandTimeoutMs(context, 'storybook:build', 900_000),
       allowFailure: true,
     });
     if (buildResult.exitCode !== 0) {
@@ -103,7 +104,7 @@ export function maybeOpenStorybook(context) {
   const [command, args] = openCommand;
   const result = runCommand(command, args, {
     cwd: context.rootPath,
-    timeoutMs: 10_000,
+    timeoutMs: resolveCommandTimeoutMs(context, 'storybook:open', 10_000),
     allowFailure: true,
   });
 

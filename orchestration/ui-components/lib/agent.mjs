@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 import { CODEX_SAFE_CONFIG } from './constants.mjs';
 import { fail } from './errors.mjs';
+import { resolveAgentTimeoutMs } from './timeout-budget.mjs';
 import {
   hasAlias,
   hasCommand,
@@ -39,6 +40,11 @@ export function invokeAgentWithSchema(
   timeoutMs
 ) {
   if (context.scenario.engine === 'codex') {
+    const effectiveTimeoutMs = resolveAgentTimeoutMs(
+      context,
+      purpose,
+      timeoutMs
+    );
     const schemaPath = resolve(
       context.artifactsDir,
       `${context.runId}-${purpose}-schema.json`
@@ -61,7 +67,7 @@ export function invokeAgentWithSchema(
       ],
       {
         cwd: context.rootPath,
-        timeoutMs,
+        timeoutMs: effectiveTimeoutMs,
       }
     );
 
@@ -70,7 +76,7 @@ export function invokeAgentWithSchema(
     recordAgentTrace(context, {
       purpose,
       commandLine: result.commandLine,
-      timeoutMs,
+      timeoutMs: effectiveTimeoutMs,
       prompt,
       schema,
       stdout: result.stdout,

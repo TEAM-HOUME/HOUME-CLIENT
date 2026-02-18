@@ -219,7 +219,7 @@ export function stepExtractIntent(context) {
     'intent-resolve',
     buildPrompt(context),
     schema,
-    Math.min(context.scenario.figma.timeoutMs, 180_000)
+    context.scenario.figma.timeoutMs
   );
 
   const resolvedIntent = {

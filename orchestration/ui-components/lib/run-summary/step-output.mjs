@@ -18,9 +18,12 @@ export function summarizeStepOutput(name, output) {
         : '';
     const model = String(output.model || '').trim();
     const reasoningEffort = String(output.reasoningEffort || '').trim();
+    const pipelineTimeoutMs = Number(output.pipelineTimeoutMs || 0);
+    const pipelineTimeoutMinutes =
+      pipelineTimeoutMs > 0 ? Math.round(pipelineTimeoutMs / 60_000) : 0;
     const runtimeSummary =
       model || reasoningEffort
-        ? `\n- 모델=${model || 'unknown'}, 추론=${reasoningEffort || 'unknown'}`
+        ? `\n- 모델=${model || 'unknown'}, 추론=${reasoningEffort || 'unknown'}${pipelineTimeoutMinutes > 0 ? `, 전체 타임아웃=${pipelineTimeoutMinutes}분` : ''}`
         : '';
     return `엔진=${output.engine}, 실행=${output.command}(${output.mode})${mcpSummary}${runtimeSummary}`;
   }

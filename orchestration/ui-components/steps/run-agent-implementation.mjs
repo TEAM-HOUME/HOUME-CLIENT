@@ -33,7 +33,7 @@ function invokeImplementationAgent(context, prompt) {
     additionalProperties: false,
   };
 
-  return invokeAgentWithSchema(context, 'implement', prompt, schema, 1_200_000);
+  return invokeAgentWithSchema(context, 'implement', prompt, schema, 1_800_000);
 }
 
 function summarizeDesignTokens(context) {

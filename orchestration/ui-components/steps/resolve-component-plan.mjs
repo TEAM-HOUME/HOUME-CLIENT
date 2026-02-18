@@ -170,7 +170,7 @@ function invokeResolveAgent(context, contracts) {
     'resolve-component-plan',
     buildResolvePrompt(context, contracts),
     schema,
-    Math.min(context.scenario.figma.timeoutMs, 300_000)
+    context.scenario.figma.timeoutMs
   );
 }
 

@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
+import { PIPELINE_TIMEOUT_MS } from './lib/constants.mjs';
 import { getChangedFiles } from './lib/git-gates.mjs';
 import {
   DEFAULT_RETRY_LIMITS,
@@ -67,6 +68,8 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     status: 'failed',
     error: null,
     agentRuntime: null,
+    pipelineTimeoutMs: PIPELINE_TIMEOUT_MS,
+    pipelineDeadlineAt: Date.now() + PIPELINE_TIMEOUT_MS,
     contracts: null,
     resolvedIntent: null,
     intentArtifactPath: null,
