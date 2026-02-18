@@ -2,8 +2,12 @@ import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
+import { fail } from '../lib/errors.mjs';
 import { parseFigmaUrl, validateDesignContext } from '../lib/figma.mjs';
-import { enforceMcpGuardrails } from '../lib/mcp-guardrails.mjs';
+import {
+  enforceMcpGuardrails,
+  getMcpGuardrailPolicy,
+} from '../lib/mcp-guardrails.mjs';
 
 const SCOPE_VERDICT_ENUM = ['sufficient', 'too_broad', 'too_narrow', 'unknown'];
 
@@ -18,8 +22,48 @@ function normalizeScopeVerdict(value) {
   return 'unknown';
 }
 
-function buildScopePrompt(context, figmaMeta) {
+function normalizeNodeId(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/-/g, ':');
+}
+
+function normalizeParentChain(parentChain) {
+  if (!Array.isArray(parentChain)) {
+    return [];
+  }
+  const normalized = [];
+  const seen = new Set();
+  for (const nodeId of parentChain) {
+    const value = normalizeNodeId(nodeId);
+    if (!value || seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    normalized.push(value);
+  }
+  return normalized;
+}
+
+function enforceParentHopsLimit(parentChain, parentHopsMax) {
+  const maxHops = Number.isFinite(parentHopsMax)
+    ? Math.max(0, Math.trunc(parentHopsMax))
+    : 0;
+  if (parentChain.length > maxHops) {
+    fail(
+      `Scope parentChain 길이가 parent_hops_max를 초과했습니다 (${parentChain.length} > ${maxHops}).`
+    );
+  }
+}
+
+function buildScopePrompt(context, figmaMeta, constraints) {
   const intent = context.resolvedIntent;
+  const maxCalls = Number.isFinite(constraints?.maxCalls)
+    ? constraints.maxCalls
+    : 12;
+  const maxFailedCalls = Number.isFinite(constraints?.maxFailedCalls)
+    ? constraints.maxFailedCalls
+    : 4;
   const lines = [
     'You are doing read-only Figma scope selection for implementation.',
     `Analyze this Figma URL with MCP: ${context.scenario.figma.url}`,
@@ -34,6 +78,14 @@ function buildScopePrompt(context, figmaMeta) {
     '- too_narrow: selected node misses required UI pieces for this component.',
     '- unknown: cannot determine confidently.',
     '- rationale must be written in Korean.',
+    '',
+    'Hard MCP constraints:',
+    `- Parent traversal limit: at most ${context.scenario.figma.parentHopsMax} hops from current node.`,
+    '- Allowed targets: current node and strict parent chain only.',
+    '- Never query canvas/document root nodes (e.g., 0:1).',
+    '- Never scan siblings, cousins, or unrelated sections.',
+    `- Keep MCP calls in this step <= ${maxCalls}, failed calls <= ${maxFailedCalls}.`,
+    '- If evidence is insufficient within limits, return scopeVerdict=unknown and cannotNarrowFurther=true.',
     '',
     'Do not edit any code or files.',
     'Return JSON only that matches the schema.',
@@ -93,20 +145,25 @@ export function stepExtractFigmaScope(context) {
       const scopeResult = invokeAgentWithSchema(
         context,
         'figma-scope',
-        buildScopePrompt(context, figmaMeta),
+        buildScopePrompt(
+          context,
+          figmaMeta,
+          getMcpGuardrailPolicy('figma-scope')
+        ),
         schema,
         context.scenario.figma.timeoutMs
       );
       enforceMcpGuardrails(context, 'figma-scope');
 
-      scope.selectedNodeId = String(scopeResult.selectedNodeId)
-        .trim()
-        .replace(/-/g, ':');
-      scope.parentChain = Array.isArray(scopeResult.parentChain)
-        ? scopeResult.parentChain.map((id) =>
-            String(id).trim().replace(/-/g, ':')
-          )
-        : [];
+      const normalizedParentChain = normalizeParentChain(
+        scopeResult.parentChain
+      );
+      enforceParentHopsLimit(
+        normalizedParentChain,
+        context.scenario.figma.parentHopsMax
+      );
+      scope.selectedNodeId = normalizeNodeId(scopeResult.selectedNodeId);
+      scope.parentChain = normalizedParentChain;
       scope.scopeVerdict = normalizeScopeVerdict(scopeResult.scopeVerdict);
       scope.cannotNarrowFurther = Boolean(scopeResult.cannotNarrowFurther);
       scope.rationale = String(scopeResult.rationale);

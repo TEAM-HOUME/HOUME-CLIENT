@@ -40,6 +40,19 @@ const PURPOSE_POLICIES = Object.freeze({
   },
 });
 
+export function getMcpGuardrailPolicy(purpose) {
+  const policy = PURPOSE_POLICIES[purpose];
+  if (!policy) {
+    return null;
+  }
+  return {
+    ...policy,
+    requiredTools: Array.isArray(policy.requiredTools)
+      ? [...policy.requiredTools]
+      : [],
+  };
+}
+
 function normalizeToolName(value) {
   return String(value || '').trim();
 }
