@@ -1,12 +1,5 @@
 import { fail } from '../lib/errors.mjs';
-
-const INTERACTION_COMPONENT_KINDS = new Set([
-  'modal',
-  'bottom_sheet',
-  'dialog',
-  'sheet',
-  'drawer',
-]);
+import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
 
 function splitAmbiguities(intent) {
   const blockingAmbiguities = [];

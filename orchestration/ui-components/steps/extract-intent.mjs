@@ -4,32 +4,12 @@ import { relative, resolve } from 'node:path';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { readContracts } from '../lib/contracts.mjs';
 import { collectIntentCodebaseGuidance } from '../lib/feedback/intent-codebase-guidance.mjs';
-
-const COMPONENT_KIND_ENUM = [
-  'toast',
-  'snackbar',
-  'modal',
-  'bottom_sheet',
-  'dialog',
-  'sheet',
-  'drawer',
-  'banner',
-  'tooltip',
-  'chip',
-  'unknown',
-];
-const ROLE_ENUM = ['global', 'local', 'inline', 'unknown'];
-
-function normalizeEnum(value, allowed, fallback) {
-  const normalized = String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .replace(/[\s-]+/g, '_');
-  if (allowed.includes(normalized)) {
-    return normalized;
-  }
-  return fallback;
-}
+import {
+  COMPONENT_KIND_ENUM,
+  ROLE_ENUM,
+  normalizeComponentKind,
+  normalizeRole,
+} from '../lib/intent-taxonomy.mjs';
 
 function normalizeArray(values) {
   if (!Array.isArray(values)) {
@@ -199,12 +179,8 @@ export function stepExtractIntent(context) {
   const resolvedIntent = {
     brief: context.scenario.intent.brief,
     page: String(result.page ?? '').trim(),
-    componentKind: normalizeEnum(
-      result.componentKind,
-      COMPONENT_KIND_ENUM,
-      'unknown'
-    ),
-    role: normalizeEnum(result.role, ROLE_ENUM, 'unknown'),
+    componentKind: normalizeComponentKind(result.componentKind, 'unknown'),
+    role: normalizeRole(result.role, 'unknown'),
     state: String(result.state ?? '').trim(),
     summary: String(result.summary ?? '').trim(),
     behaviorNeeded: Boolean(result.behaviorNeeded),

@@ -96,7 +96,7 @@ flowchart TD
   C --> D{{preflight}}
 
   D -- fail --> Z1[write report + retention + fail exit]
-  D -- pass --> I1[extract-intent]
+  D -- pass --> I1[extract-intent (docs + codebase baseline)]
   I1 --> I2{{gate-intent}}
   I2 -- fail --> I3[feedback: intent retry + structured overrides]
   I3 --> I1
@@ -156,7 +156,8 @@ sequenceDiagram
   R->>A: preflight (--version)
   A-->>R: runtime ok
 
-  R->>A: extract-intent (brief + hints + docs + feedback + overrides)
+  R->>R: build codebase baseline snapshot (src/shared/components + src/stories)
+  R->>A: extract-intent (brief + hints + docs + codebase + feedback + overrides)
   A-->>R: structured intent JSON
   R->>R: gate-intent
 
@@ -244,7 +245,7 @@ stateDiagram-v2
   READY --> PREFLIGHT
 
   PREFLIGHT --> BLOCKED: fail
-  PREFLIGHT --> INTENT: pass
+  PREFLIGHT --> INTENT: pass (load docs + codebase baseline)
 
   INTENT --> INTENT_GATE
   INTENT_GATE --> INTENT_RETRY: fail
@@ -322,6 +323,9 @@ figma:
 
 - `brief`: required natural-language context for intent extraction
 - `intent.page|component_kind|role|state|notes`: optional hints for stable intent resolution
+- `intent.component_kind` canonical values: `toast|snackbar|banner|tooltip|modal|dialog|bottom_sheet|drawer|sheet|popover|dropdown|menu|tabs|accordion|carousel|chip|card|list_item|empty_state|input|textarea|select|checkbox|radio|switch|progress|skeleton`
+- `intent.role` canonical values: `global|local|inline` (`unknown` is reserved for unresolved extraction output)
+- `intent.component_kind` / `intent.role` hints accept alias input (Korean/English synonyms) and are normalized to canonical values during extraction
 - `behavior.confirmed`: set `true` when creating a new interactive component with explicit behavior
 - `behavior.spec`: behavior contract text (required if `behavior.confirmed=true`)
 - `gates.intent_mode`: intent gate strictness (`warn|error`, default `error`)

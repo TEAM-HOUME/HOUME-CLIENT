@@ -4,6 +4,7 @@ import { relative, resolve } from 'node:path';
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { readContracts } from '../lib/contracts.mjs';
 import { fail } from '../lib/errors.mjs';
+import { INTERACTION_COMPONENT_KINDS } from '../lib/intent-taxonomy.mjs';
 
 const INTERACTION_KEYWORDS = [
   'modal',
@@ -17,15 +18,8 @@ const INTERACTION_KEYWORDS = [
   'dropdown',
   'select',
   'accordion',
+  'carousel',
 ];
-
-const INTERACTION_COMPONENT_KINDS = new Set([
-  'modal',
-  'bottom_sheet',
-  'dialog',
-  'sheet',
-  'drawer',
-]);
 
 function normalizePath(value) {
   return String(value ?? '')

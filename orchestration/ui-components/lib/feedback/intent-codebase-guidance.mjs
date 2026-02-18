@@ -5,6 +5,33 @@ const SEARCH_DIRS = ['src/shared/components', 'src/stories'];
 const MAX_FILE_SCAN = 500;
 const MAX_CANDIDATES = 5;
 const MAX_FILE_READ_CHARS = 12_000;
+const COMPONENT_KIND_KEYWORD_HINTS = {
+  toast: ['toast', 'snackbar'],
+  snackbar: ['snackbar', 'toast'],
+  modal: ['modal', 'dialog', 'popup'],
+  bottom_sheet: ['bottom', 'sheet', 'modal'],
+  dialog: ['dialog', 'modal', 'alert'],
+  drawer: ['drawer', 'sidebar', 'panel'],
+  sheet: ['sheet', 'panel', 'drawer'],
+  popover: ['popover', 'tooltip', 'menu'],
+  dropdown: ['dropdown', 'menu', 'select'],
+  menu: ['menu', 'dropdown', 'popover'],
+  tabs: ['tabs', 'tab', 'tabbar'],
+  accordion: ['accordion', 'panel', 'expand'],
+  carousel: ['carousel', 'slider', 'slide'],
+  chip: ['chip', 'tag', 'pill'],
+  card: ['card', 'tile', 'item'],
+  list_item: ['list', 'item', 'row', 'cell'],
+  empty_state: ['empty', 'placeholder'],
+  input: ['input', 'textfield', 'field', 'form'],
+  textarea: ['textarea', 'multiline', 'input', 'form'],
+  select: ['select', 'picker', 'dropdown', 'form'],
+  checkbox: ['checkbox', 'check', 'form'],
+  radio: ['radio', 'option', 'form'],
+  switch: ['switch', 'toggle', 'form'],
+  progress: ['progress', 'loader', 'spinner'],
+  skeleton: ['skeleton', 'placeholder', 'loading'],
+};
 
 function tokenize(text) {
   return String(text ?? '')
@@ -37,22 +64,9 @@ function toKeywordSet(context) {
     tokenize(value).forEach((token) => keywords.add(token));
   });
 
-  if (kind === 'snackbar') {
-    keywords.add('toast');
-    keywords.add('snackbar');
-  }
-  if (kind === 'toast') {
-    keywords.add('toast');
-    keywords.add('snackbar');
-  }
-  if (kind === 'bottom_sheet') {
-    keywords.add('bottom');
-    keywords.add('sheet');
-    keywords.add('modal');
-  }
-  if (kind === 'modal') {
-    keywords.add('modal');
-    keywords.add('dialog');
+  const kindHints = COMPONENT_KIND_KEYWORD_HINTS[kind];
+  if (Array.isArray(kindHints)) {
+    kindHints.forEach((keyword) => keywords.add(keyword));
   }
   return keywords;
 }
