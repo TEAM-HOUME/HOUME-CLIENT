@@ -78,7 +78,8 @@ export function buildCacheKey(context) {
   });
 }
 
-export function buildPrompt(context) {
+export function buildPrompt(context, options = {}) {
+  const assetWriteDir = String(options.assetWriteDir || '').trim();
   const designContextPath = context.designContextArtifactPath
     ? relative(context.rootPath, context.designContextArtifactPath)
     : '(missing)';
@@ -97,10 +98,13 @@ export function buildPrompt(context) {
     `Figma URL: ${context.scenario.figma.url}`,
     `Implementation scope node-id: ${context.figmaScope.selectedNodeId}`,
     `Design context artifact: ${designContextPath}`,
+    `Asset write directory (absolute): ${assetWriteDir || '(not provided)'}`,
     '',
     'Rules:',
     '- In this step, call required Figma MCP tools directly for the selected node.',
     `- Required tool coverage (all must be called at least once): ${FIGMA_REQUIRED_TOOLS.join(', ')}`,
+    '- Always pass dirForAssetWrites with the provided absolute directory when calling Figma MCP tools in this step.',
+    '- If a tool still fails due to asset-write path/options, retry once with the same node-id and the same dirForAssetWrites value.',
     '- Keep outputs read-only and do not edit code or files.',
     '- Preserve raw.<tool> status/output/error from MCP results.',
     '- Normalize tokens into: colors, typography, spacing, radius, size.',

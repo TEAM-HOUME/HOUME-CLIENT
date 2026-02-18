@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 import { findCachedArtifact } from '../lib/artifact-cache.mjs';
@@ -96,6 +96,16 @@ function writeCaptureArtifact(context, capture) {
   return artifactPath;
 }
 
+function ensureDesignTokenAssetWriteDir(context) {
+  const assetWriteDir = resolve(
+    context.artifactsDir,
+    context.runId,
+    'figma-design-token-assets'
+  );
+  mkdirSync(assetWriteDir, { recursive: true });
+  return assetWriteDir;
+}
+
 export function stepExtractDesignTokens(context) {
   if (context.options.dryRun) {
     return {
@@ -127,10 +137,11 @@ export function stepExtractDesignTokens(context) {
   let extractionMessage = null;
 
   try {
+    const assetWriteDir = ensureDesignTokenAssetWriteDir(context);
     const result = invokeAgentWithSchema(
       context,
       'design-tokens',
-      buildPrompt(context),
+      buildPrompt(context, { assetWriteDir }),
       buildSchema(),
       context.scenario.figma.timeoutMs
     );
