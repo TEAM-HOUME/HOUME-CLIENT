@@ -36,6 +36,8 @@ import { stepVerify } from './steps/verify.mjs';
 
 const RETRY_LIMITS = DEFAULT_RETRY_LIMITS;
 const PLANNED_STEP_COUNT = 15;
+const STEP_DIVIDER =
+  '------------------------------------------------------------';
 const STEP_DISPLAY_ORDER = Object.freeze({
   preflight: 1,
   'extract-intent': 2,
@@ -115,49 +117,50 @@ function printFinalSummary(context, reportResult) {
   const totalSteps = context.steps.length;
 
   console.log('');
-  console.log(`[ui-components] 단계 요약: ${passedSteps}/${totalSteps} 통과`);
+  console.log('[ui-components]');
+  console.log(STEP_DIVIDER);
+  console.log('[summary]');
+  console.log(`- 단계 요약: ${passedSteps}/${totalSteps} 통과`);
   if (context.storybookOpenResult?.status === 'opened') {
-    console.log(
-      `[ui-components] Storybook 열기 완료: ${context.storybookOpenResult.url}`
-    );
+    console.log(`- Storybook 열기: 완료`);
+    console.log(`- Storybook URL: ${context.storybookOpenResult.url}`);
   } else if (
     context.storybookOpenResult &&
     context.storybookOpenResult.status !== 'skipped'
   ) {
-    console.log(
-      `[ui-components] Storybook 열기 실패: ${context.storybookOpenResult.reason}`
-    );
+    console.log(`- Storybook 열기: 실패`);
+    console.log(`- Storybook 사유: ${context.storybookOpenResult.reason}`);
   }
   if (context.warnings.length > 0) {
-    console.log(`[ui-components] 경고: ${context.warnings.length}건`);
+    console.log(`- 경고: ${context.warnings.length}건`);
   }
   if (context.figmaMcpToolUsage.totalCalls > 0) {
     console.log(
-      `[ui-components] Figma MCP 도구 호출: 총 ${formatNumber(context.figmaMcpToolUsage.totalCalls)}회 (성공 ${formatNumber(context.figmaMcpToolUsage.successCalls)}, 실패 ${formatNumber(context.figmaMcpToolUsage.failedCalls)}, 미가용 ${formatNumber(context.figmaMcpToolUsage.unavailableCalls)})`
+      `- Figma MCP 도구 호출: 총 ${formatNumber(context.figmaMcpToolUsage.totalCalls)}회 (성공 ${formatNumber(context.figmaMcpToolUsage.successCalls)}, 실패 ${formatNumber(context.figmaMcpToolUsage.failedCalls)}, 미가용 ${formatNumber(context.figmaMcpToolUsage.unavailableCalls)})`
     );
   }
   const agentTokenUsageText = formatAgentTokenUsage(context.agentTokenUsage);
   if (agentTokenUsageText) {
-    console.log(`[ui-components] 에이전트 토큰: ${agentTokenUsageText}`);
+    console.log(`- 에이전트 토큰: ${agentTokenUsageText}`);
   }
   console.log(
-    `[ui-components] 리포트 인덱스: ${relative(context.rootPath, reportResult.indexPath)} (${reportResult.indexEntryCount}건)`
+    `- 리포트 인덱스: ${relative(context.rootPath, reportResult.indexPath)} (${reportResult.indexEntryCount}건)`
   );
   if (reportResult.retention.removedReportCount > 0) {
     console.log(
-      `[ui-components] 정리: 리포트 ${reportResult.retention.removedReportCount}건, 아티팩트 엔트리 ${reportResult.retention.removedArtifactEntries}건 삭제 (보관 기준: 최근 7일/최근 10런)`
+      `- 정리: 리포트 ${reportResult.retention.removedReportCount}건, 아티팩트 엔트리 ${reportResult.retention.removedArtifactEntries}건 삭제 (보관 기준: 최근 7일/최근 10런)`
     );
   }
-  console.log(
-    `[ui-components] 리포트: ${relative(context.rootPath, reportPath)}`
-  );
+  console.log(`- 리포트: ${relative(context.rootPath, reportPath)}`);
 
   if (context.status === 'failed') {
-    console.error(`[ui-components] 실패: ${context.error}`);
+    console.error(`- 실패: ${context.error}`);
+    console.log(STEP_DIVIDER);
     console.log('');
     return;
   }
-  console.log('[ui-components] 파이프라인 완료');
+  console.log('- 파이프라인 완료');
+  console.log(STEP_DIVIDER);
   console.log('');
 }
 

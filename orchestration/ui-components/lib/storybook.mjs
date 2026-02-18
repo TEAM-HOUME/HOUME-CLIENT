@@ -4,6 +4,39 @@ import { pathToFileURL } from 'node:url';
 
 import { runCommand } from './agent.mjs';
 
+function normalizeUrlCandidate(rawValue) {
+  const value = String(rawValue ?? '').trim();
+  if (!value) {
+    return '';
+  }
+  if (!/^https?:\/\//i.test(value)) {
+    return '';
+  }
+  return value;
+}
+
+function probeHttpUrl(url, cwd) {
+  const result = runCommand('curl', ['-sS', '--max-time', '2', '--head', url], {
+    cwd,
+    timeoutMs: 5_000,
+    allowFailure: true,
+  });
+  return result.exitCode === 0;
+}
+
+function resolvePreferredStorybookUrl(context) {
+  const envUrl = normalizeUrlCandidate(process.env.UI_COMPONENTS_STORYBOOK_URL);
+  const candidates = [envUrl, 'http://127.0.0.1:6006', 'http://localhost:6006']
+    .filter(Boolean)
+    .filter((candidate, index, list) => list.indexOf(candidate) === index);
+  for (const candidate of candidates) {
+    if (probeHttpUrl(candidate, context.rootPath)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 export function maybeOpenStorybook(context) {
   if (!context.options.openStorybook) {
     return {
@@ -57,7 +90,9 @@ export function maybeOpenStorybook(context) {
     };
   }
 
-  const storybookUrl = pathToFileURL(storybookIndexPath).toString();
+  const preferredHttpUrl = resolvePreferredStorybookUrl(context);
+  const storybookUrl =
+    preferredHttpUrl || pathToFileURL(storybookIndexPath).toString();
   const openCommand =
     process.platform === 'darwin'
       ? ['open', [storybookUrl]]
@@ -85,5 +120,6 @@ export function maybeOpenStorybook(context) {
   return {
     status: 'opened',
     url: storybookUrl,
+    source: preferredHttpUrl ? 'http' : 'file',
   };
 }
