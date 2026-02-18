@@ -35,7 +35,7 @@ export async function promptRetryDecision(
   const stageLabel = STAGE_LABELS[stage] || stage;
   const remaining = Math.max(0, maxAttempts - attempt);
   const retryQuestion = `재시도하시겠습니까? (남은 ${remaining}회, y/n, Enter=y): `;
-  const noteQuestion = '자유 보강 지시 입력 (선택, Enter=생략): ';
+  const noteQuestion = '추가 프롬프트 입력 (선택, Enter=생략): ';
   const parsedError = splitErrorDetails(errorMessage);
   console.log(
     `[ui-components] [${stage}] ${stageLabel} 단계 실패 (${attempt}/${maxAttempts})`
