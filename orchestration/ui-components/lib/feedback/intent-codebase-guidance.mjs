@@ -173,7 +173,12 @@ function buildDefaultNote(clues) {
   return `애매한 사항은 코드베이스 기준으로 정리해 주세요 (${summary}).${refText}`;
 }
 
-export function collectIntentCodebaseGuidance(context) {
+export function collectIntentCodebaseGuidance(context, options = {}) {
+  const forceRefresh = Boolean(options.forceRefresh);
+  if (!forceRefresh && context?.intentCodebaseGuidance) {
+    return context.intentCodebaseGuidance;
+  }
+
   const rootPath = context?.rootPath || process.cwd();
   const keywords = toKeywordSet(context);
   if (keywords.size === 0) {
@@ -202,12 +207,16 @@ export function collectIntentCodebaseGuidance(context) {
     .slice(0, MAX_CANDIDATES);
 
   if (scored.length === 0) {
-    return {
+    const guidance = {
       summaryLines: ['- 유사 코드 파일을 찾지 못했습니다.'],
       defaultNote:
         '애매한 사항은 기존 코드베이스 일반 규칙(문서/기존 패턴) 기준으로 정리해 주세요.',
       references: [],
     };
+    if (context) {
+      context.intentCodebaseGuidance = guidance;
+    }
+    return guidance;
   }
 
   const analyses = scored
@@ -238,9 +247,13 @@ export function collectIntentCodebaseGuidance(context) {
     references,
   });
 
-  return {
+  const guidance = {
     summaryLines,
     defaultNote,
     references,
   };
+  if (context) {
+    context.intentCodebaseGuidance = guidance;
+  }
+  return guidance;
 }

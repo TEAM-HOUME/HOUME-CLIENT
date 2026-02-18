@@ -72,6 +72,7 @@ function createContext(args, scenario, runId, rootPath, artifactsDir) {
     error: null,
     agentRuntime: null,
     contracts: null,
+    intentCodebaseGuidance: null,
     resolvedIntent: null,
     intentArtifactPath: null,
     intentGate: null,

@@ -3,6 +3,7 @@ import { relative, resolve } from 'node:path';
 
 import { invokeAgentWithSchema } from '../lib/agent.mjs';
 import { readContracts } from '../lib/contracts.mjs';
+import { collectIntentCodebaseGuidance } from '../lib/feedback/intent-codebase-guidance.mjs';
 
 const COMPONENT_KIND_ENUM = [
   'toast',
@@ -68,6 +69,7 @@ function buildPrompt(context) {
   const intent = context.scenario.intent;
   const feedbackNotes = dedupeFeedbackNotes(context.feedbackLoop?.intent);
   const contracts = context.contracts;
+  const codebaseGuidance = collectIntentCodebaseGuidance(context);
   const uiRuleSources =
     contracts &&
     Array.isArray(contracts.sources) &&
@@ -91,6 +93,14 @@ function buildPrompt(context) {
   if (intent.notes) {
     hintLines.push(`- notes: ${intent.notes}`);
   }
+  const codebaseSummaryLines =
+    codebaseGuidance && Array.isArray(codebaseGuidance.summaryLines)
+      ? codebaseGuidance.summaryLines
+      : ['- 코드베이스 스냅샷을 찾지 못했습니다.'];
+  const codebaseDefaultNote =
+    codebaseGuidance && codebaseGuidance.defaultNote
+      ? codebaseGuidance.defaultNote
+      : '';
 
   return [
     'You are resolving implementation intent from a short product brief.',
@@ -109,9 +119,16 @@ function buildPrompt(context) {
       : 'Project UI rules and codebase conventions: (none)',
     uiRulesContent,
     '',
+    'Current codebase baseline snapshot (must be considered first):',
+    ...codebaseSummaryLines,
+    ...(codebaseDefaultNote
+      ? [`- Default policy suggestion: ${codebaseDefaultNote}`]
+      : []),
+    '',
     'Rules:',
     '- Keep this read-only and do not edit files.',
     '- Return structured intent for UI implementation only.',
+    '- Use the current codebase baseline snapshot as primary behavior fallback when brief/hints are ambiguous.',
     '- Focus on UI behavior/spec gaps only; do not mention tooling/setup topics.',
     '- Do not ask for or suggest Code Connect integration.',
     '- Do not include MCP auth/token/tool availability as ambiguities.',
@@ -177,6 +194,7 @@ export function stepExtractIntent(context) {
     schema,
     Math.min(context.scenario.figma.timeoutMs, 180_000)
   );
+  const codebaseGuidance = collectIntentCodebaseGuidance(context);
 
   const resolvedIntent = {
     brief: context.scenario.intent.brief,
@@ -194,11 +212,21 @@ export function stepExtractIntent(context) {
     ambiguities: normalizeArray(result.ambiguities),
   };
 
+  const intentArtifact = {
+    ...resolvedIntent,
+    codebaseGuidance: codebaseGuidance
+      ? {
+          summaryLines: codebaseGuidance.summaryLines,
+          references: codebaseGuidance.references,
+          defaultNote: codebaseGuidance.defaultNote,
+        }
+      : null,
+  };
   const artifactPath = resolve(
     context.artifactsDir,
     `${context.runId}-intent.json`
   );
-  writeFileSync(artifactPath, JSON.stringify(resolvedIntent, null, 2), 'utf8');
+  writeFileSync(artifactPath, JSON.stringify(intentArtifact, null, 2), 'utf8');
 
   context.resolvedIntent = resolvedIntent;
   context.intentArtifactPath = artifactPath;
@@ -210,6 +238,9 @@ export function stepExtractIntent(context) {
     confidence: resolvedIntent.confidence,
     ambiguities: resolvedIntent.ambiguities,
     behaviorNeeded: resolvedIntent.behaviorNeeded,
+    codebaseSummaryLines: codebaseGuidance?.summaryLines || [],
+    codebaseReferenceCount: codebaseGuidance?.references?.length || 0,
+    codebaseDefaultNote: codebaseGuidance?.defaultNote || '',
     artifactPath: relative(context.rootPath, artifactPath),
   };
 }

@@ -42,6 +42,20 @@ export function logStepDetails(name, output, traceRecords) {
     if (output.behaviorNeeded) {
       console.log('- 동작정의 필요: 예');
     }
+    if (
+      Array.isArray(output.codebaseSummaryLines) &&
+      output.codebaseSummaryLines.length > 0
+    ) {
+      console.log(
+        `- 코드베이스 참고: ${output.codebaseReferenceCount || 0}개 파일`
+      );
+      output.codebaseSummaryLines.forEach((line, index) => {
+        printMultilineValue(`코드베이스 근거 ${index + 1}`, line);
+      });
+      if (output.codebaseDefaultNote) {
+        printMultilineValue('코드베이스 기본정책', output.codebaseDefaultNote);
+      }
+    }
     if (Array.isArray(output.ambiguities) && output.ambiguities.length > 0) {
       output.ambiguities.forEach((ambiguity, index) => {
         console.log(`- 모호점 ${index + 1}: ${ambiguity}`);

@@ -1,4 +1,4 @@
-brief: '이미지 생성 완료 페이지에서 캐러셀의 마지막일 때 페이지 상태.'
+brief: '이미지 생성 완료 페이지 상에서 캐러셀의 마지막일 때의 페이지 상태. 여러 이미지가 먼저 보여지고 마지막에 나오는 고정 이미지임'
 
 figma:
   url: 'https://www.figma.com/design/87dDqo3EUSFSzXK7f7s5Gs/TEMP?node-id=1-403&m=dev'

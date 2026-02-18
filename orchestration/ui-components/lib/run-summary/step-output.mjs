@@ -34,7 +34,8 @@ export function summarizeStepOutput(name, output) {
     const ambiguityCount = Array.isArray(output.ambiguities)
       ? output.ambiguities.length
       : 0;
-    return `유형=${output.componentKind}, 역할=${output.role}, 상태=${output.state || '(none)'}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 모호점=${ambiguityCount}개`;
+    const codebaseRefCount = Number(output.codebaseReferenceCount || 0);
+    return `유형=${output.componentKind}, 역할=${output.role}, 상태=${output.state || '(none)'}, 신뢰도=${Number(output.confidence || 0).toFixed(2)}, 모호점=${ambiguityCount}개, 코드참고=${codebaseRefCount}개`;
   }
   if (name === 'gate-intent') {
     const blockingCount = Array.isArray(output.blockingAmbiguities)
