@@ -87,7 +87,7 @@ describe('usePostSignupMutation', () => {
     sessionStorage.setItem('signupToken', 'mock-signup-token');
   });
 
-  it('성공 시 스토어 업데이트, sessionStorage 제거, GENERATE_START로 이동한다', async () => {
+  it('성공 시 스토어 업데이트, sessionStorage 제거, WELCOME으로 이동한다', async () => {
     server.use(successHandler);
 
     const { result } = renderHook(() => usePostSignupMutation(), {
@@ -103,7 +103,7 @@ describe('usePostSignupMutation', () => {
     expect(mockSetUserName).toHaveBeenCalledWith('테스트');
     expect(mockSetAccessToken).toHaveBeenCalledWith('mock-access-token');
     expect(sessionStorage.getItem('signupToken')).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith('/generate/start');
+    expect(mockNavigate).toHaveBeenCalledWith('/welcome');
   });
 
   it('API 에러 시 isError가 true이고 경고 토스트를 표시한다', async () => {

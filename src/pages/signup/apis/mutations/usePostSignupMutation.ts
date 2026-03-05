@@ -52,7 +52,7 @@ export const usePostSignupMutation = () => {
       setUserName(response.userName);
       setAccessToken(response.accessToken);
       sessionStorage.removeItem('signupToken');
-      navigate(ROUTES.GENERATE_START);
+      navigate(ROUTES.WELCOME);
     },
     onError: (error) => {
       console.error('[usePostSignupMutation] 회원가입 실패:', error);

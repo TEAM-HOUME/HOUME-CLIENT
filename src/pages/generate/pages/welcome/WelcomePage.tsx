@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useABTest } from '@pages/generate/hooks/useABTest';
-import { useStartPageModelPreload } from '@pages/generate/hooks/useStartPageModelPreload';
+import { useWelcomePageModelPreload } from '@pages/generate/hooks/useWelcomePageModelPreload';
 import { logGenerateStartClickBtnCTA } from '@pages/generate/utils/analytics';
 
 import { ROUTES } from '@routes/paths';
 
+import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
 import SignupImage from '@assets/icons/loginAfter.png';
@@ -13,18 +14,20 @@ import SignupImage from '@assets/icons/loginAfter.png';
 import CtaButton from '@components/button/ctaButton/CtaButton';
 import TitleNavBar from '@components/navBar/TitleNavBar';
 
-import * as styles from './StartPage.css';
+import * as styles from './WelcomePage.css';
 
-const StartPage = () => {
+const WelcomePage = () => {
   // zustand에서 userName 가져오기
   const userName = useUserStore((state) => state.userName);
   const navigate = useNavigate();
   const { variant } = useABTest();
 
-  useStartPageModelPreload();
+  useWelcomePageModelPreload(); // ONNX 모델 워밍업용 (현재 미사용)
+  const setFlow = useImageFlowStore((state) => state.setFlow);
+
   const handleGoToImageSetup = () => {
-    // 이미지 생성 시작 페이지 CTA 버튼 클릭 시 GA 이벤트 전송
     logGenerateStartClickBtnCTA(variant);
+    setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
     navigate(ROUTES.IMAGE_SETUP);
   };
 
@@ -56,4 +59,4 @@ const StartPage = () => {
   );
 };
 
-export default StartPage;
+export default WelcomePage;
