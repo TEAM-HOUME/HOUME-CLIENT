@@ -9,10 +9,15 @@ import { ROUTES } from '@routes/paths';
 import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
+import { TOAST_TYPE } from '@shared/types/toast';
+
 import SignupImage from '@assets/icons/loginAfter.png';
 
 import CtaButton from '@components/button/ctaButton/CtaButton';
 import TitleNavBar from '@components/navBar/TitleNavBar';
+import { useToast } from '@components/toast/useToast';
+
+import { getLoginRedirect, consumeLoginRedirect } from '@utils/loginRedirect';
 
 import * as styles from './WelcomePage.css';
 

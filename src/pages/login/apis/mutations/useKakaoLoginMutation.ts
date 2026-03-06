@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { logLoginSocialViewToastLoginError } from '@pages/login/utils/analytics';
+
 import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
@@ -63,9 +65,12 @@ export const useKakaoLoginMutation = () => {
     { code: string; env: AuthEnvironment }
   >({
     mutationFn: ({ code, env }) => getKakaoOAuthCallback(code, env),
+    // 카카오 로그인 성공
     onSuccess: (response) => {
-      // 신규 회원: signupToken 기반으로 회원가입 진행
+      // 신규회원 카카오 로그인 성공 시 자체 회원가입 페이지로 이동
       if (response.data.isNewUser) {
+        // signupToken: 카카오 인증 통과 ~ 자체 회원가입 사이
+        // 자체 회원가입 시 signupToken 사용
         const signupToken = response.data.signupToken;
         if (!signupToken) {
           console.error(
@@ -85,14 +90,26 @@ export const useKakaoLoginMutation = () => {
         return;
       }
 
-      // 기존 회원: access-token 헤더로 로그인 완료
+      // 기존 회원: access-token 헤더로 카카오 로그인 완료
       if (response.accessToken) {
         setAccessToken(response.accessToken);
       }
 
-      // 로그인 성공 시 시작점 복귀 + 토스트
+      // 기존회원 카카오 로그인 성공 시 시작점 복귀 + 토스트
       navigate(consumeLoginRedirect() ?? ROUTES.HOME);
       notify({ text: '로그인이 완료되었어요', type: TOAST_TYPE.INFO });
+    },
+    // 카카오 로그인 실패
+    onError: (error) => {
+      console.error('[useKakaoLoginMutation] login error:', error);
+      logLoginSocialViewToastLoginError();
+
+      // 카카오 로그인 실패 시 시작점 복귀 + 토스트
+      navigate(consumeLoginRedirect() ?? ROUTES.HOME);
+      notify({
+        text: '로그인 처리 중 오류가 발생했습니다.',
+        type: TOAST_TYPE.WARNING,
+      });
     },
   });
 };
