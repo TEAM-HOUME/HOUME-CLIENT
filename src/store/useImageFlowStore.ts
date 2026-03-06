@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export const ENTRY_ROUTE = {
   GENERATE_BUTTON: 'GENERATE_BUTTON', // 경로1: 상단 "이미지 생성" 버튼
@@ -44,18 +45,26 @@ const RESULT_TYPE_MAP: Record<EntryRoute, ResultType> = {
   [ENTRY_ROUTE.PRODUCT_SELECTION]: RESULT_TYPE.LIST,
 };
 
-export const useImageFlowStore = create<ImageFlowState>((set) => ({
-  entryRoute: null,
-  resultType: null,
-  preset: null,
-  setFlow: ({ entryRoute, preset }) =>
-    set({
-      entryRoute,
-      resultType: RESULT_TYPE_MAP[entryRoute], // 결과 페이지 타입 자동 매핑
-      preset: preset ?? null,
+export const useImageFlowStore = create<ImageFlowState>()(
+  persist(
+    (set) => ({
+      entryRoute: null,
+      resultType: null,
+      preset: null,
+      setFlow: ({ entryRoute, preset }) =>
+        set({
+          entryRoute,
+          resultType: RESULT_TYPE_MAP[entryRoute], // 결과 페이지 타입 자동 매핑
+          preset: preset ?? null,
+        }),
+      reset: () => set({ entryRoute: null, resultType: null, preset: null }),
     }),
-  reset: () => set({ entryRoute: null, resultType: null, preset: null }),
-}));
+    {
+      name: 'image-flow',
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);
 
 // 진입 경로 기반 다음 퍼널 스텝 분기 헬퍼
 // 경로1,3: 도면→인테리어스타일, 2,4,5: 도면→이미지로딩

@@ -6,7 +6,6 @@ import { logGenerateStartClickBtnCTA } from '@pages/generate/utils/analytics';
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
 import SignupImage from '@assets/images/signupWelcome.png';
@@ -24,7 +23,6 @@ const WelcomePage = () => {
   const { variant } = useABTest();
 
   useWelcomePageModelPreload(); // ONNX 모델 워밍업용 (현재 미사용)
-  const setFlow = useImageFlowStore((state) => state.setFlow);
 
   const redirectPath = getLoginRedirect();
   const isFromMypage = redirectPath?.startsWith(ROUTES.MYPAGE);
@@ -38,7 +36,7 @@ const WelcomePage = () => {
       navigate(ROUTES.HOME);
     } else {
       // 이미지 생성 중 로그인 게이트 진입 및 회원가입 완료 → CTA 탭 시 이미지 생성 플로우 복귀
-      setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
+      // entryRoute는 useImageFlowStore persist(sessionStorage)로 OAuth redirect에서도 유지됨
       navigate(consumeLoginRedirect() ?? ROUTES.IMAGE_SETUP);
     }
   };
