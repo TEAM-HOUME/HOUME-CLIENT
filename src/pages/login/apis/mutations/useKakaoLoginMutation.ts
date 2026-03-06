@@ -5,7 +5,11 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
+import { TOAST_TYPE } from '@shared/types/toast';
+
 import { HTTPMethod, request } from '@apis/config/request';
+
+import { useToast } from '@components/toast/useToast';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
@@ -50,6 +54,7 @@ export const getKakaoOAuthCallback = async (
 
 export const useKakaoLoginMutation = () => {
   const navigate = useNavigate();
+  const { notify } = useToast();
   const setAccessToken = useUserStore((state) => state.setAccessToken);
 
   return useMutation<
@@ -85,8 +90,9 @@ export const useKakaoLoginMutation = () => {
         setAccessToken(response.accessToken);
       }
 
-      // 로그인 성공 시 시작점 복귀
+      // 로그인 성공 시 시작점 복귀 + 토스트
       navigate(consumeLoginRedirect() ?? ROUTES.HOME);
+      notify({ text: '로그인이 완료되었어요', type: TOAST_TYPE.INFO });
     },
   });
 };
