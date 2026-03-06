@@ -30,10 +30,24 @@ const WelcomePage = () => {
   useWelcomePageModelPreload(); // ONNX 모델 워밍업용 (현재 미사용)
   const setFlow = useImageFlowStore((state) => state.setFlow);
 
-  const handleGoToImageSetup = () => {
+  const { notify } = useToast();
+  const redirectPath = getLoginRedirect();
+  const isFromMypage = redirectPath?.startsWith(ROUTES.MYPAGE);
+
+  const handleCtaClick = () => {
     logGenerateStartClickBtnCTA(variant);
-    setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
-    navigate(ROUTES.IMAGE_SETUP);
+
+    if (isFromMypage) {
+      // 마이페이지 탭 후 로그인 게이트 진입 및 회원가입 완료 → CTA 탭 시 홈으로 이동
+      consumeLoginRedirect();
+      navigate(ROUTES.HOME);
+      notify({ text: '회원가입이 완료되었어요', type: TOAST_TYPE.INFO });
+    } else {
+      // 이미지 생성 중 로그인 게이트 진입 및 회원가입 완료 → CTA 탭 시 이미지 생성 플로우 복귀
+      setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
+      navigate(consumeLoginRedirect() ?? ROUTES.IMAGE_SETUP);
+      notify({ text: '회원가입이 완료되었어요', type: TOAST_TYPE.INFO });
+    }
   };
 
   return (
@@ -58,7 +72,9 @@ const WelcomePage = () => {
         />
       </div>
       <div className={styles.btnarea}>
-        <CtaButton onClick={handleGoToImageSetup}>이미지 만들러가기</CtaButton>
+        <CtaButton onClick={handleCtaClick}>
+          {isFromMypage ? '홈에서 시작하기' : '계속해서 이미지 생성하기'}
+        </CtaButton>
       </div>
     </div>
   );
