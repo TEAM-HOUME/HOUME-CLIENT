@@ -48,6 +48,7 @@ coverage
 CLAUDE.md
 answer-guide.md
 docs/
+.mcp.json
 
 dev-debug.log
 # Dependency directories

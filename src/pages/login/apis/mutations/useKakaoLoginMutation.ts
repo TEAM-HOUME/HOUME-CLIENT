@@ -10,6 +10,8 @@ import { HTTPMethod, request } from '@apis/config/request';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
 
+import { consumeLoginRedirect } from '@utils/loginRedirect';
+
 import type { KakaoLoginResponse, LoginApiResponse } from '../../types/auth';
 import type { AuthEnvironment } from '../../types/environment';
 
@@ -83,7 +85,8 @@ export const useKakaoLoginMutation = () => {
         setAccessToken(response.accessToken);
       }
 
-      navigate(ROUTES.HOME);
+      // 로그인 성공 시 시작점 복귀
+      navigate(consumeLoginRedirect() ?? ROUTES.HOME);
     },
   });
 };
