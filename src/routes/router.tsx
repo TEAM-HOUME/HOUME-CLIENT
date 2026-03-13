@@ -106,12 +106,12 @@ const protectedRoutes = [
     },
   },
   {
-    path: ROUTES.GENERATE_START,
+    path: ROUTES.WELCOME,
     lazy: async () => {
-      const { default: StartPage } = await import(
-        '@pages/generate/pages/start/StartPage'
+      const { default: WelcomePage } = await import(
+        '@pages/generate/pages/welcome/WelcomePage'
       );
-      return { Component: StartPage };
+      return { Component: WelcomePage };
     },
   },
 ];

@@ -14,6 +14,8 @@ import { useToast } from '@components/toast/useToast';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
 
+import { consumeLoginRedirect } from '@utils/loginRedirect';
+
 import type { SignupRequest, SignupResponse } from '../../types/apis/signup';
 
 export const postSignup = async (
@@ -52,12 +54,15 @@ export const usePostSignupMutation = () => {
       setUserName(response.userName);
       setAccessToken(response.accessToken);
       sessionStorage.removeItem('signupToken');
-      navigate(ROUTES.GENERATE_START);
+      navigate(ROUTES.WELCOME);
     },
     onError: (error) => {
       console.error('[usePostSignupMutation] 회원가입 실패:', error);
+
+      // 가입 실패 시 시작점 복귀 + 에러 토스트
+      navigate(consumeLoginRedirect() ?? ROUTES.HOME);
       notify({
-        text: '회원가입에 실패했어요. 다시 시도해주세요.',
+        text: '회원가입이 완료되지 않았습니다',
         type: TOAST_TYPE.WARNING,
       });
     },
