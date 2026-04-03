@@ -6,6 +6,7 @@ import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuer
 
 import { ROUTES } from '@routes/paths';
 
+import { useImageFlowStore, ENTRY_ROUTE } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
 import MenuTab from '@components/v2/menuTab/MenuTab';
@@ -31,9 +32,8 @@ const HomePage = () => {
   const scrollDepth50Sent = useRef(false);
   const scrollDepth100Sent = useRef(false);
 
-  const { isLoading: isUserDataLoading } = useMyPageUserQuery({
-    enabled: isLoggedIn,
-  });
+  // TODO: v1에서 로그인 확인용으로 사용, v2 구현 과정에서 임시 미사용 처리함
+  useMyPageUserQuery({ enabled: isLoggedIn });
 
   // 스크롤 깊이 추적
   useEffect(() => {
@@ -71,22 +71,11 @@ const HomePage = () => {
     };
   }, []);
 
-  /**
-   * 플로팅 버튼 클릭 핸들러
-   * - 로그인 안됨: 로그인 페이지로 이동
-   * - 로그인됨: imageSetup 이미지 생성 플로우로 이동 (크레딧 체크는 ActivityInfo에서 수행)
-   */
   const handleGenerate = () => {
     logLandingClickBtnCTA();
-
-    if (!isLoggedIn) {
-      navigate(ROUTES.LOGIN);
-      return;
-    }
-
-    if (isUserDataLoading) return;
-
-    // 크레딧 체크 없이 무조건 퍼널 진입 허용
+    useImageFlowStore
+      .getState()
+      .setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
     navigate(ROUTES.IMAGE_SETUP);
   };
 

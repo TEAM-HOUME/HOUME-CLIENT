@@ -17,7 +17,7 @@ import { create } from 'zustand';
 
 import { DEFAULT_FILTERS, type FloorPlanFilters } from '../types/floorPlan';
 
-// 도면 선택 상태 초기값 — selectFloorPlan, clearFloorPlan, closeFloorPlanSheet, reset에서 반복 사용
+// 도면 선택 상태 초기값 — selectNewFloorPlan, clearFloorPlan, closeFloorPlanSheet, reset에서 반복 사용
 const INITIAL_SELECTION = {
   selectedFloorPlanId: null as number | null,
   selectedViewIndex: 0,
@@ -36,8 +36,10 @@ interface FloorPlanStoreState {
   isFloorPlanSheetOpen: boolean;
   isRecentSheetOpen: boolean;
 
-  // 도면 카드 클릭 시 호출, viewIndex/mirror 초기화
-  selectFloorPlan: (id: number) => void;
+  // 도면 카드를 새로 클릭했을 때 호출, viewIndex/mirror 초기화된 상태로 도면 보여줌
+  selectNewFloorPlan: (floorPlanId: number) => void;
+  // 로그인 복귀/경로3 진입 시 이전에 선택했던 상태를 그대로 복원
+  restoreFloorPlan: (floorPlanId: number, isMirror: boolean) => void;
   // 도면 카드 선택 해제
   clearFloorPlan: () => void;
   setViewIndex: (idx: number) => void;
@@ -73,8 +75,11 @@ export const useFloorPlanStore = create<FloorPlanStoreState>((set) => ({
   isFloorPlanSheetOpen: false,
   isRecentSheetOpen: false,
 
-  selectFloorPlan: (id) =>
-    set({ ...INITIAL_SELECTION, selectedFloorPlanId: id }),
+  selectNewFloorPlan: (floorPlanId) =>
+    set({ ...INITIAL_SELECTION, selectedFloorPlanId: floorPlanId }),
+  restoreFloorPlan: (floorPlanId, isMirror) => {
+    set({ selectedFloorPlanId: floorPlanId, isMirror: isMirror });
+  },
   clearFloorPlan: () => set(INITIAL_SELECTION),
   // 도면이 여러 장일 경우 선택된 도면 view index 세팅
   // TODO: 바텀시트를 퍼널 스텝으로 등록하면, 뒤로가기로 돌아왔을 때 이전에 보고 있던 뷰 인덱스를 복원해야 함
@@ -120,6 +125,7 @@ export const useFloorPlanStore = create<FloorPlanStoreState>((set) => ({
   openFloorPlanSheet: () => set({ isFloorPlanSheetOpen: true }),
   closeFloorPlanSheet: () =>
     set({ ...INITIAL_SELECTION, isFloorPlanSheetOpen: false }),
+  // TODO: 최근 생성 공간 API 연동 시, 도면 데이터를 파라미터로 받아 스토어에 저장하거나 별도 방식으로 전달 검토
   openRecentSheet: () => set({ isRecentSheetOpen: true }),
   closeRecentSheet: () => set({ isRecentSheetOpen: false }),
 

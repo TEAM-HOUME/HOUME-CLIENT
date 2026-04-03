@@ -32,29 +32,21 @@ import { useKakaoLoginMutation } from './apis/mutations/useKakaoLoginMutation';
 import { getAuthEnvironment } from './utils/environment';
 
 const KakaoCallbackPage = () => {
-  // 오류 핸들러
+  // 오류 핸들러 (인가 코드 없음 케이스 전용)
   const { handleError } = useErrorHandler('login');
 
   // Tanstack Query - useKakaoLoginMutation 훅 호출
-  const {
-    mutate: kakaoLogin,
-    isPending,
-    isError,
-    error,
-  } = useKakaoLoginMutation();
+  const { mutate: kakaoLogin, isPending } = useKakaoLoginMutation();
 
   useEffect(() => {
-    // 카카오 인증 완료 후 프론트엔드로 리다이렉트된 URL에서 인가 코드(code) 파싱
-    // 예: http://localhost:5173/oauth/kakao/callback?code=인가코드
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
 
-    // 환경 감지: hostname 기반으로 local/preview/dev 결정
     const hostname = window.location.hostname;
     const env = getAuthEnvironment(hostname);
 
     if (code) {
-      // 파싱한 인가 코드와 환경 정보를 백엔드 콜백 API(/oauth/kakao/callback)로 전달
+      // 로그인 성공/실패 핸들링 로직은 mutation 선언부에서 처리
       kakaoLogin({ code, env });
     } else {
       handleError(
@@ -66,13 +58,6 @@ const KakaoCallbackPage = () => {
       );
     }
   }, [kakaoLogin, handleError]);
-
-  // 오류 발생 시 useErrorHandler로 처리
-  useEffect(() => {
-    if (isError && error) {
-      handleError(error, 'api', '로그인 처리 중 오류가 발생했습니다.');
-    }
-  }, [isError, error, handleError]);
 
   if (isPending) {
     return <Loading />;

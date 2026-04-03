@@ -12,17 +12,16 @@ import {
 import { useFloorPlanStore } from '../stores/useFloorPlanStore';
 
 import type {
-  CompletedFloorPlan,
+  CompletedFloorPlanSelect,
   ImageSetupSteps,
 } from '../../types/funnel/steps';
 import type { FloorPlanFilters, RecentFloorPlanData } from '../types/floorPlan';
 
 export const useFloorPlanSelect = (
-  context: ImageSetupSteps['FloorPlan'],
-  onNext: (data: CompletedFloorPlan) => void
+  _context: ImageSetupSteps['FloorPlanSelect'],
+  onNext: (data: CompletedFloorPlanSelect) => void
 ) => {
   const store = useFloorPlanStore();
-  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
   const { notify } = useToast();
 
   // 더미 데이터 (추후 useFloorPlanQuery / useRecentFloorPlanQuery로 교체)
@@ -33,11 +32,24 @@ export const useFloorPlanSelect = (
 
   // 최근 생성 공간이 있으면 초기 시트 표시 + 토스트 알림
   useEffect(() => {
+    // 1순위: useFunnelStore에 저장된 도면이 있는 경우 (case: 경로 3 홈 도면 클릭 / 로그인 게이트에서 복귀)
+    const savedFloorPlan = useFunnelStore.getState().floorPlan;
+    if (savedFloorPlan) {
+      store.restoreFloorPlan(
+        savedFloorPlan.floorPlanId,
+        savedFloorPlan.isMirror
+      );
+      store.openFloorPlanSheet();
+      return;
+    }
+
+    // 2순위: 최근 생성 공간이 있는 경우 (case: API 응답에 최근 생성 공간 O)
+    // TODO: 최근 생성 공간 API 연동 시 RecentSheet에 해당 도면을 띄우도록 데이터 전달해야 함
     if (recentFloorPlan) {
       store.openRecentSheet();
-      // TODO: 토스트 높이 수정하기
       notify({ text: '저장된 내 공간을 불러왔어요.' });
     }
+
     // 마운트 시 1회만 실행
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -68,23 +80,16 @@ export const useFloorPlanSelect = (
   /**
    * handleConfirmFloorPlan / handleConfirmRecentFloorPlan에서
    * payload 생성 + funnelStore 저장 로직이 동일하므로 헬퍼로 추출
-   * savedHouseInfo가 있으면 우선 사용하고, 없으면 context(퍼널 진입 시 전달받은 값)로 폴백.
-   * TODO: 전체 플로우 skeleton 설계 시 퍼널 관련 로직 점검 필요
    */
-  const confirmFloorPlan = (floorPlanData: CompletedFloorPlan['floorPlan']) => {
+  const confirmFloorPlan = (
+    floorPlanData: CompletedFloorPlanSelect['floorPlan']
+  ) => {
     useFunnelStore.getState().setFloorPlan(floorPlanData);
-
-    onNext({
-      houseType: savedHouseInfo?.houseType ?? context.houseType,
-      roomType: savedHouseInfo?.roomType ?? context.roomType,
-      areaType: savedHouseInfo?.areaType ?? context.areaType,
-      houseId: savedHouseInfo?.houseId ?? context.houseId,
-      floorPlan: floorPlanData,
-    });
+    onNext({ floorPlan: floorPlanData });
   };
 
   const handleCardClick = (floorPlanId: number) => {
-    store.selectFloorPlan(floorPlanId);
+    store.selectNewFloorPlan(floorPlanId);
     store.openFloorPlanSheet();
   };
 

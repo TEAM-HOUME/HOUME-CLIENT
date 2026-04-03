@@ -34,7 +34,6 @@ export const useActivityInfo = (
 
   // Zustand store에서 저장된 데이터
   const savedActivityInfo = useFunnelStore((state) => state.activityInfo);
-  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
   const savedFloorPlan = useFunnelStore((state) => state.floorPlan);
   const savedMoodBoardIds = useFunnelStore((state) => state.moodBoardIds);
 
@@ -183,9 +182,10 @@ export const useActivityInfo = (
       return;
     }
 
+    // TODO: 경로별 이미지 생성 API 분리 시 재설계 필요
     const generateImageRequest: GenerateImageRequest = {
-      houseId: savedHouseInfo?.houseId ?? context.houseId,
-      equilibrium: savedHouseInfo?.areaType ?? context.areaType,
+      houseId: 0, // TODO: 경로별 API 분리 후 제거
+      equilibrium: '', // TODO: 경로별 API 분리 후 제거
       floorPlan: {
         floorPlanId:
           savedFloorPlan?.floorPlanId ?? context.floorPlan.floorPlanId,

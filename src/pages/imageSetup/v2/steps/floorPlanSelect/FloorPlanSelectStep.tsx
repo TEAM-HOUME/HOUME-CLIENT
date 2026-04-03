@@ -1,18 +1,16 @@
-import PageLayout from '@components/pageLayout/PageLayout';
-
 import FilterSheet from './FilterSheet';
 import FloorPlanSelectGrid from './FloorPlanSelectGrid';
 import FloorPlanSheet from './FloorPlanSheet';
 import { useFloorPlanSelect } from '../../hooks/useFloorPlanSelect';
 
 import type {
-  CompletedFloorPlan,
+  CompletedFloorPlanSelect,
   ImageSetupSteps,
 } from '../../../types/funnel/steps';
 
 interface FloorPlanSelectStepProps {
-  context: ImageSetupSteps['FloorPlan'];
-  onNext: (data: CompletedFloorPlan) => void;
+  context: ImageSetupSteps['FloorPlanSelect'];
+  onNext: (data: CompletedFloorPlanSelect) => void;
 }
 
 const FloorPlanSelectStep = ({ context, onNext }: FloorPlanSelectStepProps) => {
@@ -32,13 +30,7 @@ const FloorPlanSelectStep = ({ context, onNext }: FloorPlanSelectStepProps) => {
   } = useFloorPlanSelect(context, onNext);
 
   return (
-    <PageLayout
-      header={{
-        type: 'title',
-        title: '원하는 공간 선택하기',
-        backLabel: '이전',
-      }}
-    >
+    <>
       <FloorPlanSelectGrid
         filterCategories={filterCategories}
         floorPlans={filteredFloorPlans}
@@ -76,7 +68,7 @@ const FloorPlanSelectStep = ({ context, onNext }: FloorPlanSelectStepProps) => {
           onConfirm={handleConfirmRecentFloorPlan}
         />
       )}
-    </PageLayout>
+    </>
   );
 };
 

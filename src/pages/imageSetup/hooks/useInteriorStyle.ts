@@ -14,7 +14,6 @@ export const useInteriorStyle = (
 ) => {
   // Zustand store에서 저장된 데이터
   const savedMoodBoardIds = useFunnelStore((state) => state.moodBoardIds);
-  const savedHouseInfo = useFunnelStore((state) => state.houseInfo);
   const savedFloorPlan = useFunnelStore((state) => state.floorPlan);
 
   const [selectedImages, setSelectedImages] = useState<number[]>(
@@ -46,10 +45,6 @@ export const useInteriorStyle = (
     useFunnelStore.getState().setMoodBoardIds(selectedImages);
 
     const payload: CompletedInteriorStyle = {
-      houseType: savedHouseInfo?.houseType ?? context.houseType,
-      roomType: savedHouseInfo?.roomType ?? context.roomType,
-      areaType: savedHouseInfo?.areaType ?? context.areaType,
-      houseId: savedHouseInfo?.houseId ?? context.houseId,
       floorPlan: savedFloorPlan ?? context.floorPlan,
       moodBoardIds: selectedImages,
     };

@@ -1,3 +1,9 @@
+import { useNavigate } from 'react-router-dom';
+
+import { ROUTES } from '@routes/paths';
+
+import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+
 import RoomTypeCard from '@components/v2/roomTypeCard/RoomTypeCard';
 
 import TextButton from '@/shared/components/v2/btnText/TextButton';
@@ -34,6 +40,15 @@ const ROOM_TYPE_MOCK = [
 ] as const;
 
 const RoomTypeSection = () => {
+  const navigate = useNavigate();
+
+  const handleRoomTypeClick = () => {
+    useImageFlowStore
+      .getState()
+      .setFlow({ entryRoute: ENTRY_ROUTE.FLOOR_PLAN });
+    navigate(ROUTES.IMAGE_SETUP);
+  };
+
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
@@ -58,7 +73,7 @@ const RoomTypeSection = () => {
                 size="s"
                 label={room.label}
                 imageSrc={room.imageSrc}
-                onClick={() => {}}
+                onClick={handleRoomTypeClick}
               />
             </div>
           ))}

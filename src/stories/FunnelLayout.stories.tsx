@@ -18,7 +18,7 @@ const meta = {
   argTypes: {
     currentStep: {
       control: { type: 'radio' },
-      options: ['HouseInfo', 'FloorPlan', 'InteriorStyle', 'ActivityInfo'],
+      options: ['FloorPlanSelect', 'InteriorStyle', 'ActivityInfo'],
     },
     children: { control: false },
   },
@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    currentStep: 'FloorPlan',
+    currentStep: 'FloorPlanSelect',
     children: (
       <div style={{ padding: 16 }}>
         <div

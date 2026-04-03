@@ -11,10 +11,6 @@ const meta: Meta<typeof InteriorStyle> = {
   tags: ['autodocs'],
   args: {
     context: {
-      houseType: 'APARTMENT',
-      roomType: 'ONE_ROOM',
-      areaType: 'AREA_10',
-      houseId: 1,
       floorPlan: { floorPlanId: 1, isMirror: false },
     },
     onNext: fn(),

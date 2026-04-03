@@ -6,7 +6,7 @@ export const ROUTES = {
   LANDING: '/landing',
   LOGIN: '/login',
   SIGNUP: '/signup',
-  GENERATE_START: '/generate/start',
+  WELCOME: '/welcome',
   IMAGE_SETUP: '/imageSetup',
   GENERATE: '/generate',
   GENERATE_RESULT: '/generate/result',
@@ -15,7 +15,9 @@ export const ROUTES = {
   SETTING_SERVICE: '/mypage/setting/service',
   SETTING_PRIVACY: '/mypage/setting/privacy',
   OAUTH: '/oauth/kakao/callback',
-  TEST: '/test',
+  STYLE_LIST: '/styles',
+  STYLE_DETAIL: '/styles/:styleId',
+  BANNER_DETAIL: '/banner/:bannerId',
 } as const;
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
