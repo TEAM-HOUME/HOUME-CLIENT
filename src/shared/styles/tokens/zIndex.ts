@@ -11,4 +11,5 @@ export const zIndex = {
   popup: 350,
   toast: 400,
   sheet: 450,
+  navBar: 500,
 } as const;

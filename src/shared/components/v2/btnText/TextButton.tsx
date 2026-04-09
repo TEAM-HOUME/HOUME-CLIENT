@@ -2,10 +2,17 @@ import type { ComponentProps, ReactNode } from 'react';
 
 import clsx from 'clsx';
 
+import Icon, { type IconName } from '@shared/components/v2/icon/Icon';
+
 import * as styles from './TextButton.css';
 
 export type TextButtonColor = 'primary' | 'secondary' | 'inverse';
 export type TextButtonSize = 's' | 'm';
+
+const iconSizeForButton: Record<TextButtonSize, '16' | '20'> = {
+  s: '16',
+  m: '20',
+};
 
 export type TextButtonProps = Omit<
   ComponentProps<'button'>,
@@ -13,8 +20,8 @@ export type TextButtonProps = Omit<
 > & {
   color?: TextButtonColor;
   size?: TextButtonSize;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
+  leftIcon?: IconName;
+  rightIcon?: IconName;
   children: ReactNode;
 };
 
@@ -27,6 +34,8 @@ const TextButton = ({
   children,
   ...rest
 }: TextButtonProps) => {
+  const iconSize = iconSizeForButton[size];
+
   return (
     <button
       type="button"
@@ -34,14 +43,14 @@ const TextButton = ({
       {...rest}
     >
       {leftIcon != null ? (
-        <span className={styles.iconSlot({ size })} aria-hidden>
-          {leftIcon}
+        <span className={styles.iconSlot} aria-hidden>
+          <Icon name={leftIcon} size={iconSize} />
         </span>
       ) : null}
-      {children}
+      <span className={styles.textSlot}>{children}</span>
       {rightIcon != null ? (
-        <span className={styles.iconSlot({ size })} aria-hidden>
-          {rightIcon}
+        <span className={styles.iconSlot} aria-hidden>
+          <Icon name={rightIcon} size={iconSize} />
         </span>
       ) : null}
     </button>

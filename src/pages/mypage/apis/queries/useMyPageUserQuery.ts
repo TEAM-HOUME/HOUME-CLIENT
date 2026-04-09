@@ -5,7 +5,7 @@ import { HTTPMethod, request } from '@apis/config/request';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
 
-import type { MyPageUserResponse } from '../../types/apis/MyPage';
+import type { MyPageUserResponse } from '../../types/apis/userData';
 
 type MyPageUserData = MyPageUserResponse['data'];
 type UseMyPageUserOptions = Omit<

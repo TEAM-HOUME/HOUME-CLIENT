@@ -16,14 +16,14 @@ import {
   type CardClickArea,
 } from '@utils/productCardUtils';
 
-import * as styles from './CardProduct.css';
+import * as styles from './ProductCard.css';
 import ActionButton from '../button/actionButton/ActionButton';
 import IconButton from '../button/IconButton';
 import Icon from '../icon/Icon';
 
 type CardType = 'default' | 'shopping';
 
-interface CardProductProps {
+interface ProductCardProps {
   cardType?: CardType;
   product: ProductInfo;
   price?: PriceInfo;
@@ -34,7 +34,7 @@ interface CardProductProps {
   enableWholeCardLink?: boolean;
 }
 
-const CardProduct = ({
+const ProductCard = ({
   cardType = 'default',
   product,
   price,
@@ -43,7 +43,7 @@ const CardProduct = ({
   disabled = false,
   onCardClick,
   enableWholeCardLink = false,
-}: CardProductProps) => {
+}: ProductCardProps) => {
   const isDefault = cardType === 'default';
   const [isLoaded, setIsLoaded] = useState(false);
   const linkHref = link?.href;
@@ -64,7 +64,7 @@ const CardProduct = ({
 
   return (
     <div
-      className={`${styles.wrapper} ${
+      className={`${styles.wrapper()} ${
         enableWholeCardLink ? styles.clickable : ''
       }`}
       onClick={handleWrapperClick}
@@ -99,7 +99,7 @@ const CardProduct = ({
               aria-label={'공식 사이트로 이동'}
               onClick={link?.onClick}
             >
-              사이트
+              {link?.label || '사이트'}
             </ActionButton>
           )}
         </div>
@@ -143,7 +143,7 @@ const CardProduct = ({
           </div>
         )}
 
-        <div className={styles.middleInfoSection}>
+        <div className={styles.middleInfoSection({ cardType })}>
           {/* 브랜드, 상품 이름 */}
           <div className={styles.productInfo} data-click-area="title">
             {isDefault && !!product.brand && (
@@ -155,20 +155,34 @@ const CardProduct = ({
           {/* 가격 정보 */}
           {(originalPriceText || discountPriceText) && (
             <div className={styles.priceSection}>
-              {originalPriceText && (
-                <p className={styles.originalPriceText}>{originalPriceText}</p>
-              )}
-              {discountPriceText && (
-                <div className={styles.discountRow}>
-                  {discountRateText && (
-                    <span className={styles.discountRateText}>
-                      {discountRateText}
-                    </span>
+              {discountRateText ? (
+                // 할인 있을 때
+                <>
+                  {originalPriceText && (
+                    <p className={styles.originalPriceText}>
+                      {originalPriceText}
+                    </p>
                   )}
+                  {discountPriceText && (
+                    <div className={styles.discountRow}>
+                      {discountRateText && (
+                        <span className={styles.discountRateText}>
+                          {discountRateText}
+                        </span>
+                      )}
+                      <span className={styles.discountPriceText}>
+                        {discountPriceText}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // 할인 없을 때
+                originalPriceText && (
                   <span className={styles.discountPriceText}>
-                    {discountPriceText}
+                    {originalPriceText}
                   </span>
-                </div>
+                )
               )}
             </div>
           )}
@@ -187,12 +201,7 @@ const CardProduct = ({
             </div>
           )
         ) : (
-          <ActionButton
-            variant="outlined"
-            color="inverse"
-            size="S"
-            className={styles.fullWidthBtn}
-          >
+          <ActionButton variant="outlined" color="inverse" size="S" fullWidth>
             선택
           </ActionButton>
         )}
@@ -200,4 +209,4 @@ const CardProduct = ({
     </div>
   );
 };
-export default CardProduct;
+export default ProductCard;

@@ -1,6 +1,6 @@
 // 가구 찜하기 API
 export interface SaveItemsRequest {
-  recommendFurnitureId: number;
+  rawProductId: number;
 }
 
 export interface SaveItemsResponse {

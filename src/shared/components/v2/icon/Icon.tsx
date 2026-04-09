@@ -11,6 +11,7 @@ import ChevronUp from '@assets/v2/svg/ChevronUp.svg?url';
 import Close from '@assets/v2/svg/Close.svg?url';
 import CloseFillBlack from '@assets/v2/svg/CloseFillBlack.svg?url';
 import CloseFillGray from '@assets/v2/svg/CloseFillGray.svg?url';
+import Credit from '@assets/v2/svg/Credit.svg?url';
 import CupBlack from '@assets/v2/svg/CupBlack.svg?url';
 import CupGray from '@assets/v2/svg/CupGray.svg?url';
 import DeskBlack from '@assets/v2/svg/DeskBlack.svg?url';
@@ -27,6 +28,8 @@ import MouseBlack from '@assets/v2/svg/MouseBlack.svg?url';
 import MouseGray from '@assets/v2/svg/MouseGray.svg?url';
 import PlusFill from '@assets/v2/svg/PlusFill.svg?url';
 import Profile from '@assets/v2/svg/Profile.svg?url';
+import RadioDefault from '@assets/v2/svg/RadioDefault.svg?url';
+import RadioSelected from '@assets/v2/svg/RadioSelected.svg?url';
 import Refresh from '@assets/v2/svg/Refresh.svg?url';
 import Search from '@assets/v2/svg/Search.svg?url';
 import ViewDetail from '@assets/v2/svg/ViewDetail.svg?url';
@@ -63,9 +66,12 @@ const IconsName = {
   MouseGray,
   PlusFill,
   Profile,
+  RadioDefault,
+  RadioSelected,
   Refresh,
   Search,
   ViewDetail,
+  Credit,
 } as const;
 
 export type IconName = keyof typeof IconsName;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
 
@@ -27,7 +27,10 @@ const HomePage = () => {
   const navigate = useNavigate();
   const accessToken = useUserStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
-  const [activeMenuTab, setActiveMenuTab] = useState<HomeMenuTab>('explore');
+  const location = useLocation();
+  const [activeMenuTab, setActiveMenuTab] = useState<HomeMenuTab>(
+    location.state?.activeTab ?? 'explore'
+  );
 
   const scrollDepth50Sent = useRef(false);
   const scrollDepth100Sent = useRef(false);

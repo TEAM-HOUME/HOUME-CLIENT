@@ -16,7 +16,7 @@ export const wrapper = recipe({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    minWidth: '16.4rem',
+    minWidth: '16.6rem',
   },
 });
 
@@ -35,9 +35,10 @@ export const imgSection = recipe({
   base: {
     aspectRatio: '1 / 1', // 내부 absolute(링크 버튼)의 기준
     position: 'relative', // 모서리 밖으로 이미지 안 튀어나오게
-    border: `1px solid ${colorVars.color.border.secondary}`,
-    borderRadius: unitVars.unit.radius['300'],
-    background: 'transparent', // 이미지 영역만 정사각형
+    flexShrink: 0,
+    border: `1px solid ${colorVars.color.border.tertiary}`,
+    borderRadius: unitVars.unit.radius['300'], // 이미지 영역만 정사각형
+    background: 'transparent',
     width: '100%',
     overflow: 'hidden',
   },
@@ -124,11 +125,21 @@ export const colorChipCount = style({
   color: colorVars.color.text.tertiary,
 });
 
-export const middleInfoSection = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: unitVars.unit.gapPadding['200'],
-  padding: unitVars.unit.gapPadding['050'],
+export const middleInfoSection = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: unitVars.unit.gapPadding['200'],
+    padding: unitVars.unit.gapPadding['050'],
+  },
+  variants: {
+    cardType: {
+      default: {},
+      shopping: {
+        height: '7.2rem',
+      },
+    },
+  },
 });
 
 export const productInfo = style({
@@ -150,6 +161,7 @@ export const productText = style({
   display: '-webkit-box',
   maxHeight: '4.1rem',
   overflow: 'hidden',
+  wordBreak: 'break-all',
   color: colorVars.color.text.primary,
   WebkitLineClamp: 2,
   WebkitBoxOrient: 'vertical',
@@ -192,8 +204,4 @@ export const saveCountRow = style({
 export const saveCountText = style({
   ...fontVars.font.caption_r_11,
   color: colorVars.color.gray400,
-});
-
-export const fullWidthBtn = style({
-  width: '100%',
 });

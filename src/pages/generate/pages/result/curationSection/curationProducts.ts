@@ -71,7 +71,7 @@ const toFiniteProductId = (
   return null;
 };
 
-const normalizeColorHexes = (value: unknown) => {
+export const normalizeColorHexes = (value: unknown) => {
   if (!Array.isArray(value)) return [];
 
   return value

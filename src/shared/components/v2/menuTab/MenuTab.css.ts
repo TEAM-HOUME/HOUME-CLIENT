@@ -13,6 +13,7 @@ export const menuTabBar = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-start',
+  borderBottom: `0.2rem solid ${colorVars.color.border.tertiary}`,
   background: colorVars.color.fill.inverse,
   padding: `${unitVars.unit.gapPadding['000']} ${unitVars.unit.gapPadding['500']}`,
   width: '100%',
@@ -26,19 +27,23 @@ export const tabButton = recipe({
     alignItems: 'center',
     justifyContent: 'center',
     margin: `${unitVars.unit.gapPadding['000']} ${unitVars.unit.gapPadding['100']}`,
-    borderBottom: '0.2rem solid transparent',
+    marginBottom: '-0.4rem',
+    borderBottom: `0.2rem solid transparent`,
     padding: unitVars.unit.gapPadding['200'],
-    height: '100%',
     ...fontVars.font.title_sb_16,
+    height: '100%',
   },
   variants: {
+    menuType: {
+      default: {},
+      mypage: { flex: 1 },
+    },
     state: {
       active: {
         borderBottomColor: colorVars.color.fill.primary,
         color: colorVars.color.text.primary,
       },
       inactive: {
-        borderBottomColor: colorVars.color.fill.inverse,
         color: colorVars.color.text.tertiary,
       },
     },

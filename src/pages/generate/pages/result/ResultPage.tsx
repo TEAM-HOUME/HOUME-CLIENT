@@ -18,10 +18,6 @@ import type {
   GenerateImageData,
 } from '@pages/generate/types/generate';
 import { useMyPageImageDetailQuery } from '@pages/mypage/apis/queries/useMyPageImageDetailQuery';
-import type {
-  MyPageImageDetail,
-  MyPageImageHistory,
-} from '@pages/mypage/types/apis/MyPage';
 import { createImageDetailPlaceholder } from '@pages/mypage/utils/resultNavigation';
 
 import { ROUTES } from '@routes/paths';
@@ -41,6 +37,11 @@ import GeneratedImgA from './components/GeneratedImgA';
 import GeneratedImgB from './components/GeneratedImgB';
 import CurationSection from './curationSection/CurationSection';
 import * as styles from './ResultPage.css';
+
+import type {
+  MyPageImageDetail,
+  MyPageImageHistory,
+} from '@/pages/mypage/types/apis/generateList';
 
 // 통일된 타입 정의
 type UnifiedGenerateImageResult = {

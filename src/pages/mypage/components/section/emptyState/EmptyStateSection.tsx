@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 
-import SmallButton from '@pages/mypage/components/button/smallButton/SmallButton';
 import { logMyPageClickBtnMakeImg } from '@pages/mypage/utils/analytics';
 
 import { ROUTES } from '@routes/paths';
 
-import emptyImage from '@assets/images/mypageEmptyImage.png';
+import emptyImage from '@assets/v2/images/ImgEmpty.png';
+
+import TextButton from '@/shared/components/v2/btnText/TextButton';
+import ActionButton from '@/shared/components/v2/button/actionButton/ActionButton';
 
 import * as styles from './EmptyStateSection.css';
 
@@ -16,28 +18,43 @@ interface EmptyStateSectionProps {
 const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
   const navigate = useNavigate();
 
-  const handleMakeImgClick = () => {
+  const handleGoProductClick = () => {
     logMyPageClickBtnMakeImg();
-    navigate(ROUTES.HOME);
+    navigate(ROUTES.HOME, { state: { activeTab: 'product' } });
+  };
+
+  const handleGoRoomTypeClick = () => {
+    navigate(ROUTES.GENERATE); // 임시 라우터
   };
 
   const content = {
     generatedImages: {
-      title: '생성된 이미지가 없어요.',
-      description: '지금 바로 이미지를 만들어보세요.',
-      buttonText: '이미지 만들러 가기',
-      onClick: handleMakeImgClick,
+      title: '아직 만들어진 이미지가 없어요.',
+      description: '집 구조와 취향을 반영한 우리 집을\n지금 바로 상상해보세요.',
+      buttonText: '우리 집 상상해보기',
+      lineBtnText: '상품 먼저 둘러보기',
+      onPrimaryClick: handleGoRoomTypeClick,
+      onSecondaryClick: handleGoProductClick,
     },
     savedItems: {
-      title: '찜 가구가 없어요.',
+      title: '아직 찜한 상품이 없어요.',
       description:
-        '지금 바로 이미지를 만들고\n내 취향에 딱 맞는 가구를 추천받아보세요.',
-      buttonText: '이미지 만들러 가기',
-      onClick: handleMakeImgClick,
+        '마음에 드는 상품을 찜해두고\n우리 집에 두면 어떨지 상상해보세요.',
+      buttonText: '상품 둘러보기',
+      lineBtnText: '우리 집 먼저 상상하기',
+      onPrimaryClick: handleGoProductClick,
+      onSecondaryClick: handleGoRoomTypeClick,
     },
   };
 
-  const { title, description, buttonText, onClick } = content[type];
+  const {
+    title,
+    description,
+    buttonText,
+    lineBtnText,
+    onPrimaryClick,
+    onSecondaryClick,
+  } = content[type];
 
   return (
     <section className={styles.container}>
@@ -47,7 +64,28 @@ const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
           <p className={styles.title}>{title}</p>
           <p className={styles.description}>{description}</p>
         </div>
-        <SmallButton onClick={onClick}>{buttonText}</SmallButton>
+        <div className={styles.buttonWrapper}>
+          <ActionButton
+            variant="solid"
+            color="primary"
+            size="L"
+            onClick={onPrimaryClick}
+          >
+            {buttonText}
+          </ActionButton>
+          {/* 컴포넌트 변경 가능성 있음 */}
+          <TextButton
+            color="secondary"
+            size="s"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSecondaryClick?.();
+            }}
+            className={styles.lineButton}
+          >
+            {lineBtnText}
+          </TextButton>
+        </div>
       </div>
     </section>
   );

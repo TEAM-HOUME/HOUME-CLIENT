@@ -4,14 +4,15 @@ interface MenuTabItem<T extends string = string> {
   value: T;
   label: string;
 }
-
 interface MenuTabProps<T extends string> {
+  menuType?: 'default' | 'mypage';
   tabs: MenuTabItem<T>[];
   activeTab: T;
   onTabChange: (tab: T) => void;
 }
 
 const MenuTab = <T extends string>({
+  menuType = 'default',
   tabs,
   activeTab,
   onTabChange,
@@ -26,6 +27,7 @@ const MenuTab = <T extends string>({
           aria-selected={activeTab === value}
           className={styles.tabButton({
             state: activeTab === value ? 'active' : 'inactive',
+            menuType,
           })}
           onClick={() => onTabChange(value)}
         >

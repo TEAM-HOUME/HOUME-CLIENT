@@ -8,3 +8,8 @@ export const contentWrapper = style({
   alignSelf: 'stretch',
   minHeight: '100vh',
 });
+
+export const menuTabContainer = style({
+  alignSelf: 'stretch',
+  width: '100%',
+});

@@ -2,10 +2,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
 import HistorySection from '@pages/mypage/components/history/HistorySection';
-import type { MyPageImagesData } from '@pages/mypage/types/apis/MyPage';
 
 import { queryKeys } from '@constants/queryKey';
 
+import type { MyPageImagesData } from '@/pages/mypage/types/apis/generateList';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const createQueryClient = (data: MyPageImagesData) => {

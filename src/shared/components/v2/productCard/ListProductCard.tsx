@@ -16,12 +16,12 @@ import {
   type CardClickArea,
 } from '@utils/productCardUtils';
 
-import * as styles from './ListCardProduct.css';
+import * as styles from './ListProductCard.css';
 import IconButton from '../button/IconButton';
 
 type CardSize = 's' | 'm';
 
-interface ListCardProductProps {
+interface ListProductCardProps {
   cardSize?: CardSize;
   product: ProductInfo;
   price?: PriceInfo;
@@ -32,7 +32,7 @@ interface ListCardProductProps {
   enableWholeCardLink?: boolean;
 }
 
-const ListCardProduct = ({
+const ListProductCard = ({
   cardSize = 'm',
   product,
   price,
@@ -41,7 +41,7 @@ const ListCardProduct = ({
   disabled = false,
   onCardClick,
   enableWholeCardLink = false,
-}: ListCardProductProps) => {
+}: ListProductCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const linkHref = link?.href;
 
@@ -72,7 +72,10 @@ const ListCardProduct = ({
         enableWholeCardLink ? `${product.title} 상품 링크로 이동` : undefined
       }
     >
-      <section className={styles.imgSection()} data-click-area="image">
+      <section
+        className={styles.imgSection({ size: cardSize })}
+        data-click-area="image"
+      >
         {!isLoaded && <div className={styles.skeleton} />}
         <img
           className={styles.cardImage({ loaded: isLoaded, size: cardSize })}
@@ -110,20 +113,29 @@ const ListCardProduct = ({
         {/* 가격 정보 */}
         {(originalPriceText || discountPriceText) && (
           <div className={styles.priceSection}>
-            {originalPriceText && (
-              <p className={styles.originalPriceText}>{originalPriceText}</p>
-            )}
-            {discountPriceText && (
-              <div className={styles.discountRow}>
-                {discountRateText && (
-                  <span className={styles.discountRateText}>
-                    {discountRateText}
-                  </span>
+            {discountRateText ? (
+              // 할인 있을 때
+              <>
+                {discountPriceText && (
+                  <div className={styles.discountRow}>
+                    {discountRateText && (
+                      <span className={styles.discountRateText}>
+                        {discountRateText}
+                      </span>
+                    )}
+                    <span className={styles.discountPriceText}>
+                      {discountPriceText}
+                    </span>
+                  </div>
                 )}
+              </>
+            ) : (
+              // 할인 없을 때
+              originalPriceText && (
                 <span className={styles.discountPriceText}>
-                  {discountPriceText}
+                  {originalPriceText}
                 </span>
-              </div>
+              )
             )}
           </div>
         )}
@@ -153,4 +165,4 @@ const ListCardProduct = ({
     </div>
   );
 };
-export default ListCardProduct;
+export default ListProductCard;

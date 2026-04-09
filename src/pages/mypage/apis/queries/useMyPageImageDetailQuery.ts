@@ -5,7 +5,7 @@ import { HTTPMethod, request } from '@apis/config/request';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
 
-import type { MyPageImageDetailData } from '../../types/apis/MyPage';
+import type { MyPageImageDetailData } from '../../types/apis/generateList';
 
 type UseMyPageImageDetailOptions = Omit<
   UseQueryOptions<MyPageImageDetailData, Error, MyPageImageDetailData>,

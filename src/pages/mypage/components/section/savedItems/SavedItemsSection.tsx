@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { normalizeColorHexes } from '@pages/generate/pages/result/curationSection/curationProducts';
 import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQuery';
 import { logMyPageClickBtnFurnitureCard } from '@pages/mypage/utils/analytics';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
-import CardProduct from '@components/card/cardProduct/CardProduct';
-
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
+
+import ProductCard from '@/shared/components/v2/productCard/ProductCard';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
@@ -57,21 +58,38 @@ const SavedItemsSection = () => {
     <section className={styles.container}>
       <div className={styles.gridContainer}>
         {savedItems.map((item) => {
-          const isTargetItem = String(item.id) === String(focusItemId);
+          const isTargetItem =
+            String(item.rawProductId) === String(focusItemId);
 
           return (
             <div
-              key={item.furnitureProductId}
+              key={item.rawProductId}
               ref={isTargetItem ? itemFocusRef : null}
+              className={styles.cardWrapper}
             >
-              <CardProduct
-                size="small"
-                title={item.furnitureProductName}
-                imageUrl={item.furnitureProductImageUrl}
-                linkHref={item.furnitureProductSiteUrl}
-                isSaved={true}
-                onToggleSave={() => handleToggleSave(item.id)}
-                onLinkClick={logMyPageClickBtnFurnitureCard}
+              <ProductCard
+                product={{
+                  title: item.productName,
+                  brand: item.brandName,
+                  imageUrl: item.productImageUrl,
+                  colorHexes: normalizeColorHexes(item.colors),
+                }}
+                price={{
+                  original: item.listPrice,
+                  discount: item.discountPrice,
+                  discountRate: item.discountRate,
+                }}
+                save={{
+                  isSaved: true,
+                  onToggle: () => handleToggleSave(item.rawProductId),
+                  count: item.jjymCount,
+                }}
+                link={{
+                  href: item.productSiteUrl,
+                  onClick: logMyPageClickBtnFurnitureCard,
+                  label: '사이트',
+                }}
+                enableWholeCardLink={true}
               />
             </div>
           );

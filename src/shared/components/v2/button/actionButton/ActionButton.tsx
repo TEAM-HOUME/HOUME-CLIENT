@@ -24,7 +24,7 @@ const BUTTON_SIZE_TO_ICON_SIZE: Record<ActionButtonSize, IconSize> = {
 };
 
 export interface ActionButtonProps
-  extends Omit<React.ComponentProps<'button'>, 'children'> {
+  extends Omit<React.ComponentProps<'button'>, 'children' | 'width'> {
   children: React.ReactNode;
   variant?: ActionButtonVariant;
   color?: ActionButtonColor;

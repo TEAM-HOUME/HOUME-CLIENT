@@ -1,14 +1,5 @@
 import type { BaseResponse } from '@shared/types/apis';
 
-// 마이페이지 사용자 정보 조회 API
-export interface MyPageUserData {
-  userId: number;
-  name: string;
-  CreditCount: number; // 서버 응답과 동일하게 CreditCount 사용
-}
-
-export type MyPageUserResponse = BaseResponse<MyPageUserData>;
-
 // 마이페이지 이미지 생성 이력 조회 API
 export interface MyPageImageHistory {
   generatedImageUrl: string; // 서버 응답 필드명 그대로 사용
@@ -43,3 +34,38 @@ export interface MyPageImageDetailData {
 }
 
 export type MyPageImageDetailResponse = BaseResponse<MyPageImageDetailData>;
+
+export interface GeneratedImageListResponseData {
+  groups: GeneratedImageListData[];
+}
+
+export type GeneratedImageListResponse =
+  BaseResponse<GeneratedImageListResponseData>;
+
+export interface GeneratedImageListData {
+  date: string;
+  items: GeneratedImageListItem[];
+}
+
+type ViewType = 'LIST' | 'CURATION';
+export interface GeneratedImageListItem {
+  imageId: number;
+  viewType: ViewType;
+  generatedImageUrl: string;
+  generatedAt: string;
+  bannerTitle: string;
+  productSummaryText: string;
+  usedProducts: UsedProduct[];
+}
+
+export interface UsedProduct {
+  rawProductId: number;
+  productImageUrl: string;
+  productName: string;
+  listPrice: number;
+  discountRate: number;
+  discountPrice: number;
+  productSiteUrl: string;
+  isJjym: boolean;
+  colors: string[];
+}

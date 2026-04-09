@@ -13,7 +13,7 @@ import type {
 export const getJjymList = async (): Promise<JjymsResponse> => {
   return request<JjymsResponse>({
     method: HTTPMethod.GET,
-    url: API_ENDPOINT.GENERATE.MYPAGE_JJYM_LIST,
+    url: API_ENDPOINT.GENERATE.MYPAGE_JJYM_LIST_V2,
   });
 };
 

@@ -1,46 +1,63 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@styles/fontStyle';
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@/shared/styles/tokensV2/color.css';
+import { fontVars } from '@/shared/styles/tokensV2/font.css';
+import { unitVars } from '@/shared/styles/tokensV2/unit.css';
 
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: unitVars.unit.gapPadding['500'],
   width: '100%',
 });
 
 export const image = style({
-  width: '37.5rem',
-  height: '22rem',
+  width: '100%',
 });
 
 export const contentWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: '1.6rem',
+  gap: unitVars.unit.gapPadding['600'],
+  padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['000']}`,
 });
 
 export const textWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: '1.2rem',
-  padding: '1.6rem 2rem',
+  gap: unitVars.unit.gapPadding['200'],
+  padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['100']}`,
 });
 
 export const title = style({
-  ...fontStyle('title_sb_16'),
+  ...fontVars.font.title_sb_16,
   textAlign: 'center',
   whiteSpace: 'nowrap',
-  color: colorVars.color.gray999,
+  color: colorVars.color.text.primary,
 });
 
 export const description = style({
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   textAlign: 'center',
   whiteSpace: 'pre-line',
-  color: colorVars.color.gray500,
+  color: colorVars.color.text.tertiary,
+});
+
+export const buttonWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: unitVars.unit.gapPadding['600'],
+  padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['000']}`,
+  width: '100%',
+});
+
+export const lineButton = style({
+  textDecoration: 'underline',
+  textUnderlineOffset: '2px',
 });

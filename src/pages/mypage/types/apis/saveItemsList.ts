@@ -4,9 +4,14 @@ export interface JjymsResponse {
 }
 
 export interface FurnitureItem {
-  id: number;
-  furnitureProductImageUrl: string;
-  furnitureProductSiteUrl: string;
-  furnitureProductName: string;
-  furnitureProductId: number;
+  rawProductId: number;
+  productImageUrl: string;
+  productSiteUrl: string;
+  productName: string;
+  brandName: string;
+  colors: string[];
+  listPrice: number;
+  discountRate: number;
+  discountPrice: number;
+  jjymCount: number;
 }

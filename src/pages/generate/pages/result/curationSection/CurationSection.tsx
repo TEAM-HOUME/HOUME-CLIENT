@@ -140,7 +140,7 @@ const CurationSection = ({ groupId = null }: CurationSectionProps) => {
 
   useEffect(() => {
     // 추천ID(recommendId) 기준으로 맞춰서 넣기
-    const ids = jjymItems.map((item) => item.id);
+    const ids = jjymItems.map((item) => item.rawProductId);
     setSavedProductIds(ids);
   }, [jjymItems, setSavedProductIds]);
 

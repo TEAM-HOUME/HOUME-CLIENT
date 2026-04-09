@@ -6,8 +6,8 @@ import type {
   MyPageImageDetail,
   MyPageImageDetailData,
   MyPageImageHistory,
-  MyPageUserData,
-} from '../types/apis/MyPage';
+} from '../types/apis/generateList';
+import type { MyPageUserData } from '../types/apis/userData';
 
 interface BuildResultNavigationArgs {
   history: MyPageImageHistory;

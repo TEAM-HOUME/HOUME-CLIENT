@@ -18,6 +18,7 @@ export const ROUTES = {
   STYLE_LIST: '/styles',
   STYLE_DETAIL: '/styles/:styleId',
   BANNER_DETAIL: '/banner/:bannerId',
+  TEST: '/test',
 } as const;
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

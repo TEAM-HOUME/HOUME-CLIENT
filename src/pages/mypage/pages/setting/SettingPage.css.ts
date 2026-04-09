@@ -1,48 +1,32 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@styles/fontStyle';
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@/shared/styles/tokensV2/color.css';
+import { fontVars } from '@/shared/styles/tokensV2/font.css';
+import { unitVars } from '@/shared/styles/tokensV2/unit.css';
 
 export const container = style({
-  padding: '2.4rem 2rem 0 2rem',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: unitVars.unit.gapPadding['800'],
+  padding: unitVars.unit.gapPadding['500'],
   width: '100%',
+  minHeight: '100vh',
 });
 
 export const section = style({
-  marginBottom: '4rem',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: unitVars.unit.gapPadding['300'],
 });
 
 export const sectionTitle = style({
-  ...fontStyle('title_sb_16'),
-  marginBottom: '1.6rem',
-  color: colorVars.color.gray800,
-});
-
-export const buttonArea = style({
   display: 'block',
-  margin: 0,
-  borderTop: `0.1rem solid ${colorVars.color.gray100}`,
-  padding: 0,
-  listStyle: 'none',
+  ...fontVars.font.title_sb_16,
+  padding: `${unitVars.unit.gapPadding['100']} ${unitVars.unit.gapPadding['000']}`,
+  color: colorVars.color.text.primary,
 });
 
 export const buttonItem = style({
   display: 'block',
-  borderBottom: `0.1rem solid ${colorVars.color.gray100}`,
-  padding: '1.2rem 0',
-});
-
-export const settingButton = style({
-  display: 'flex',
-  border: 'none',
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-  padding: 0,
-  width: '100%',
-  textAlign: 'left',
-});
-
-export const buttonText = style({
-  ...fontStyle('body_r_14'),
-  color: colorVars.color.gray600,
+  padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['000']}`,
 });

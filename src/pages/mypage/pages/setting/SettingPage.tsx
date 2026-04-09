@@ -16,9 +16,11 @@ import { ROUTES } from '@routes/paths';
 
 import { TOAST_TYPE } from '@shared/types/toast';
 
-import TitleNavBar from '@components/navBar/TitleNavBar';
 import GeneralModal from '@components/overlay/modal/GeneralModal';
 import { useToast } from '@components/toast/useToast';
+import TitleNavBar from '@components/v2/navBar/TitleNavBar';
+
+import TextButton from '@/shared/components/v2/btnText/TextButton';
 
 import * as styles from './SettingPage.css';
 
@@ -93,35 +95,50 @@ const SettingPage = () => {
     <>
       <TitleNavBar
         title="설정"
-        isBackIcon
-        isLoginBtn={false}
+        backLabel="이전"
         onBackClick={() => navigate(-1)}
       />
-
       <div className={styles.container}>
+        {/* 프로필 */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>프로필</h2>
+          <ul aria-label="프로필 설정 목록">
+            <li className={styles.buttonItem}>
+              <TextButton
+                color="primary"
+                size="s"
+                // onClick={() => navigate(ROUTES.PROFILE_EDIT)}
+                aria-label="프로필 수정"
+              >
+                프로필 수정
+              </TextButton>
+            </li>
+          </ul>
+        </section>
+
         {/* 약관 및 정책 섹션 */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>약관 및 정책</h2>
-          <ul className={styles.buttonArea} aria-label="약관 및 정책 목록">
+          <ul aria-label="약관 및 정책 목록">
             <li className={styles.buttonItem}>
-              <button
-                type="button"
-                className={styles.settingButton}
+              <TextButton
+                color="primary"
+                size="s"
                 onClick={handleServicePolicy}
                 aria-label="서비스 이용 약관"
               >
-                <span className={styles.buttonText}>서비스 이용 약관</span>
-              </button>
+                서비스 이용 약관
+              </TextButton>
             </li>
             <li className={styles.buttonItem}>
-              <button
-                type="button"
-                className={styles.settingButton}
+              <TextButton
+                color="primary"
+                size="s"
                 onClick={handlePrivacyPolicy}
                 aria-label="개인정보 처리방침"
               >
-                <span className={styles.buttonText}>개인정보 처리방침</span>
-              </button>
+                개인정보 처리방침
+              </TextButton>
             </li>
           </ul>
         </section>
@@ -129,26 +146,26 @@ const SettingPage = () => {
         {/* 계정 설정 섹션 */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>계정 설정</h2>
-          <ul className={styles.buttonArea} aria-label="계정 설정 목록">
+          <ul aria-label="계정 설정 목록">
             <li className={styles.buttonItem}>
-              <button
-                type="button"
-                className={styles.settingButton}
+              <TextButton
+                color="primary"
+                size="s"
                 onClick={handleLogout}
                 aria-label="로그아웃"
               >
-                <span className={styles.buttonText}>로그아웃</span>
-              </button>
+                로그아웃
+              </TextButton>
             </li>
             <li className={styles.buttonItem}>
-              <button
-                type="button"
-                className={styles.settingButton}
+              <TextButton
+                color="primary"
+                size="s"
                 onClick={handleWithdraw}
-                aria-label="탈퇴하기"
+                aria-label="계정탈퇴"
               >
-                <span className={styles.buttonText}>탈퇴하기</span>
-              </button>
+                계정 탈퇴
+              </TextButton>
             </li>
           </ul>
         </section>

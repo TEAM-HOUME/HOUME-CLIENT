@@ -9,6 +9,7 @@ export const API_ENDPOINT = {
     SIGN_UP: '/api/v1/sign-up',
     MYPAGE: '/api/v1/mypage/user',
     MYPAGE_IMAGES: '/api/v1/mypage/images',
+    MYPAGE_IMAGES_V2: '/api/v2/mypage/images',
     MYPAGE_IMAGE_DETAIL: (imageId: number) =>
       `/api/v1/mypage/images/${imageId}`,
     DELETE: '/api/v1/user',
@@ -40,7 +41,10 @@ export const API_ENDPOINT = {
     CURATION_DASHBOARD: '/api/v1/dashboard-info',
     JJYM: (recommendFurnitureId: number) =>
       `/api/v1/recommend-furnitures/${recommendFurnitureId}/jjym`, // 찜하기 토글
+    JJYM_V2: (rawProductId: number) =>
+      `/api/v2/curation-raw-products/${rawProductId}/jjym`,
     MYPAGE_JJYM_LIST: '/api/v1/jjyms', // 찜한 가구 조회
+    MYPAGE_JJYM_LIST_V2: '/api/v2/jjyms',
   },
   ANALYTICS: {
     FURNITURE_LOGS: '/api/v1/furnitures/logs',
