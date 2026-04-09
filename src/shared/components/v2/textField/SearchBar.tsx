@@ -14,7 +14,7 @@ interface SearchBarProps
 const SearchBar = ({
   value: controlledValue,
   onChange: onControlledChange,
-  placeholder = '가구 유형, 브랜드, 키워드로 상품을 검색하세요.',
+  placeholder = '카테고리, 브랜드, 키워드로 상품을 검색하세요.',
   id,
   ...props
 }: SearchBarProps) => {

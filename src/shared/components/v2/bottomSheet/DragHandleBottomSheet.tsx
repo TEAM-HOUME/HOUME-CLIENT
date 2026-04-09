@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import BottomSheetBase from './BottomSheetBase';
 import * as styles from './BottomSheetBase.css';
@@ -9,6 +9,7 @@ interface DragHandleBottomSheetProps {
   contentSlot: ReactNode;
   primaryButton: ReactNode;
   secondaryButton?: ReactNode;
+  onExpandedChange?: (expanded: boolean) => void;
   /** 최소 높이 (rem 문자열). 있으면 Persistent(최소높이 존재) 모드, 없으면 Dismissible 모드 */
   collapsedHeight?: string;
   /** Dismissible 모드에서 바텀시트가 사라질 때 부모에게 알리는 콜백 (부모가 open을 false로 바꿈) */
@@ -33,6 +34,7 @@ const DragHandleBottomSheet = ({
   contentSlot,
   primaryButton,
   secondaryButton,
+  onExpandedChange,
   collapsedHeight,
   onDismiss,
 }: DragHandleBottomSheetProps) => {
@@ -47,6 +49,10 @@ const DragHandleBottomSheet = ({
   const startHeightRef = useRef(0);
   const collapsedPxRef = useRef(0);
   const expandedPxRef = useRef(0);
+
+  useEffect(() => {
+    onExpandedChange?.(expanded);
+  }, [expanded, onExpandedChange]);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {

@@ -110,6 +110,7 @@ const HomePage = () => {
           { value: 'product', label: '상품' },
         ]}
         activeTab={activeMenuTab}
+        sticky={activeMenuTab === 'explore'}
         onTabChange={setActiveMenuTab}
       />
       {activeMenuTab === 'explore' && <ExploreTab />}
