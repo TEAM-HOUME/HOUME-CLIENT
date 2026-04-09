@@ -107,7 +107,10 @@ export const infoSection = recipe({
   variants: {
     size: {
       s: { gap: unitVars.unit.gapPadding['050'], minWidth: '22rem' },
-      m: { gap: unitVars.unit.gapPadding['100'], minWidth: '26.1rem' },
+      m: {
+        gap: unitVars.unit.gapPadding['100'],
+        minWidth: '24.7rem',
+      },
     },
   },
 });

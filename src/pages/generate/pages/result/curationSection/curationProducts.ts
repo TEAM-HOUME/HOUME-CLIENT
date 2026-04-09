@@ -75,11 +75,24 @@ export const normalizeColorHexes = (value: unknown) => {
   if (!Array.isArray(value)) return [];
 
   return value
-    .filter((color): color is string => typeof color === 'string')
-    .map((color) => color.trim())
     .map((color) => {
-      if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) return color;
-      return COLOR_NAME_TO_HEX_MAP[color] ?? null;
+      // { name, value } 형태
+      if (typeof color === 'object' && color !== null && 'value' in color) {
+        const rawValue = (color as { value?: unknown }).value;
+        if (typeof rawValue !== 'string') return null;
+        const trimmed = rawValue.trim();
+        if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(trimmed)) {
+          return trimmed;
+        }
+        return COLOR_NAME_TO_HEX_MAP[trimmed] ?? null;
+      }
+      // string 형태 → 한글 이름이면 매핑
+      if (typeof color === 'string') {
+        const trimmed = color.trim();
+        if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(trimmed)) return trimmed;
+        return COLOR_NAME_TO_HEX_MAP[trimmed] ?? null;
+      }
+      return null;
     })
     .filter((color): color is string => Boolean(color));
 };
