@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
@@ -10,7 +11,6 @@ import { useToast } from '@components/v2/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 
-import { useFunnelStore } from '../../stores/useFunnelStore';
 import { useHouseTemplateDetailQuery } from '../apis/queries/useHouseTemplateDetailQuery';
 import { useHouseTemplatesQuery } from '../apis/queries/useHouseTemplatesQuery';
 import {

@@ -15,10 +15,10 @@ import {
 import { useStackDataQuery } from '@pages/generate/v2/apis/queries/useStackDataQuery';
 import LikeButton from '@pages/generate/v2/components/likeButton/LikeButton';
 import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
 import { ROUTES } from '@routes/paths';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import {

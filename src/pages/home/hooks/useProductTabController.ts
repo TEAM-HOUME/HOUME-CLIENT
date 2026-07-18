@@ -12,10 +12,10 @@ import type {
   ProductFilterChipCategory,
   SelectedProduct,
 } from '@pages/home/types/productTab';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
 import { ROUTES } from '@routes/paths';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';

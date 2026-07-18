@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 
 import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 /**

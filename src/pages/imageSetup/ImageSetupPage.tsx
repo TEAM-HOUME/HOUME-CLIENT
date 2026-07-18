@@ -9,6 +9,7 @@ import {
   entryRouteToFlowRoute,
   FLOW_CONFIG,
 } from '@store/imageFlow/flowConfig';
+import { useFunnelStore } from '@store/useFunnelStore';
 import {
   consumeEntryRouteHold,
   holdEntryRoute,
@@ -28,7 +29,6 @@ import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageSetup';
 import ActivityInfo from './steps/activityInfo/ActivityInfo';
 import InteriorStyle from './steps/interiorStyle/InteriorStyle';
-import { useFunnelStore } from './stores/useFunnelStore';
 import FloorPlanSelectStep from './v2/steps/floorPlanSelect/FloorPlanSelectStep';
 import { useFloorPlanStore } from './v2/stores/useFloorPlanStore';
 

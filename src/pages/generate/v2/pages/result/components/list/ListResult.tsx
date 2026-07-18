@@ -6,11 +6,11 @@ import { useResultListAnalytics } from '@pages/generate/analytics/useResultListA
 import { useGenerateListResultQuery } from '@pages/generate/v2/apis/queries/useGenerateListResultQuery';
 import { useRelatedImagesQuery } from '@pages/generate/v2/apis/queries/useRelatedImagesQuery';
 import { useSimilarItemsQuery } from '@pages/generate/v2/apis/queries/useSimilarItemsQuery';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
 import { ROUTES } from '@routes/paths';
 
 import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 

@@ -1,5 +1,4 @@
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
-
+import { useFunnelStore } from '@store/useFunnelStore';
 import {
   useImageFlowStore,
   type FlowAnalyticsSnapshot,

@@ -4,8 +4,8 @@ import { useGenerateBannerImageMutation } from '@pages/generate/apis/mutations/u
 import { useGenerateFullFunnelImageMutation } from '@pages/generate/apis/mutations/useGenerateFullFunnelImageMutation';
 import { useGenerateOtherStyleImageMutation } from '@pages/generate/apis/mutations/useGenerateOtherStyleImageMutation';
 import { useGenerateProductImageMutation } from '@pages/generate/apis/mutations/useGenerateProductImageMutation';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type {
