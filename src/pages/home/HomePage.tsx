@@ -11,7 +11,8 @@ import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuer
 
 import { ROUTES } from '@routes/paths';
 
-import { useImageFlowStore, ENTRY_ROUTE } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';

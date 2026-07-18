@@ -13,7 +13,8 @@ import { useImageMetaQuery } from '@pages/generate/v2/apis/queries/useImageMetaQ
 
 import { ROUTES } from '@routes/paths';
 
-import { isCurationViewType, RESULT_TYPE } from '@store/useImageFlowStore';
+import { isCurationViewType } from '@store/imageFlow/flowConfig';
+import { RESULT_TYPE } from '@store/imageFlow/types';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {

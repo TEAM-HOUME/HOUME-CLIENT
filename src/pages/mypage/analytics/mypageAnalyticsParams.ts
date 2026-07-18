@@ -1,6 +1,6 @@
 import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
 
-import { isCurationViewType } from '@store/useImageFlowStore';
+import { isCurationViewType } from '@store/imageFlow/flowConfig';
 
 import { joinAnalyticsIds } from '@shared/analytics/params/builders/productCard';
 import { IMG_RESULT_TYPE } from '@shared/analytics/params/result';

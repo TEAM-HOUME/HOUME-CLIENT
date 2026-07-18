@@ -5,11 +5,13 @@ import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQu
 
 import { ROUTES } from '@routes/paths';
 
+import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { useImageFlowStore } from '@store/useImageFlowStore';
+
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
 import TextButton from '@/shared/components/v2/btnText/TextButton';
 import ActionButton from '@/shared/components/v2/button/actionButton/ActionButton';
-import { ENTRY_ROUTE, useImageFlowStore } from '@/store/useImageFlowStore';
 
 import * as styles from './EmptyStateSection.css';
 

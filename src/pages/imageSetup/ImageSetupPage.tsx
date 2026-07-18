@@ -6,8 +6,11 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@routes/paths';
 
 import {
+  entryRouteToFlowRoute,
+  FLOW_CONFIG,
+} from '@store/imageFlow/flowConfig';
+import {
   consumeEntryRouteHold,
-  getNextFunnelStep,
   holdEntryRoute,
   useImageFlowStore,
 } from '@store/useImageFlowStore';
@@ -109,7 +112,8 @@ const ImageSetupPage = () => {
               ) => {
                 const entryRoute = useImageFlowStore.getState().entryRoute;
                 if (!entryRoute) return;
-                const nextStep = getNextFunnelStep(entryRoute);
+                const nextStep =
+                  FLOW_CONFIG[entryRouteToFlowRoute(entryRoute)].afterFloorPlan;
 
                 if (nextStep === 'INTERIOR_STYLE') {
                   // 풀퍼널 (경로 1, 3): 로그인 게이트 통과 후 다음 스텝(InteriorStyle)으로 이동

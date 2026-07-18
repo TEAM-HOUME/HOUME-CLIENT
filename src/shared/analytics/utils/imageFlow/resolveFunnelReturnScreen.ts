@@ -1,8 +1,5 @@
-import {
-  ENTRY_ROUTE,
-  RESULT_TYPE,
-  useImageFlowStore,
-} from '@store/useImageFlowStore';
+import { ENTRY_ROUTE, RESULT_TYPE } from '@store/imageFlow/types';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';
 

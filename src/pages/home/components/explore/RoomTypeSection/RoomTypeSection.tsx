@@ -15,7 +15,8 @@ import { useHouseTemplatesQuery } from '@pages/imageSetup/v2/apis/queries/useHou
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
 
