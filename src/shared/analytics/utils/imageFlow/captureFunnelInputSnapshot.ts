@@ -19,12 +19,13 @@ export const captureFullFunnelFlowSnapshot = (
  * useActivityInfo에서 이미 저장됐으면 skip
  */
 export const ensureShortFunnelFlowSnapshot = (): void => {
-  const { flowSnapshot, preset } = useImageFlowStore.getState();
+  const { flowSnapshot, flow } = useImageFlowStore.getState();
   if (flowSnapshot) return;
 
   const funnel = useFunnelStore.getState();
   useImageFlowStore.getState().setFlowSnapshot({
     floorPlanId: funnel.floorPlan?.floorPlanId,
-    productIds: preset?.type === 'product' ? preset.productIds : undefined,
+    productIds:
+      flow?.route === 'PRODUCT_SELECTION' ? flow.productIds : undefined,
   });
 };

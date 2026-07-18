@@ -136,13 +136,10 @@ const BannerDetailPage = () => {
   const handleCta = () => {
     if (selectedAnswerId === null) return;
 
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.HOME_BANNER,
-      preset: {
-        type: 'banner',
-        bannerId: parsedBannerId,
-        answerId: selectedAnswerId,
-      },
+    useImageFlowStore.getState().startFlow({
+      route: 'HOME_BANNER',
+      bannerId: parsedBannerId,
+      answerId: selectedAnswerId,
     });
 
     const selectedAnswer = bannerDetail.answers?.find(

@@ -7,7 +7,6 @@ import { trackSelectFurnitureBtnCtaClick } from '@pages/imageSetup/analytics/sel
 import { ROUTES } from '@routes/paths';
 
 import { useFunnelStore } from '@store/useFunnelStore';
-import { holdEntryRoute } from '@store/useImageFlowStore';
 
 import {
   buildSelectedFurnitureChips,
@@ -245,7 +244,6 @@ export const useActivityInfo = (
       hasPreviousImage: recentFloorPlanData?.hasRecentImage === true,
     });
 
-    holdEntryRoute();
     navigate(ROUTES.GENERATE);
   };
 

@@ -9,7 +9,6 @@ import { useSimilarItemsQuery } from '@pages/generate/v2/apis/queries/useSimilar
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE } from '@store/imageFlow/types';
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
@@ -296,13 +295,11 @@ const ListResult = ({ image, isProductView }: ListResultProps) => {
     }
 
     useFunnelStore.getState().reset();
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.PRODUCT_REGENERATE,
-      preset: {
-        type: 'product',
-        productIds: mapped.map((p) => p.id),
-        productsToBeRestored: mapped,
-      },
+    useImageFlowStore.getState().startFlow({
+      route: 'PRODUCT_SELECTION',
+      isRegenerate: true,
+      productIds: mapped.map((p) => p.id),
+      productsToBeRestored: mapped,
     });
 
     navigate(ROUTES.HOME, { state: { activeTab: 'product' } });

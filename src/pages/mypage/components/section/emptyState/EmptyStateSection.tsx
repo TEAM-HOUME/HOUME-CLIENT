@@ -5,7 +5,6 @@ import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQu
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE } from '@store/imageFlow/types';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
@@ -37,9 +36,7 @@ const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
   };
 
   const handleGoRoomTypeClick = () => {
-    useImageFlowStore
-      .getState()
-      .setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
+    useImageFlowStore.getState().startFlow({ route: 'GENERATE_BUTTON' });
     navigate(ROUTES.IMAGE_SETUP);
   };
 

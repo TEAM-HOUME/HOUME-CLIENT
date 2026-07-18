@@ -14,14 +14,53 @@ export type FlowRoute =
 // 진입 경로별 정적 구성
 // 이 경로면 어떤 스텝을 거치고, 어떤 이미지 생성 API를 호출하며, 어떤 결과화면(목록형/추천형)을 띄우는가
 export interface FlowConfig {
-  // FloorPlanSelect 스텝 완료 후 다음 목적지 (기존 getNextFunnelStep 대체)
-  // INTERIOR_STYLE: 풀퍼널(다음 스텝으로 이동), GENERATE: 숏퍼널(바로 /generate)
+  // 도면 선택 다음: INTERIOR_STYLE(다음 스텝) 또는 GENERATE(바로 이미지 생성)
   afterFloorPlan: 'INTERIOR_STYLE' | 'GENERATE';
-  // 이미지 생성 요청 종류 — S2의 buildGenerateRequest가 사용 (기존 preset.type switch 대체)
+  // 어떤 이미지 생성 API를 부를지
   requestKind: 'fullFunnel' | 'banner' | 'otherStyle' | 'product';
-  // 결과 페이지 viewType (기존 RESULT_TYPE_MAP + 저장 resultType 대체)
+  // 결과 페이지에서 보여줄 화면 종류
   resultView: ResultType;
 }
+
+// 플로우가 지금 퍼널 안이냐 밖이냐
+// - funnel: /imageSetup에서 진행 중
+// - postFunnel: 퍼널을 빠져나온 뒤 (ResultPage·GA가 이 값 사용)
+export type FlowPhase = 'funnel' | 'postFunnel';
+
+// 지금 진행 중인 플로우에 필요한 값: 종류(route) + 상태(phase) + 퍼널 진입 전 preset
+// +) 퍼널 스텝 안에서 사용자가 고르는 값(도면 최종 선택·무드보드·활동)은 여기 없고 useFunnelStore에 있음
+// 한 번 쓰고 버리는 값(도면 id·복원용 상품)은 사용 후 null로 비운다.
+export type ImageFlow =
+  | { route: 'GENERATE_BUTTON'; phase: FlowPhase }
+  | { route: 'FLOOR_PLAN'; phase: FlowPhase; presetFloorPlanId: number | null } // null = 홈에서 '더보기'로 도면 페이지 진입 또는 다 씀
+  | {
+      route: 'HOME_BANNER';
+      phase: FlowPhase;
+      bannerId: number;
+      answerId: number;
+    }
+  | { route: 'STYLE_RESTYLE'; phase: FlowPhase; styleId: number }
+  | {
+      route: 'PRODUCT_SELECTION';
+      phase: FlowPhase;
+      isRegenerate: boolean; // 결과에서 "다시 선택하기"로 온 경우 true (GA만 SHOP_REGENERATE로 구분)
+      productIds: number[];
+      productsToBeRestored: ProductItem[] | null; // null = 복원 다 씀 또는 생성 완료 후 비움
+    };
+
+// useImageFlowStore의 startFlow가 받는 값. ImageFlow에서 phase만 뺀 형태 —
+// 시작할 땐 phase가 항상 funnel이라 startFlow에서 알아서 넣는다.
+export type StartFlowInput =
+  | { route: 'GENERATE_BUTTON' }
+  | { route: 'FLOOR_PLAN'; presetFloorPlanId?: number }
+  | { route: 'HOME_BANNER'; bannerId: number; answerId: number }
+  | { route: 'STYLE_RESTYLE'; styleId: number }
+  | {
+      route: 'PRODUCT_SELECTION';
+      isRegenerate: boolean;
+      productIds: number[];
+      productsToBeRestored: ProductItem[];
+    };
 
 // 이미지 생성 퍼널 진입 경로 (6가지), GA 이벤트용 종류
 // 같은 상품으로 이미지 재생성(PRODUCT_REGENERATE)은 상품으로 이미지 생성(PRODUCT_SELECTION)과 완전히 동일한 플로우, 따라서 FlowRoute에서는 구분 X

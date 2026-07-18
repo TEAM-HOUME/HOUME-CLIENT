@@ -15,6 +15,7 @@ import type {
 
 import { ROUTES } from '@routes/paths';
 
+import { ENTRY_ROUTE } from '@store/imageFlow/types';
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
@@ -179,13 +180,11 @@ const useProductTabController = ({
 
     const entryRoute = resolveShopFlowEntryRoute();
 
-    useImageFlowStore.getState().setFlow({
-      entryRoute,
-      preset: {
-        type: 'product',
-        productIds: selectedProducts.map((p) => p.id),
-        productsToBeRestored: selectedProducts,
-      },
+    useImageFlowStore.getState().startFlow({
+      route: 'PRODUCT_SELECTION',
+      isRegenerate: entryRoute === ENTRY_ROUTE.PRODUCT_REGENERATE,
+      productIds: selectedProducts.map((p) => p.id),
+      productsToBeRestored: selectedProducts,
     });
 
     requireLogin(

@@ -1,76 +1,80 @@
 import { describe, expect, it } from 'vitest';
 
-import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/types';
-
 import {
   FLOW_CONFIG,
-  entryRouteToFlowRoute,
+  flowToEntryRoute,
   isCurationViewType,
 } from './flowConfig';
+import { ENTRY_ROUTE, type FlowRoute, type ImageFlow } from './types';
 
-const ALL_ENTRY_ROUTES = Object.values(ENTRY_ROUTE) as EntryRoute[];
-
-// FLOW_CONFIG가 기존 동작(RESULT_TYPE_MAP + getNextFunnelStep)을 그대로 재현하는지 고정한다.
-// - resultView: 기존 RESULT_TYPE_MAP과 값이 일치해야 함
+// FLOW_CONFIG가 기존 동작(RESULT_TYPE_MAP + getNextFunnelStep)을 그대로 재현하는지 route별로 고정한다.
+// - resultView: 기존 RESULT_TYPE_MAP과 값이 일치
 // - afterFloorPlan: 기존 getNextFunnelStep(INTERIOR_STYLE / IMAGE_LOADING)과 등가 (IMAGE_LOADING === GENERATE)
 describe('FLOW_CONFIG (기존 매핑 동등성)', () => {
-  const expectedResultView: Record<EntryRoute, string> = {
-    [ENTRY_ROUTE.GENERATE_BUTTON]: 'FULL_FUNNEL',
-    [ENTRY_ROUTE.HOME_BANNER]: 'BANNER',
-    [ENTRY_ROUTE.FLOOR_PLAN]: 'FULL_FUNNEL',
-    [ENTRY_ROUTE.STYLE_RESTYLE]: 'STYLE',
-    [ENTRY_ROUTE.PRODUCT_SELECTION]: 'PRODUCT',
-    [ENTRY_ROUTE.PRODUCT_REGENERATE]: 'PRODUCT',
-  };
-
-  const expectedAfterFloorPlan: Record<
-    EntryRoute,
-    'INTERIOR_STYLE' | 'GENERATE'
+  const expected: Record<
+    FlowRoute,
+    { resultView: string; afterFloorPlan: 'INTERIOR_STYLE' | 'GENERATE' }
   > = {
-    [ENTRY_ROUTE.GENERATE_BUTTON]: 'INTERIOR_STYLE',
-    [ENTRY_ROUTE.FLOOR_PLAN]: 'INTERIOR_STYLE',
-    [ENTRY_ROUTE.HOME_BANNER]: 'GENERATE',
-    [ENTRY_ROUTE.STYLE_RESTYLE]: 'GENERATE',
-    [ENTRY_ROUTE.PRODUCT_SELECTION]: 'GENERATE',
-    [ENTRY_ROUTE.PRODUCT_REGENERATE]: 'GENERATE',
+    GENERATE_BUTTON: {
+      resultView: 'FULL_FUNNEL',
+      afterFloorPlan: 'INTERIOR_STYLE',
+    },
+    FLOOR_PLAN: { resultView: 'FULL_FUNNEL', afterFloorPlan: 'INTERIOR_STYLE' },
+    HOME_BANNER: { resultView: 'BANNER', afterFloorPlan: 'GENERATE' },
+    STYLE_RESTYLE: { resultView: 'STYLE', afterFloorPlan: 'GENERATE' },
+    PRODUCT_SELECTION: { resultView: 'PRODUCT', afterFloorPlan: 'GENERATE' },
   };
 
-  it.each(ALL_ENTRY_ROUTES)(
-    '%s: resultView가 기존 RESULT_TYPE_MAP과 일치한다',
-    (entryRoute) => {
-      const config = FLOW_CONFIG[entryRouteToFlowRoute(entryRoute)];
-      expect(config.resultView).toBe(expectedResultView[entryRoute]);
-    }
-  );
-
-  it.each(ALL_ENTRY_ROUTES)(
-    '%s: afterFloorPlan이 기존 getNextFunnelStep과 등가다',
-    (entryRoute) => {
-      const config = FLOW_CONFIG[entryRouteToFlowRoute(entryRoute)];
-      expect(config.afterFloorPlan).toBe(expectedAfterFloorPlan[entryRoute]);
-    }
-  );
+  (Object.keys(expected) as FlowRoute[]).forEach((route) => {
+    it(`${route}: resultView/afterFloorPlan이 기존 매핑과 일치한다`, () => {
+      expect(FLOW_CONFIG[route].resultView).toBe(expected[route].resultView);
+      expect(FLOW_CONFIG[route].afterFloorPlan).toBe(
+        expected[route].afterFloorPlan
+      );
+    });
+  });
 });
 
-describe('entryRouteToFlowRoute', () => {
-  it('PRODUCT_REGENERATE는 PRODUCT_SELECTION으로 접힌다', () => {
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.PRODUCT_REGENERATE)).toBe(
-      'PRODUCT_SELECTION'
-    );
+// flow → GA용 EntryRoute(6값) 역변환. product의 isRegenerate만 SHOP_REGENERATE 구분을 만든다.
+describe('flowToEntryRoute', () => {
+  it('flow가 null이면 null', () => {
+    expect(flowToEntryRoute(null)).toBeNull();
   });
 
-  it('나머지 5개 route는 동일한 FlowRoute로 매핑된다', () => {
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.GENERATE_BUTTON)).toBe(
-      'GENERATE_BUTTON'
-    );
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.HOME_BANNER)).toBe('HOME_BANNER');
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.FLOOR_PLAN)).toBe('FLOOR_PLAN');
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.STYLE_RESTYLE)).toBe(
-      'STYLE_RESTYLE'
-    );
-    expect(entryRouteToFlowRoute(ENTRY_ROUTE.PRODUCT_SELECTION)).toBe(
-      'PRODUCT_SELECTION'
-    );
+  it('product + isRegenerate=true → PRODUCT_REGENERATE (GA SHOP_REGENERATE)', () => {
+    const flow: ImageFlow = {
+      route: 'PRODUCT_SELECTION',
+      phase: 'funnel',
+      isRegenerate: true,
+      productIds: [1],
+      productsToBeRestored: null,
+    };
+    expect(flowToEntryRoute(flow)).toBe(ENTRY_ROUTE.PRODUCT_REGENERATE);
+  });
+
+  it('product + isRegenerate=false → PRODUCT_SELECTION (GA SHOP)', () => {
+    const flow: ImageFlow = {
+      route: 'PRODUCT_SELECTION',
+      phase: 'funnel',
+      isRegenerate: false,
+      productIds: [1],
+      productsToBeRestored: null,
+    };
+    expect(flowToEntryRoute(flow)).toBe(ENTRY_ROUTE.PRODUCT_SELECTION);
+  });
+
+  it('그 외 route는 그대로 EntryRoute로 매핑된다', () => {
+    expect(
+      flowToEntryRoute({ route: 'GENERATE_BUTTON', phase: 'funnel' })
+    ).toBe(ENTRY_ROUTE.GENERATE_BUTTON);
+    expect(
+      flowToEntryRoute({
+        route: 'HOME_BANNER',
+        phase: 'funnel',
+        bannerId: 1,
+        answerId: 2,
+      })
+    ).toBe(ENTRY_ROUTE.HOME_BANNER);
   });
 });
 

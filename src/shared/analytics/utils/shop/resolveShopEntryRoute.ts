@@ -11,9 +11,9 @@ import { mapEntryRouteToImageEntry } from '@shared/analytics/utils/imageEntryRou
  * (일반 image_entry_route는 setFlow 이후 read-only인 `getEntryRoute()`를 쓴다.)
  */
 export const resolveShopFlowEntryRoute = (): EntryRoute => {
-  const entryRoute = useImageFlowStore.getState().entryRoute;
+  const flow = useImageFlowStore.getState().flow;
 
-  return entryRoute === ENTRY_ROUTE.PRODUCT_REGENERATE
+  return flow?.route === 'PRODUCT_SELECTION' && flow.isRegenerate
     ? ENTRY_ROUTE.PRODUCT_REGENERATE
     : ENTRY_ROUTE.PRODUCT_SELECTION;
 };
