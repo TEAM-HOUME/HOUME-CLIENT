@@ -40,7 +40,7 @@ export function useAppUpdate({
     if (latestVersion) {
       try {
         sessionStorage.setItem(
-          APP_UPDATE_STORAGE_KEYS.dismissedVersion,
+          APP_UPDATE_STORAGE_KEYS.DISMISSED_VERSION,
           latestVersion
         );
       } catch {
@@ -74,7 +74,7 @@ export function useAppUpdate({
       let dismissedVersion: string | null = null;
       try {
         dismissedVersion = sessionStorage.getItem(
-          APP_UPDATE_STORAGE_KEYS.dismissedVersion
+          APP_UPDATE_STORAGE_KEYS.DISMISSED_VERSION
         );
       } catch {
         dismissedVersion = null;

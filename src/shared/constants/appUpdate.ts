@@ -7,11 +7,11 @@ export const APP_UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 export const APP_UPDATE_STORAGE_KEYS = {
   /** 닫은(스와이프 등) 최신 version.json 값 (세션 단위) */
-  dismissedVersion: 'houme:dismissed-app-version',
+  DISMISSED_VERSION: 'houme:dismissed-app-version',
   /** vite:preloadError 로 reload 한 빌드 표시 (빌드당 1회) */
-  preloadReloadedPrefix: 'houme:preload-reloaded:',
+  PRELOAD_RELOADED_PREFIX: 'houme:preload-reloaded:',
 } as const;
 
 export const getPreloadReloadedStorageKey = (
   buildId: string = CLIENT_BUILD_ID
-) => `${APP_UPDATE_STORAGE_KEYS.preloadReloadedPrefix}${buildId}`;
+) => `${APP_UPDATE_STORAGE_KEYS.PRELOAD_RELOADED_PREFIX}${buildId}`;
