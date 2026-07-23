@@ -13,12 +13,11 @@ export function setupVitePreloadErrorReload(
   }
 
   window.addEventListener('vite:preloadError', (event) => {
-    event.preventDefault();
-
     const reloadKey = getPreloadReloadedStorageKey();
 
     try {
       if (sessionStorage.getItem(reloadKey)) {
+        // 이미 1회 reload 한 빌드 → preventDefault 하지 않아 원본 에러가 라우터/에러 UI로 전달됨
         return;
       }
       sessionStorage.setItem(reloadKey, 'true');
@@ -26,6 +25,7 @@ export function setupVitePreloadErrorReload(
       // sessionStorage 사용 불가 시에도 1회 reload는 시도
     }
 
+    event.preventDefault();
     window.location.reload();
   });
 }
