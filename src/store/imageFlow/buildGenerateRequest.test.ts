@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildGenerateRequest, type FunnelData } from './buildGenerateRequest';
 
-import type { ImageFlow } from './types';
+import type { ImageFlow } from './flowConfig';
 
 const validFloorPlan = {
   floorPlanId: 1,

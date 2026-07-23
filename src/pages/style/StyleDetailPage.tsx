@@ -10,7 +10,7 @@ import {
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 

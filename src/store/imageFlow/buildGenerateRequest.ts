@@ -5,7 +5,7 @@ import type {
   ProductGenerateImageRequest,
 } from '@apis/__generated__/data-contracts';
 
-import type { ImageFlow } from './types';
+import type { ImageFlow } from './flowConfig';
 
 // 퍼널에서 사용자가 입력한 값. sessionStorage에 저장돼 값이 망가질 수 있어 필드마다 검사한다
 export interface FunnelData {

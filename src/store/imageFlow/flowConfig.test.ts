@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ENTRY_ROUTE,
   FLOW_CONFIG,
   flowToEntryRoute,
   isCurationViewType,
+  type FlowRoute,
+  type ImageFlow,
 } from './flowConfig';
-import { ENTRY_ROUTE, type FlowRoute, type ImageFlow } from './types';
 
 // FLOW_CONFIG가 기존 동작(RESULT_TYPE_MAP + getNextFunnelStep)을 그대로 재현하는지 route별로 고정한다.
 // - resultView: 기존 RESULT_TYPE_MAP과 값이 일치

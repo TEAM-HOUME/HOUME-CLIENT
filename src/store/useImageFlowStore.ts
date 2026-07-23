@@ -6,7 +6,7 @@ import type {
   ImageFlow,
   ProductItem,
   StartFlowInput,
-} from '@store/imageFlow/types';
+} from '@store/imageFlow/flowConfig';
 import { useFunnelStore } from '@store/useFunnelStore';
 
 /** 퍼널 데이터를 비운 뒤에도 결과 화면 GA에 쓰려고 미리 저장해 둔 퍼널 입력값 */

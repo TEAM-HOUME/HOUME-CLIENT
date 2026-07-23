@@ -1,5 +1,9 @@
-import { FLOW_CONFIG, flowToEntryRoute } from '@store/imageFlow/flowConfig';
-import { ENTRY_ROUTE, RESULT_TYPE } from '@store/imageFlow/types';
+import {
+  ENTRY_ROUTE,
+  FLOW_CONFIG,
+  flowToEntryRoute,
+  RESULT_TYPE,
+} from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';

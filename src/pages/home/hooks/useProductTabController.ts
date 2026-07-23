@@ -15,7 +15,7 @@ import type {
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE } from '@store/imageFlow/types';
+import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 

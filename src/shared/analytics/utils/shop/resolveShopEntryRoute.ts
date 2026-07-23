@@ -1,4 +1,4 @@
-import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/types';
+import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type { ImageEntryRoute } from '@shared/analytics/params/gate';

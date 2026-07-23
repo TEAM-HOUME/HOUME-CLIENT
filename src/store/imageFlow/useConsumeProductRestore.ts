@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import type { ProductItem } from './types';
+import type { ProductItem } from './flowConfig';
 
 /**
  * 복원할 상품 목록을 마운트 때 한 번 꺼내 돌려주는 훅.
