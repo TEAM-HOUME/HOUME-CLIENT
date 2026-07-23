@@ -22,7 +22,8 @@ export function setupVitePreloadErrorReload(
       }
       sessionStorage.setItem(reloadKey, 'true');
     } catch {
-      // sessionStorage 사용 불가 시에도 1회 reload는 시도
+      // 가드를 남길 수 없으면 자동 reload하지 않음 (무한 새로고침 방지)
+      return;
     }
 
     event.preventDefault();
