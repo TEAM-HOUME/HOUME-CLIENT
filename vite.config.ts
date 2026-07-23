@@ -14,8 +14,14 @@ const dirname =
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
 
-/** 배포 감지용 빌드 ID (Sentry용 __APP_VERSION__과 분리) */
+/** 배포 감지용 빌드 ID (Sentry용 __APP_VERSION__과 분리)
+ * 배포(빌드) 인스턴스마다 고유해야 같은 커밋 재배포도 감지 가능
+ */
 const buildId =
+  process.env.VERCEL_DEPLOYMENT_ID ??
+  (process.env.GITHUB_RUN_ID
+    ? `${process.env.GITHUB_SHA ?? 'gha'}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT ?? '1'}`
+    : undefined) ??
   process.env.VERCEL_GIT_COMMIT_SHA ??
   process.env.GITHUB_SHA ??
   Date.now().toString();
