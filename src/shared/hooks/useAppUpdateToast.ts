@@ -33,6 +33,8 @@ export function useAppUpdateToast() {
     shownVersionRef.current = latestVersion;
     isReloadingRef.current = false;
 
+    const toastVersion = latestVersion;
+
     notify({
       text: TOAST_MESSAGE.APP_UPDATE_AVAILABLE,
       type: TOAST_TYPE.ACTION,
@@ -46,6 +48,9 @@ export function useAppUpdateToast() {
         duration: PERSISTENT_TOAST_DURATION_MS,
         toasterId: TOASTER_ID.BOTTOM_4,
         onDismiss: () => {
+          if (shownVersionRef.current !== toastVersion) {
+            return;
+          }
           // 스와이프 등으로 닫은 경우에만 세션 dismiss (같은 버전 재알림 방지)
           if (!isReloadingRef.current) {
             dismiss();
