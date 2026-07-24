@@ -24,6 +24,18 @@ export const trackSignupCompCtaClick = () => {
 
 // Meta Pixel CompleteRegistration 이벤트 호출
 export const trackSignupCompCompleteRegistration = () => {
+  const isMetaPixelEnabled = import.meta.env.VITE_ENABLE_META_PIXEL === 'true';
+
+  if (!isMetaPixelEnabled) {
+    if (import.meta.env.DEV) {
+      console.info(
+        '[Meta Pixel] CompleteRegistration 전송 안 함: 비활성화된 환경'
+      );
+    }
+
+    return;
+  }
+
   if (typeof window.fbq !== 'function') {
     if (import.meta.env.DEV) {
       console.warn('[Meta Pixel] fbq가 로드되지 않았습니다.');
