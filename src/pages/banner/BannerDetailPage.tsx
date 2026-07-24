@@ -14,7 +14,8 @@ import { useRecentFloorPlanQuery } from '@pages/imageSetup/v2/apis/queries/useRe
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {
@@ -135,13 +136,10 @@ const BannerDetailPage = () => {
   const handleCta = () => {
     if (selectedAnswerId === null) return;
 
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.HOME_BANNER,
-      preset: {
-        type: 'banner',
-        bannerId: parsedBannerId,
-        answerId: selectedAnswerId,
-      },
+    useImageFlowStore.getState().startFlow({
+      route: 'HOME_BANNER',
+      bannerId: parsedBannerId,
+      answerId: selectedAnswerId,
     });
 
     const selectedAnswer = bannerDetail.answers?.find(

@@ -1,4 +1,4 @@
-import type { ProductItem } from '@store/useImageFlowStore';
+import type { ProductItem } from '@store/imageFlow/flowConfig';
 
 import type { GenerateImageResultProductResponse } from '@apis/__generated__/data-contracts';
 

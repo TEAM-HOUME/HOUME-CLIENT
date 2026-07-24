@@ -9,7 +9,7 @@
  *   image_entry_route: getEntryRoute(),
  * });
  */
-import { ENTRY_ROUTE, type EntryRoute } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/flowConfig';
 
 import {
   IMAGE_ENTRY_ROUTE,

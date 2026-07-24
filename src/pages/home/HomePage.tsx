@@ -11,7 +11,7 @@ import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuer
 
 import { ROUTES } from '@routes/paths';
 
-import { useImageFlowStore, ENTRY_ROUTE } from '@store/useImageFlowStore';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
@@ -50,12 +50,15 @@ const HomePage = () => {
   const tabParam = searchParams.get('tab');
 
   // 외부 진입(로그인 복귀/ResultPage 재선택) 흐름 감지:
-  // useImageFlowStore.preset.type === 'product'이고 productsToBeRestored이 비어있지 않으면
+  // flow가 PRODUCT_SELECTION이고 productsToBeRestored이 비어있지 않으면
   // -> 사용자가 '이 상품들로 우리 집 꾸미기' CTA를 거쳐서 돌아오는 중. 따라서 '상품' 탭으로 이동
-  // HomePage mount 시 1회만 평가 (preset은 ProductTab mount 직후 clearPreset으로 비워지므로 다음 진입엔 영향 없음)
+  // HomePage mount 시 1회만 평가 (productsToBeRestored는 ProductTab mount 직후 소비(null)되므로 다음 진입엔 영향 없음)
   const presetHasProductsToBeRestored = useMemo(() => {
-    const preset = useImageFlowStore.getState().preset;
-    return preset?.type === 'product' && preset.productsToBeRestored.length > 0;
+    const flow = useImageFlowStore.getState().flow;
+    return (
+      flow?.route === 'PRODUCT_SELECTION' &&
+      (flow.productsToBeRestored?.length ?? 0) > 0
+    );
   }, []);
 
   const [activeMenuTab, setActiveMenuTab] = useState<HomeMenuTab>(
@@ -107,9 +110,7 @@ const HomePage = () => {
   useMyPageUserQuery({ enabled: isLoggedIn });
 
   const handleGenerate = () => {
-    useImageFlowStore
-      .getState()
-      .setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
+    useImageFlowStore.getState().startFlow({ route: 'GENERATE_BUTTON' });
     navigate(ROUTES.IMAGE_SETUP);
   };
 

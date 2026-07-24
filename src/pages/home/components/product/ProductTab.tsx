@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { overlay } from 'overlay-kit';
 
@@ -11,7 +11,7 @@ import {
 import { useSheetMinimizeOnScroll } from '@pages/home/hooks/useSheetMinimizeOnScroll';
 import { consumeReopenProduct } from '@pages/home/utils/productDetailOverlayReopen';
 
-import { useImageFlowStore } from '@store/useImageFlowStore';
+import { useConsumeProductRestore } from '@store/imageFlow/useConsumeProductRestore';
 
 import CloseBottomSheet from '@shared/components/v2/bottomSheet/CloseBottomSheet';
 import DragHandleBottomSheet from '@shared/components/v2/bottomSheet/DragHandleBottomSheet';
@@ -27,19 +27,8 @@ import {
 } from '../../constants/productTab';
 
 const ProductTab = () => {
-  const productsToBeRestored = useMemo(() => {
-    const preset = useImageFlowStore.getState().preset;
-    return preset?.type === 'product' ? preset.productsToBeRestored : [];
-  }, []);
-
+  const productsToBeRestored = useConsumeProductRestore();
   const hasProductsToBeRestored = productsToBeRestored.length > 0;
-
-  useEffect(() => {
-    if (hasProductsToBeRestored) {
-      useImageFlowStore.getState().clearPreset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const [productCountViewed, setProductCountViewed] = useState(0);
 

@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 
+import { useFunnelStore } from '@store/useFunnelStore';
+
 import { MAX_MOOD_BOARD_SELECTION } from '../constants/interiorStyle';
-import { useFunnelStore } from '../stores/useFunnelStore';
 
 import type {
   CompletedInteriorStyle,

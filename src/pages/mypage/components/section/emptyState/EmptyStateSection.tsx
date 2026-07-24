@@ -5,11 +5,12 @@ import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQu
 
 import { ROUTES } from '@routes/paths';
 
+import { useImageFlowStore } from '@store/useImageFlowStore';
+
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
 import TextButton from '@/shared/components/v2/btnText/TextButton';
 import ActionButton from '@/shared/components/v2/button/actionButton/ActionButton';
-import { ENTRY_ROUTE, useImageFlowStore } from '@/store/useImageFlowStore';
 
 import * as styles from './EmptyStateSection.css';
 
@@ -35,9 +36,7 @@ const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
   };
 
   const handleGoRoomTypeClick = () => {
-    useImageFlowStore
-      .getState()
-      .setFlow({ entryRoute: ENTRY_ROUTE.GENERATE_BUTTON });
+    useImageFlowStore.getState().startFlow({ route: 'GENERATE_BUTTON' });
     navigate(ROUTES.IMAGE_SETUP);
   };
 
