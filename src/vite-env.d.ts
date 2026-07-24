@@ -25,3 +25,7 @@ declare module '*.lottie' {
   const src: string;
   export default src;
 }
+
+interface Window {
+  fbq?: (command: 'track', eventName: 'CompleteRegistration') => void;
+}

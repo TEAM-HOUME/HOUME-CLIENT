@@ -21,3 +21,20 @@ export const trackSignupCompCtaClick = () => {
     return_screen_name,
   });
 };
+
+// Meta Pixel CompleteRegistration 이벤트 호출
+export const trackSignupCompCompleteRegistration = () => {
+  if (typeof window.fbq !== 'function') {
+    if (import.meta.env.DEV) {
+      console.warn('[Meta Pixel] fbq가 로드되지 않았습니다.');
+    }
+
+    return;
+  }
+
+  window.fbq('track', 'CompleteRegistration');
+
+  if (import.meta.env.DEV) {
+    console.info('[Meta Pixel] CompleteRegistration 호출');
+  }
+};
