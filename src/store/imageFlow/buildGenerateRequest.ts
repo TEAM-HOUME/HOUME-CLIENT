@@ -130,5 +130,8 @@ export const buildGenerateRequest = (
         },
       };
     }
+    default:
+      // sessionStorage 손상 등으로 알 수 없는 route가 복원된 경우 방어 (컴파일 타임엔 도달 불가)
+      return { kind: 'invalid' };
   }
 };

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildGenerateRequest, type FunnelData } from './buildGenerateRequest';
-
-import type { ImageFlow } from './flowConfig';
+import { FLOW_CONFIG, type ImageFlow } from './flowConfig';
 
 const validFloorPlan = {
   floorPlanId: 1,
@@ -193,5 +192,62 @@ describe('buildGenerateRequest - invalid 케이스', () => {
       answerId: 2,
     } as unknown as ImageFlow;
     expect(buildGenerateRequest(flow, shortFunnelData).kind).toBe('invalid');
+  });
+
+  it('route가 알 수 없는 값이면 invalid (switch default 방어)', () => {
+    const flow = {
+      route: 'UNKNOWN_ROUTE',
+      phase: 'funnel',
+    } as unknown as ImageFlow;
+    expect(buildGenerateRequest(flow, fullFunnelData).kind).toBe('invalid');
+  });
+});
+
+// FLOW_CONFIG.requestKind가 실제 buildGenerateRequest 결과의 kind와 일치하는지 (둘의 드리프트 방지)
+describe('buildGenerateRequest - kind가 FLOW_CONFIG.requestKind와 일치', () => {
+  const cases: { flow: ImageFlow; funnel: FunnelData }[] = [
+    {
+      flow: { route: 'GENERATE_BUTTON', phase: 'postFunnel' },
+      funnel: fullFunnelData,
+    },
+    {
+      flow: {
+        route: 'FLOOR_PLAN',
+        phase: 'postFunnel',
+        presetFloorPlanId: null,
+      },
+      funnel: fullFunnelData,
+    },
+    {
+      flow: {
+        route: 'HOME_BANNER',
+        phase: 'postFunnel',
+        bannerId: 5,
+        answerId: 7,
+      },
+      funnel: shortFunnelData,
+    },
+    {
+      flow: { route: 'STYLE_RESTYLE', phase: 'postFunnel', styleId: 9 },
+      funnel: shortFunnelData,
+    },
+    {
+      flow: {
+        route: 'PRODUCT_SELECTION',
+        phase: 'postFunnel',
+        isRegenerate: false,
+        productIds: [1],
+        productsToBeRestored: null,
+      },
+      funnel: shortFunnelData,
+    },
+  ];
+
+  cases.forEach(({ flow, funnel }) => {
+    it(`${flow.route}: kind가 FLOW_CONFIG.requestKind와 같다`, () => {
+      expect(buildGenerateRequest(flow, funnel).kind).toBe(
+        FLOW_CONFIG[flow.route].requestKind
+      );
+    });
   });
 });

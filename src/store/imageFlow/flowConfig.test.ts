@@ -15,24 +15,46 @@ import {
 describe('FLOW_CONFIG (기존 매핑 동등성)', () => {
   const expected: Record<
     FlowRoute,
-    { resultView: string; afterFloorPlan: 'INTERIOR_STYLE' | 'GENERATE' }
+    {
+      resultView: string;
+      afterFloorPlan: 'INTERIOR_STYLE' | 'GENERATE';
+      requestKind: string;
+    }
   > = {
     GENERATE_BUTTON: {
       resultView: 'FULL_FUNNEL',
       afterFloorPlan: 'INTERIOR_STYLE',
+      requestKind: 'fullFunnel',
     },
-    FLOOR_PLAN: { resultView: 'FULL_FUNNEL', afterFloorPlan: 'INTERIOR_STYLE' },
-    HOME_BANNER: { resultView: 'BANNER', afterFloorPlan: 'GENERATE' },
-    STYLE_RESTYLE: { resultView: 'STYLE', afterFloorPlan: 'GENERATE' },
-    PRODUCT_SELECTION: { resultView: 'PRODUCT', afterFloorPlan: 'GENERATE' },
+    FLOOR_PLAN: {
+      resultView: 'FULL_FUNNEL',
+      afterFloorPlan: 'INTERIOR_STYLE',
+      requestKind: 'fullFunnel',
+    },
+    HOME_BANNER: {
+      resultView: 'BANNER',
+      afterFloorPlan: 'GENERATE',
+      requestKind: 'banner',
+    },
+    STYLE_RESTYLE: {
+      resultView: 'STYLE',
+      afterFloorPlan: 'GENERATE',
+      requestKind: 'otherStyle',
+    },
+    PRODUCT_SELECTION: {
+      resultView: 'PRODUCT',
+      afterFloorPlan: 'GENERATE',
+      requestKind: 'product',
+    },
   };
 
   (Object.keys(expected) as FlowRoute[]).forEach((route) => {
-    it(`${route}: resultView/afterFloorPlan이 기존 매핑과 일치한다`, () => {
+    it(`${route}: resultView/afterFloorPlan/requestKind가 기존 매핑과 일치한다`, () => {
       expect(FLOW_CONFIG[route].resultView).toBe(expected[route].resultView);
       expect(FLOW_CONFIG[route].afterFloorPlan).toBe(
         expected[route].afterFloorPlan
       );
+      expect(FLOW_CONFIG[route].requestKind).toBe(expected[route].requestKind);
     });
   });
 });

@@ -107,7 +107,7 @@ export type StartFlowInput =
  * requestKind: 이미지 생성 요청 API 종류
  * resultView: 어떤 FlowRoute로부터 생성된 이미지인지
  */
-export const FLOW_CONFIG: Record<FlowRoute, FlowConfig> = {
+export const FLOW_CONFIG = {
   GENERATE_BUTTON: {
     afterFloorPlan: 'INTERIOR_STYLE',
     requestKind: 'fullFunnel',
@@ -133,7 +133,7 @@ export const FLOW_CONFIG: Record<FlowRoute, FlowConfig> = {
     requestKind: 'product',
     resultView: RESULT_TYPE.PRODUCT, // 목록형 결과에 '상품 다시 선택하기' 버튼을 띄움
   },
-};
+} as const satisfies Record<FlowRoute, FlowConfig>;
 
 // flow → GA에서 쓰는 EntryRoute(6개)로 변환.
 // 상품 재선택(isRegenerate)만 PRODUCT_REGENERATE로 나뉘고, 나머지는 route를 그대로 쓴다.
