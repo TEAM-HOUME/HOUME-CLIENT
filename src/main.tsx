@@ -20,12 +20,15 @@ import { queryClient } from '@apis/config/queryClient';
 
 import AppErrorFallback from '@components/errorFallback/AppErrorFallback';
 import MainToaster from '@components/v2/toast/Sonner';
+
 import '@styles/global.css';
+import { setupVitePreloadErrorReload } from '@utils/setupVitePreloadErrorReload';
 
 import App from './App';
 
 initSentry();
 initClarity();
+setupVitePreloadErrorReload();
 
 // 개발 모드: ?ab=A|B (useABTest와 동일 — 앱 부트 시 storage 선반영)
 if (import.meta.env.DEV) {

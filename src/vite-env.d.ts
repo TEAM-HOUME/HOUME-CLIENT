@@ -14,6 +14,7 @@ interface ImportMetaEnv {
 }
 
 declare const __APP_VERSION__: string;
+declare const __BUILD_ID__: string;
 
 declare module '*.svg?react' {
   import * as React from 'react';

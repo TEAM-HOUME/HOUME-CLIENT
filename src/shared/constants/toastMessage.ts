@@ -15,9 +15,11 @@ export const TOAST_MESSAGE = {
   NETWORK_UNSTABLE: '네트워크가 불안정해요. 확인 후 다시 시도해 주세요.',
   IMAGE_GENERATION_SERVER_ERROR:
     '이미지 생성에 문제가 발생했어요. 잠시 후에 다시 시도해 주세요.',
+  APP_UPDATE_AVAILABLE: '새로운 버전이 배포되었습니다.',
 } as const;
 
 export const TOAST_ACTION_LABEL = {
   VIEW: '보러가기',
   UNDO: '되돌리기',
+  RELOAD: '새로고침',
 } as const;

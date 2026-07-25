@@ -6,13 +6,41 @@ import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import svgr from 'vite-plugin-svgr';
 // https://vite.dev/config/
 const dirname =
   typeof __dirname !== 'undefined'
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
+
+/** 배포 감지용 빌드 ID (Sentry용 __APP_VERSION__과 분리)
+ * 배포(빌드) 인스턴스마다 고유해야 같은 커밋 재배포도 감지 가능
+ */
+const buildId =
+  process.env.VERCEL_DEPLOYMENT_ID ??
+  (process.env.GITHUB_RUN_ID
+    ? `${process.env.GITHUB_SHA ?? 'gha'}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT ?? '1'}`
+    : undefined) ??
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  process.env.GITHUB_SHA ??
+  Date.now().toString();
+
+function versionFilePlugin(version: string): Plugin {
+  return {
+    name: 'generate-version-file',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({
+          version,
+          builtAt: new Date().toISOString(),
+        }),
+      });
+    },
+  };
+}
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
@@ -28,6 +56,7 @@ export default defineConfig({
         },
       },
     }),
+    versionFilePlugin(buildId),
     // 프로덕션 빌드 시 source map을 Sentry에 업로드 (auth token이 있을 때만 동작)
     sentryVitePlugin({
       org: process.env.SENTRY_ORG,
@@ -42,6 +71,7 @@ export default defineConfig({
   ],
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.0'),
+    __BUILD_ID__: JSON.stringify(buildId),
   },
   build: {
     // source map은 Sentry auth token이 있을 때만 생성 → 업로드 후 플러그인이 삭제(원본 노출 방지)
