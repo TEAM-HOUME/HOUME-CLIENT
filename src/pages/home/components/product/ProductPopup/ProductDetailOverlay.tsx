@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   trackShopFeedDetailMdCloseClick,
@@ -11,7 +11,7 @@ import {
   trackShopFeedDetailMdView,
 } from '@pages/home/analytics/shopAnalytics';
 import { useProductDetailQuery } from '@pages/home/apis/queries/useProductDetailQuery';
-import { setReopenProduct } from '@pages/home/utils/productDetailOverlayReopen';
+import { useSaveReopenProductOnLoginExit } from '@pages/home/hooks/useSaveReopenProductOnLoginExit';
 
 import { ROUTES } from '@routes/paths';
 
@@ -69,8 +69,6 @@ const ProductDetailOverlay = ({
     },
   });
   const getSavedState = useSavedItemsStore((s) => s.getSavedState);
-  const location = useLocation();
-  const openedPathRef = useRef(location.pathname);
   const merged = useMemo(() => {
     const detailColorHexes =
       detail?.colors
@@ -171,15 +169,13 @@ const ProductDetailOverlay = ({
     unmount,
   ]);
 
-  useEffect(() => {
-    if (location.pathname === openedPathRef.current) return;
+  // 오버레이가 열린 뒤 로그인 페이지로 이탈하면, 닫기 직전에 재오픈 정보를 저장한다
+  const getReopenData = useCallback(() => {
+    const { product, price, linkHrefOverride } = mergedRef.current;
+    return { id, product, price, linkHref: linkHrefOverride };
+  }, [id]);
 
-    if (location.pathname === ROUTES.LOGIN) {
-      const { product, price, linkHrefOverride } = mergedRef.current;
-      setReopenProduct({ id, product, price, linkHref: linkHrefOverride });
-    }
-    unmount();
-  }, [location.pathname, unmount, id]);
+  useSaveReopenProductOnLoginExit({ unmount, getReopenData });
 
   return (
     <Popup

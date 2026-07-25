@@ -6,11 +6,11 @@ import { useResultListAnalytics } from '@pages/generate/analytics/useResultListA
 import { useGenerateListResultQuery } from '@pages/generate/v2/apis/queries/useGenerateListResultQuery';
 import { useRelatedImagesQuery } from '@pages/generate/v2/apis/queries/useRelatedImagesQuery';
 import { useSimilarItemsQuery } from '@pages/generate/v2/apis/queries/useSimilarItemsQuery';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+import { useFunnelStore } from '@store/useFunnelStore';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
@@ -295,13 +295,11 @@ const ListResult = ({ image, isProductView }: ListResultProps) => {
     }
 
     useFunnelStore.getState().reset();
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.PRODUCT_REGENERATE,
-      preset: {
-        type: 'product',
-        productIds: mapped.map((p) => p.id),
-        productsToBeRestored: mapped,
-      },
+    useImageFlowStore.getState().startFlow({
+      route: 'PRODUCT_SELECTION',
+      isRegenerate: true,
+      productIds: mapped.map((p) => p.id),
+      productsToBeRestored: mapped,
     });
 
     navigate(ROUTES.HOME, { state: { activeTab: 'product' } });

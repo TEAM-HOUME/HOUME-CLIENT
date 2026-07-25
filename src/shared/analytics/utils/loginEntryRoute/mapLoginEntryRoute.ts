@@ -10,7 +10,7 @@
  *   mapEntryRouteToLoginEntry(ENTRY_ROUTE.HOME_BANNER)
  * );
  */
-import { ENTRY_ROUTE, type EntryRoute } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/flowConfig';
 
 import {
   LOGIN_ENTRY_ROUTE,

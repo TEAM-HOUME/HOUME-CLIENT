@@ -15,7 +15,7 @@ import { useHouseTemplatesQuery } from '@pages/imageSetup/v2/apis/queries/useHou
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
 
@@ -54,9 +54,7 @@ const RoomTypeSection = ({
   }, [floorPlans, queryClient]);
 
   const navigateToImageSetup = () => {
-    useImageFlowStore
-      .getState()
-      .setFlow({ entryRoute: ENTRY_ROUTE.FLOOR_PLAN });
+    useImageFlowStore.getState().startFlow({ route: 'FLOOR_PLAN' });
     navigate(ROUTES.IMAGE_SETUP);
   };
 
@@ -98,9 +96,9 @@ const RoomTypeSection = ({
       hasPreviousSpace,
     });
 
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.FLOOR_PLAN,
-      preset: { type: 'floorPlan', floorPlanId },
+    useImageFlowStore.getState().startFlow({
+      route: 'FLOOR_PLAN',
+      presetFloorPlanId: floorPlanId,
     });
     navigate(ROUTES.IMAGE_SETUP);
   };

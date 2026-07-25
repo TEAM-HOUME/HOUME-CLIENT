@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 import {
   getSignupCompPageViewParams,
+  trackSignupCompCompleteRegistration,
   trackSignupCompCtaClick,
 } from '@pages/generate/analytics/signupCompAnalytics';
 import { useWelcomePageModelPreload } from '@pages/generate/hooks/useWelcomePageModelPreload';
@@ -37,6 +40,11 @@ const WelcomePage = () => {
     SCREEN_NAME.SIGNUP_COMP,
     getSignupCompPageViewParams()
   );
+
+  // Meta Pixel CompleteRegistration 이벤트 호출
+  useEffect(() => {
+    trackSignupCompCompleteRegistration();
+  }, []);
 
   const redirectPath = getLoginRedirect();
   const isFromMypage = redirectPath?.startsWith(ROUTES.MYPAGE);

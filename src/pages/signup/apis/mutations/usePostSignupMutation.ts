@@ -6,6 +6,7 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
+import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@shared/analytics/metaPixel';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import type { SocialSignUpV2Request } from '@apis/__generated__/data-contracts';
@@ -57,6 +58,7 @@ export const usePostSignupMutation = () => {
       setUserName(response.userName);
       setAccessToken(response.accessToken);
       sessionStorage.removeItem('signupToken');
+      sessionStorage.setItem(META_COMPLETE_REGISTRATION_PENDING_KEY, 'true');
       navigate(ROUTES.WELCOME);
       notify({
         text: TOAST_MESSAGE.SIGNUP_SUCCESS,

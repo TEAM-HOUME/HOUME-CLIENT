@@ -9,7 +9,7 @@ import { formatDate } from '@pages/mypage/utils/formatting';
 
 import { ROUTES } from '@routes/paths';
 
-import { isCurationViewType } from '@store/useImageFlowStore';
+import { isCurationViewType } from '@store/imageFlow/flowConfig';
 
 import type { ItemResponse } from '@apis/__generated__/data-contracts';
 

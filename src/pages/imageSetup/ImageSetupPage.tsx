@@ -5,12 +5,9 @@ import { Navigate, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
-import {
-  consumeEntryRouteHold,
-  getNextFunnelStep,
-  holdEntryRoute,
-  useImageFlowStore,
-} from '@store/useImageFlowStore';
+import { FLOW_CONFIG } from '@store/imageFlow/flowConfig';
+import { useFunnelStore } from '@store/useFunnelStore';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
 
@@ -25,7 +22,6 @@ import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageSetup';
 import ActivityInfo from './steps/activityInfo/ActivityInfo';
 import InteriorStyle from './steps/interiorStyle/InteriorStyle';
-import { useFunnelStore } from './stores/useFunnelStore';
 import FloorPlanSelectStep from './v2/steps/floorPlanSelect/FloorPlanSelectStep';
 import { useFloorPlanStore } from './v2/stores/useFloorPlanStore';
 
@@ -70,25 +66,19 @@ const ImageSetupPage = () => {
     return () => {
       const loginRedirect = getLoginRedirect();
       if (!loginRedirect) {
-        // useFloorPlanStore(도면 시트 UI 상태) + entryRoute(가드용)만 cleanup에서 정리
-        // useImageFlowStore의 preset/resultType은 LoadingPage/ResultPage에서 사용하므로 유지
-        // /generate 정상 이동 시 entryRoute도 유지 (GA image_entry_route)
+        // 도면 시트 UI 상태는 초기화하고, 플로우는 "퍼널을 나감"으로만 표시한다(leaveFunnel).
+        // route는 남겨야 LoadingPage/ResultPage와 GA가 계속 쓸 수 있음.
         useFloorPlanStore.getState().reset();
-        if (!consumeEntryRouteHold()) {
-          useImageFlowStore.setState({ entryRoute: null });
-        }
+        useImageFlowStore.getState().leaveFunnel();
       }
     };
   }, []);
 
-  // entryRoute가 존재하지 않으면(ex: URL로 직접 접근) 홈으로 리다이렉트하도록 예외처리
-  // entryRoute는 sessionStorage persist로 저장되므로 브라우저 새로고침, OAuth 복귀 시에는 유지됨 -> 예외처리 필요 X
-  // sessionStorage 수동 삭제 <- 이까지는 일반적인 사용자 플로우 X
-  // => URL로 직접 접근하는 경우에 대한 예외처리만 적용하면 될 듯함
-  const entryRoute = useImageFlowStore.getState().entryRoute;
-  if (!entryRoute) {
-    // Navigate: 렌더되면 해당 경로로 이동시키는 React Router 컴포넌트
-    // useEffect + navigate()보다 더 선언적, React스러움
+  // 퍼널 진행 중일 때만(phase==='funnel') 이 페이지를 연다.
+  // 그 외(URL로 바로 들어옴, 이미 퍼널을 나감)는 홈으로 보냄.
+  // 새로고침·로그인 복귀 때는 flow가 sessionStorage에 남아 phase='funnel'이라 그대로 통과된다.
+  const flow = useImageFlowStore.getState().flow;
+  if (flow?.phase !== 'funnel') {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
@@ -107,24 +97,23 @@ const ImageSetupPage = () => {
                 data: CompletedFloorPlanSelect,
                 { history }
               ) => {
-                const entryRoute = useImageFlowStore.getState().entryRoute;
-                if (!entryRoute) return;
-                const nextStep = getNextFunnelStep(entryRoute);
+                const flow = useImageFlowStore.getState().flow;
+                if (!flow) return;
+                const nextStep = FLOW_CONFIG[flow.route].afterFloorPlan;
 
                 if (nextStep === 'INTERIOR_STYLE') {
                   // 풀퍼널 (경로 1, 3): 로그인 게이트 통과 후 다음 스텝(InteriorStyle)으로 이동
                   // 미로그인 시 도면 선택값은 useFunnelStore persist로 유지됨
                   requireLogin(
                     () => history.push('InteriorStyle', data),
-                    mapEntryRouteToLoginEntry(entryRoute)
+                    mapEntryRouteToLoginEntry(flow.route)
                   );
                 } else {
                   // 숏퍼널(경로 2, 4, 5): FloorPlanSelect가 마지막 스텝 → 바로 이미지 생성으로 이동
-                  // payload는 LoadingPage가 useImageFlowStore.preset + useFunnelStore.floorPlan으로 조립
+                  // payload는 LoadingPage가 flow + useFunnelStore.floorPlan으로 조립
                   const hasCredit = await checkCredit();
                   if (!hasCredit) return;
 
-                  holdEntryRoute();
                   navigate(ROUTES.GENERATE);
                 }
               },

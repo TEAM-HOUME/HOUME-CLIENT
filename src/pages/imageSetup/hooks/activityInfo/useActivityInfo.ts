@@ -6,7 +6,7 @@ import { trackSelectFurnitureBtnCtaClick } from '@pages/imageSetup/analytics/sel
 
 import { ROUTES } from '@routes/paths';
 
-import { holdEntryRoute } from '@store/useImageFlowStore';
+import { useFunnelStore } from '@store/useFunnelStore';
 
 import {
   buildSelectedFurnitureChips,
@@ -20,7 +20,6 @@ import { useCategorySelection } from './useCategorySelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
 import { useActivitiesQuery } from '../../apis/queries/useActivitiesQuery';
 import { useFurnitureCategoriesQuery } from '../../apis/queries/useFurnitureCategoriesQuery';
-import { useFunnelStore } from '../../stores/useFunnelStore';
 import { CATEGORY_SELECTION_MODE } from '../../types/funnel/activityInfo';
 import { useRecentFloorPlanQuery } from '../../v2/apis/queries/useRecentFloorPlanQuery';
 
@@ -245,7 +244,6 @@ export const useActivityInfo = (
       hasPreviousImage: recentFloorPlanData?.hasRecentImage === true,
     });
 
-    holdEntryRoute();
     navigate(ROUTES.GENERATE);
   };
 

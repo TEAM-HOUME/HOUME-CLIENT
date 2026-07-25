@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
@@ -10,7 +11,6 @@ import { useToast } from '@components/v2/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 
-import { useFunnelStore } from '../../stores/useFunnelStore';
 import { useHouseTemplateDetailQuery } from '../apis/queries/useHouseTemplateDetailQuery';
 import { useHouseTemplatesQuery } from '../apis/queries/useHouseTemplatesQuery';
 import {
@@ -59,8 +59,9 @@ export const useFloorPlanSelect = (
   const recentFloorPlan = getRecentFloorPlanForAnalytics(recentFloorPlanData);
 
   // 시트 자동 오픈 우선순위 (마운트 시 1회 평가):
-  // 1순위: useFunnelStore.floorPlan 있음 → FloorPlanSheet 복원 (로그인 게이트 복귀)
-  // 2순위: useImageFlowStore.preset.type === 'floorPlan' → FloorPlanSheet 오픈, 이후 바로 preset 소비 (LoadingPage에 preset이 불필요하므로 바로 null 처리)
+  // 1순위: useFunnelStore에 저장된 도면 → 그 도면 시트 복원 (로그인 복귀 등)
+  // 2순위: 홈에서 미리 고른 도면(preset) → 그 도면 시트 오픈 (consumeFloorPlanPreset로 꺼내면 비워짐)
+  // 3순위: 최근 사용 도면(API 응답) → RecentSheet 오픈 (아래 별도 effect, 위에서 시트가 안 열렸을 때만)
   // 그 외: 자동 오픈 없음
   useEffect(() => {
     const savedFloorPlan = useFunnelStore.getState().floorPlan;
@@ -76,12 +77,13 @@ export const useFloorPlanSelect = (
       return;
     }
 
-    const preset = useImageFlowStore.getState().preset;
-    if (preset?.type === 'floorPlan') {
-      store.selectNewFloorPlan(preset.floorPlanId);
+    // 홈에서 도면을 미리 골라 들어온 경우: 그 도면 id를 꺼내(꺼내면 비워짐) 시트를 열어준다
+    const presetFloorPlanId = useImageFlowStore
+      .getState()
+      .consumeFloorPlanPreset();
+    if (presetFloorPlanId != null) {
+      store.selectNewFloorPlan(presetFloorPlanId);
       store.openFloorPlanSheet();
-      // FLOOR_PLAN 경로는 풀퍼널이므로 LoadingPage가 preset을 사용하지 않음 → 시트 오픈 후 즉시 클리어
-      useImageFlowStore.getState().clearPreset();
     }
     // 마운트 시 1회만 평가
     // eslint-disable-next-line react-hooks/exhaustive-deps

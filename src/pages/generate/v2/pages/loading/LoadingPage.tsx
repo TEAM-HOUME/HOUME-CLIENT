@@ -15,10 +15,10 @@ import {
 import { useStackDataQuery } from '@pages/generate/v2/apis/queries/useStackDataQuery';
 import LikeButton from '@pages/generate/v2/components/likeButton/LikeButton';
 import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
-import { useFunnelStore } from '@pages/imageSetup/stores/useFunnelStore';
 
 import { ROUTES } from '@routes/paths';
 
+import { FLOW_CONFIG } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import {
@@ -257,14 +257,10 @@ const LoadingPage = () => {
       recoverFromImageGenerationError();
     };
 
-    // mutation 응답 시(성공/실패 모두) 퍼널/프리셋 데이터 즉시 정리
-    // (이전 입력값이 sessionStorage에 살아있으면 사용자가 /generate URL로 직접 재진입 시 mutation이 재실행되어 같은 요청이 불필요하게 다시 실행됨)
-    // - useFunnelStore.reset(): 풀퍼널 분기(preset === null) 차단 — useFunnelStore 데이터 비워서 useGenerateImageRequest가 invalid 반환하도록
-    // - preset null: 숏퍼널 분기(preset.type === 'banner'/'style'/'product') 차단
-    // - useImageFlowStore의 entryRoute/resultType은 ResultPage에서 사용하므로 유지
+    // 요청이 끝나면(성공/실패 모두) 쓴 데이터를 정리한다.
+    // (안 그러면 /generate로 다시 들어왔을 때 같은 요청이 또 나감. 세부 정리는 completeGenerationRequest 참고)
     const onMutationSettled = () => {
-      useFunnelStore.getState().reset();
-      useImageFlowStore.getState().clearPreset();
+      useImageFlowStore.getState().completeGenerationRequest();
     };
 
     const mutateOptions = {
@@ -353,8 +349,10 @@ const LoadingPage = () => {
   const handleProgressComplete = () => {
     if (!navigationData || !isApiCompleted) return;
     const { imageId, imageUrl, isMirror } = navigationData;
-    // STYLE | PRODUCT | BANNER | FULL_FUNNEL
-    const viewType = useImageFlowStore.getState().resultType;
+    // 결과 화면 종류(STYLE/PRODUCT/BANNER/FULL_FUNNEL)를 flow에서 계산.
+    // flow가 없으면 null → ResultPage가 기본(추천형) 화면으로 보여준다.
+    const flow = useImageFlowStore.getState().flow;
+    const viewType = flow ? FLOW_CONFIG[flow.route].resultView : null;
 
     // url에 imageId/viewType, state에 imageUrl/isMirror 전달
     // state.from='loading': ResultPage가 진입 경로를 식별해 뒤로가기 가드를 다르게 적용

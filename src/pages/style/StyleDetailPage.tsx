@@ -10,7 +10,8 @@ import {
 
 import { ROUTES } from '@routes/paths';
 
-import { ENTRY_ROUTE, useImageFlowStore } from '@store/useImageFlowStore';
+import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
+import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
@@ -105,9 +106,9 @@ const StyleDetailPage = () => {
   const handleCta = () => {
     if (Number.isNaN(parsedStyleId)) return;
 
-    useImageFlowStore.getState().setFlow({
-      entryRoute: ENTRY_ROUTE.STYLE_RESTYLE,
-      preset: { type: 'style', styleId: parsedStyleId },
+    useImageFlowStore.getState().startFlow({
+      route: 'STYLE_RESTYLE',
+      styleId: parsedStyleId,
     });
 
     trackStyleDetailCtaClick(styleContext);
