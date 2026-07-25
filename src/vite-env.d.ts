@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_ENABLE_FIREBASE_ANALYTICS?: string;
+  readonly VITE_ENABLE_META_PIXEL?: string;
+  readonly VITE_META_PIXEL_ID?: string;
   readonly VITE_ANALYTICS_ENV?: 'local' | 'staging' | 'production';
   readonly VITE_SENTRY_DSN?: string;
   readonly VITE_SENTRY_ENVIRONMENT?: string;
@@ -24,4 +26,8 @@ declare module '*.svg?react' {
 declare module '*.lottie' {
   const src: string;
   export default src;
+}
+
+interface Window {
+  fbq?: (command: 'track', eventName: 'CompleteRegistration') => void;
 }
