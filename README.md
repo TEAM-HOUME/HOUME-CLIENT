@@ -98,7 +98,6 @@
 | **`Programming Language`** | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white)                                                                                             |
 | **`Styling`**              | ![Vanilla Extract](https://img.shields.io/badge/Vanilla%20Extract-%23F786AD?style=for-the-badge&logo=vanillaextract&logoColor=white)                                                                              |
 | **`Data Fetching`**        | ![TanstackQuery](https://img.shields.io/badge/TanstackQuery-FF4154?style=for-the-badge&logo=ReactQuery&logoColor=white)                                                                                           |
-| **`UI Documentation`**     | ![Chromatic](https://img.shields.io/badge/Chromatic-Storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white)                                                                                          |
 | **`Formatting`**           | ![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=white) |
 | **`Package Manager`**      | ![PNPM](https://img.shields.io/badge/pnpm-%23F29F05?style=for-the-badge&logo=pnpm&logoColor=white)                                                                                                                |
 | **`Deployment`**           | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)                                                                                                             |
@@ -138,7 +137,6 @@ src/
 │   ├── types/           # 공통 타입 정의
 │   ├── utils/           # 공통 유틸 함수들
 │   └── hooks/           # 전역 커스텀 훅
-└── stories/             # Storybook을 위한 스토리 파일
 ```
 
 <br>
