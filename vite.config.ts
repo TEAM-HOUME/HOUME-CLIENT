@@ -1,20 +1,13 @@
 /// <reference types="vitest/config" />
-import { fileURLToPath } from 'node:url';
 import path from 'path';
 
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
-// https://vite.dev/config/
-const dirname =
-  typeof __dirname !== 'undefined'
-    ? __dirname
-    : path.dirname(fileURLToPath(import.meta.url));
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
+// https://vite.dev/config/
 export default defineConfig({
   assetsInclude: ['**/*.lottie'],
   plugins: [
@@ -53,34 +46,6 @@ export default defineConfig({
   test: {
     projects: [
       {
-        extends: true,
-        plugins: [
-          // The plugin will run tests for the stories defined in your Storybook config
-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          ...(process.env.NODE_ENV !== 'production'
-            ? [
-                storybookTest({
-                  configDir: path.join(dirname, '.storybook'),
-                }),
-              ]
-            : []),
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: 'playwright',
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
-          },
-          setupFiles: ['.storybook/vitest.setup.ts'],
-        },
-      },
-      {
         // 테스트 환경 구축에 필요한 설정들
         extends: true, // vanillaExtractPlugin 등 Vite 플러그인 상속 (.css.ts import 동작에 필요)
         test: {
@@ -96,12 +61,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts', 'src/**/*.tsx'],
-      exclude: [
-        'src/**/*.test.ts',
-        'src/**/*.test.tsx',
-        'src/**/*.css.ts',
-        'src/**/*.stories.tsx',
-      ],
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.css.ts'],
       reporter: ['text', 'html'],
       reportsDirectory: './coverage',
     },
@@ -111,7 +71,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
       '@pages': path.resolve(__dirname, 'src/pages'),
       '@routes': path.resolve(__dirname, 'src/routes'),
-      '@stories': path.resolve(__dirname, 'src/stories'),
       '@shared': path.resolve(__dirname, 'src/shared'),
       '@apis': path.resolve(__dirname, 'src/shared/apis'),
       '@assets': path.resolve(__dirname, 'src/shared/assets'),
