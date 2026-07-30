@@ -25,11 +25,12 @@ describe('redactUrl', () => {
     expect(redacted).toContain('env=prod');
   });
 
-  it('상품 검색어(keyword)를 가린다', () => {
-    const redacted = redactUrl('/api/products?keyword=내검색어&cursor=3');
+  // 가구 검색어는 개인정보가 아니고, 어떤 검색어에서 실패했는지가 원인 파악에 쓰인다.
+  // GA 이벤트로도 breadcrumb에 원문이 실리므로 URL에서만 가리면 오해를 부른다.
+  it('상품 검색어(keyword)는 가리지 않는다', () => {
+    const url = '/api/products?keyword=내검색어&cursor=3';
 
-    expect(redacted).not.toContain('내검색어');
-    expect(redacted).toContain('cursor=3');
+    expect(redactUrl(url)).toBe(url);
   });
 
   it('토큰 계열 파라미터를 가린다', () => {

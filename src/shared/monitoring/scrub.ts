@@ -4,11 +4,17 @@ import type { Breadcrumb, ErrorEvent } from '@sentry/react';
  * 개인정보·자격증명 스크럽
  *
  * Sentry는 요청 URL과 breadcrumb를 자동으로 수집하는데, 하우미는 카카오 인가코드를
- * 쿼리 파라미터로 보내고(`/oauth/kakao/callback?code=...`) 상품 검색어도 URL에 실린다.
+ * 쿼리 파라미터로 보낸다(`/oauth/kakao/callback?code=...`).
  * 헤더·쿠키만 지우는 것(기존 scrub)으로는 부족해서 URL 계열을 전부 이 모듈에서 걸러낸다.
  */
 
-/** 값이 노출되면 안 되는 쿼리 파라미터 키 (소문자로 비교) */
+/**
+ * 값이 노출되면 안 되는 쿼리 파라미터 키 (소문자로 비교)
+ *
+ * 상품 검색어(`keyword`, `q`)는 **의도적으로 넣지 않는다.** 가구 검색어는 개인정보가 아니고,
+ * "어떤 검색어에서 에러가 나는가"가 원인 파악에 직접 쓰인다. GA 이벤트로도 원문이
+ * breadcrumb에 실리므로 여기서 막으면 같은 값이 한쪽만 가려져 오해를 부른다.
+ */
 const SENSITIVE_QUERY_KEYS = new Set([
   'code', // 카카오 OAuth 인가코드
   'token',
@@ -18,8 +24,6 @@ const SENSITIVE_QUERY_KEYS = new Set([
   'refresh-token',
   'signuptoken',
   'id_token',
-  'keyword', // 상품 검색어 (사용자 입력)
-  'q',
   'email',
   'phone',
 ]);

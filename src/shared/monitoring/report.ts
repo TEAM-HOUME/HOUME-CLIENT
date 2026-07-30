@@ -69,6 +69,16 @@ export const reportMessage = (
 };
 
 /**
+ * 이후 전송되는 모든 이벤트에 붙는 태그를 설정한다.
+ *
+ * `null`을 넘기면 태그를 지운다. 값이 사라진 뒤에도 옛 값이 남아
+ * 잘못된 화면·경로로 표시되는 것을 막기 위함이다.
+ */
+export const setReportTag = (key: string, value: string | null): void => {
+  Sentry.setTag(key, value ?? undefined);
+};
+
+/**
  * 이벤트로 보내지 않고 흔적만 남긴다.
  * 별도 quota를 소모하지 않으면서 이후 실제 이벤트에 맥락으로 첨부된다.
  */

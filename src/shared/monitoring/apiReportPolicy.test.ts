@@ -17,7 +17,9 @@ afterEach(() => {
 });
 
 describe('decideApiReport — 전송하는 것', () => {
-  it('5xx는 error로 전송한다', () => {
+  it('5xx는 샘플에 걸릴 때 error로 전송한다', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
     const decision = decideApiReport(
       info({ kind: API_ERROR_KIND.SERVER, status: 500 }),
       auto
@@ -45,6 +47,8 @@ describe('decideApiReport — 전송하는 것', () => {
   });
 
   it('fingerprint에 경로·상태·코드가 들어간다', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
     const decision = decideApiReport(
       info({ status: 500, code: 50013, routePattern: '/api/v1/gen' }),
       auto
@@ -98,6 +102,24 @@ describe('decideApiReport — 전송하지 않는 것', () => {
         captureMode: 'never',
       })
     ).toBeNull();
+  });
+
+  // 서버 Sentry가 같은 실패를 더 자세히 잡으므로 FE는 표본만 수집한다
+  it('5xx는 샘플에 걸리지 않으면 보내지 않는다', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    expect(
+      decideApiReport(info({ kind: API_ERROR_KIND.SERVER, status: 500 }), auto)
+    ).toBeNull();
+  });
+
+  // 서버에 요청이 닿지 않은 실패는 서버 로그에 없으므로 줄이지 않는다
+  it('타임아웃은 샘플링하지 않고 항상 보낸다', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    expect(
+      decideApiReport(info({ kind: API_ERROR_KIND.TIMEOUT }), auto)
+    ).not.toBeNull();
   });
 });
 

@@ -23,6 +23,20 @@ export const CAPTURED_CLIENT_ERROR_CODES = new Set<number>([
 const NETWORK_QUERY_SAMPLE_RATE = 0.1;
 /** 인증 실패(401/403) 샘플링 비율 */
 const AUTH_STATUS_SAMPLE_RATE = 0.1;
+/**
+ * 서버 오류(5xx) 샘플링 비율
+ *
+ * HOUME-SERVER가 이미 같은 실패를 Sentry로 보내고 Discord 알림까지 띄운다
+ * (`GlobalExceptionHandler`의 `ImageFallbackException`·`GeneralException` 처리).
+ * 서버 쪽이 스택·요청 바디까지 남기므로 FE는 "사용자에게 어떻게 보였나"를 확인할 표본만
+ * 있으면 됨, 로그 100% 수집은 중복·불필요
+ *
+ * 반면 타임아웃과 네트워크 에러는 서버에 요청이 닿지 않아 서버 로그에 흔적이 없으므로
+ * 줄이지 않는다.
+ *
+ * 0.2라는 값 자체는 근거가 약하다. 배포 후 실제 유입량을 보고 조정한다.
+ */
+const SERVER_ERROR_SAMPLE_RATE = 0.2;
 
 /** query/mutation 단위로 정책을 덮어쓰는 모드 */
 export type ApiCaptureMode = 'auto' | 'always' | 'never';
@@ -69,8 +83,13 @@ export const decideApiReport = (
   }
 
   switch (info.kind) {
-    // 서버 장애·타임아웃·예상 못한 throw는 전량 수집
+    // 서버가 응답을 준 실패 — 서버 Sentry가 더 자세히 잡으므로 표본만 수집
     case API_ERROR_KIND.SERVER:
+      return shouldSample(SERVER_ERROR_SAMPLE_RATE)
+        ? { level: 'error', fingerprint }
+        : null;
+
+    // 서버에 요청이 닿지 않은 실패 + 예상 못한 throw는 전량 수집 (서버 로그에 흔적이 없다)
     case API_ERROR_KIND.TIMEOUT:
     case API_ERROR_KIND.UNKNOWN:
       return { level: 'error', fingerprint };

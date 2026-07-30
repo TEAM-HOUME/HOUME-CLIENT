@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // 외부 의존성 모킹 (실제 모듈 동작과 독립적으로 로직만 검증)
 vi.mock('sonner', () => ({ toast: { custom: vi.fn() } }));
@@ -79,6 +79,14 @@ describe('handleGlobalError', () => {
 describe('handleQueryError — Sentry 전송', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // 5xx는 20% 샘플링이라 확률에 따라 결과가 흔들린다.
+    // 이 파일은 "정책 결과가 전송으로 연결되는가"를 보는 것이므로 샘플은 항상 통과시킨다.
+    // (샘플링 비율 자체는 apiReportPolicy.test.ts에서 검증)
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('5xx는 Sentry로 전송한다', async () => {
@@ -124,20 +132,28 @@ describe('handleQueryError — Sentry 전송', () => {
     expect(addReportBreadcrumb).toHaveBeenCalledTimes(1);
   });
 
-  it('queryKey에 담긴 검색어가 컨텍스트로 새어나가지 않는다', async () => {
+  // queryKey 세 번째 자리에는 필터·cursor를 담은 객체가 통째로 들어가고,
+  // 앞으로 무엇이 추가될지 모른다. 그래서 앞 2개 세그먼트만 쓴다.
+  // (검색어 자체는 개인정보가 아니라 GA breadcrumb으로는 원문이 실린다)
+  it('queryKey는 앞 2개 세그먼트만 컨텍스트에 담는다', async () => {
     const { reportError } = await import('@shared/monitoring/report');
 
     handleQueryError(axiosError(500), fakeQuery());
 
     const serialized = JSON.stringify(vi.mocked(reportError).mock.calls[0][1]);
-    expect(serialized).not.toContain('검색어');
     expect(serialized).toContain('product.productList');
+    expect(serialized).not.toContain('검색어');
   });
 });
 
 describe('handleMutationError — Sentry 전송', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('meta.sentry.capture가 always면 4xx도 전송한다', async () => {
