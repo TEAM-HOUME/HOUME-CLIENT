@@ -53,6 +53,7 @@ import { useExitBlocker } from '@hooks/useExitBlocker';
 
 import { useExitImageFlow } from './hooks/useExitImageFlow';
 import { useGenerateImageRequest } from './hooks/useGenerateImageRequest';
+import { useGenerateStallWatchdog } from './hooks/useGenerateStallWatchdog';
 import * as styles from './LoadingPage.css';
 import ProgressBar from './ProgressBar';
 import { usePostCarouselLikeMutation } from '../../apis/mutations/useCarouselLikeMutation';
@@ -248,6 +249,7 @@ const LoadingPage = () => {
   // 진입경로별 mutation 호출 (풀퍼널 / banner / otherStyle / product 분기)
   useEffect(() => {
     const onMutationError = (error: unknown) => {
+      // Sentry 전송은 전역 에러 핸들러가 담당한다 (mutation의 meta.sentry.scope로 도메인 식별)
       if (isImageGenerationServerError(error)) {
         notifyImageGenerationError();
       } else {
@@ -268,10 +270,8 @@ const LoadingPage = () => {
       onSettled: onMutationSettled,
     };
 
-    if (requestState.kind === 'invalid') {
-      console.error('invalid requestState kind');
-      return;
-    }
+    // invalid 리포트는 원인(reason)을 아는 useGenerateImageRequest가 담당한다
+    if (requestState.kind === 'invalid') return;
 
     ensureShortFunnelFlowSnapshot();
 
@@ -303,6 +303,18 @@ const LoadingPage = () => {
       }
     };
   }, []);
+
+  // 생성이 끝나지 않아 이 화면에 갇히면 Sentry로 남기고 홈으로 빼낸다
+  // (알림은 기존 생성 실패 토스트 재사용 — 크레딧 소모 안내 문구는 기획 확인 후 결정)
+  useGenerateStallWatchdog({
+    enabled: isRequestValid,
+    isApiCompleted,
+    hasNavigationData: Boolean(navigationData),
+    onStall: () => {
+      notifyImageGenerationError();
+      recoverFromImageGenerationError();
+    },
+  });
 
   // currentImages는 `currentStack?.carousels ?? []`로 항상 배열 → 빈 배열 여부만 확인
   const hasError = isError || currentImages.length === 0;
@@ -347,7 +359,10 @@ const LoadingPage = () => {
   }, [displayCurrentImage, hasError, isPending]);
 
   const handleProgressComplete = () => {
+    // 여기서 빠져나가면 ProgressBar가 완료를 한 번만 처리하므로 다시 호출되지 않음.
+    // 즉 사용자는 ProgressBar가 100%인 상태에서 갇힘 → useGenerateStallWatchdog가 감지해서 빼낸다.
     if (!navigationData || !isApiCompleted) return;
+
     const { imageId, imageUrl, isMirror } = navigationData;
     // 결과 화면 종류(STYLE/PRODUCT/BANNER/FULL_FUNNEL)를 flow에서 계산.
     // flow가 없으면 null → ResultPage가 기본(추천형) 화면으로 보여준다.
