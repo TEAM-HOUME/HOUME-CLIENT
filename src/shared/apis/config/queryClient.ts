@@ -3,11 +3,14 @@ import { isAxiosError } from 'axios';
 
 import { prefetchStaticData } from '@pages/imageSetup/utils/staticDataPrefetch';
 
-import { handleGlobalError, isSessionExpiredError } from './globalErrorHandler';
+import { isSessionExpiredError } from '@shared/monitoring/classifyApiError';
+
+import { handleMutationError, handleQueryError } from './globalErrorHandler';
 
 export const queryClient = new QueryClient({
-  queryCache: new QueryCache({ onError: handleGlobalError }),
-  mutationCache: new MutationCache({ onError: handleGlobalError }),
+  // 사용자 처리(toast/redirect) + Sentry 전송을 함께 담당하는 어댑터
+  queryCache: new QueryCache({ onError: handleQueryError }),
+  mutationCache: new MutationCache({ onError: handleMutationError }),
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false, // 브라우저 포커싱 시 자동 재요청 방지
