@@ -3,6 +3,8 @@ import { useMutation } from '@tanstack/react-query';
 import type { GeneratedImagePayload } from '@pages/generate/types/generate';
 import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
 
+import { MONITORING_SCOPE } from '@shared/monitoring/scope';
+
 import type {
   BannerGenerateImageRequest,
   BannerGenerateImageResponse,
@@ -33,6 +35,8 @@ export const useGenerateBannerImageMutation = () => {
 
   return useMutation<GeneratedImagePayload, Error, BannerGenerateImageRequest>({
     mutationFn: postGenerateBannerImage,
+    // 실패 시 전역 에러 핸들러가 이 scope를 태그로 붙여 Sentry로 보낸다
+    meta: { sentry: { scope: MONITORING_SCOPE.IMAGE_GENERATE } },
     onSuccess: (data) => {
       resetGenerate();
       setNavigationData(data);

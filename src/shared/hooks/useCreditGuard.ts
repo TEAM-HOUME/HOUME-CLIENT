@@ -4,6 +4,8 @@ import { overlay } from 'overlay-kit';
 
 import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
 
+import { reportError, reportMessage } from '@shared/monitoring/report';
+import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 import { TOAST_TYPE } from '@shared/types/toastLegacy';
 
 import { useToast } from '@components/toast/useToast';
@@ -72,6 +74,14 @@ export const useCreditGuard = (
       const { data: latestUserData } = await refetch();
 
       if (!latestUserData) {
+        // 조회는 성공했는데 응답이 비어 생성이 차단된 상태.
+        // 사용자는 퍼널을 다 밟고 CTA를 눌렀는데 아무 일도 일어나지 않는다.
+        reportMessage('credit check returned no data', {
+          scope: MONITORING_SCOPE.IMAGE_GENERATE,
+          level: 'warning',
+          fingerprint: ['credit-guard', 'no-data'],
+          context: { required_credits: requiredCredits },
+        });
         notify({
           text: '정보를 불러올 수 없습니다.',
           type: TOAST_TYPE.WARNING,
@@ -88,7 +98,13 @@ export const useCreditGuard = (
         return false;
       }
     } catch (error) {
-      console.error('[useCreditGuard] 크레딧 확인 실패:', error);
+      // 크레딧이 실제로 있는데도 생성이 막히는 경우다.
+      // 호출부(useActivityInfo)가 false를 받으면 CTA 버튼을 비활성화해 재시도도 불가능해진다.
+      reportError(error, {
+        scope: MONITORING_SCOPE.IMAGE_GENERATE,
+        tags: { step: 'credit_check' },
+        context: { required_credits: requiredCredits },
+      });
       notify({
         text: '크레딧 확인에 실패했습니다.',
         type: TOAST_TYPE.WARNING,
