@@ -1,0 +1,45 @@
+name: Auto Assign
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issues:
+    types: [opened, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  assign-author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign issue or PR to author
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const item = context.payload.pull_request ?? context.payload.issue
+            const author = item.user.login
+            const itemNumber = item.number
+
+            try {
+              await github.rest.issues.checkUserCanBeAssigned({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                assignee: author,
+              })
+
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: itemNumber,
+                assignees: [author],
+              })
+            } catch (error) {
+              core.warning(`Failed to add assignee: ${error.message}`)
+            }
