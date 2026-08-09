@@ -1,0 +1,50 @@
+version: 1
+labels:
+  - label: '⚙️ Setting'
+    title: '(?i)^\[?(chore|setting|config)\]?([(:\s]|$)'
+  - label: '⚙️ Setting'
+    branch: '(?i)^(chore|setting|config)/'
+
+  - label: '🌐 Deploy'
+    title: '(?i)^\[?(deploy|release)\]?([(:\s]|$)'
+  - label: '🌐 Deploy'
+    branch: '(?i)^(deploy|release)/'
+
+  - label: '🎨 Style'
+    title: '(?i)^\[?(style|format|prettier)\]?([(:\s]|$)'
+  - label: '🎨 Style'
+    branch: '(?i)^(style|format|prettier)/'
+
+  - label: '💫 Feature'
+    title: '(?i)^\[?(feat|feature)\]?([(:\s]|$)'
+  - label: '💫 Feature'
+    branch: '(?i)^(feat|feature)/'
+
+  - label: '📄 Docs'
+    title: '(?i)^\[?docs?\]?([(:\s]|$)'
+  - label: '📄 Docs'
+    branch: '(?i)^docs?/'
+
+  - label: '🔧 Fix'
+    title: '(?i)^\[?(fix|hotfix|bugfix)\]?([(:\s]|$)'
+  - label: '🔧 Fix'
+    branch: '(?i)^(fix|hotfix|bugfix)/'
+
+  - label: '🛠️ Refactor'
+    title: '(?i)^\[?refactor\]?([(:\s]|$)'
+  - label: '🛠️ Refactor'
+    branch: '(?i)^refactor/'
+
+  - label: '🧪 Test'
+    title: '(?i)^\[?tests?\]?([(:\s]|$)'
+  - label: '🧪 Test'
+    branch: '(?i)^tests?/'
+
+  - label: '🤙 성하'
+    authors: ['earl9rey']
+
+  - label: '🤙 소이'
+    authors: ['soyyyyy']
+
+  - label: '🤙 지성'
+    authors: ['jstar000']
