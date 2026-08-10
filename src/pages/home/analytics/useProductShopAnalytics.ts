@@ -24,7 +24,7 @@ import {
   type ProductTabController,
 } from '@pages/home/hooks/useProductTabController';
 import type { SelectedProduct } from '@pages/home/types/productTab';
-import { useRecentFloorPlanQuery } from '@pages/imageSetup/v2/apis/queries/useRecentFloorPlanQuery';
+import { useRecentFloorPlanQuery } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';

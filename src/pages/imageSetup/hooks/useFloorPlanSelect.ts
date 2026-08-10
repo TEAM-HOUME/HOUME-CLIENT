@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
 
+import type {
+  CompletedFloorPlanSelect,
+  ImageSetupSteps,
+} from '@pages/imageSetup/types/funnel/steps';
+
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
@@ -20,11 +25,6 @@ import {
 import { FILTER_CATEGORIES } from '../constants/floorPlanFilters';
 import { useFloorPlanRatioStore } from '../stores/useFloorPlanRatioStore';
 import { useFloorPlanStore } from '../stores/useFloorPlanStore';
-
-import type {
-  CompletedFloorPlanSelect,
-  ImageSetupSteps,
-} from '../../types/funnel/steps';
 
 const EMPTY_FLOOR_PLANS: ExploreHouseTemplateItemResponse[] = [];
 

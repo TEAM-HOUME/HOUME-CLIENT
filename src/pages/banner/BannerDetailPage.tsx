@@ -10,7 +10,7 @@ import {
   type BannerDetailContext,
 } from '@pages/banner/analytics/bannerDetailAnalytics';
 import { useBannerDetailQuery } from '@pages/home/apis/queries/useBannerDetailQuery';
-import { useRecentFloorPlanQuery } from '@pages/imageSetup/v2/apis/queries/useRecentFloorPlanQuery';
+import { useRecentFloorPlanQuery } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
 
 import { ROUTES } from '@routes/paths';
 

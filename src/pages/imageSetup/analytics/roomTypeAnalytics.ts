@@ -1,5 +1,5 @@
-import { FILTER_CATEGORIES } from '@pages/imageSetup/v2/constants/floorPlanFilters';
-import type { FloorPlanFilters } from '@pages/imageSetup/v2/types/floorPlan';
+import { FILTER_CATEGORIES } from '@pages/imageSetup/constants/floorPlanFilters';
+import type { FloorPlanFilters } from '@pages/imageSetup/types/floorPlan';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {

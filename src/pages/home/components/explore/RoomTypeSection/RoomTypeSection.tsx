@@ -10,8 +10,8 @@ import {
   trackHomeSpaceMoreCardClick,
   trackHomeSpaceMoreClick,
 } from '@pages/home/analytics/homeAnalytics';
-import { getHouseTemplateDetail } from '@pages/imageSetup/v2/apis/queries/useHouseTemplateDetailQuery';
-import { useHouseTemplatesQuery } from '@pages/imageSetup/v2/apis/queries/useHouseTemplatesQuery';
+import { getHouseTemplateDetail } from '@pages/imageSetup/apis/queries/useHouseTemplateDetailQuery';
+import { useHouseTemplatesQuery } from '@pages/imageSetup/apis/queries/useHouseTemplatesQuery';
 
 import { ROUTES } from '@routes/paths';
 

@@ -23,7 +23,7 @@ import { useExitBlocker } from '@hooks/useExitBlocker';
 
 import * as styles from './FunnelLayout.css';
 import { FUNNEL_STEP_PARAM } from '../../constants/funnel';
-import { useFloorPlanStore } from '../../v2/stores/useFloorPlanStore';
+import { useFloorPlanStore } from '../../stores/useFloorPlanStore';
 
 type FunnelStepKey = 'FloorPlanSelect' | 'InteriorStyle' | 'ActivityInfo';
 

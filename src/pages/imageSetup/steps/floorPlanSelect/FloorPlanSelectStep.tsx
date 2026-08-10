@@ -1,13 +1,12 @@
 import { useRoomTypeAnalytics } from '@pages/imageSetup/analytics/useRoomTypeAnalytics';
+import type {
+  CompletedFloorPlanSelect,
+  ImageSetupSteps,
+} from '@pages/imageSetup/types/funnel/steps';
 
 import FilterSheet from './FilterSheet';
 import FloorPlanSelectGrid from './FloorPlanSelectGrid';
 import FloorPlanSheet from './FloorPlanSheet';
-
-import type {
-  CompletedFloorPlanSelect,
-  ImageSetupSteps,
-} from '../../../types/funnel/steps';
 
 interface FloorPlanSelectStepProps {
   context: ImageSetupSteps['FloorPlanSelect'];

@@ -6,7 +6,7 @@ import {
   trackHomeTapExploreClick,
   trackHomeTapShopClick,
 } from '@pages/home/analytics/homeAnalytics';
-import { useRecentFloorPlanQuery } from '@pages/imageSetup/v2/apis/queries/useRecentFloorPlanQuery';
+import { useRecentFloorPlanQuery } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
 import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
 
 import { ROUTES } from '@routes/paths';
