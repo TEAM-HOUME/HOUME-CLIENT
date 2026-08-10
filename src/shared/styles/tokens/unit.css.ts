@@ -1,7 +1,7 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
 /**
- * 디자인 토큰 V2 - Unit (dimension, gap/padding, radius)
+ * 디자인 토큰 - Unit (dimension, gap/padding, radius)
  *
  * Figma Design Token - unit 스코프
  * 값 단위: rem

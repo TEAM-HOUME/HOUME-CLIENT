@@ -11,7 +11,7 @@ import { zIndex } from '@styles/tokens/zIndex';
 
 const motionHidden = { opacity: 0 } as const;
 
-// 앱의 모바일 프레임을 덮는 최상위 레이어 (v2 Popup과 동일한 프레임 폭 규칙)
+// 앱의 모바일 프레임을 덮는 최상위 레이어 (Popup과 동일한 프레임 폭 규칙)
 export const viewportLayer = style({
   position: 'fixed',
   zIndex: zIndex.popup,

@@ -46,7 +46,7 @@ const ImageZoomViewer = ({
   const [motion, setMotion] = useState<'opening' | 'open'>('opening');
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  // 첫 프레임 hidden → rAF×2 후 open (enter fade 트리거) — v2 Popup과 동일 패턴
+  // 첫 프레임 hidden → rAF×2 후 open (enter fade 트리거) — Popup과 동일 패턴
   useLayoutEffect(() => {
     let raf2: number | null = null;
     const raf1 = requestAnimationFrame(() => {

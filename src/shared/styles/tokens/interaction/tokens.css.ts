@@ -1,7 +1,7 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
 /**
- * 디자인 토큰 V2 - Interaction
+ * 디자인 토큰 - Interaction
  *
  * Figma InteractionToken 스코프
  * - duration: 애니메이션 전체 소요 시간

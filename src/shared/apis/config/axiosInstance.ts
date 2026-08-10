@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 
 import type { BaseResponse } from '@shared/types/apis';
 
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { ERROR_CODES } from '@constants/apiErrorCode';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
 
@@ -52,7 +53,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/reissue`,
+          `${import.meta.env.VITE_API_BASE_URL}${API_ENDPOINT.AUTH.REISSUE}`,
           null,
           {
             withCredentials: true,

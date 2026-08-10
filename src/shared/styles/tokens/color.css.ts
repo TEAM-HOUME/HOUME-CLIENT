@@ -1,7 +1,7 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
 /**
- * 디자인 토큰 V2 - 색상
+ * 디자인 토큰 - 색상
  *
  * 1) Primitives: 원시값만 정의 (grayscale, purple)
  * 2) Semantics: Figma color-semantic → primitive의 var() 참조

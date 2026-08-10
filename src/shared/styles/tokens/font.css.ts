@@ -3,7 +3,7 @@ import { createGlobalTheme } from '@vanilla-extract/css';
 const LS = '-0.02em'; // Letter spacing -2%
 
 /**
- * 디자인 토큰 V2 - 폰트(타이포)
+ * 디자인 토큰 - 폰트(타이포)
  *
  * 1) Primitives: Figma typo-primitive (font, size, weight) — 원시값만
  * 2) Semantic: 역할별 토큰 (title_sb_16, body_m_14 등) — primitive 참조
