@@ -22,12 +22,10 @@ import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
-import { useToast } from '@components/toast/useToast';
 import TitleNavBar from '@components/v2/navBar/TitleNavBar';
 import Popup from '@components/v2/popup/Popup';
 
 import TextButton from '@/shared/components/v2/btnText/TextButton';
-import { TOAST_TYPE } from '@/shared/types/toastLegacy';
 
 import * as styles from './SettingPage.css';
 
@@ -71,7 +69,6 @@ const SuccessionPopup = ({
 
 const SettingPage = () => {
   const navigate = useNavigate();
-  const { notify } = useToast();
   const { mutate: logout } = useLogoutMutation();
   const { mutate: deleteUser } = useDeleteUserMutation();
   const logoutTimerRef = useRef<number | null>(null);
@@ -97,14 +94,7 @@ const SettingPage = () => {
   const handleLogout = () => {
     trackSettingLogoutClick();
 
-    // 1) 토스트 표시 (2.5초 유지)
-    notify({
-      text: '로그아웃 되었습니다',
-      type: TOAST_TYPE.INFO,
-      options: { autoClose: 2500 },
-    });
-
-    // 2) 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
+    // 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
     navigate(ROUTES.HOME, { replace: true });
 
     // 기존 타이머가 있으면 제거하고, 새 타이머로 갱신

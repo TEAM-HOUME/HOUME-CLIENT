@@ -7,10 +7,6 @@ import { ROUTES } from '@routes/paths';
 import type { ErrorType, PageContext } from '@shared/types/error';
 import { ERROR_MESSAGES } from '@shared/types/error';
 
-import { useToast } from '@components/toast/useToast';
-
-import { TOAST_TYPE } from '@/shared/types/toastLegacy';
-
 /**
  * 중앙화된 에러 핸들러 훅
  *
@@ -19,13 +15,12 @@ import { TOAST_TYPE } from '@/shared/types/toastLegacy';
  */
 export const useErrorHandler = (context: PageContext) => {
   const navigate = useNavigate();
-  const { notify } = useToast();
 
-  // 토스트 중복 방지를 위한 ref
+  // 같은 에러 연속 처리(중복 리다이렉트) 방지를 위한 ref
   const lastErrorRef = useRef<{ message: string; timestamp: number } | null>(
     null
   );
-  const TOAST_COOLDOWN = 3000; // 3초 내 같은 에러 메시지 중복 방지
+  const ERROR_COOLDOWN = 3000; // 3초 내 같은 에러 메시지 중복 방지
 
   /**
    * 컨텍스트와 에러 타입에 따른 리다이렉트 경로 반환
@@ -89,35 +84,29 @@ export const useErrorHandler = (context: PageContext) => {
       // 에러 로깅
       console.error(`[${context}] ${type} error:`, error);
 
-      // 토스트 알림
+      // 중복 판정용 에러 메시지
       const message = customMessage || ERROR_MESSAGES[type];
       const now = Date.now();
 
-      // 같은 메시지가 쿨다운 시간 내에 이미 표시되었다면 무시
+      // 같은 메시지가 쿨다운 시간 내에 이미 처리되었다면 무시
       if (
         lastErrorRef.current &&
         lastErrorRef.current.message === message &&
-        now - lastErrorRef.current.timestamp < TOAST_COOLDOWN
+        now - lastErrorRef.current.timestamp < ERROR_COOLDOWN
       ) {
         return;
       }
 
       lastErrorRef.current = { message, timestamp: now };
 
-      notify({
-        text: message,
-        type: TOAST_TYPE.WARNING,
-      });
-
-      // 리다이렉트
+      // 리다이렉트 (1초 지연은 기존 동작 유지)
       const redirectPath = getRedirectPath(context, type);
 
-      // 약간의 지연을 두어 사용자가 토스트를 볼 수 있도록 함
       setTimeout(() => {
         navigate(redirectPath);
       }, 1000);
     },
-    [context, navigate, notify, getRedirectPath]
+    [context, navigate, getRedirectPath]
   );
 
   return { handleError };
