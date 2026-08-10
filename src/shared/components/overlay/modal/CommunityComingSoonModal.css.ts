@@ -1,7 +1,8 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
+import { colorVars } from '@styles/tokensV2/color.css';
+
 import { fontStyle } from '@/shared/styles/fontStyle';
-import { colorVars } from '@/shared/styles/tokens/color.css';
 import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 const fadeIn = keyframes({
@@ -13,7 +14,8 @@ export const backdrop = style({
   position: 'fixed',
   zIndex: zIndex.backdrop,
   inset: 0,
-  background: colorVars.color.gray999_20,
+  // 딤 0.2는 공식 토큰에 없는 값 — v2 Popup.css.ts의 동일 리터럴과 함께 색상 토큰화 차수에서 디자인 확인 후 정리
+  background: 'rgba(0, 0, 0, 0.2)',
   animation: `${fadeIn} 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
 });
 

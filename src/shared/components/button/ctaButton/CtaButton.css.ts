@@ -2,7 +2,7 @@ import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@styles/fontStyle';
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@styles/tokensV2/color.css';
 
 export const buttonWrapper = style({
   display: 'flex',
@@ -31,9 +31,9 @@ export const CtaButton = recipe({
   variants: {
     state: {
       active: {
-        backgroundColor: colorVars.color.primary,
+        backgroundColor: colorVars.color.purple600,
         ':active': {
-          backgroundColor: colorVars.color.primary_dark,
+          backgroundColor: colorVars.color.purple700,
         },
       },
       disabled: {

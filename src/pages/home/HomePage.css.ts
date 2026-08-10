@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@styles/tokensV2/color.css';
 
 export const page = style({
   position: 'relative',

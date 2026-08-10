@@ -3,7 +3,7 @@ import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@styles/fontStyle';
 import { animationTokens } from '@styles/tokens/animation.css';
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@styles/tokensV2/color.css';
 
 export const container = style({
   position: 'relative',
@@ -73,7 +73,7 @@ export const slideNum = style({
   justifyContent: 'center',
   gap: '0.1rem',
   borderRadius: '99.9rem',
-  backgroundColor: colorVars.color.gray999_30,
+  backgroundColor: colorVars.color.gray999_a30,
   width: '3.4rem',
   height: '2rem',
   ...fontStyle('caption_r_11'),
@@ -131,22 +131,22 @@ export const slideNavIconFrame = style({
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '1.2rem',
-  backgroundColor: colorVars.color.gray999_30,
+  backgroundColor: colorVars.color.gray999_a30,
   width: '2.4rem',
   height: '2.4rem',
 
   selectors: {
     [`${slidePrevBtn}:active &`]: {
-      backgroundColor: colorVars.color.gray999_50,
+      backgroundColor: colorVars.color.gray999_a50,
     },
     [`${slideNextBtn}:active &`]: {
-      backgroundColor: colorVars.color.gray999_50,
+      backgroundColor: colorVars.color.gray999_a50,
     },
     [`${slidePrevBtn}:disabled &`]: {
-      backgroundColor: colorVars.color.gray999_04,
+      backgroundColor: colorVars.color.gray999_a04,
     },
     [`${slideNextBtn}:disabled &`]: {
-      backgroundColor: colorVars.color.gray999_04,
+      backgroundColor: colorVars.color.gray999_a04,
     },
   },
 });
@@ -285,5 +285,5 @@ export const feedbackTagButton = style({
 
 export const feedbackTagButtonSelected = style({
   backgroundColor: colorVars.color.gray000,
-  color: colorVars.color.primary,
+  color: colorVars.color.purple600,
 });

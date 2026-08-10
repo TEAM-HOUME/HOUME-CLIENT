@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
 import { fontStyle } from '@styles/fontStyle';
-import { colorVars } from '@styles/tokens/color.css';
+import { colorVars } from '@styles/tokensV2/color.css';
 
 export const container = style({
   display: 'flex',
