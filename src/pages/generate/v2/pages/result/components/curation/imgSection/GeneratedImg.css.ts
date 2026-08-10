@@ -1,10 +1,9 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { unitVars } from '@shared/styles/tokensV2/unit.css';
-
 import { fontStyle } from '@styles/fontStyle';
-import { colorVars } from '@styles/tokensV2/color.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = style({
   position: 'relative',

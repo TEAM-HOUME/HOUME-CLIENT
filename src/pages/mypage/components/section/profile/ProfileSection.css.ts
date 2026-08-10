@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontVars } from '@/shared/styles/tokensV2/font.css';
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = style({
   boxSizing: 'border-box',

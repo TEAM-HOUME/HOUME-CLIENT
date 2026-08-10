@@ -1,9 +1,9 @@
 import { recipe } from '@vanilla-extract/recipes';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { pressTransformInteraction } from '@styles/tokensV2/interaction/presets';
-import { unitVars } from '@styles/tokensV2/unit.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { pressTransformInteraction } from '@styles/tokens/interaction/presets';
+import { unitVars } from '@styles/tokens/unit.css';
 
 const sizeVariantStyles = {
   XS: {

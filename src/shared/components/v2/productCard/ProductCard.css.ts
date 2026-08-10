@@ -1,12 +1,11 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { colorVars } from '@shared/styles/tokensV2/color.css';
-import { fontVars } from '@shared/styles/tokensV2/font.css';
-import { unitVars } from '@shared/styles/tokensV2/unit.css';
-
-import { pressInteraction } from '@styles/tokensV2/interaction/presets';
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { pressInteraction } from '@styles/tokens/interaction/presets';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 export const wrapper = recipe({
   base: {

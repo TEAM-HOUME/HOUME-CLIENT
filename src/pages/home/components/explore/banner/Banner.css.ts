@@ -1,9 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { unitVars } from '@styles/tokensV2/unit.css';
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 export const root = style({
   boxSizing: 'border-box',

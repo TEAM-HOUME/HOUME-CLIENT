@@ -6,7 +6,7 @@ import {
   toastHideInteraction,
   toastShowContentOpacityInteraction,
   toastShowInteraction,
-} from '@styles/tokensV2/interaction/presets';
+} from '@styles/tokens/interaction/presets';
 
 globalStyle('[data-sonner-toast]', {
   transition: toastShowInteraction,

@@ -2,9 +2,9 @@ import { style } from '@vanilla-extract/css';
 
 import { PRODUCT_BOTTOM_SHEET_COLLAPSED_HEIGHT } from '@pages/home/constants/productTab';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { unitVars } from '@styles/tokensV2/unit.css';
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 // 플로팅 스크롤-탑 버튼은 바텀시트 collapsed 높이 바로 위에 위치 (높이 상수는 productTab.ts 단일 출처)
 const PRODUCT_SCROLL_TOP_FLOATING_BOTTOM = `calc(${PRODUCT_BOTTOM_SHEET_COLLAPSED_HEIGHT} + 1.2rem)`;

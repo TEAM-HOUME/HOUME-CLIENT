@@ -1,7 +1,7 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
 

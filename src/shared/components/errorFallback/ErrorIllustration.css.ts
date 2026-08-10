@@ -1,6 +1,6 @@
 import { style, keyframes } from '@vanilla-extract/css';
 
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { zIndex } from '@styles/tokens/zIndex';
 
 export const wrapper = style({
   aspectRatio: '822 / 768',

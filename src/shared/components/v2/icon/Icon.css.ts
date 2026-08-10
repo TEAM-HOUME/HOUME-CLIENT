@@ -1,9 +1,8 @@
 import { styleVariants } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { pressInteraction } from '@styles/tokensV2/interaction/presets';
-
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { pressInteraction } from '@styles/tokens/interaction/presets';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const iconSize = styleVariants({
   '12': { width: '1.2rem', height: '1.2rem' },

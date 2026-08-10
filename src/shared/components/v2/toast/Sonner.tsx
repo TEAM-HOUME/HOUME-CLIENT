@@ -13,7 +13,7 @@ import { TOAST_MESSAGE } from '@constants/toastMessage';
 
 import './Sonner.css';
 
-import { unitVars } from '@styles/tokensV2/unit.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 import { useToast } from './useToast';
 

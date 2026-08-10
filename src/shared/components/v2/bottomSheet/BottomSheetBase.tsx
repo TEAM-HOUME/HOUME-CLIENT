@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 
 import IconButton from '@components/v2/button/IconButton';
 
-import { sheetSlideOutOpacityInteraction } from '@styles/tokensV2/interaction/presets';
+import { sheetSlideOutOpacityInteraction } from '@styles/tokens/interaction/presets';
 
 import * as styles from './BottomSheetBase.css';
 import { SHEET_TRANSITION_MS } from './constants';

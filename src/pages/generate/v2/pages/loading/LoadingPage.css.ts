@@ -1,10 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
-import { animationTokens } from '@styles/tokensV2/animation.css';
-
-import { colorVars } from '@/shared/styles/tokensV2/color.css';
-import { fontVars } from '@/shared/styles/tokensV2/font.css';
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { animationTokens } from '@styles/tokens/animation.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const pageLayout = style({
   display: 'flex',

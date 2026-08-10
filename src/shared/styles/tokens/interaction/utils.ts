@@ -1,7 +1,7 @@
 import {
   interactionDurationValues,
   interactionVars,
-} from '@styles/tokensV2/interaction/tokens.css';
+} from '@styles/tokens/interaction/tokens.css';
 
 export type InteractionDuration =
   keyof typeof interactionVars.interaction.duration;
@@ -28,11 +28,11 @@ export interface InteractionSpec {
 /**
  * Figma 스펙 → CSS transition 문자열
  *
- * 공통 스펙은 `@styles/tokensV2/interaction/presets` 참고.
+ * 공통 스펙은 `@styles/tokens/interaction/presets` 참고.
  * 컴포넌트 전용 스펙만 여기서 `interaction()` 호출.
  *
  * @example
- * import { pressInteraction } from '@styles/tokensV2/interaction/presets';
+ * import { pressInteraction } from '@styles/tokens/interaction/presets';
  * // ...pressInteraction(0.95) => transition + :active scale
  */
 export const interaction = (spec: InteractionSpec): string =>

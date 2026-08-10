@@ -1,10 +1,10 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { unitVars } from '@styles/tokensV2/unit.css';
-import { zIndex } from '@styles/tokensV2/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 const NAV_BAR_CONTENT_HEIGHT = '4.8rem';
 const SAFE_AREA_INSET_TOP = 'env(safe-area-inset-top, 0px)';

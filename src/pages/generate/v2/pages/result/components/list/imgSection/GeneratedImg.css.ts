@@ -2,8 +2,8 @@ import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 import { fontStyle } from '@styles/fontStyle';
-import { animationTokens } from '@styles/tokensV2/animation.css';
-import { colorVars } from '@styles/tokensV2/color.css';
+import { animationTokens } from '@styles/tokens/animation.css';
+import { colorVars } from '@styles/tokens/color.css';
 
 export const container = style({
   position: 'relative',

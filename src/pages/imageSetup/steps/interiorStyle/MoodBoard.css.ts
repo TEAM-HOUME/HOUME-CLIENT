@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { animationTokens } from '@styles/tokensV2/animation.css';
+import { animationTokens } from '@styles/tokens/animation.css';
 
 export const wrapper = style({
   display: 'flex',

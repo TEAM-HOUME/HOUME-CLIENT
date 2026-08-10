@@ -1,9 +1,8 @@
 import { recipe } from '@vanilla-extract/recipes';
 
-import { pressInteraction } from '@styles/tokensV2/interaction/presets';
-
-import { colorVars } from '@/shared/styles/tokensV2/color.css';
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { pressInteraction } from '@styles/tokens/interaction/presets';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const likeButton = recipe({
   base: {

@@ -1,10 +1,10 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { transition } from '@styles/tokensV2/interaction/utils';
-import { unitVars } from '@styles/tokensV2/unit.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { transition } from '@styles/tokens/interaction/utils';
+import { unitVars } from '@styles/tokens/unit.css';
 
 // 최소화 시 헤더가 접히는 트랜지션 (패널 height 슬라이드와 동일 duration/easing)
 const collapseTransition = [

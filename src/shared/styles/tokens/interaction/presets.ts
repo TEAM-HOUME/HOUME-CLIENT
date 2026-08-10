@@ -3,7 +3,7 @@ import {
   interactionDurationMs,
   interactionEasing,
   type InteractionSpec,
-} from '@styles/tokensV2/interaction/utils';
+} from '@styles/tokens/interaction/utils';
 
 const interactionTransitions = (
   spec: InteractionSpec,

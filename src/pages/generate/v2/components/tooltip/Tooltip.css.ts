@@ -1,18 +1,18 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 import {
   TOOLTIP_AFTER_DELAY_MS,
   tooltipFadeInSpec,
-} from '@styles/tokensV2/interaction/presets';
+} from '@styles/tokens/interaction/presets';
 import {
   interactionDurationMs,
   interactionEasing,
-} from '@styles/tokensV2/interaction/utils';
-import { zIndex } from '@styles/tokensV2/zIndex';
+} from '@styles/tokens/interaction/utils';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
-import { colorVars } from '@/shared/styles/tokensV2/color.css';
-import { fontVars } from '@/shared/styles/tokensV2/font.css';
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
 const tooltipFadeInKeyframes = keyframes({
   from: {
     transform: 'scale(0.8)',

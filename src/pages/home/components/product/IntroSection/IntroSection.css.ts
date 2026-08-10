@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { unitVars } from '@styles/tokensV2/unit.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 /** 비율 박스 — introBanner가 inset으로 프레임에 맞게 채움 */
 export const section = style({
