@@ -1,9 +1,9 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { fontStyle } from '@styles/fontStyle';
 import { animationTokens } from '@styles/tokens/animation.css';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const container = style({
   position: 'relative',
@@ -76,7 +76,7 @@ export const slideNum = style({
   backgroundColor: colorVars.color.gray999_a30,
   width: '3.4rem',
   height: '2rem',
-  ...fontStyle('caption_r_11'),
+  ...fontVars.font.caption_r_11,
   color: colorVars.color.gray000,
 });
 
@@ -207,7 +207,7 @@ export const lockTextBox = style({
   alignItems: 'center',
   textAlign: 'center',
   color: colorVars.color.gray900,
-  ...fontStyle('body_m_14'),
+  ...fontVars.font.body_m_14,
 });
 
 globalStyle(`${lockTextBox} p`, {
@@ -222,7 +222,7 @@ export const moreBtn = style({
   backgroundColor: colorVars.color.gray999,
   width: '11.6rem',
   height: '4.4rem',
-  ...fontStyle('body_m_14'),
+  ...fontVars.font.body_m_14,
   color: colorVars.color.gray000,
 });
 
@@ -242,7 +242,7 @@ export const feedbackBox = style({
 
 export const feedbackTitle = style({
   margin: 0,
-  ...fontStyle('body_m_14'),
+  ...fontVars.font.body_m_14,
   color: colorVars.color.gray900,
 });
 
@@ -269,7 +269,7 @@ export const feedbackTagButton = style({
   borderRadius: '99.9rem',
   backgroundColor: colorVars.color.gray000,
   padding: '0 1.6rem',
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   height: '3.6rem',
   color: colorVars.color.gray700,
 

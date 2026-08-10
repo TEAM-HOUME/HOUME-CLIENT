@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const pageLayout = style({
   position: 'relative',
@@ -36,7 +36,7 @@ export const devViewToggle = style({
 });
 
 export const devViewToggleLabel = style({
-  ...fontStyle('caption_r_12'),
+  ...fontVars.font.caption_r_12,
   color: colorVars.color.gray500,
 });
 
@@ -51,7 +51,7 @@ export const devViewToggleBtn = style({
   backgroundColor: colorVars.color.gray000,
   cursor: 'pointer',
   padding: '0.6rem 1rem',
-  ...fontStyle('caption_r_12'),
+  ...fontVars.font.caption_r_12,
   color: colorVars.color.gray700,
 });
 
@@ -100,7 +100,7 @@ export const textGroup = style({
 });
 
 export const placeholderNote = style({
-  ...fontStyle('caption_r_12'),
+  ...fontVars.font.caption_r_12,
   marginTop: 'auto',
   textAlign: 'center',
   color: colorVars.color.gray500,

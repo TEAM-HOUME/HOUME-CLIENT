@@ -1,8 +1,8 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = style({
@@ -115,7 +115,7 @@ export const lockTextBox = style({
   alignItems: 'center',
   textAlign: 'center',
   color: colorVars.color.text.primary,
-  ...fontStyle('body_m_14'),
+  ...fontVars.font.body_m_14,
 });
 
 globalStyle(`${lockTextBox} p`, {

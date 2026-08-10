@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const container = style({
   display: 'flex',
@@ -16,7 +16,7 @@ export const container = style({
 });
 
 export const message = style({
-  ...fontStyle('body_m_14'),
+  ...fontVars.font.body_m_14,
   color: colorVars.color.gray600,
 });
 
@@ -27,7 +27,7 @@ export const retryButton = style({
   borderColor: colorVars.color.gray300,
   backgroundColor: colorVars.color.gray000,
   cursor: 'pointer',
-  ...fontStyle('caption_m_12'),
+  ...fontVars.font.caption_m_12,
   padding: '0.8rem 1.6rem',
   color: colorVars.color.gray600,
 });

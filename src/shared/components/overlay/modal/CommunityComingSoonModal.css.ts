@@ -1,9 +1,8 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 import { zIndex } from '@styles/tokens/zIndex';
-
-import { fontStyle } from '@/shared/styles/fontStyle';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
@@ -48,12 +47,12 @@ export const headingText = style({
 });
 
 export const title = style({
-  ...fontStyle('title_sb_16'),
+  ...fontVars.font.title_sb_16,
   color: colorVars.color.gray900,
 });
 
 export const body = style({
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   whiteSpace: 'pre-line',
   color: colorVars.color.gray700,
 });
@@ -68,6 +67,6 @@ export const closeButton = style({
   justifyContent: 'center',
   width: '100%',
   height: '4.8rem',
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   color: colorVars.color.gray700,
 });
