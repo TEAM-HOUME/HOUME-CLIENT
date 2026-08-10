@@ -16,9 +16,9 @@ import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
+import TextButton from '@components/btnText/TextButton';
 import OptimizedImage from '@components/image/OptimizedImage';
-import TextButton from '@components/v2/btnText/TextButton';
-import ListProductCard from '@components/v2/productCard/ListProductCard';
+import ListProductCard from '@components/productCard/ListProductCard';
 
 import * as styles from './GenImgCard.css';
 

@@ -10,9 +10,9 @@ import type { FactorItem } from '@shared/apis/__generated__/data-contracts';
 import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
-import IconButton from '@components/v2/button/IconButton';
-import Chip from '@components/v2/chip/Chip';
-import { useToast } from '@components/v2/toast/useToast';
+import IconButton from '@components/button/IconButton';
+import Chip from '@components/chip/Chip';
+import { useToast } from '@components/toast/useToast';
 
 import * as styles from './ImgFeedback.css.ts';
 

@@ -1,6 +1,6 @@
-import CloseBottomSheet from '@components/v2/bottomSheet/CloseBottomSheet';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import Chip from '@components/v2/chip/Chip';
+import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Chip from '@components/chip/Chip';
 
 import * as styles from './FilterSheet.css';
 

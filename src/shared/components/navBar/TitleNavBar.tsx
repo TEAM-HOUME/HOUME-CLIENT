@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import TextButton from '@components/v2/btnText/TextButton';
+import TextButton from '@components/btnText/TextButton';
 
 import { ROUTES } from '@/routes/paths';
 

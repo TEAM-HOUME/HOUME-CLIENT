@@ -44,8 +44,8 @@ import TestImg from '@assets/v2/images/TestImg.png';
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 import OptimizedImage from '@components/image/OptimizedImage';
 import Loading from '@components/loading/Loading';
-import Popup from '@components/v2/popup/Popup';
-import { useToast } from '@components/v2/toast/useToast';
+import Popup from '@components/popup/Popup';
+import { useToast } from '@components/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 

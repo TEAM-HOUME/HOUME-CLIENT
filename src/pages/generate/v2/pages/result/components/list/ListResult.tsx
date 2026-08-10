@@ -22,18 +22,17 @@ import {
 } from '@shared/analytics/params/gate';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import ActionButton from '@shared/components/v2/button/actionButton/ActionButton';
-import EmptyView from '@shared/components/v2/emptyView/EmptyView';
 import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import EmptyView from '@components/emptyView/EmptyView';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-
-import ListProductCard from '@/shared/components/v2/productCard/ListProductCard';
-import ProductCard from '@/shared/components/v2/productCard/ProductCard';
-import StyleCard from '@/shared/components/v2/styleCard/StyleCard';
+import ListProductCard from '@components/productCard/ListProductCard';
+import ProductCard from '@components/productCard/ProductCard';
+import StyleCard from '@components/styleCard/StyleCard';
 
 import GeneratedImg from './imgSection/GeneratedImg';
 import * as styles from './ListResult.css';

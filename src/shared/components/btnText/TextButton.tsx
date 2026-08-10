@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from 'react';
 
 import clsx from 'clsx';
 
-import Icon, { type IconName } from '@shared/components/v2/icon/Icon';
+import Icon, { type IconName } from '@components/icon/Icon';
 
 import * as styles from './TextButton.css';
 

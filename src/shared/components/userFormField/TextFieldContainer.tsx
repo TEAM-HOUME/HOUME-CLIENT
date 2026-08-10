@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import clsx from 'clsx';
 
-import Icon from '@/shared/components/v2/icon/Icon';
+import Icon from '@components/icon/Icon';
 
 import * as styles from './TextFieldContainer.css';
 

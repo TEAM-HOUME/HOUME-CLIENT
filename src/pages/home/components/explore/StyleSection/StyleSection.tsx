@@ -9,10 +9,10 @@ import { ROUTES } from '@routes/paths';
 
 import FallbackImage from '@assets/v2/images/bannerFallback.svg';
 
+import TextButton from '@components/btnText/TextButton';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import TextButton from '@components/v2/btnText/TextButton';
-import StyleCard from '@components/v2/styleCard/StyleCard';
+import StyleCard from '@components/styleCard/StyleCard';
 
 import { useGetStyleListQuery } from '@/shared/apis/queries/useGetStyleQuery';
 

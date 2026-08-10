@@ -22,10 +22,9 @@ import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
-import Popup from '@components/v2/popup/Popup';
-
-import TextButton from '@/shared/components/v2/btnText/TextButton';
+import TextButton from '@components/btnText/TextButton';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import Popup from '@components/popup/Popup';
 
 import * as styles from './SettingPage.css';
 

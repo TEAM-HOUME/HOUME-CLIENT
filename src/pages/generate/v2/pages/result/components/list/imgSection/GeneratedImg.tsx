@@ -1,5 +1,5 @@
 import OptimizedImage from '@components/image/OptimizedImage';
-import { openImageZoom } from '@components/v2/imageZoom/openImageZoom';
+import { openImageZoom } from '@components/imageZoom/openImageZoom';
 
 import * as styles from './GeneratedImg.css';
 

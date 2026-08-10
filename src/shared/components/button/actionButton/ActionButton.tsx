@@ -2,10 +2,7 @@ import * as React from 'react';
 
 import clsx from 'clsx';
 
-import Icon, {
-  type IconName,
-  type IconSize,
-} from '@shared/components/v2/icon/Icon';
+import Icon, { type IconName, type IconSize } from '@components/icon/Icon';
 
 import * as styles from './ActionButton.css';
 

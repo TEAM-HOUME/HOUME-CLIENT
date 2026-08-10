@@ -9,7 +9,7 @@ import { MAX_SELECTED_PRODUCTS } from '@pages/home/hooks/useProductSelection';
 import type { SelectedProduct } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
-import ProductCard from '@shared/components/v2/productCard/ProductCard';
+import ProductCard from '@components/productCard/ProductCard';
 
 import * as styles from './RecommendSection.css';
 

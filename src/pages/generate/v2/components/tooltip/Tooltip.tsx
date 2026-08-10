@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import Arrow from '@assets/v2/svg/TooltipArrow.svg?react';
 
-import IconButton from '@components/v2/button/IconButton.tsx';
+import IconButton from '@components/button/IconButton.tsx';
 
 import * as styles from './Tooltip.css';
 

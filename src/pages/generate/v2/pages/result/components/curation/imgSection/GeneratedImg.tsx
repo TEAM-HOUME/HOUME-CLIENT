@@ -9,11 +9,11 @@ import 'swiper/css/pagination';
 
 import generateResultLockedPreview from '@assets/images/generateResultLockedPreview.png';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import IconButton from '@components/button/IconButton';
 import OptimizedImage from '@components/image/OptimizedImage';
+import { openImageZoom } from '@components/imageZoom/openImageZoom';
 import CommunityComingSoonModal from '@components/overlay/modal/CommunityComingSoonModal';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import IconButton from '@components/v2/button/IconButton';
-import { openImageZoom } from '@components/v2/imageZoom/openImageZoom';
 
 import * as styles from './GeneratedImg.css';
 

@@ -24,16 +24,15 @@ import {
 } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
-import ActionButton from '@shared/components/v2/button/actionButton/ActionButton';
-import Icon from '@shared/components/v2/icon/Icon';
-import TitleNavBar from '@shared/components/v2/navBar/TitleNavBar';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Icon from '@components/icon/Icon';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import StyleCard from '@components/styleCard/StyleCard';
 
 import { useLoginGate } from '@hooks/useLoginGate';
-
-import StyleCard from '@/shared/components/v2/styleCard/StyleCard';
 
 import * as styles from './BannerDetailPage.css';
 

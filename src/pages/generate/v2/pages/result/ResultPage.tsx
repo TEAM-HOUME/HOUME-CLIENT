@@ -28,7 +28,7 @@ import { clarityEvent } from '@shared/config/clarity';
 
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
+import TitleNavBar from '@components/navBar/TitleNavBar';
 
 import { useExitBlocker } from '@hooks/useExitBlocker';
 

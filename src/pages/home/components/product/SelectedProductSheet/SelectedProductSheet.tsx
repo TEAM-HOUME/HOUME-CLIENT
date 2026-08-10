@@ -5,7 +5,7 @@ import { overlay } from 'overlay-kit';
 import ProductDetailOverlay from '@pages/home/components/product/ProductPopup/ProductDetailOverlay';
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
-import Icon from '@shared/components/v2/icon/Icon';
+import Icon from '@components/icon/Icon';
 
 import ProductSheetCard from './ProductSheetCard';
 import * as styles from './SelectedProductSheet.css';

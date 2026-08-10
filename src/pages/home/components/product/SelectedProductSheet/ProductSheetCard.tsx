@@ -2,11 +2,10 @@ import type { KeyboardEvent } from 'react';
 
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
-import IconButton from '@shared/components/v2/button/IconButton';
-import Icon from '@shared/components/v2/icon/Icon';
-
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
+import IconButton from '@components/button/IconButton';
+import Icon from '@components/icon/Icon';
 import OptimizedImage from '@components/image/OptimizedImage';
 
 import * as styles from './ProductSheetCard.css';

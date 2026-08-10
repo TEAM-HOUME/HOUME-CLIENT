@@ -17,7 +17,7 @@ import { TOAST_TYPE } from '@shared/types/toast';
 
 import { HTTPMethod, request } from '@apis/config/request';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';

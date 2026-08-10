@@ -9,7 +9,7 @@ import {
 
 import { createPortal } from 'react-dom';
 
-import IconButton from '@components/v2/button/IconButton';
+import IconButton from '@components/button/IconButton';
 
 import { sheetSlideOutOpacityInteraction } from '@styles/tokens/interaction/presets';
 

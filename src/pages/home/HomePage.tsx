@@ -24,8 +24,8 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 
-import MenuTab from '@components/v2/menuTab/MenuTab';
-import LogoNavBar from '@components/v2/navBar/LogoNavBar';
+import MenuTab from '@components/menuTab/MenuTab';
+import LogoNavBar from '@components/navBar/LogoNavBar';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 

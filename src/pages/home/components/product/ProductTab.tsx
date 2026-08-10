@@ -13,9 +13,9 @@ import { consumeReopenProduct } from '@pages/home/utils/productDetailOverlayReop
 
 import { useConsumeProductRestore } from '@store/imageFlow/useConsumeProductRestore';
 
-import CloseBottomSheet from '@shared/components/v2/bottomSheet/CloseBottomSheet';
-import DragHandleBottomSheet from '@shared/components/v2/bottomSheet/DragHandleBottomSheet';
-import ActionButton from '@shared/components/v2/button/actionButton/ActionButton';
+import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
+import DragHandleBottomSheet from '@components/bottomSheet/DragHandleBottomSheet';
+import ActionButton from '@components/button/actionButton/ActionButton';
 
 import ProductDetailOverlay from './ProductPopup/ProductDetailOverlay';
 import * as styles from './ProductTab.css';

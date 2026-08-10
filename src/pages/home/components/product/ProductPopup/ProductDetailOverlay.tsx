@@ -19,7 +19,6 @@ import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
 import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import type { ProductColorDetail } from '@shared/apis/__generated__/data-contracts';
-import Popup from '@shared/components/v2/popup/Popup';
 import type {
   LinkInfo,
   PriceInfo,
@@ -28,6 +27,8 @@ import type {
 } from '@shared/types/productCard';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
+
+import Popup from '@components/popup/Popup';
 
 import ProductDetailCard from './ProductDetailCard';
 

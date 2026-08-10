@@ -12,7 +12,7 @@ import type { MyPageProfileResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';
 import { HTTPMethod, request } from '@apis/config/request';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';

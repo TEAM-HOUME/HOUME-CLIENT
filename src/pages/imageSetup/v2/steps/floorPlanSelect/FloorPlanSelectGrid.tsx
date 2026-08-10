@@ -4,10 +4,10 @@ import type { ExploreHouseTemplateItemResponse } from '@apis/__generated__/data-
 
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
-import IconButton from '@components/v2/button/IconButton';
-import Chip from '@components/v2/chip/Chip';
-import Icon from '@components/v2/icon/Icon';
-import RoomTypeCard from '@components/v2/roomTypeCard/RoomTypeCard';
+import IconButton from '@components/button/IconButton';
+import Chip from '@components/chip/Chip';
+import Icon from '@components/icon/Icon';
+import RoomTypeCard from '@components/roomTypeCard/RoomTypeCard';
 
 import * as styles from './FloorPlanSelectGrid.css';
 

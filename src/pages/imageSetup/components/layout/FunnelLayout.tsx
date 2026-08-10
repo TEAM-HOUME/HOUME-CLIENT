@@ -16,11 +16,10 @@ import {
 } from '@shared/analytics/componentAnalytics';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
-import Popup from '@components/v2/popup/Popup';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import Popup from '@components/popup/Popup';
 
 import { useExitBlocker } from '@hooks/useExitBlocker';
-
-import TitleNavBar from '@/shared/components/v2/navBar/TitleNavBar';
 
 import * as styles from './FunnelLayout.css';
 import { FUNNEL_STEP_PARAM } from '../../constants/funnel';

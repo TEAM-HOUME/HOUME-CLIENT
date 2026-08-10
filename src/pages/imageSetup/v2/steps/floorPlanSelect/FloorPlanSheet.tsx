@@ -16,10 +16,10 @@ import type { ExploreHouseTemplateDetailItemResponse } from '@apis/__generated__
 
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
+import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
+import ActionButton from '@components/button/actionButton/ActionButton';
+import IconButton from '@components/button/IconButton';
 import OptimizedImage from '@components/image/OptimizedImage';
-import CloseBottomSheet from '@components/v2/bottomSheet/CloseBottomSheet';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import IconButton from '@components/v2/button/IconButton';
 
 import { IMAGE_SIZES } from '@utils/imageVariant';
 

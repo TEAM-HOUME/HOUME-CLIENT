@@ -6,7 +6,7 @@ import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
-import TitleNavBar from '@/shared/components/v2/navBar/TitleNavBar';
+import TitleNavBar from '@components/navBar/TitleNavBar';
 
 import { PRIVACY_POLICY } from './constants/policies';
 import * as styles from './PolicyPage.css';

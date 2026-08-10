@@ -7,7 +7,7 @@ import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuer
 import { reportError, reportMessage } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 
-import CreditRequestPopup from '@components/v2/popup/CreditRequestPopup';
+import CreditRequestPopup from '@components/popup/CreditRequestPopup';
 
 interface CreditGuardReturn {
   checkCredit: () => Promise<boolean>;

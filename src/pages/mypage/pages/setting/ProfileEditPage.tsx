@@ -10,13 +10,13 @@ import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Chip from '@components/chip/Chip';
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 import Loading from '@components/loading/Loading';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import Chip from '@components/v2/chip/Chip';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
-import DateField from '@components/v2/userFormField/DateField';
-import TextField from '@components/v2/userFormField/TextField';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import DateField from '@components/userFormField/DateField';
+import TextField from '@components/userFormField/TextField';
 
 import { ERROR_MESSAGES } from '@constants/clientErrorMessage';
 

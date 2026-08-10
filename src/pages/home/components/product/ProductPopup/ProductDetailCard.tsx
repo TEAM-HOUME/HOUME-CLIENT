@@ -1,6 +1,4 @@
 import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import ActionButton from '@shared/components/v2/button/actionButton/ActionButton';
-import Icon from '@shared/components/v2/icon/Icon';
 import type {
   LinkInfo,
   PriceInfo,
@@ -9,6 +7,8 @@ import type {
 
 import emptyImage from '@assets/v2/images/ImgEmpty.png';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Icon from '@components/icon/Icon';
 import OptimizedImage from '@components/image/OptimizedImage';
 
 import { useProductLink } from '@hooks/useProductLink';

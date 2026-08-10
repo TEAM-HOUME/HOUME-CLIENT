@@ -1,6 +1,6 @@
 // 주요활동 code → v2 Icon name 매핑
 // 서버가 아이콘을 내려주지 않으므로, 클라이언트에서 code 기반으로 매핑
-import type { IconName } from '@components/v2/icon/Icon';
+import type { IconName } from '@components/icon/Icon';
 
 interface ActivityIconNames {
   gray: IconName;

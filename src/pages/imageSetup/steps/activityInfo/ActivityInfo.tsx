@@ -4,12 +4,12 @@ import { overlay } from 'overlay-kit';
 
 import { useSelectFurnitureAnalytics } from '@pages/imageSetup/analytics/useSelectFurnitureAnalytics';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Chip from '@components/chip/Chip';
+import Icon from '@components/icon/Icon';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import Chip from '@components/v2/chip/Chip';
-import Icon from '@components/v2/icon/Icon';
-import TextHeading from '@components/v2/textHeading/TextHeading';
+import TextHeading from '@components/textHeading/TextHeading';
 
 import { useExitBlocker } from '@hooks/useExitBlocker';
 

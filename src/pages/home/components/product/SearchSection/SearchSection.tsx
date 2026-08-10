@@ -22,17 +22,16 @@ import type {
 } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
-import IconButton from '@shared/components/v2/button/IconButton';
-import EmptyView from '@shared/components/v2/emptyView/EmptyView';
-import ProductCard from '@shared/components/v2/productCard/ProductCard';
-import SearchBar from '@shared/components/v2/textField/SearchBar';
 import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
 
+import IconButton from '@components/button/IconButton';
+import Chip from '@components/chip/Chip';
+import EmptyView from '@components/emptyView/EmptyView';
+import Icon from '@components/icon/Icon';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import Chip from '@components/v2/chip/Chip';
-
-import Icon from '@/shared/components/v2/icon/Icon';
+import ProductCard from '@components/productCard/ProductCard';
+import SearchBar from '@components/textField/SearchBar';
 
 import * as styles from './SearchSection.css';
 

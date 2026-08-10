@@ -11,15 +11,15 @@ import { ROUTES } from '@routes/paths';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
 import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import Chip from '@shared/components/v2/chip/Chip';
-import EmptyView from '@shared/components/v2/emptyView/EmptyView';
-import ProductCard from '@shared/components/v2/productCard/ProductCard';
 import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
+import Chip from '@components/chip/Chip';
+import EmptyView from '@components/emptyView/EmptyView';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
+import ProductCard from '@components/productCard/ProductCard';
 
 import * as styles from './CurationResult.css';
 import ImgFeedback from './feedbackSection/ImgFeedback';

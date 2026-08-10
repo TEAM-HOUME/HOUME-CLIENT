@@ -1,5 +1,5 @@
 // like, dislike 버튼
-import Icon from '@components/v2/icon/Icon';
+import Icon from '@components/icon/Icon';
 
 import * as styles from './LikeButton.css';
 

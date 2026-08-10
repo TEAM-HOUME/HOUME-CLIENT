@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
-import IconButton from '@components/v2/button/IconButton';
+import IconButton from '@components/button/IconButton';
 
 import * as styles from './TextField.css';
 import TextFieldContainer from './TextFieldContainer';
