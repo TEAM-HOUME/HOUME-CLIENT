@@ -5,7 +5,7 @@ import type {
   ProductInfo,
 } from '@shared/types/productCard';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';

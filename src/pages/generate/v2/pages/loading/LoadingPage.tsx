@@ -39,7 +39,7 @@ import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
 
 import type { GetCarouselResponseDTO } from '@apis/__generated__/data-contracts';
 
-import TestImg from '@assets/v2/images/TestImg.png';
+import TestImg from '@assets/images/TestImg.png';
 
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 import OptimizedImage from '@components/image/OptimizedImage';

@@ -16,7 +16,7 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
 import { useGetStyleListQuery } from '@apis/queries/useGetStyleQuery';
 
-import FallbackImage from '@assets/v2/images/bannerFallback.svg';
+import FallbackImage from '@assets/images/bannerFallback.svg';
 
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';

@@ -14,7 +14,7 @@ import type {
 } from '@apis/__generated__/data-contracts';
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import TextButton from '@components/btnText/TextButton';
 import OptimizedImage from '@components/image/OptimizedImage';

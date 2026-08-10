@@ -8,9 +8,9 @@ import { type ScreenName } from '@shared/analytics/screenNames';
 import { trackCallback } from '@shared/analytics/track';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 
-import imgProfile from '@assets/v2/images/ImgProfile.svg';
-import logotypeBlack from '@assets/v2/images/LogotypeBlack.svg';
-import logotypeWhite from '@assets/v2/images/LogotypeWhite.svg';
+import imgProfile from '@assets/images/ImgProfile.svg';
+import logotypeBlack from '@assets/images/LogotypeBlack.svg';
+import logotypeWhite from '@assets/images/LogotypeWhite.svg';
 
 import * as styles from './LogoNavBar.css';
 import TextButton from '../btnText/TextButton';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import bannerFallback from '@assets/v2/images/bannerFallback.svg';
+import bannerFallback from '@assets/images/bannerFallback.svg';
 
 import * as styles from './IntroSection.css';
 

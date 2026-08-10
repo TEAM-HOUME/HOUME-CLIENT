@@ -2,7 +2,7 @@ import type { Ref } from 'react';
 
 import type { ExploreHouseTemplateItemResponse } from '@apis/__generated__/data-contracts';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';

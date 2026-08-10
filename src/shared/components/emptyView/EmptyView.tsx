@@ -1,4 +1,4 @@
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import * as styles from './EmptyView.css';
 

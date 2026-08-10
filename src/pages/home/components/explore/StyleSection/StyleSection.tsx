@@ -7,7 +7,7 @@ import {
 
 import { ROUTES } from '@routes/paths';
 
-import FallbackImage from '@assets/v2/images/bannerFallback.svg';
+import FallbackImage from '@assets/images/bannerFallback.svg';
 
 import TextButton from '@components/btnText/TextButton';
 import InlineError from '@components/inlineError/InlineError';

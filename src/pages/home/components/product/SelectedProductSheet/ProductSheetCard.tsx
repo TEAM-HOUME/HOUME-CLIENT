@@ -2,7 +2,7 @@ import type { KeyboardEvent } from 'react';
 
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import IconButton from '@components/button/IconButton';
 import Icon from '@components/icon/Icon';

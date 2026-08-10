@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react';
 
 import clsx from 'clsx';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import OptimizedImage from '@components/image/OptimizedImage';
 

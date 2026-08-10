@@ -14,7 +14,7 @@ import {
 
 import type { ExploreHouseTemplateDetailItemResponse } from '@apis/__generated__/data-contracts';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
 import ActionButton from '@components/button/actionButton/ActionButton';

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import Arrow from '@assets/v2/svg/TooltipArrow.svg?react';
+import Arrow from '@assets/icons/TooltipArrow.svg?react';
 
 import IconButton from '@components/button/IconButton.tsx';
 

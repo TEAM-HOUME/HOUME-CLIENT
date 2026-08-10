@@ -25,7 +25,7 @@ import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRou
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
-import FallbackImage from '@assets/v2/images/bannerFallback.svg';
+import FallbackImage from '@assets/images/bannerFallback.svg';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import InlineError from '@components/inlineError/InlineError';

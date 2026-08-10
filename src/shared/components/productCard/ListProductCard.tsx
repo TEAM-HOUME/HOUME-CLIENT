@@ -6,7 +6,7 @@ import type {
   LinkInfo,
 } from '@shared/types/productCard';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import OptimizedImage from '@components/image/OptimizedImage';
 

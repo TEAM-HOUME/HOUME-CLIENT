@@ -3,7 +3,7 @@ import { useId } from 'react';
 
 import clsx from 'clsx';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
 import Icon from '@components/icon/Icon';
 import OptimizedImage from '@components/image/OptimizedImage';
