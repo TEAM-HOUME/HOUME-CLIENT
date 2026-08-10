@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { animationTokens } from '@styles/tokens/animation.css';
+import { animationTokens } from '@styles/tokensV2/animation.css';
 import { unitVars } from '@styles/tokensV2/unit.css';
 
 import { colorVars } from '@/shared/styles/tokensV2/color.css';

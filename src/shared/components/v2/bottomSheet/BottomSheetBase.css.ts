@@ -1,7 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { zIndex } from '@styles/tokens/zIndex';
 import { colorVars } from '@styles/tokensV2/color.css';
 import {
   pressInteraction,
@@ -9,6 +8,7 @@ import {
 } from '@styles/tokensV2/interaction/presets';
 import { transition } from '@styles/tokensV2/interaction/utils';
 import { unitVars } from '@styles/tokensV2/unit.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 // 최소화 시 actionRow가 접히는 트랜지션 (패널 height 슬라이드와 동일 duration/easing)
 // transform은 쓰지 않음 — translateY(%)가 애니메이션 중인 높이에 종속돼 버튼이 출렁이므로 maxHeight+opacity만 사용

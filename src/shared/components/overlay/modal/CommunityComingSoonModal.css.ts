@@ -1,9 +1,9 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
 import { colorVars } from '@styles/tokensV2/color.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 import { fontStyle } from '@/shared/styles/fontStyle';
-import { zIndex } from '@/shared/styles/tokens/zIndex';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },

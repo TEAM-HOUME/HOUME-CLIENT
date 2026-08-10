@@ -1,9 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
-import { zIndex } from '@styles/tokens/zIndex';
 import { colorVars } from '@styles/tokensV2/color.css';
 import { fontVars } from '@styles/tokensV2/font.css';
 import { unitVars } from '@styles/tokensV2/unit.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 export const page = style({
   display: 'flex',

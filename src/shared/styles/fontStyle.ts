@@ -1,4 +1,4 @@
-import { fontVars } from '@styles/tokens/font.css';
+import { fontVars } from './fontLegacy.css';
 
 type FontKeys = Exclude<keyof typeof fontVars, 'family'>;
 

@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { zIndex } from '@/shared/styles/tokens/zIndex';
+import { zIndex } from '@styles/tokensV2/zIndex';
+
 import { fontVars } from '@/shared/styles/tokensV2/font.css';
 import { unitVars } from '@/shared/styles/tokensV2/unit.css';
 

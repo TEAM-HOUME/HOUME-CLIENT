@@ -1,13 +1,13 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { zIndex } from '@styles/tokens/zIndex';
 import { colorVars } from '@styles/tokensV2/color.css';
 import {
   popupFadeInInteraction,
   popupFadeInOpacityInteraction,
 } from '@styles/tokensV2/interaction/presets';
 import { unitVars } from '@styles/tokensV2/unit.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 const motionHidden = { opacity: 0 } as const;
 

@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { animationTokens } from '@styles/tokens/animation.css';
+import { animationTokens } from '@styles/tokensV2/animation.css';
 import { colorVars } from '@styles/tokensV2/color.css';
 import { fontVars } from '@styles/tokensV2/font.css';
 import { pressInteraction } from '@styles/tokensV2/interaction/presets';

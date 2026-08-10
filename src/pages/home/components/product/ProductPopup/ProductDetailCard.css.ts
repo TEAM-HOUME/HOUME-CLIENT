@@ -8,8 +8,8 @@ import { unitVars } from '@shared/styles/tokensV2/unit.css';
 import {
   SKELETON_GRADIENT,
   animationTokens,
-} from '@styles/tokens/animation.css';
-import { zIndex } from '@styles/tokens/zIndex';
+} from '@styles/tokensV2/animation.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 const skeletonShimmer = style({
   background: SKELETON_GRADIENT,

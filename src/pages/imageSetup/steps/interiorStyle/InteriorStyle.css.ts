@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { zIndex } from '@styles/tokens/zIndex';
 import { unitVars } from '@styles/tokensV2/unit.css';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 export const container = style({
   position: 'relative',

@@ -3,7 +3,7 @@ import { style } from '@vanilla-extract/css';
 import {
   SKELETON_GRADIENT,
   animationTokens,
-} from '@styles/tokens/animation.css';
+} from '@styles/tokensV2/animation.css';
 import { colorVars } from '@styles/tokensV2/color.css';
 
 // placeholder 모드에서 이미지가 로드되면 페이드인 (로딩 중엔 placeholder가 보임)

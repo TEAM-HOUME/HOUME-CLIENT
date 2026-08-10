@@ -8,8 +8,8 @@ import {
   interactionDurationMs,
   interactionEasing,
 } from '@styles/tokensV2/interaction/utils';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
-import { zIndex } from '@/shared/styles/tokens/zIndex';
 import { colorVars } from '@/shared/styles/tokensV2/color.css';
 import { fontVars } from '@/shared/styles/tokensV2/font.css';
 import { unitVars } from '@/shared/styles/tokensV2/unit.css';

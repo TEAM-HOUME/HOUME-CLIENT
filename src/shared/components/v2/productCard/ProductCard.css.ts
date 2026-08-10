@@ -5,8 +5,8 @@ import { colorVars } from '@shared/styles/tokensV2/color.css';
 import { fontVars } from '@shared/styles/tokensV2/font.css';
 import { unitVars } from '@shared/styles/tokensV2/unit.css';
 
-import { zIndex } from '@styles/tokens/zIndex';
 import { pressInteraction } from '@styles/tokensV2/interaction/presets';
+import { zIndex } from '@styles/tokensV2/zIndex';
 
 export const wrapper = recipe({
   base: {
