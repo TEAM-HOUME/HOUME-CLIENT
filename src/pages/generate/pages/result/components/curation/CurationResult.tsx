@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useResultRecAnalytics } from '@pages/generate/analytics/useResultRecAnalytics';
-import { useCurationCategoriesQuery } from '@pages/generate/v2/apis/queries/useCurationCategoriesQuery';
-import { useCurationProductsQuery } from '@pages/generate/v2/apis/queries/useCurationProductsQuery';
+import { useCurationCategoriesQuery } from '@pages/generate/apis/queries/useCurationCategoriesQuery';
+import { useCurationProductsQuery } from '@pages/generate/apis/queries/useCurationProductsQuery';
 
 import { ROUTES } from '@routes/paths';
 

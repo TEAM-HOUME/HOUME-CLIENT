@@ -9,7 +9,7 @@ import {
 
 import { trackResultListBtnBackClick } from '@pages/generate/analytics/resultListAnalytics';
 import { trackResultRecBtnBackClick } from '@pages/generate/analytics/resultRecAnalytics';
-import { useImageMetaQuery } from '@pages/generate/v2/apis/queries/useImageMetaQuery';
+import { useImageMetaQuery } from '@pages/generate/apis/queries/useImageMetaQuery';
 
 import { ROUTES } from '@routes/paths';
 

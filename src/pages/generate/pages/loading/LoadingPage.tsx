@@ -12,9 +12,9 @@ import {
   trackLoadImgPageBackSwipe,
   trackLoadImgPageRefresh,
 } from '@pages/generate/analytics/loadImgAnalytics';
-import { useStackDataQuery } from '@pages/generate/v2/apis/queries/useStackDataQuery';
-import LikeButton from '@pages/generate/v2/components/likeButton/LikeButton';
-import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
+import { useStackDataQuery } from '@pages/generate/apis/queries/useStackDataQuery';
+import LikeButton from '@pages/generate/components/likeButton/LikeButton';
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 
 import { ROUTES } from '@routes/paths';
 

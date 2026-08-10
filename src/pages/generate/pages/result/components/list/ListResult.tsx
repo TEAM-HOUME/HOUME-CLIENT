@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useResultListAnalytics } from '@pages/generate/analytics/useResultListAnalytics';
-import { useGenerateListResultQuery } from '@pages/generate/v2/apis/queries/useGenerateListResultQuery';
-import { useRelatedImagesQuery } from '@pages/generate/v2/apis/queries/useRelatedImagesQuery';
-import { useSimilarItemsQuery } from '@pages/generate/v2/apis/queries/useSimilarItemsQuery';
+import { useGenerateListResultQuery } from '@pages/generate/apis/queries/useGenerateListResultQuery';
+import { useRelatedImagesQuery } from '@pages/generate/apis/queries/useRelatedImagesQuery';
+import { useSimilarItemsQuery } from '@pages/generate/apis/queries/useSimilarItemsQuery';
 
 import { ROUTES } from '@routes/paths';
 

@@ -1,10 +1,10 @@
 import { memo, useEffect, useRef, useState } from 'react';
 
+import { useDeleteResultPreferenceMutation } from '@pages/generate/apis/mutations/useDeleteResultPreferenceMutation';
+import { useFactorPreferenceMutation } from '@pages/generate/apis/mutations/useFactorPreferenceMutation';
+import { useResultPreferenceMutation } from '@pages/generate/apis/mutations/useResultPreferenceMutation';
+import { useFactorsQuery } from '@pages/generate/apis/queries/useFactorsQuery';
 import type { ResultPageLikeState } from '@pages/generate/types/generate';
-import { useDeleteResultPreferenceMutation } from '@pages/generate/v2/apis/mutations/useDeleteResultPreferenceMutation';
-import { useFactorPreferenceMutation } from '@pages/generate/v2/apis/mutations/useFactorPreferenceMutation';
-import { useResultPreferenceMutation } from '@pages/generate/v2/apis/mutations/useResultPreferenceMutation';
-import { useFactorsQuery } from '@pages/generate/v2/apis/queries/useFactorsQuery';
 
 import type { FactorItem } from '@shared/apis/__generated__/data-contracts';
 import { TOAST_MESSAGE } from '@shared/constants/toastMessage';

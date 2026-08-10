@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
