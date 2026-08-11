@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 
-import { useGetRandomNicknameQuery } from '@apis/queries/useGetNickname';
+import { useRandomNicknameQuery } from '@apis/queries/useRandomNicknameQuery';
 
 export const useRandomNickname = (
   onSuccess?: (newNickname: string) => void
 ) => {
-  const { data: randomNickname, refetch } = useGetRandomNicknameQuery();
+  const { data: randomNickname, refetch } = useRandomNicknameQuery();
 
   const refresh = useCallback(async () => {
     try {

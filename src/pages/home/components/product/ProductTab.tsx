@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { overlay } from 'overlay-kit';
 
 import { useProductShopAnalytics } from '@pages/home/analytics/useProductShopAnalytics';
-import ProductFilterSheet from '@pages/home/components/product/ProductFilterSheet/ProductFilterSheet';
+import ProductFilterSheet from '@pages/home/components/product/productFilterSheet/ProductFilterSheet';
 import {
   MAX_SELECTED_PRODUCTS,
   useProductTabController,
@@ -17,10 +17,10 @@ import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
 import DragHandleBottomSheet from '@components/bottomSheet/DragHandleBottomSheet';
 import ActionButton from '@components/button/actionButton/ActionButton';
 
-import ProductDetailOverlay from './ProductPopup/ProductDetailOverlay';
+import ProductDetailOverlay from './productPopup/ProductDetailOverlay';
 import * as styles from './ProductTab.css';
-import SearchSection from './SearchSection/SearchSection';
-import SelectedProductSheet from './SelectedProductSheet/SelectedProductSheet';
+import SearchSection from './searchSection/SearchSection';
+import SelectedProductSheet from './selectedProductSheet/SelectedProductSheet';
 import {
   PRODUCT_BOTTOM_SHEET_COLLAPSED_HEIGHT,
   PRODUCT_BOTTOM_SHEET_MINIMIZED_HEIGHT,

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { overlay } from 'overlay-kit';
 
-import ProductDetailOverlay from '@pages/home/components/product/ProductPopup/ProductDetailOverlay';
+import ProductDetailOverlay from '@pages/home/components/product/productPopup/ProductDetailOverlay';
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
 import Icon from '@components/icon/Icon';

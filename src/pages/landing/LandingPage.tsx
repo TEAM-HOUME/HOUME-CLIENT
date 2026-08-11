@@ -14,7 +14,7 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 import type { HomeLocationState } from '@shared/types/tabNavigation';
 
-import { useLandingQuery } from '@apis/queries/useLandingQuery';
+import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import OptimizedImage from '@components/image/OptimizedImage';
@@ -31,7 +31,7 @@ const LANDING_BANNER_AFTER_DELAY_MS = 2000;
 const LandingPage = () => {
   const navigate = useNavigate();
   const { variant, isLoading: isABTestLoading } = useABTest();
-  const { data: landingData } = useLandingQuery();
+  const { data: landingData } = useLandingListQuery();
   const landingItems = landingData?.landings ?? [];
   const [currentIndex, setCurrentIndex] = useState(0);
 

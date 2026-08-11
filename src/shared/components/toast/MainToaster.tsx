@@ -11,7 +11,7 @@ import {
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 
-import './Sonner.css';
+import './MainToaster.css';
 
 import { unitVars } from '@styles/tokens/unit.css';
 

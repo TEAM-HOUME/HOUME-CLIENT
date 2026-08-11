@@ -19,7 +19,7 @@ import TextField from '@components/userFormField/TextField';
 
 import { ERROR_MESSAGES } from '@constants/clientErrorMessage';
 
-import { useRandomNickname } from '@hooks/useGetRandomNickname';
+import { useRandomNickname } from '@hooks/useRandomNickname';
 import useUserForm from '@hooks/useUserForm';
 
 import * as styles from './ProfileEditPage.css';

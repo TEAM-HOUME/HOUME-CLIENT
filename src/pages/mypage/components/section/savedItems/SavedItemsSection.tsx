@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useMypageSavedItemsAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQuery';
+import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
@@ -26,7 +26,7 @@ const SavedItemsSection = () => {
     (state) => state.setSavedProductIds
   );
 
-  const { data: savedItems = [], isFetched } = useGetJjymListQuery({
+  const { data: savedItems = [], isFetched } = useJjymListQuery({
     gcTime: 0,
     refetchOnMount: 'always',
   });

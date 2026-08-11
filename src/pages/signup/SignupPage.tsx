@@ -32,10 +32,10 @@ import {
   useBrowserBackTrap,
 } from '@hooks/useBrowserBackTrap';
 import { useExitBlocker } from '@hooks/useExitBlocker';
-import { useRandomNickname } from '@hooks/useGetRandomNickname';
+import { useRandomNickname } from '@hooks/useRandomNickname';
 import useUserForm from '@hooks/useUserForm';
 
-import { usePostSignupMutation } from './apis/mutations/usePostSignupMutation';
+import { useSignupMutation } from './apis/mutations/useSignupMutation';
 import * as styles from './SignupPage.css';
 
 interface SignupLocationState {
@@ -244,7 +244,7 @@ const SignupPage = () => {
     },
   });
 
-  const { mutate: signUp } = usePostSignupMutation();
+  const { mutate: signUp } = useSignupMutation();
   const { randomNickname, refresh } = useRandomNickname(trackNicknameChange);
 
   useEffect(() => {

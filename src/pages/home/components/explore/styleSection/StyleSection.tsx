@@ -7,14 +7,14 @@ import {
 
 import { ROUTES } from '@routes/paths';
 
+import { useStyleListQuery } from '@apis/queries/useStyleListQuery';
+
 import FallbackImage from '@assets/images/bannerFallback.svg';
 
 import TextButton from '@components/btnText/TextButton';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
 import StyleCard from '@components/styleCard/StyleCard';
-
-import { useGetStyleListQuery } from '@/shared/apis/queries/useGetStyleQuery';
 
 import * as styles from './StyleSection.css';
 
@@ -40,7 +40,7 @@ const StyleSection = () => {
     isFetching,
     isError,
     refetch,
-  } = useGetStyleListQuery(EXPLORE_STYLE_GRID_SIZE);
+  } = useStyleListQuery(EXPLORE_STYLE_GRID_SIZE);
 
   return (
     <section className={styles.section}>

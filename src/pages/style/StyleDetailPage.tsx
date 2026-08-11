@@ -38,7 +38,7 @@ import { useLoginGate } from '@hooks/useLoginGate';
 
 import { normalizeColorHexes } from '@utils/normalizeColorHexes';
 
-import { useGetStyleDetailQuery } from './apis/useGetStyleDetailQuery';
+import { useStyleDetailQuery } from './apis/queries/useStyleDetailQuery';
 import * as styles from './StyleDetailPage.css';
 
 const StyleDetailPage = () => {
@@ -54,7 +54,7 @@ const StyleDetailPage = () => {
     isLoading,
     isError,
     refetch,
-  } = useGetStyleDetailQuery(parsedStyleId);
+  } = useStyleDetailQuery(parsedStyleId);
 
   const isDataReady = !isLoading && !isError && styleDetailData != null;
 

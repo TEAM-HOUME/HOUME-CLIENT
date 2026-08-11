@@ -10,8 +10,8 @@ import {
   trackShopListProductView,
   type ShopListContext,
 } from '@pages/home/analytics/shopAnalytics';
-import ProductDetailOverlay from '@pages/home/components/product/ProductPopup/ProductDetailOverlay';
-import RecommendSection from '@pages/home/components/product/RecommendSection/RecommendSection';
+import ProductDetailOverlay from '@pages/home/components/product/productPopup/ProductDetailOverlay';
+import RecommendSection from '@pages/home/components/product/recommendSection/RecommendSection';
 import { useProductHeaderScroll } from '@pages/home/hooks/useProductHeaderScroll';
 import type { ProductSearchCardItem } from '@pages/home/hooks/useProductSearch';
 import { MAX_SELECTED_PRODUCTS } from '@pages/home/hooks/useProductSelection';

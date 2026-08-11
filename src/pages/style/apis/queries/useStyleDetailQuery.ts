@@ -15,7 +15,7 @@ export const getStyleDetail = async (
   });
 };
 
-export const useGetStyleDetailQuery = (styleId: number) => {
+export const useStyleDetailQuery = (styleId: number) => {
   return useQuery({
     queryKey: queryKeys.styles.detail(styleId),
     queryFn: () => getStyleDetail(styleId),
