@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
-
 import { useUserStore } from '@store/useUserStore';
+
+import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 
 /**
  * 사용자 정보를 전역 상태와 동기화하는 훅

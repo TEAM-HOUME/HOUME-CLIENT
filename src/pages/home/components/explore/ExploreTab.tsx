@@ -9,11 +9,12 @@ import {
 import Banner, {
   type BannerSlide,
 } from '@pages/home/components/explore/banner/Banner';
-import { useLandingQuery } from '@pages/landing/apis/queries/useLandingQuery';
 
 import { ROUTES } from '@routes/paths';
 
 import { GA_EVENTS } from '@shared/analytics/events';
+
+import { useLandingQuery } from '@apis/queries/useLandingQuery';
 
 import promoBanner from '@assets/images/PromoBanner.svg';
 

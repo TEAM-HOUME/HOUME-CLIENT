@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 import type { HomeLocationState } from '@pages/home/HomePage';
 import { trackLandingCtaClick } from '@pages/landing/analytics/landingAnalytics';
-import { useLandingQuery } from '@pages/landing/apis/queries/useLandingQuery';
 import { LANDING_CTA_BY_VARIANT } from '@pages/landing/constants/landingCtaAbTest';
 
 import { ROUTES } from '@routes/paths';
@@ -14,6 +13,8 @@ import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { getLandingTestType } from '@shared/analytics/params/landing';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+
+import { useLandingQuery } from '@apis/queries/useLandingQuery';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import OptimizedImage from '@components/image/OptimizedImage';

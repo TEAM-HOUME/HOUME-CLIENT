@@ -1,12 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import type {
-  EditProfileRequest,
-  MyPageUserData,
-} from '@pages/mypage/types/apis/userData';
+import type { EditProfileRequest } from '@pages/mypage/types/apis/userData';
 
 import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
+import type { MyPageUserData } from '@shared/types/user';
 
 import type { MyPageProfileResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';

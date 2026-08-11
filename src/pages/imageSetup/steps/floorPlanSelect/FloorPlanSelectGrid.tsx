@@ -1,5 +1,7 @@
 import type { Ref } from 'react';
 
+import type { FilterCategory, FloorPlanFilters } from '@shared/types/floorPlan';
+
 import type { ExploreHouseTemplateItemResponse } from '@apis/__generated__/data-contracts';
 
 import emptyImage from '@assets/images/ImgEmpty.png';
@@ -12,7 +14,6 @@ import RoomTypeCard from '@components/roomTypeCard/RoomTypeCard';
 import * as styles from './FloorPlanSelectGrid.css';
 
 import type { FloorPlanAspectRatio } from '../../stores/useFloorPlanRatioStore';
-import type { FilterCategory, FloorPlanFilters } from '../../types/floorPlan';
 
 interface FloorPlanSelectGridProps {
   gridScrollRef: Ref<HTMLDivElement | null>;

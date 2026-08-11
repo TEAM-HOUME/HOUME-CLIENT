@@ -11,17 +11,17 @@ import { useImageFlowStore } from '@store/useImageFlowStore';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import type { ExploreHouseTemplateItemResponse } from '@apis/__generated__/data-contracts';
+import { useHouseTemplateDetailQuery } from '@apis/queries/useHouseTemplateDetailQuery';
+import { useHouseTemplatesQuery } from '@apis/queries/useHouseTemplatesQuery';
+import {
+  getRecentFloorPlanForAnalytics,
+  useRecentFloorPlanQuery,
+} from '@apis/queries/useRecentFloorPlanQuery';
 
 import { useToast } from '@components/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 
-import { useHouseTemplateDetailQuery } from '../apis/queries/useHouseTemplateDetailQuery';
-import { useHouseTemplatesQuery } from '../apis/queries/useHouseTemplatesQuery';
-import {
-  getRecentFloorPlanForAnalytics,
-  useRecentFloorPlanQuery,
-} from '../apis/queries/useRecentFloorPlanQuery';
 import { FILTER_CATEGORIES } from '../constants/floorPlanFilters';
 import { useFloorPlanRatioStore } from '../stores/useFloorPlanRatioStore';
 import { useFloorPlanStore } from '../stores/useFloorPlanStore';

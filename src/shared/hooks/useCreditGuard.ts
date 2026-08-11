@@ -2,10 +2,10 @@ import { createElement, useCallback, useState } from 'react';
 
 import { overlay } from 'overlay-kit';
 
-import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
-
 import { reportError, reportMessage } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
+
+import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 
 import CreditRequestPopup from '@components/popup/CreditRequestPopup';
 

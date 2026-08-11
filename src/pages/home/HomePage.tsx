@@ -6,8 +6,6 @@ import {
   trackHomeTapExploreClick,
   trackHomeTapShopClick,
 } from '@pages/home/analytics/homeAnalytics';
-import { useRecentFloorPlanQuery } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
-import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuery';
 
 import { ROUTES } from '@routes/paths';
 
@@ -23,6 +21,9 @@ import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+
+import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
+import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 
 import MenuTab from '@components/menuTab/MenuTab';
 import LogoNavBar from '@components/navBar/LogoNavBar';

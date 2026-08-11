@@ -10,14 +10,14 @@ import {
   trackHomeSpaceMoreCardClick,
   trackHomeSpaceMoreClick,
 } from '@pages/home/analytics/homeAnalytics';
-import { getHouseTemplateDetail } from '@pages/imageSetup/apis/queries/useHouseTemplateDetailQuery';
-import { useHouseTemplatesQuery } from '@pages/imageSetup/apis/queries/useHouseTemplatesQuery';
 
 import { ROUTES } from '@routes/paths';
 
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
+import { getHouseTemplateDetail } from '@apis/queries/useHouseTemplateDetailQuery';
+import { useHouseTemplatesQuery } from '@apis/queries/useHouseTemplatesQuery';
 
 import TextButton from '@components/btnText/TextButton';
 import RoomTypeCard from '@components/roomTypeCard/RoomTypeCard';

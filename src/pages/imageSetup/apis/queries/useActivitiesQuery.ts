@@ -4,9 +4,8 @@ import type { ActivityFurnitureMappingsResponse } from '@apis/__generated__/data
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
+import { STATIC_DATA_QUERY_OPTIONS } from '@constants/cache';
 import { queryKeys } from '@constants/queryKey';
-
-import { STATIC_DATA_QUERY_OPTIONS } from '../../constants/cache';
 
 export const getActivities =
   async (): Promise<ActivityFurnitureMappingsResponse> => {

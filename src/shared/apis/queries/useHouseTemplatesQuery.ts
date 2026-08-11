@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { STATIC_DATA_QUERY_OPTIONS } from '@pages/imageSetup/constants/cache';
+import type { FloorPlanFilters } from '@shared/types/floorPlan';
 
 import type { ExploreHouseTemplateListResponse } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
+import { STATIC_DATA_QUERY_OPTIONS } from '@constants/cache';
 import { queryKeys } from '@constants/queryKey';
-
-import type { FloorPlanFilters } from '../../types/floorPlan';
 
 interface HouseTemplatesParams extends Partial<FloorPlanFilters> {
   size?: number;

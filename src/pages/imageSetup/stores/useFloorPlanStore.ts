@@ -15,7 +15,10 @@
 // zustand 사용: 4개 컴포넌트(도면 그리드, 필터 3개)가 동일 상태를 읽고 써야함 + prop drilling 방지
 import { create } from 'zustand';
 
-import { DEFAULT_FILTERS, type FloorPlanFilters } from '../types/floorPlan';
+import {
+  DEFAULT_FILTERS,
+  type FloorPlanFilters,
+} from '@shared/types/floorPlan';
 
 // 도면 선택 상태 초기값 — selectNewFloorPlan, clearFloorPlan, closeFloorPlanSheet, reset에서 반복 사용
 const INITIAL_SELECTION = {
