@@ -22,7 +22,7 @@ export const textbox = style({
   padding: `${unitVars.unit.gapPadding['300']} ${unitVars.unit.gapPadding['500']}`,
   ...fontVars.font.title_sb_20,
   width: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
   textAlign: 'center',
 });
 
@@ -46,7 +46,7 @@ export const imgbox = style({
 export const loginImg = style({
   width: '37.5rem',
   height: '37.5rem',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const aside = style({

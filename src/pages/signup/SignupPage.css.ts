@@ -32,7 +32,7 @@ export const container = style({
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['600'],
   width: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const title = style({

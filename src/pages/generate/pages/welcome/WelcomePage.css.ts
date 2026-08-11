@@ -18,7 +18,7 @@ export const contents = style({
   gap: unitVars.unit.gapPadding['200'],
   background: colorVars.color.bg.primary,
   padding: `${unitVars.unit.gapPadding['500']} ${unitVars.unit.gapPadding['000']}`,
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const imgbox = style({
@@ -42,7 +42,7 @@ export const textbox = style({
   padding: `${unitVars.unit.gapPadding['300']} ${unitVars.unit.gapPadding['500']}`,
   ...fontVars.font.title_sb_20,
   width: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
   textAlign: 'center',
 });
 

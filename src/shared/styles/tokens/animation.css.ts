@@ -13,7 +13,7 @@ const fadeInUp = keyframes({
 
 // 애니메이션 토큰
 export const animationTokens = {
-  fadeInUpFast: `${fadeInUp} 0.8s ease-out forwards`,
+  fadeInUp: `${fadeInUp} 0.8s ease-out forwards`,
   skeletonWave: keyframes({
     to: { backgroundPositionX: '-200%' },
   }),

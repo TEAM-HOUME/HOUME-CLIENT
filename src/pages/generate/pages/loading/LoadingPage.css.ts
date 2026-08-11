@@ -18,7 +18,7 @@ export const wrapper = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${unitVars.unit.gapPadding['000']} ${unitVars.unit.gapPadding['500']} ${unitVars.unit.gapPadding['800']}`,
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const carouselSection = style({
