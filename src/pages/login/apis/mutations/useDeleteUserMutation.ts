@@ -35,8 +35,5 @@ export const useDeleteUserMutation = () => {
         sessionStorage.clear();
       }, 100);
     },
-    onError: (error) => {
-      console.error('회원탈퇴 실패:', error);
-    },
   });
 };

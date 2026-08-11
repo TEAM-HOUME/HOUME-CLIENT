@@ -62,9 +62,3 @@ export const toastStyle: CSSProperties = {
   backgroundColor: 'transparent',
   width: '100%',
 };
-
-export const testStyle = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1.2rem',
-});

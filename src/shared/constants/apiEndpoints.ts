@@ -49,9 +49,8 @@ export const API_ENDPOINT = {
       `/api/v1/generated-images/${imageId}/preference/factors/${factorId}`,
     CURATION_CATEGORIES: (imageId: number) =>
       `/api/v1/generated-images/${imageId}/curations/categories`, // ONNX 객체 인식 큐레이션 — 복구 파일 useGeneratedCategoriesQuery가 사용
-    CURATION_CATEGORIES_V2: (
-      imageId: number // b-2 추천형 (객체 인식 X)
-    ) => `/api/v2/generated-images/${imageId}/curations/categories`,
+    CURATION_CATEGORIES_V2: (imageId: number) =>
+      `/api/v2/generated-images/${imageId}/curations/categories`, // b-2 추천형 (객체 인식 X)
     CURATION_PRODUCTS: (imageId: number, categoryId: number) =>
       `/api/v1/generated-images/${imageId}/curations/products/${categoryId}`,
     JJYM_V2: (rawProductId: number) =>
@@ -68,11 +67,3 @@ export const API_ENDPOINT = {
     STYLE_DETAIL: (styleId: number) => `/api/v1/other-styles/${styleId}`,
   },
 } as const;
-
-// 헬퍼 타입: 중첩된 객체의 모든 리프(leaf) 값들을 추출
-export type DeepValues<T> = T extends object
-  ? { [K in keyof T]: DeepValues<T[K]> }[keyof T]
-  : T;
-
-// 자동으로 모든 엔드포인트 문자열 추출
-export type ApiEndpoint = DeepValues<typeof API_ENDPOINT>;

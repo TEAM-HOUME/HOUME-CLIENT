@@ -26,6 +26,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
+import { reportMessage } from '@shared/monitoring/report';
+import { MONITORING_SCOPE } from '@shared/monitoring/scope';
+
 import Loading from '@components/loading/Loading';
 
 import { SIGNUP_EXIT_MODAL_PENDING_KEY } from '@hooks/useBrowserBackTrap';
@@ -40,7 +43,7 @@ const KakaoCallbackPage = () => {
   const navigate = useNavigate();
 
   // Tanstack Query - useKakaoLoginMutation 훅 호출
-  const { mutate: kakaoLogin, isPending } = useKakaoLoginMutation();
+  const { mutate: kakaoLogin } = useKakaoLoginMutation();
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -78,18 +81,18 @@ const KakaoCallbackPage = () => {
       // 로그인 성공/실패 핸들링 로직은 mutation 선언부에서 처리
       kakaoLogin({ code, env });
     } else {
-      // 인가 코드 없이 콜백에 도달한 비정상 진입 — API 호출 전 플로우 에러라
-      // 중앙 에러 경로(axios·queryClient)가 잡을 수 없어 이 지점에서 직접 처리
-      console.error('[login] 카카오 콜백 URL에 인가 코드가 없습니다');
+      // 인가 코드 없이 콜백에 도달한 비정상 진입 — API 호출 전 플로우 분기라
+      // 중앙 에러 경로(axios·queryClient)가 잡을 수 없어 이 지점에서 계측·처리
+      reportMessage('kakao callback missing auth code', {
+        scope: MONITORING_SCOPE.AUTH,
+        level: 'warning',
+        fingerprint: ['kakao-callback', 'missing-code'],
+      });
       setTimeout(() => {
         navigate(ROUTES.LOGIN);
       }, 1000);
     }
   }, [kakaoLogin, navigate]);
-
-  if (isPending) {
-    return <Loading />;
-  }
 
   return <Loading />;
 };

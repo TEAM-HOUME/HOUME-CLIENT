@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
@@ -70,7 +70,6 @@ const SettingPage = () => {
   const navigate = useNavigate();
   const { mutate: logout } = useLogoutMutation();
   const { mutate: deleteUser } = useDeleteUserMutation();
-  const logoutTimerRef = useRef<number | null>(null);
 
   useAnalyticsPageView(
     GA_EVENTS.setting.PAGE_VIEW,
@@ -96,17 +95,11 @@ const SettingPage = () => {
     // 보호 라우트 리다이렉트 경쟁을 피하기 위해 먼저 홈으로 이동
     navigate(ROUTES.HOME, { replace: true });
 
-    // 기존 타이머가 있으면 제거하고, 새 타이머로 갱신
-    if (logoutTimerRef.current !== null) {
-      window.clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-
-    logoutTimerRef.current = window.setTimeout(() => {
-      // 전역 훅(useLogoutMutation)이 onSettled에서 홈으로 이동 처리함
+    // 홈 이동이 커밋된 뒤 인증을 해제해야 보호 라우트 가드와 경쟁하지 않는다
+    // (navigate 직후 페이지가 언마운트되므로 중복 클릭 방어는 불필요)
+    window.setTimeout(() => {
       logout();
-      logoutTimerRef.current = null; // 실행 후 레퍼런스 정리
-    }, 1000); // 1초 후 로그아웃 실행
+    }, 1000);
   };
 
   const handleWithdraw = () => {

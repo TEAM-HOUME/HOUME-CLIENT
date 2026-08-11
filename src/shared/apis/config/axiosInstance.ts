@@ -17,7 +17,10 @@ const axiosInstance = axios.create({
 });
 
 // 인증 제외 API 경로 (Authorization 헤더 제거 대상)
-const EXCLUDE_AUTH_URLS = ['/oauth/kakao', '/oauth/kakao/callback'];
+const EXCLUDE_AUTH_URLS: string[] = [
+  API_ENDPOINT.AUTH.KAKAO_AUTH,
+  API_ENDPOINT.AUTH.KAKAO_CALLBACK,
+];
 
 // 요청 시 accessToken 자동 삽입
 axiosInstance.interceptors.request.use((config) => {
