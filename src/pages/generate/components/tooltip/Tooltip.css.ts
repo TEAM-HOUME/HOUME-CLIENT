@@ -65,7 +65,6 @@ export const arrow = style({
   bottom: '-0.78rem',
   left: '50%',
   transform: 'translateX(-50%)',
-  color: colorVars.color.fill.secondary,
 });
 
 export const arrowIcon = style({

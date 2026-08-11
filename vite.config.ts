@@ -4,7 +4,6 @@ import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import svgr from 'vite-plugin-svgr';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,14 +11,6 @@ export default defineConfig({
   plugins: [
     react(),
     vanillaExtractPlugin(),
-    svgr({
-      svgrOptions: {
-        plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
-        svgoConfig: {
-          floatPrecision: 2,
-        },
-      },
-    }),
     // 프로덕션 빌드 시 source map을 Sentry에 업로드 (auth token이 있을 때만 동작)
     sentryVitePlugin({
       org: process.env.SENTRY_ORG,
