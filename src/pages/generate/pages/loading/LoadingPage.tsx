@@ -56,7 +56,7 @@ import { useGenerateImageRequest } from './hooks/useGenerateImageRequest';
 import { useGenerateStallWatchdog } from './hooks/useGenerateStallWatchdog';
 import * as styles from './LoadingPage.css';
 import ProgressBar from './ProgressBar';
-import { usePostCarouselLikeMutation } from '../../apis/mutations/useCarouselLikeMutation';
+import { useCarouselLikeMutation } from '../../apis/mutations/useCarouselLikeMutation';
 import Tooltip from '../../components/tooltip/Tooltip';
 
 const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
@@ -222,7 +222,7 @@ const LoadingPage = () => {
 
   // 스택 UI 좋아요 (찜하기 연동됨)
   const { mutate: postLike, isPending: isJjymLoading } =
-    usePostCarouselLikeMutation();
+    useCarouselLikeMutation();
 
   const notifyImageGenerationError = useCallback(() => {
     notify({

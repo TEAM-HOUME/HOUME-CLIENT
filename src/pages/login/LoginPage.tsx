@@ -15,7 +15,7 @@ import DotLottiePlayer from '@components/lottie/DotLottiePlayer';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 
-import * as styles from './loginPage.css';
+import * as styles from './LoginPage.css';
 import { getAuthEnvironment } from './utils/environment';
 
 const LoginPage = () => {

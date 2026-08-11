@@ -14,7 +14,7 @@ import {
 } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
-import { useGetStyleListQuery } from '@apis/queries/useGetStyleQuery';
+import { useStyleListQuery } from '@apis/queries/useStyleListQuery';
 
 import FallbackImage from '@assets/images/bannerFallback.svg';
 
@@ -35,7 +35,7 @@ const StyleListPage = () => {
     isFetching,
     isError,
     refetch,
-  } = useGetStyleListQuery();
+  } = useStyleListQuery();
 
   const isDataReady = !isFetching && !isError;
 

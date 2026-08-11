@@ -21,7 +21,7 @@ export const getStyleList = async (
 
 type OtherStyleItem = OtherStyleResponse & { id: number };
 
-export const useGetStyleListQuery = (size?: number) => {
+export const useStyleListQuery = (size?: number) => {
   return useQuery({
     queryKey: queryKeys.styles.list(size),
     queryFn: () => getStyleList(size),

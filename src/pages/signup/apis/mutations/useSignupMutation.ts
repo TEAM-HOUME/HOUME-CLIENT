@@ -45,7 +45,7 @@ export const postSignup = async (
   };
 };
 
-export const usePostSignupMutation = () => {
+export const useSignupMutation = () => {
   const navigate = useNavigate();
   const { notify } = useToast();
   const setUserName = useUserStore((state) => state.setUserName);
@@ -68,13 +68,13 @@ export const usePostSignupMutation = () => {
     },
     onError: (error) => {
       if (import.meta.env.DEV && isAxiosError(error)) {
-        console.error('[usePostSignupMutation] 회원가입 실패:', {
+        console.error('[useSignupMutation] 회원가입 실패:', {
           status: error.response?.status,
           message: error.response?.data?.message,
           data: error.response?.data,
         });
       } else {
-        console.error('[usePostSignupMutation] 회원가입 실패:', error);
+        console.error('[useSignupMutation] 회원가입 실패:', error);
       }
 
       // 가입 실패 시 시작점 복귀 + 에러 토스트

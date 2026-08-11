@@ -4,7 +4,7 @@ import * as styles from './ProgressBar.css';
 import { PROGRESS_CONFIG } from '../../constants/progressConfig';
 import { useGenerateStore } from '../../stores/useGenerateStore';
 
-interface ProgressLoadingBarProps {
+interface ProgressBarProps {
   onComplete?: () => void;
 }
 
@@ -16,7 +16,7 @@ const LOADING_MESSAGES = [
 
 const MESSAGE_ROTATION_INTERVAL = 3000; // 3초
 
-const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
+const ProgressBar = ({ onComplete }: ProgressBarProps) => {
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
@@ -118,4 +118,4 @@ const ProgressLoadingBar = ({ onComplete }: ProgressLoadingBarProps) => {
   );
 };
 
-export default ProgressLoadingBar;
+export default ProgressBar;

@@ -15,7 +15,7 @@ export const getGeneratedImageList =
     });
   };
 
-export const useGetGeneratedImageListQuery = () => {
+export const useGeneratedImageListQuery = () => {
   return useQuery<MyPageGeneratedImageV2Response>({
     queryKey: queryKeys.mypage.images(),
     queryFn: getGeneratedImageList,

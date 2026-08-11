@@ -17,8 +17,6 @@ import {
   trackRoomTypeViewSheetSubmit,
   trackRoomTypeViewSheetView,
 } from '@pages/imageSetup/analytics/roomTypeAnalytics';
-import { fetchHouseTemplateDetail } from '@pages/imageSetup/apis/queries/useHouseTemplateDetailQuery';
-import { ensureRecentFloorPlanForAnalytics } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
 import { useFloorPlanSelect } from '@pages/imageSetup/hooks/useFloorPlanSelect';
 import { useFloorPlanStore } from '@pages/imageSetup/stores/useFloorPlanStore';
 import type {
@@ -32,6 +30,9 @@ import {
   useScrollDepthTrack,
 } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
+
+import { fetchHouseTemplateDetail } from '@apis/queries/useHouseTemplateDetailQuery';
+import { ensureRecentFloorPlanForAnalytics } from '@apis/queries/useRecentFloorPlanQuery';
 
 export const useRoomTypeAnalytics = (
   context: ImageSetupSteps['FloorPlanSelect'],

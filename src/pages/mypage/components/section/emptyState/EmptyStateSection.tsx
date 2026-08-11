@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useMypageEmptyStateAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQuery';
+import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { ROUTES } from '@routes/paths';
 
@@ -21,7 +21,7 @@ interface EmptyStateSectionProps {
 const EmptyStateSection = ({ type }: EmptyStateSectionProps) => {
   const navigate = useNavigate();
   const { data: savedItems = [], isFetched: isJjymFetched } =
-    useGetJjymListQuery();
+    useJjymListQuery();
 
   const { wrapPrimaryClick, wrapSecondaryClick } = useMypageEmptyStateAnalytics(
     {

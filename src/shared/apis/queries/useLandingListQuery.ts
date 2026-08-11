@@ -14,7 +14,7 @@ export const getLandingList = async (): Promise<LandingListResponse> => {
   });
 };
 
-export const useLandingQuery = () => {
+export const useLandingListQuery = () => {
   return useQuery({
     queryKey: queryKeys.landing.all,
     queryFn: getLandingList,

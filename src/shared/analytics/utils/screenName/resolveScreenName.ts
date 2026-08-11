@@ -1,8 +1,8 @@
-import { FUNNEL_ID } from '@pages/imageSetup/constants/funnel';
-
 import { ROUTES } from '@routes/paths';
 
 import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';
+
+import { FUNNEL_ID } from '@constants/funnel';
 
 const FUNNEL_STEP_PARAM = `${FUNNEL_ID}.step`;
 

@@ -1,10 +1,10 @@
+import type { FilterCategory, FloorPlanFilters } from '@shared/types/floorPlan';
+
 import CloseBottomSheet from '@components/bottomSheet/CloseBottomSheet';
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Chip from '@components/chip/Chip';
 
 import * as styles from './FilterSheet.css';
-
-import type { FilterCategory, FloorPlanFilters } from '../../types/floorPlan';
 
 interface FilterSheetProps {
   open: boolean;

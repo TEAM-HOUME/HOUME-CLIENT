@@ -9,8 +9,6 @@ import {
   trackBannerDetailCtaClick,
   type BannerDetailContext,
 } from '@pages/banner/analytics/bannerDetailAnalytics';
-import { useBannerDetailQuery } from '@pages/home/apis/queries/useBannerDetailQuery';
-import { useRecentFloorPlanQuery } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
 
 import { ROUTES } from '@routes/paths';
 
@@ -25,6 +23,8 @@ import {
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
 
+import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
+
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import InlineError from '@components/inlineError/InlineError';
@@ -34,6 +34,7 @@ import StyleCard from '@components/styleCard/StyleCard';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 
+import { useBannerDetailQuery } from './apis/queries/useBannerDetailQuery';
 import * as styles from './BannerDetailPage.css';
 
 const BannerDetailPage = () => {

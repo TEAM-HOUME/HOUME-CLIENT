@@ -1,6 +1,6 @@
 import { useFunnel } from '@use-funnel/react-router';
 
-import { FUNNEL_ID } from '../constants/funnel';
+import { FUNNEL_ID } from '@constants/funnel';
 
 import type { ImageSetupSteps } from '../types/funnel/steps';
 

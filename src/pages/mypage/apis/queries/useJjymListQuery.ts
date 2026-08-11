@@ -22,7 +22,7 @@ type GetJjymListQueryOptions = Omit<
   'queryKey' | 'queryFn' | 'select'
 >;
 
-export const useGetJjymListQuery = (options?: GetJjymListQueryOptions) => {
+export const useJjymListQuery = (options?: GetJjymListQueryOptions) => {
   return useQuery({
     queryKey: queryKeys.mypage.jjymList(),
     queryFn: getJjymList,

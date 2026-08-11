@@ -14,7 +14,7 @@ export const postCarouselLike = async (rawProductId: number): Promise<void> => {
   });
 };
 
-export const usePostCarouselLikeMutation = () => {
+export const useCarouselLikeMutation = () => {
   return useMutation({
     mutationFn: postCarouselLike,
     onSuccess: () => {

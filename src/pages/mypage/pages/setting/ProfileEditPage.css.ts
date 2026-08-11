@@ -6,65 +6,58 @@ import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
 import { unitVars } from '@styles/tokens/unit.css';
 
+// SignupPage.css.ts와 동일한 폼 레이아웃 — cross-feature css 재사용을 끊기 위해 값 그대로 복사 (PR #656)
+export const wrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: unitVars.unit.gapPadding['700'],
+  padding: unitVars.unit.gapPadding['500'],
+  width: '100%',
+});
+
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  background: colorVars.color.bg.primary,
+  justifyContent: 'center',
+  gap: unitVars.unit.gapPadding['600'],
   width: '100%',
-  height: '100%',
-});
-
-export const contents = style({
-  gap: unitVars.unit.gapPadding['200'],
-  background: colorVars.color.bg.primary,
-  padding: `${unitVars.unit.gapPadding['500']} ${unitVars.unit.gapPadding['000']}`,
   animation: animationTokens.fadeInUp,
 });
 
-export const imgbox = style({
-  display: 'flex',
-  justifyContent: 'center',
-  width: '100%',
-});
-
-export const signupLottie = style({
-  width: '37.5rem',
-  height: '37.5rem',
-});
-
-export const textbox = style({
+export const fieldbox = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: unitVars.unit.gapPadding['300'],
-  marginTop: unitVars.unit.gapPadding['200'],
-  padding: `${unitVars.unit.gapPadding['300']} ${unitVars.unit.gapPadding['500']}`,
-  ...fontVars.font.title_sb_20,
   width: '100%',
-  animation: animationTokens.fadeInUp,
-  textAlign: 'center',
 });
 
-export const title = style({
-  ...fontVars.font.title_sb_20,
+export const fieldtitle = style({
+  marginBottom: unitVars.unit.gapPadding['300'],
+  padding: unitVars.unit.gapPadding['100'],
+  ...fontVars.font.title_sb_16,
+  width: '100%',
   color: colorVars.color.text.primary,
 });
 
-export const content = style({
-  ...fontVars.font.body_r_14,
-  color: colorVars.color.text.secondary,
+export const flexbox = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: unitVars.unit.gapPadding['200'],
+  width: '100%',
 });
 
 export const btnarea = style({
   position: 'fixed',
   bottom: '0',
+  left: '50%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['100'],
+  transform: 'translateX(-50%)',
   background: bottomFadeGradient,
   padding: unitVars.unit.gapPadding['500'],
   width: '100%',

@@ -12,7 +12,7 @@ export const getRandomNickname = async (): Promise<string> => {
   });
 };
 
-export const useGetRandomNicknameQuery = () => {
+export const useRandomNicknameQuery = () => {
   return useQuery({
     queryKey: queryKeys.signup.randomNickname(),
     queryFn: () => getRandomNickname(),

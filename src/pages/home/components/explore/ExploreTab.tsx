@@ -9,17 +9,18 @@ import {
 import Banner, {
   type BannerSlide,
 } from '@pages/home/components/explore/banner/Banner';
-import { useLandingQuery } from '@pages/landing/apis/queries/useLandingQuery';
 
 import { ROUTES } from '@routes/paths';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 
+import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
+
 import promoBanner from '@assets/images/PromoBanner.svg';
 
 import * as styles from './ExploreTab.css';
-import RoomTypeSection from './RoomTypeSection/RoomTypeSection';
-import StyleSection from './StyleSection/StyleSection';
+import RoomTypeSection from './roomTypeSection/RoomTypeSection';
+import StyleSection from './styleSection/StyleSection';
 
 type ExploreTabProps = {
   exploreSeedBannerId?: number;
@@ -35,7 +36,7 @@ const ExploreTab = ({
   hasPreviousSpace = false,
 }: ExploreTabProps) => {
   const navigate = useNavigate();
-  const { data: landingData } = useLandingQuery();
+  const { data: landingData } = useLandingListQuery();
 
   const seedBannerId = useMemo(() => {
     if (exploreSeedBannerId != null && exploreSeedBannerId > 0) {

@@ -19,7 +19,7 @@ import {
 import { queryClient } from '@apis/config/queryClient';
 
 import AppErrorFallback from '@components/errorFallback/AppErrorFallback';
-import MainToaster from '@components/toast/Sonner';
+import MainToaster from '@components/toast/MainToaster';
 import '@styles/global.css';
 
 import App from './App';

@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import { overlay } from 'overlay-kit';
 import { useNavigate } from 'react-router-dom';
 
-import { useDeleteUserMutation } from '@pages/login/apis/mutations/useDeleteUserMutation';
-import { useLogoutMutation } from '@pages/login/apis/mutations/useLogoutMutation';
 import {
   getSettingPageViewParams,
   trackSettingLogoutClick,
   trackSettingSuccessionClick,
   trackSettingSuccessionModalView,
 } from '@pages/mypage/analytics/settingAnalytics';
+import { useDeleteUserMutation } from '@pages/mypage/apis/mutations/useDeleteUserMutation';
+import { useLogoutMutation } from '@pages/mypage/apis/mutations/useLogoutMutation';
 
 import { ROUTES } from '@routes/paths';
 

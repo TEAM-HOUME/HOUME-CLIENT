@@ -1,4 +1,4 @@
-import type { FilterCategory } from '../types/floorPlan';
+import type { FilterCategory } from '@shared/types/floorPlan';
 
 /**
  * 도면 필터 카테고리 정의

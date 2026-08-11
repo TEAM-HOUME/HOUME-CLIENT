@@ -1,11 +1,11 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
+import type { MyPageUserResponse } from '@shared/types/user';
+
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
-
-import type { MyPageUserResponse } from '../../types/apis/userData';
 
 type MyPageUserData = MyPageUserResponse['data'];
 type UseMyPageUserOptions = Omit<
