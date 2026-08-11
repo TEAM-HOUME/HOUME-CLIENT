@@ -88,9 +88,7 @@ const KakaoCallbackPage = () => {
         level: 'warning',
         fingerprint: ['kakao-callback', 'missing-code'],
       });
-      setTimeout(() => {
-        navigate(ROUTES.LOGIN);
-      }, 1000);
+      navigate(ROUTES.LOGIN, { replace: true });
     }
   }, [kakaoLogin, navigate]);
 
