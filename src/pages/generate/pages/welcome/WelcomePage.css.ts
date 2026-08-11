@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
+import { bottomFadeGradient } from '@styles/gradients';
 import { animationTokens } from '@styles/tokens/animation.css';
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
@@ -64,7 +65,7 @@ export const btnarea = style({
   alignItems: 'center',
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['100'],
-  background: `linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)`,
+  background: bottomFadeGradient,
   padding: unitVars.unit.gapPadding['500'],
   width: '100%',
   maxWidth: unitVars.unit.dimension.wMax,

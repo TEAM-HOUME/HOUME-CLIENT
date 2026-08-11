@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
+import { bottomFadeGradient } from '@styles/gradients';
 import { animationTokens } from '@styles/tokens/animation.css';
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
@@ -68,7 +69,7 @@ export const btnarea = style({
   alignItems: 'center',
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['200'],
-  background: `linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)`,
+  background: bottomFadeGradient,
   padding: unitVars.unit.gapPadding['500'],
   width: '100%',
   maxWidth: unitVars.unit.dimension.wMax,
@@ -90,6 +91,7 @@ export const btn = style({
   ...pressInteraction(0.97),
   border: 'none',
   borderRadius: unitVars.unit.radius.full,
+  // 카카오 브랜드 가이드 색 — 디자인 토큰에 없는 외부 브랜드 값이라 리터럴 유지
   backgroundColor: '#FEE500',
 
   padding: `${unitVars.unit.gapPadding['400']} ${unitVars.unit.gapPadding['600']}`,
