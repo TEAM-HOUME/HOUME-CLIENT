@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import type { LogoutResponse } from '@pages/login/types/auth';
+import type { LogoutResponse } from '@pages/mypage/types/apis/auth';
 
 import { ROUTES } from '@routes/paths';
 
