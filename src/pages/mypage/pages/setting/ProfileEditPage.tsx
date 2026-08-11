@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { trackEditProfileCtaClick } from '@pages/mypage/analytics/editProfileAnalytics';
 import { useEditProfileMutation } from '@pages/mypage/apis/mutations/useEditProfileMutation';
 import { useMyPageProfileQuery } from '@pages/mypage/apis/queries/useEditProfileQuery';
-import * as styles from '@pages/signup/SignupPage.css';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
@@ -22,6 +21,8 @@ import { ERROR_MESSAGES } from '@constants/clientErrorMessage';
 
 import { useRandomNickname } from '@hooks/useGetRandomNickname';
 import useUserForm from '@hooks/useUserForm';
+
+import * as styles from './ProfileEditPage.css';
 
 const ProfileEditPage = () => {
   const { data: profile, isPending: isProfilePending } =

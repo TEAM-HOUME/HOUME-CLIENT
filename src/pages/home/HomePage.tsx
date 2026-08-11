@@ -21,6 +21,7 @@ import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import type { HomeLocationState, HomeTab } from '@shared/types/tabNavigation';
 
 import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
@@ -33,13 +34,6 @@ import { setLoginRedirect } from '@utils/loginRedirect';
 import ExploreTab from './components/explore/ExploreTab';
 import ProductTab from './components/product/ProductTab';
 import * as styles from './HomePage.css';
-
-export type HomeMenuTab = 'explore' | 'product';
-
-export type HomeLocationState = {
-  activeTab?: HomeMenuTab;
-  exploreSeedBannerId?: number;
-};
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -62,7 +56,7 @@ const HomePage = () => {
     );
   }, []);
 
-  const [activeMenuTab, setActiveMenuTab] = useState<HomeMenuTab>(
+  const [activeMenuTab, setActiveMenuTab] = useState<HomeTab>(
     tabParam === 'product' || tabParam === 'explore'
       ? tabParam
       : (homeState?.activeTab ??
@@ -86,7 +80,7 @@ const HomePage = () => {
   });
 
   // 탭 전환 시 URL ?tab= 에 반영 → 로그인 게이트로 이탈했다 복귀해도 같은 탭으로 돌아옴
-  const handleTabChange = (tab: HomeMenuTab) => {
+  const handleTabChange = (tab: HomeTab) => {
     if (tab === 'explore' && activeMenuTab !== 'explore') {
       trackHomeTapExploreClick();
     }
