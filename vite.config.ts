@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import path from 'path';
 
 import { sentryVitePlugin } from '@sentry/vite-plugin';
@@ -42,29 +41,6 @@ export default defineConfig({
   },
   server: {
     host: true,
-  },
-  test: {
-    projects: [
-      {
-        // 테스트 환경 구축에 필요한 설정들
-        extends: true, // vanillaExtractPlugin 등 Vite 플러그인 상속 (.css.ts import 동작에 필요)
-        test: {
-          name: 'unit',
-          include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-          environment: 'jsdom', // React 컴포넌트 렌더링에 필요한 브라우저 DOM 환경
-          globals: true, // describe/it/expect를 import 없이 사용
-          setupFiles: ['vitest.setup.ts'], // jest-dom 매처 등록 + cleanup 설정
-        },
-      },
-    ],
-    // 테스트 커버리지 확인용
-    coverage: {
-      provider: 'v8',
-      include: ['src/**/*.ts', 'src/**/*.tsx'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.css.ts'],
-      reporter: ['text', 'html'],
-      reportsDirectory: './coverage',
-    },
   },
   resolve: {
     alias: {
