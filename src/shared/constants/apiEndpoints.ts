@@ -47,6 +47,8 @@ export const API_ENDPOINT = {
     FACTORS: '/api/v1/factors',
     FACTOR_PREFERENCE: (imageId: number, factorId: number) =>
       `/api/v1/generated-images/${imageId}/preference/factors/${factorId}`,
+    CURATION_CATEGORIES: (imageId: number) =>
+      `/api/v1/generated-images/${imageId}/curations/categories`, // ONNX 객체 인식 큐레이션 — 복구 파일 useGeneratedCategoriesQuery가 사용
     CURATION_CATEGORIES_V2: (
       imageId: number // b-2 추천형 (객체 인식 X)
     ) => `/api/v2/generated-images/${imageId}/curations/categories`,
