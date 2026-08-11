@@ -1,4 +1,4 @@
-import CtaButton from '@components/button/ctaButton/CtaButton';
+import ActionButton from '@components/button/actionButton/ActionButton';
 import ErrorIllustration from '@components/errorFallback/ErrorIllustration';
 
 import * as styles from './AppErrorFallback.css';
@@ -24,9 +24,9 @@ export default function AppErrorFallback() {
 
       {/* App-level crash 발생 시 앱 전체가 불안정한 상황 -> '다시 시도'보다는 '홈으로 돌아가기'가 적절*/}
       <section className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound" onClick={handleGoToHome}>
+        <ActionButton size="2XL" fullWidth onClick={handleGoToHome}>
           홈으로 돌아가기
-        </CtaButton>
+        </ActionButton>
       </section>
     </main>
   );

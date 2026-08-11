@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
-import CtaButton from '@components/button/ctaButton/CtaButton';
+import ActionButton from '@components/button/actionButton/ActionButton';
 import ErrorIllustration from '@components/errorFallback/ErrorIllustration';
 
 import * as styles from './RouteErrorFallback.css';
@@ -39,9 +39,9 @@ export default function RouteErrorFallback() {
       </section>
 
       <section className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound" onClick={handleGoToHome}>
+        <ActionButton size="2XL" fullWidth onClick={handleGoToHome}>
           홈으로 돌아가기
-        </CtaButton>
+        </ActionButton>
       </section>
     </main>
   );
