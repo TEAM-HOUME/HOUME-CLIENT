@@ -10,8 +10,9 @@ import { type CountTriggerEvent } from '@shared/analytics/params/shop';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { toSheetExpansionStatus } from '@shared/analytics/utils/imageFlow';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { resolveShopTriggerContext } from '@shared/analytics/utils/shop/resolveShopTriggerContext';
 import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+
+import { resolveShopTriggerContext } from './resolveShopTriggerContext';
 
 type FilterLabelMap = Record<string, string>;
 

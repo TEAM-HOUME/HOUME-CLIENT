@@ -19,10 +19,11 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import TitleNavBar from '@components/navBar/TitleNavBar';
 import Popup from '@components/popup/Popup';
 
+import { FUNNEL_STEP_PARAM } from '@constants/funnel';
+
 import { useExitBlocker } from '@hooks/useExitBlocker';
 
 import * as styles from './FunnelLayout.css';
-import { FUNNEL_STEP_PARAM } from '../../constants/funnel';
 import { useFloorPlanStore } from '../../stores/useFloorPlanStore';
 
 type FunnelStepKey = 'FloorPlanSelect' | 'InteriorStyle' | 'ActivityInfo';

@@ -28,9 +28,10 @@ import type { SelectedProduct } from '@pages/home/types/productTab';
 import { GA_EVENTS } from '@shared/analytics/events';
 import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { resolveShopImageEntryRoute } from '@shared/analytics/utils/shop/resolveShopEntryRoute';
 
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
+
+import { resolveShopImageEntryRoute } from './resolveShopEntryRoute';
 
 interface UseProductShopAnalyticsOptions {
   productCountViewed: number;

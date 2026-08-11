@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { runSerializedInferenceTask } from '@pages/generate/utils/inferenceTaskScheduler';
-
 import { OBJ365_MODEL_PATH } from '@shared/detection/constants';
 import type { FurnitureCategoryCode } from '@shared/detection/furnitureCategoryMapping';
 import { buildHotspotsPipeline } from '@shared/detection/hooks/furnitureHotspotPipeline';
@@ -13,6 +11,7 @@ import { useONNXModel } from '@shared/detection/hooks/useOnnxModel';
 import { useDetectionCacheStore } from '@shared/detection/stores/useDetectionCacheStore';
 import type { ProcessedDetections } from '@shared/detection/types';
 import { mapHotspotsToDetectedObjects } from '@shared/detection/utils/detectedObjectMapper';
+import { runSerializedInferenceTask } from '@shared/detection/utils/inferenceTaskScheduler';
 
 import type {
   DetectionPrefetchOptions,
