@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import Arrow from '@assets/icons/TooltipArrow.svg?react';
+import tooltipArrow from '@assets/images/TooltipArrow.svg';
 
 import IconButton from '@components/button/IconButton.tsx';
 
@@ -27,7 +27,7 @@ const Tooltip = ({ content, children, isOpen, onClose }: TooltipProps) => {
               aria-label="툴팁 닫기"
             />
             <span className={styles.arrow}>
-              <Arrow className={styles.arrowIcon} />
+              <img src={tooltipArrow} alt="" className={styles.arrowIcon} />
             </span>
           </div>
         </div>
