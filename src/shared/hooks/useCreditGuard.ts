@@ -6,10 +6,8 @@ import { useMyPageUserQuery } from '@pages/mypage/apis/queries/useMyPageUserQuer
 
 import { reportError, reportMessage } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
-import { TOAST_TYPE } from '@shared/types/toastLegacy';
 
-import { useToast } from '@components/toast/useToast';
-import CreditRequestPopup from '@components/v2/popup/CreditRequestPopup';
+import CreditRequestPopup from '@components/popup/CreditRequestPopup';
 
 interface CreditGuardReturn {
   checkCredit: () => Promise<boolean>;
@@ -33,9 +31,6 @@ export const useCreditGuard = (
 ): CreditGuardReturn => {
   // 사용자 데이터 조회 (실시간으로 API 호출)
   const { data: userData, isPending, refetch } = useMyPageUserQuery();
-
-  // 토스트 알림 훅
-  const { notify } = useToast();
 
   // 크레딧 확인 중 상태
   const [isChecking, setIsChecking] = useState(false);
@@ -82,10 +77,6 @@ export const useCreditGuard = (
           fingerprint: ['credit-guard', 'no-data'],
           context: { required_credits: requiredCredits },
         });
-        notify({
-          text: '정보를 불러올 수 없습니다.',
-          type: TOAST_TYPE.WARNING,
-        });
         return false;
       }
 
@@ -105,15 +96,11 @@ export const useCreditGuard = (
         tags: { step: 'credit_check' },
         context: { required_credits: requiredCredits },
       });
-      notify({
-        text: '크레딧 확인에 실패했습니다.',
-        type: TOAST_TYPE.WARNING,
-      });
       return false;
     } finally {
       setIsChecking(false);
     }
-  }, [isChecking, openCreditRequestPopup, requiredCredits, refetch, notify]);
+  }, [isChecking, openCreditRequestPopup, requiredCredits, refetch]);
 
   return {
     checkCredit,

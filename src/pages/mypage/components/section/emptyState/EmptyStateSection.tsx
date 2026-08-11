@@ -7,10 +7,10 @@ import { ROUTES } from '@routes/paths';
 
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import emptyImage from '@assets/v2/images/ImgEmpty.png';
+import emptyImage from '@assets/images/ImgEmpty.png';
 
-import TextButton from '@/shared/components/v2/btnText/TextButton';
-import ActionButton from '@/shared/components/v2/button/actionButton/ActionButton';
+import TextButton from '@components/btnText/TextButton';
+import ActionButton from '@components/button/actionButton/ActionButton';
 
 import * as styles from './EmptyStateSection.css';
 

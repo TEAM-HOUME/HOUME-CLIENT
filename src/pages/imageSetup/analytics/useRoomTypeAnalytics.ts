@@ -17,14 +17,14 @@ import {
   trackRoomTypeViewSheetSubmit,
   trackRoomTypeViewSheetView,
 } from '@pages/imageSetup/analytics/roomTypeAnalytics';
+import { fetchHouseTemplateDetail } from '@pages/imageSetup/apis/queries/useHouseTemplateDetailQuery';
+import { ensureRecentFloorPlanForAnalytics } from '@pages/imageSetup/apis/queries/useRecentFloorPlanQuery';
+import { useFloorPlanSelect } from '@pages/imageSetup/hooks/useFloorPlanSelect';
+import { useFloorPlanStore } from '@pages/imageSetup/stores/useFloorPlanStore';
 import type {
   CompletedFloorPlanSelect,
   ImageSetupSteps,
 } from '@pages/imageSetup/types/funnel/steps';
-import { fetchHouseTemplateDetail } from '@pages/imageSetup/v2/apis/queries/useHouseTemplateDetailQuery';
-import { ensureRecentFloorPlanForAnalytics } from '@pages/imageSetup/v2/apis/queries/useRecentFloorPlanQuery';
-import { useFloorPlanSelect } from '@pages/imageSetup/v2/hooks/useFloorPlanSelect';
-import { useFloorPlanStore } from '@pages/imageSetup/v2/stores/useFloorPlanStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {

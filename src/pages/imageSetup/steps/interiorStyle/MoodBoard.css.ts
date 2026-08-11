@@ -7,7 +7,7 @@ export const wrapper = style({
   alignItems: 'center',
   width: '100%',
   height: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const container = style({

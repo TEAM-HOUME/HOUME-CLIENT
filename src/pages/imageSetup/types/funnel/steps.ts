@@ -4,7 +4,7 @@ interface FloorPlan {
   floorPlanView: string; // ex: '창문뷰'
 }
 
-// Funnel Step 정의 (v2: HouseInfo + FloorPlan → FloorPlanSelect)
+// Funnel Step 정의 (HouseInfo·FloorPlan 단계를 FloorPlanSelect로 통합한 구조)
 export type ImageSetupSteps = {
   // FloorPlanSelect: 도면 선택 결과만 관리
   FloorPlanSelect: {

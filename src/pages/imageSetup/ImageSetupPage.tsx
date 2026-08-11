@@ -23,9 +23,9 @@ import { getLoginRedirect } from '@utils/loginRedirect';
 import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageSetup';
 import ActivityInfo from './steps/activityInfo/ActivityInfo';
+import FloorPlanSelectStep from './steps/floorPlanSelect/FloorPlanSelectStep';
 import InteriorStyle from './steps/interiorStyle/InteriorStyle';
-import FloorPlanSelectStep from './v2/steps/floorPlanSelect/FloorPlanSelectStep';
-import { useFloorPlanStore } from './v2/stores/useFloorPlanStore';
+import { useFloorPlanStore } from './stores/useFloorPlanStore';
 
 import type {
   CompletedFloorPlanSelect,

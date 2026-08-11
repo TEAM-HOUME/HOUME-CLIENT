@@ -9,11 +9,11 @@ import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
+import ProductCard from '@components/productCard/ProductCard';
+
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
 
 import { normalizeColorHexes } from '@utils/normalizeColorHexes';
-
-import ProductCard from '@/shared/components/v2/productCard/ProductCard';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';

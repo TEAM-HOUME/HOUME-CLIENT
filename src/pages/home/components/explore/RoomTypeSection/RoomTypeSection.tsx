@@ -10,8 +10,8 @@ import {
   trackHomeSpaceMoreCardClick,
   trackHomeSpaceMoreClick,
 } from '@pages/home/analytics/homeAnalytics';
-import { getHouseTemplateDetail } from '@pages/imageSetup/v2/apis/queries/useHouseTemplateDetailQuery';
-import { useHouseTemplatesQuery } from '@pages/imageSetup/v2/apis/queries/useHouseTemplatesQuery';
+import { getHouseTemplateDetail } from '@pages/imageSetup/apis/queries/useHouseTemplateDetailQuery';
+import { useHouseTemplatesQuery } from '@pages/imageSetup/apis/queries/useHouseTemplatesQuery';
 
 import { ROUTES } from '@routes/paths';
 
@@ -19,11 +19,10 @@ import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
 
-import RoomTypeCard from '@components/v2/roomTypeCard/RoomTypeCard';
+import TextButton from '@components/btnText/TextButton';
+import RoomTypeCard from '@components/roomTypeCard/RoomTypeCard';
 
 import { queryKeys } from '@constants/queryKey';
-
-import TextButton from '@/shared/components/v2/btnText/TextButton';
 
 import * as styles from './RoomTypeSection.css';
 

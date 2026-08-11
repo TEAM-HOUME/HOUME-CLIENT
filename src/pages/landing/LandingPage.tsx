@@ -14,10 +14,10 @@ import { useAnalyticsPageView } from '@shared/analytics/hooks';
 import { getLandingTestType } from '@shared/analytics/params/landing';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import ActionButton from '@shared/components/v2/button/actionButton/ActionButton';
-import LogoNavBar from '@shared/components/v2/navBar/LogoNavBar';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
 import OptimizedImage from '@components/image/OptimizedImage';
+import LogoNavBar from '@components/navBar/LogoNavBar';
 
 import { useABTest } from '@hooks/useABTest';
 

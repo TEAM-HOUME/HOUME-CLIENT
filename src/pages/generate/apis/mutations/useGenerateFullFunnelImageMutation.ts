@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 import type { GeneratedImagePayload } from '@pages/generate/types/generate';
-import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
 
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 

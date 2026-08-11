@@ -15,7 +15,7 @@ import { ROUTES } from '@routes/paths';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 
-import promoBanner from '@assets/v2/svg/PromoBanner.svg?url';
+import promoBanner from '@assets/icons/PromoBanner.svg?url';
 
 import * as styles from './ExploreTab.css';
 import RoomTypeSection from './RoomTypeSection/RoomTypeSection';

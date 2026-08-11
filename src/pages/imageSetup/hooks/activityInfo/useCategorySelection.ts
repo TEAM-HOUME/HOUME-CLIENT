@@ -2,7 +2,7 @@ import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import type { FurnitureCategoryGroup } from '@apis/__generated__/data-contracts';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 

@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const wrapper = style({
   display: 'flex',

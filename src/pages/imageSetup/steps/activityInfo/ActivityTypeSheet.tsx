@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import type { ActivityWithFurnitureResponse } from '@apis/__generated__/data-contracts';
 
-import DragHandleBottomSheet from '@components/v2/bottomSheet/DragHandleBottomSheet';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import Icon from '@components/v2/icon/Icon';
-import TextHeading from '@components/v2/textHeading/TextHeading';
+import DragHandleBottomSheet from '@components/bottomSheet/DragHandleBottomSheet';
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Icon from '@components/icon/Icon';
+import TextHeading from '@components/textHeading/TextHeading';
 
 import { getActivityIconName } from './activityIcons';
 import * as styles from './ActivityTypeSheet.css';

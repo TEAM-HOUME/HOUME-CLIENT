@@ -13,8 +13,8 @@ import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute'
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import MenuTab from '@components/v2/menuTab/MenuTab';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
+import MenuTab from '@components/menuTab/MenuTab';
+import TitleNavBar from '@components/navBar/TitleNavBar';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 

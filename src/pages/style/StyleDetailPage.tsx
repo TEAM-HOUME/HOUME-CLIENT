@@ -25,14 +25,14 @@ import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRou
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
-import FallbackImage from '@assets/v2/images/bannerFallback.svg';
+import FallbackImage from '@assets/images/bannerFallback.svg';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
-import ListCardProduct from '@components/v2/productCard/ListProductCard';
-import StyleCard from '@components/v2/styleCard/StyleCard';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import ListCardProduct from '@components/productCard/ListProductCard';
+import StyleCard from '@components/styleCard/StyleCard';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 

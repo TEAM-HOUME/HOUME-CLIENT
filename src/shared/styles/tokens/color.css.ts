@@ -1,13 +1,20 @@
 import { createGlobalTheme } from '@vanilla-extract/css';
 
-export const colorVars = createGlobalTheme(':root', {
+/**
+ * 디자인 토큰 - 색상
+ *
+ * 1) Primitives: 원시값만 정의 (grayscale, purple)
+ * 2) Semantics: Figma color-semantic → primitive의 var() 참조
+ */
+
+const primitives = createGlobalTheme(':root', {
   color: {
-    // Grayscale
-    gray999_50: 'rgba(0, 0, 0, 0.5)',
-    gray999_04: 'rgba(0, 0, 0, 0.04)',
-    gray999_30: 'rgba(0, 0, 0, 0.3)',
-    gray999_20: 'rgba(0, 0, 0, 0.2)',
     gray999: '#000000',
+    gray999_a80: 'rgba(0, 0, 0, 0.8)',
+    gray999_a50: 'rgba(0, 0, 0, 0.5)',
+    gray999_a30: 'rgba(0, 0, 0, 0.3)',
+    gray999_a10: 'rgba(0, 0, 0, 0.1)',
+    gray999_a04: 'rgba(0, 0, 0, 0.04)',
     gray900: '#1B1E22',
     gray800: '#31373F',
     gray700: '#48505B',
@@ -19,19 +26,70 @@ export const colorVars = createGlobalTheme(':root', {
     gray100: '#F3F4F7',
     gray050: '#F9FAFB',
     gray000: '#FFFFFF',
-    gray000_30: 'rgba(255, 255, 255, 0.3)',
+    gray000_a80: 'rgba(255, 255, 255, 0.8)',
+    gray000_a30: 'rgba(255, 255, 255, 0.3)',
 
-    // Brand Colors
-    primary: '#6F00FF',
-    primary_light1: '#A696FF',
-    primary_light2: '#E8E3FC',
-    primary_light3: '#EFEDFD',
-    primary_dark: '#5000B8',
-    bg_grad:
-      'linear-gradient(180deg, #A696FF -15.93%, #DDD6FF 7.25%, #FFF 42.03%, #FFF 100%)',
+    purple700: '#5000B8',
+    purple600: '#6F00FF',
+    purple500: '#A696FF',
+    purple300: '#E8E3FC',
+    purple200: '#EFEDFD',
 
-    // Feedback
-    error: '#FF0000',
-    error_light: '#FFF0F0',
+    red700: '#ED1212',
+    red600: '#FF4D4D',
   },
 });
+
+const semantics = createGlobalTheme(':root', {
+  semantic: {
+    bg: {
+      primary: primitives.color.gray000,
+    },
+    border: {
+      primary: primitives.color.gray300,
+      secondary: primitives.color.gray200,
+      tertiary: primitives.color.gray100,
+      strong: primitives.color.gray900,
+      weak: primitives.color.gray999_a10,
+    },
+    fill: {
+      brand: primitives.color.purple600,
+      danger: primitives.color.red600,
+      dim: primitives.color.gray999_a50,
+      dimSecondary: primitives.color.gray999_a30,
+      disabled: primitives.color.gray300,
+      inverse: primitives.color.gray000,
+      inverseSecondary: primitives.color.gray000_a80,
+      primary: primitives.color.gray900,
+      secondary: primitives.color.gray700,
+      strong: primitives.color.gray999,
+      tertiary: primitives.color.gray500,
+      weak: primitives.color.gray100,
+    },
+    shadow: {
+      bottomSheet: primitives.color.gray999_a04,
+    },
+    text: {
+      brand: primitives.color.purple600,
+      danger: primitives.color.red700,
+      disabled: primitives.color.gray300,
+      inverse: primitives.color.gray000,
+      inverseSecondary: primitives.color.gray000_a80,
+      primary: primitives.color.gray900,
+      secondary: primitives.color.gray700,
+      tertiary: primitives.color.gray500,
+    },
+  },
+});
+
+/** Primitives + Semantic */
+export const colorVars = {
+  color: {
+    ...primitives.color,
+    bg: semantics.semantic.bg,
+    border: semantics.semantic.border,
+    fill: semantics.semantic.fill,
+    shadow: semantics.semantic.shadow,
+    text: semantics.semantic.text,
+  },
+};

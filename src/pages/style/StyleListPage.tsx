@@ -16,12 +16,12 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
 import { useGetStyleListQuery } from '@apis/queries/useGetStyleQuery';
 
-import FallbackImage from '@assets/v2/images/bannerFallback.svg';
+import FallbackImage from '@assets/images/bannerFallback.svg';
 
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
-import StyleCard from '@components/v2/styleCard/StyleCard';
+import TitleNavBar from '@components/navBar/TitleNavBar';
+import StyleCard from '@components/styleCard/StyleCard';
 
 import { ROUTES } from '@/routes/paths';
 

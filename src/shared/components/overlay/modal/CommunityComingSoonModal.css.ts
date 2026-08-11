@@ -1,8 +1,8 @@
 import { keyframes, style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@/shared/styles/fontStyle';
-import { colorVars } from '@/shared/styles/tokens/color.css';
-import { zIndex } from '@/shared/styles/tokens/zIndex';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
@@ -13,7 +13,8 @@ export const backdrop = style({
   position: 'fixed',
   zIndex: zIndex.backdrop,
   inset: 0,
-  background: colorVars.color.gray999_20,
+  // 딤 0.2는 공식 토큰에 없는 값 — Popup.css.ts의 동일 리터럴과 함께 색상 토큰화 차수에서 디자인 확인 후 정리
+  background: 'rgba(0, 0, 0, 0.2)',
   animation: `${fadeIn} 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
 });
 
@@ -46,12 +47,12 @@ export const headingText = style({
 });
 
 export const title = style({
-  ...fontStyle('title_sb_16'),
+  ...fontVars.font.title_sb_16,
   color: colorVars.color.gray900,
 });
 
 export const body = style({
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   whiteSpace: 'pre-line',
   color: colorVars.color.gray700,
 });
@@ -66,6 +67,6 @@ export const closeButton = style({
   justifyContent: 'center',
   width: '100%',
   height: '4.8rem',
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   color: colorVars.color.gray700,
 });

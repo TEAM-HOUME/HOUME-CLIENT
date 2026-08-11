@@ -1,11 +1,10 @@
 import { style } from '@vanilla-extract/css';
 
 import { animationTokens } from '@styles/tokens/animation.css';
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { pressInteraction } from '@styles/tokensV2/interaction/presets';
-
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { pressInteraction } from '@styles/tokens/interaction/presets';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = style({
   gap: unitVars.unit.gapPadding['200'],
@@ -23,7 +22,7 @@ export const textbox = style({
   padding: `${unitVars.unit.gapPadding['300']} ${unitVars.unit.gapPadding['500']}`,
   ...fontVars.font.title_sb_20,
   width: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
   textAlign: 'center',
 });
 
@@ -47,7 +46,7 @@ export const imgbox = style({
 export const loginImg = style({
   width: '37.5rem',
   height: '37.5rem',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const aside = style({

@@ -11,32 +11,11 @@ const fadeInUp = keyframes({
   },
 });
 
-const slideLeft = keyframes({
-  '0%': {
-    transform: 'translateX(100%)',
-    opacity: 0,
-  },
-  '100%': {
-    transform: 'translateX(0)',
-    opacity: 1,
-  },
-});
-
 // 애니메이션 토큰
 export const animationTokens = {
-  fadeInUpSlow: `${fadeInUp} 1.2s ease-out forwards`,
-  fadeInUpFast: `${fadeInUp} 0.8s ease-out forwards`,
-  slideLeft: `${slideLeft} 1.2s ease-out forwards`,
-  shimmer: keyframes({
-    '0%': { transform: 'translateX(-100%)' },
-    '100%': { transform: 'translateX(100%)' },
-  }),
+  fadeInUp: `${fadeInUp} 0.8s ease-out forwards`,
   skeletonWave: keyframes({
     to: { backgroundPositionX: '-200%' },
-  }),
-  dotsBounce: keyframes({
-    '0%, 80%, 100%': { opacity: 0 },
-    '40%': { opacity: 1 },
   }),
 } as const;
 

@@ -4,7 +4,7 @@ import type {
   FilterSectionKey,
 } from '@pages/home/utils/productFilterUtils';
 
-import Chip from '@components/v2/chip/Chip';
+import Chip from '@components/chip/Chip';
 
 import * as styles from './ProductFilterSheet.css';
 

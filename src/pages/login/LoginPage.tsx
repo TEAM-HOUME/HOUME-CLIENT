@@ -10,11 +10,10 @@ import { getLoginSocialParams } from '@shared/analytics/utils/loginEntryRoute';
 
 import { LOTTIE_SPEED } from '@assets/lottie/lottieAssets';
 
+import Icon from '@components/icon/Icon';
 import DotLottiePlayer from '@components/lottie/DotLottiePlayer';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-
-import Icon from '@/shared/components/v2/icon/Icon';
 
 import * as styles from './loginPage.css';
 import { getAuthEnvironment } from './utils/environment';

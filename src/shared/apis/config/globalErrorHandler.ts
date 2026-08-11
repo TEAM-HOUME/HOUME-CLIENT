@@ -17,8 +17,8 @@ import { addReportBreadcrumb, reportError } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
 
-import Toast from '@components/v2/toast/Toast';
-import { toastStyle } from '@components/v2/toast/Toast.css';
+import Toast from '@components/toast/Toast';
+import { toastStyle } from '@components/toast/Toast.css';
 
 import type { Mutation, Query } from '@tanstack/react-query';
 

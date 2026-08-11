@@ -24,7 +24,7 @@ import { resolveShopFlowEntryRoute } from '@shared/analytics/utils/shop/resolveS
 import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 

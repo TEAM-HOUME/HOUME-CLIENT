@@ -5,11 +5,11 @@ import { queryKeys } from '@constants/queryKey';
 
 import { getActivities } from '../apis/queries/useActivitiesQuery';
 import { getFurnitureCategories } from '../apis/queries/useFurnitureCategoriesQuery';
+import { getHouseTemplates } from '../apis/queries/useHouseTemplatesQuery';
 import { getMoodBoardImage } from '../apis/queries/useMoodBoardQuery';
 import { STATIC_DATA_QUERY_OPTIONS } from '../constants/cache';
 import { MOOD_BOARD_CONSTANTS } from '../types/apis/interiorStyle';
-import { getHouseTemplates } from '../v2/apis/queries/useHouseTemplatesQuery';
-import { DEFAULT_FILTERS } from '../v2/types/floorPlan';
+import { DEFAULT_FILTERS } from '../types/floorPlan';
 
 import type { QueryClient } from '@tanstack/react-query';
 

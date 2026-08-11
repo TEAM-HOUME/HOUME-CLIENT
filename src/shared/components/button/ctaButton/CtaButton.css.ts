@@ -1,8 +1,8 @@
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const buttonWrapper = style({
   display: 'flex',
@@ -22,7 +22,7 @@ export const CtaButton = recipe({
     borderRadius: '999px',
     padding: '1.7rem 0',
     width: '100%',
-    ...fontStyle('title_m_16'),
+    ...fontVars.font.title_m_16,
     minWidth: '12.1rem',
     height: '5.6rem',
     whiteSpace: 'nowrap',
@@ -31,9 +31,9 @@ export const CtaButton = recipe({
   variants: {
     state: {
       active: {
-        backgroundColor: colorVars.color.primary,
+        backgroundColor: colorVars.color.purple600,
         ':active': {
-          backgroundColor: colorVars.color.primary_dark,
+          backgroundColor: colorVars.color.purple700,
         },
       },
       disabled: {
@@ -78,7 +78,7 @@ export const CtaButton = recipe({
     font: {
       default: {},
       body: {
-        ...fontStyle('body_m_14'),
+        ...fontVars.font.body_m_14,
       },
     },
   },
