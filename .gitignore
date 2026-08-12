@@ -43,9 +43,12 @@ coverage
 .claude/skills/
 .claude/commands/
 .cursor
-CLAUDE.md
 answer-guide.md
-docs/
+
+# docs/는 로컬 작업 문서라 제외하되, 컨벤션 기준 원문만 추적한다
+docs/*
+!docs/conventions.md
+
 .mcp.json
 
 dev-debug.log
@@ -57,7 +60,6 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
-AGENTS.md
 .AGENTS
 
 .serena/
