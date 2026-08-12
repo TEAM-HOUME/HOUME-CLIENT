@@ -1,4 +1,4 @@
-import type { ScreenName } from '@shared/analytics/screenNames';
+import type { ScreenName } from '@analytics/screenNames';
 
 /** 유저 상태 — is_new_user */
 export const IS_NEW_USER = {

@@ -12,7 +12,7 @@ import Banner, {
 
 import { ROUTES } from '@routes/paths';
 
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 
 import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
 

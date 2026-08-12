@@ -4,11 +4,12 @@ import { useLocation } from 'react-router-dom';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { getLoginStatus } from '@shared/analytics/utils/loginStatus';
-import { resolveScreenName } from '@shared/analytics/utils/screenName';
 import { setReportTag } from '@shared/monitoring/report';
 import { AB_TEST_STORAGE_KEY, isABTestGroup } from '@shared/types/abTest';
+
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { getLoginStatus } from '@analytics/utils/loginStatus';
+import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
 /**
  * GA4·Clarity가 쓰는 세그먼트 축을 Sentry 태그로 미러링하는 훅

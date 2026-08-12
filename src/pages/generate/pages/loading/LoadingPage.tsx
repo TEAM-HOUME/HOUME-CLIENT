@@ -21,21 +21,20 @@ import { ROUTES } from '@routes/paths';
 import { FLOW_CONFIG } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
+import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
+
 import {
   trackGenImgQuitMdKeepClick,
   trackGenImgQuitMdQuitClick,
-} from '@shared/analytics/componentAnalytics';
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import {
-  ensureShortFunnelFlowSnapshot,
-  getLoadImgReturnScreenName,
-} from '@shared/analytics/utils/imageFlow';
-import { isDocumentReloadOnPath } from '@shared/analytics/utils/isDocumentReloadOnPath';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
+} from '@analytics/componentAnalytics';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { ensureShortFunnelFlowSnapshot } from '@analytics/utils/imageFlow/captureFunnelInputSnapshot';
+import { getLoadImgReturnScreenName } from '@analytics/utils/imageFlow/resolveFunnelReturnScreen';
+import { isDocumentReloadOnPath } from '@analytics/utils/isDocumentReloadOnPath';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import type { GetCarouselResponseDTO } from '@apis/__generated__/data-contracts';
 

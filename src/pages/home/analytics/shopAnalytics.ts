@@ -16,19 +16,19 @@ import type {
   SelectedProduct,
 } from '@pages/home/types/productTab';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { getProductCardIdNameParams } from '@shared/analytics/params/builders/productCard';
-import type { ImageEntryRoute } from '@shared/analytics/params/gate';
+import { GA_EVENTS } from '@analytics/events';
+import { getProductCardIdNameParams } from '@analytics/params/builders/productCard';
+import type { ImageEntryRoute } from '@analytics/params/gate';
 import {
   COUNT_TRIGGER_EVENT,
   SHEET_EXPANSION_STATUS,
   type SheetExpansionStatus,
-} from '@shared/analytics/params/shop';
-import { type ScreenName } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { toSheetExpansionStatus } from '@shared/analytics/utils/imageFlow';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+} from '@analytics/params/shop';
+import { type ScreenName } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { toSheetExpansionStatus } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
+import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
 export const trackShopFilterListClick = (
   category: ProductFilterChipCategory

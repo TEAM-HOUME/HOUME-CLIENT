@@ -39,6 +39,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, 'src/pages'),
       '@routes': path.resolve(__dirname, 'src/routes'),
       '@shared': path.resolve(__dirname, 'src/shared'),
+      '@analytics': path.resolve(__dirname, 'src/shared/analytics'),
       '@apis': path.resolve(__dirname, 'src/shared/apis'),
       '@assets': path.resolve(__dirname, 'src/shared/assets'),
       '@components': path.resolve(__dirname, 'src/shared/components'),

@@ -19,7 +19,7 @@ import {
 import {
   joinAnalyticsIds,
   toProductCardInputFromProductInfo,
-} from '@shared/analytics/params/builders/productCard';
+} from '@analytics/params/builders/productCard';
 
 import type {
   FurnitureCategoryResponse,

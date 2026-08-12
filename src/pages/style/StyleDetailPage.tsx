@@ -14,14 +14,12 @@ import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { mapEntryRouteToLoginEntry } from '@analytics/utils/loginEntryRoute/mapLoginEntryRoute';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 

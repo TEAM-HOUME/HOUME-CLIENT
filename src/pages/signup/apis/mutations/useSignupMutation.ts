@@ -6,8 +6,9 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@shared/analytics/metaPixel';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
+
+import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@analytics/metaPixel';
 
 import type { SocialSignUpV2Request } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';

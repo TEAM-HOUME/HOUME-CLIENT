@@ -15,13 +15,11 @@ import { ROUTES } from '@routes/paths';
 import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { mapEntryRouteToLoginEntry } from '@analytics/utils/loginEntryRoute/mapLoginEntryRoute';
 
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 

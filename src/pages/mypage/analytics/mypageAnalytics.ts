@@ -8,15 +8,15 @@ import {
 } from '@pages/mypage/analytics/mypageAnalyticsParams';
 import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
 
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 import {
   getProductCardIdNameParams,
   getProductCardIdNamePriceParams,
   joinAnalyticsIds,
   toProductCardInputFromJjymFeed,
   toProductCardInputFromUsedListProduct,
-} from '@shared/analytics/params/builders/productCard';
-import { trackEvent } from '@shared/analytics/track';
+} from '@analytics/params/builders/productCard';
+import { trackEvent } from '@analytics/track';
 
 import type {
   DateGroupResponse,

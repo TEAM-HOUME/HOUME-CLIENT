@@ -1,6 +1,6 @@
 import { ROUTES } from '@routes/paths';
 
-import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';
+import { SCREEN_NAME, type ScreenName } from '@analytics/screenNames';
 
 import { FUNNEL_ID } from '@constants/funnel';
 

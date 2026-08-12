@@ -7,12 +7,10 @@ import {
   trackStyleListCardClick,
 } from '@pages/style/analytics/styleAnalytics';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { useStyleListQuery } from '@apis/queries/useStyleListQuery';
 

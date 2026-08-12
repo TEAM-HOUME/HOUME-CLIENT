@@ -10,15 +10,16 @@ import {
 } from '@pages/signup/analytics/signupFormAnalytics';
 import { getSignupStep } from '@pages/signup/utils/getSignupStep';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getLoginSocialParams } from '@shared/analytics/utils/loginEntryRoute';
 import {
   VALIDATION_RULES,
   isMinLength,
   isValidNicknameFormat,
 } from '@shared/utils/userFormValidation';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getLoginSocialParams } from '@analytics/utils/loginEntryRoute/buildLoginSocialEventParams';
 
 /** iOS 뒤로가기 제스처 휴리스틱 — 화면 왼쪽 가장자리에서 오른쪽으로 스와이프 */
 const SWIPE_START_MAX_X = 50;

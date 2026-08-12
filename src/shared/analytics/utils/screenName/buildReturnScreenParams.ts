@@ -1,5 +1,5 @@
-import type { AnalyticsScreenName } from '@shared/analytics/params/global';
-import { getLoginEntryRouteParams } from '@shared/analytics/utils/loginEntryRoute';
+import type { AnalyticsScreenName } from '@analytics/params/global';
+import { getLoginEntryRouteParams } from '@analytics/utils/loginEntryRoute/buildLoginSocialEventParams';
 
 import { getLoginRedirect } from '@utils/loginRedirect';
 

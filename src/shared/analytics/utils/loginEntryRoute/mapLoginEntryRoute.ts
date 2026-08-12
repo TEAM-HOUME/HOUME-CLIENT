@@ -15,7 +15,7 @@ import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/flowConfig';
 import {
   LOGIN_ENTRY_ROUTE,
   type LoginEntryRoute,
-} from '@shared/analytics/params/gate';
+} from '@analytics/params/gate';
 
 import { persistLoginEntryRoute } from './storeLoginEntryRoute';
 

@@ -1,13 +1,13 @@
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 import {
   getScrollDepthFromWindow,
   scrollDepthParams,
-} from '@shared/analytics/params/scrollDepth';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { buildMoodboardIdsParam } from '@shared/analytics/utils/imageFlow';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+} from '@analytics/params/scrollDepth';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { buildMoodboardIdsParam } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 const selectMoodboardScreenParams = () => ({
   screen_name: SCREEN_NAME.SELECT_MOODBOARD,

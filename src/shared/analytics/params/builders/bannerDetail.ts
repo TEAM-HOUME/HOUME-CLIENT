@@ -1,4 +1,4 @@
-import type { BannerChipParams } from '@shared/analytics/params/bannerDetail';
+import type { BannerChipParams } from '@analytics/params/bannerDetail';
 
 export interface BannerChipInput {
   chipId?: number | string;

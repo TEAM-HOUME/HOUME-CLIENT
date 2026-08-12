@@ -10,8 +10,9 @@ import { ROUTES } from '@routes/paths';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
+
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 

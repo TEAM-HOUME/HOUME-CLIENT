@@ -1,4 +1,4 @@
-import type { LoginEntryRoute } from '@shared/analytics/params/gate';
+import type { LoginEntryRoute } from '@analytics/params/gate';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 

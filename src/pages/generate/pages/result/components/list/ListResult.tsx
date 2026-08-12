@@ -13,16 +13,14 @@ import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { joinAnalyticsIds } from '@shared/analytics/params/builders/productCard';
-import {
-  LOGIN_ENTRY_ROUTE,
-  IMAGE_ENTRY_ROUTE,
-} from '@shared/analytics/params/gate';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
 import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { joinAnalyticsIds } from '@analytics/params/builders/productCard';
+import { LOGIN_ENTRY_ROUTE, IMAGE_ENTRY_ROUTE } from '@analytics/params/gate';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 

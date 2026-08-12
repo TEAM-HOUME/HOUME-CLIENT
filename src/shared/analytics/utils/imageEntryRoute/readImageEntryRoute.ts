@@ -12,7 +12,7 @@
 import { flowToEntryRoute } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import type { ImageEntryRoute } from '@shared/analytics/params/gate';
+import type { ImageEntryRoute } from '@analytics/params/gate';
 
 import { mapEntryRouteToImageEntry } from './mapImageEntryRoute';
 

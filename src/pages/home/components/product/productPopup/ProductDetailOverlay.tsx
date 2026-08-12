@@ -17,7 +17,6 @@ import { ROUTES } from '@routes/paths';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import type { ProductColorDetail } from '@shared/apis/__generated__/data-contracts';
 import type {
   LinkInfo,
@@ -25,6 +24,8 @@ import type {
   ProductInfo,
   SaveInfo,
 } from '@shared/types/productCard';
+
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 

@@ -13,9 +13,9 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { LOTTIE_SPEED } from '@assets/lottie/lottieAssets';
 

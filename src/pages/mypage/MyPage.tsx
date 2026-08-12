@@ -7,8 +7,8 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
+import { persistLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
 
 import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 

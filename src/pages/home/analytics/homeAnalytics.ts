@@ -1,13 +1,13 @@
 import type { BannerSlide } from '@pages/home/components/explore/banner/Banner';
 
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 import {
   getHomeBannerParams,
   getHomeStyleParams,
-} from '@shared/analytics/params/builders';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+} from '@analytics/params/builders/homeContent';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
 

@@ -1,29 +1,23 @@
-import type {
-  ValidLoginStatus,
-  SignupStep,
-} from '@shared/analytics/params/auth';
-import type { BannerChipParams } from '@shared/analytics/params/bannerDetail';
-import type {
-  ImageEntryRoute,
-  LoginEntryRoute,
-} from '@shared/analytics/params/gate';
+import type { ValidLoginStatus, SignupStep } from '@analytics/params/auth';
+import type { BannerChipParams } from '@analytics/params/bannerDetail';
+import type { ImageEntryRoute, LoginEntryRoute } from '@analytics/params/gate';
 import type {
   AnalyticsScreenName,
   LoginStatus,
-} from '@shared/analytics/params/global';
+} from '@analytics/params/global';
 import type {
   HomeBannerParams,
   HomeStyleParams,
-} from '@shared/analytics/params/homeContent';
-import type { ImageSetupParams } from '@shared/analytics/params/imageSetup';
-import type { LandingParams } from '@shared/analytics/params/landing';
-import type { SectionName } from '@shared/analytics/params/path';
-import type { ProductCardParams } from '@shared/analytics/params/productCard';
-import type { ResultParams } from '@shared/analytics/params/result';
-import type { ScrollDepth } from '@shared/analytics/params/scrollDepth';
-import type { ShopParams } from '@shared/analytics/params/shop';
-import type { SpaceParams } from '@shared/analytics/params/space';
-import type { GaToastType } from '@shared/analytics/params/toast';
+} from '@analytics/params/homeContent';
+import type { ImageSetupParams } from '@analytics/params/imageSetup';
+import type { LandingParams } from '@analytics/params/landing';
+import type { SectionName } from '@analytics/params/path';
+import type { ProductCardParams } from '@analytics/params/productCard';
+import type { ResultParams } from '@analytics/params/result';
+import type { ScrollDepth } from '@analytics/params/scrollDepth';
+import type { ShopParams } from '@analytics/params/shop';
+import type { SpaceParams } from '@analytics/params/space';
+import type { GaToastType } from '@analytics/params/toast';
 
 /** Firebase logEvent에 허용되는 파라미터 값 타입 */
 export type AnalyticsParamValue = string | number | boolean | null;

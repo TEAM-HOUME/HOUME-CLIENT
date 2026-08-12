@@ -15,16 +15,15 @@ import { ROUTES } from '@routes/paths';
 
 import { isCurationViewType, RESULT_TYPE } from '@store/imageFlow/flowConfig';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { IMAGE_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { buildResultRecPageViewParams } from '@shared/analytics/utils/imageFlow';
 import { clarityEvent } from '@shared/config/clarity';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { IMAGE_ENTRY_ROUTE } from '@analytics/params/gate';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { buildResultRecPageViewParams } from '@analytics/utils/imageFlow/buildFunnelResultPageViewParams';
 
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';

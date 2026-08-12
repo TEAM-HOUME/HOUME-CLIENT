@@ -1,7 +1,7 @@
 import type {
   HomeBannerParams,
   HomeStyleParams,
-} from '@shared/analytics/params/homeContent';
+} from '@analytics/params/homeContent';
 
 export const getHomeBannerParams = (input: {
   bannerId?: number;

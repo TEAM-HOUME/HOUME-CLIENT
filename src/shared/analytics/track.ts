@@ -7,16 +7,18 @@
  */
 import { logEvent } from 'firebase/analytics';
 
-import type { GaEventName } from '@shared/analytics/events';
-import type {
-  AnalyticsParamValue,
-  TrackEventParams,
-} from '@shared/analytics/params/types';
 import { analytics } from '@shared/config/firebase';
 import { addReportBreadcrumb } from '@shared/monitoring/report';
 import { redactUrl } from '@shared/monitoring/scrub';
 
-export type { LoginStatus, TrackEventParams } from '@shared/analytics/params';
+import type { GaEventName } from '@analytics/events';
+import type {
+  AnalyticsParamValue,
+  TrackEventParams,
+} from '@analytics/params/types';
+
+export type { LoginStatus } from '@analytics/params/global';
+export type { TrackEventParams } from '@analytics/params/types';
 
 /** Firebase Analytics 실제 전송 여부 (.env) */
 const isAnalyticsEnabled =

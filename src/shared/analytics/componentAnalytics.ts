@@ -7,9 +7,9 @@
  *
  * @see docs/ga-wiring-convention.md § 9 component 이벤트
  */
-import { GA_EVENTS } from '@shared/analytics/events';
-import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
+import { GA_EVENTS } from '@analytics/events';
+import { SCREEN_NAME, type ScreenName } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
 
 // ─────────────────────────────────────────────
 // topNav — LogoNavBar (trackCallback params)

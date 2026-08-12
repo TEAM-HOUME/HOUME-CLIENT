@@ -6,6 +6,7 @@
       "@pages/*": ["src/pages/*"],
       "@routes/*": ["src/routes/*"],
       "@shared/*": ["src/shared/*"],
+      "@analytics/*": ["src/shared/analytics/*"],
       "@apis/*": ["src/shared/apis/*"],
       "@assets/*": ["src/shared/assets/*"],
       "@components/*": ["src/shared/components/*"],

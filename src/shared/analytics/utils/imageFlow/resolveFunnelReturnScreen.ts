@@ -6,7 +6,7 @@ import {
 } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import { SCREEN_NAME, type ScreenName } from '@shared/analytics/screenNames';
+import { SCREEN_NAME, type ScreenName } from '@analytics/screenNames';
 
 /** image_entry_route 기준 imageSetup 직전 화면 — image funnel `return_screen_name` */
 export const getReturnScreenNameFromImageEntry = (): ScreenName | undefined => {

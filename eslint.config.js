@@ -123,6 +123,7 @@ export default [
             { pattern: '@routes/**', group: 'internal', position: 'before' },
             { pattern: '@store/**', group: 'internal', position: 'before' },
             { pattern: '@shared/**', group: 'internal', position: 'before' },
+            { pattern: '@analytics/**', group: 'internal', position: 'before' },
             { pattern: '@apis/**', group: 'internal', position: 'before' },
             { pattern: '@assets/**', group: 'internal', position: 'before' },
             {

@@ -2,11 +2,11 @@ import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
 
 import { isCurationViewType } from '@store/imageFlow/flowConfig';
 
-import { joinAnalyticsIds } from '@shared/analytics/params/builders/productCard';
-import { IMG_RESULT_TYPE } from '@shared/analytics/params/result';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getReturnScreenNameParams } from '@shared/analytics/utils/screenName';
-import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+import { joinAnalyticsIds } from '@analytics/params/builders/productCard';
+import { IMG_RESULT_TYPE } from '@analytics/params/result';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
+import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
 import type {
   DateGroupResponse,
