@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import type { EditProfileRequest } from '@pages/mypage/types/apis/userData';
 
+import { ROUTES } from '@routes/paths';
+
 import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
 import type { MyPageUserData } from '@shared/types/user';
 
@@ -15,8 +17,6 @@ import { useToast } from '@components/toast/useToast';
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
 import { TOAST_MESSAGE } from '@constants/toastMessage';
-
-import { ROUTES } from '@/routes/paths';
 
 export const patchProfile = async (
   body: EditProfileRequest

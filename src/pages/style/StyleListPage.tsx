@@ -7,6 +7,8 @@ import {
   trackStyleListCardClick,
 } from '@pages/style/analytics/styleAnalytics';
 
+import { ROUTES } from '@routes/paths';
+
 import { GA_EVENTS } from '@analytics/events';
 import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
 import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
@@ -20,8 +22,6 @@ import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
 import TitleNavBar from '@components/navBar/TitleNavBar';
 import StyleCard from '@components/styleCard/StyleCard';
-
-import { ROUTES } from '@/routes/paths';
 
 import * as styles from './StyleListPage.css';
 
