@@ -21,6 +21,7 @@ import {
 } from '@utils/productCardUtils';
 
 import * as styles from './ProductCard.css';
+import BenefitBadge from '../benefitBadge/BenefitBadge';
 import ActionButton from '../button/actionButton/ActionButton';
 import IconButton from '../button/IconButton';
 import Icon from '../icon/Icon';
@@ -69,6 +70,16 @@ const ProductCard = ({
   const { visibleColors, extraColorCount } = getColorChips(product.colorHexes);
   const { originalPriceText, discountPriceText, discountRateText } =
     getPriceTexts(price?.original, price?.discount, price?.discountRate);
+  const originalPrice = price?.original;
+  const discountPrice = price?.discount;
+  const benefitAmount =
+    typeof originalPrice === 'number' &&
+    Number.isFinite(originalPrice) &&
+    typeof discountPrice === 'number' &&
+    Number.isFinite(discountPrice) &&
+    originalPrice > discountPrice
+      ? originalPrice - discountPrice
+      : null;
 
   const handleCardNavigate = () =>
     openProductLink(linkHref, undefined, LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SITE);
@@ -159,7 +170,7 @@ const ProductCard = ({
         </div>
       </section>
 
-      <section className={styles.infoSection}>
+      <section className={styles.infoSection({ cardType })}>
         {/* 색상 정보 */}
         {(visibleColors.length > 0 || extraColorCount > 0) && isDefault && (
           <div className={styles.colorRow}>
@@ -221,6 +232,10 @@ const ProductCard = ({
                 )
               )}
             </div>
+          )}
+
+          {isDefault && benefitAmount !== null && (
+            <BenefitBadge amount={benefitAmount} />
           )}
         </div>
 

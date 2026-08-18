@@ -69,12 +69,23 @@ export const saveBtnOverlay = style({
   right: '0.6rem',
 });
 
-export const infoSection = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.8rem',
-  paddingTop: unitVars.unit.gapPadding['300'],
-  paddingBottom: unitVars.unit.gapPadding['600'],
+export const infoSection = recipe({
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: unitVars.unit.gapPadding['300'],
+    paddingBottom: unitVars.unit.gapPadding['600'],
+  },
+  variants: {
+    cardType: {
+      default: {
+        gap: '0.8rem',
+      },
+      shopping: {
+        gap: '1rem',
+      },
+    },
+  },
 });
 
 export const colorRow = style({
@@ -109,16 +120,13 @@ export const middleInfoSection = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
-
+    gap: unitVars.unit.gapPadding['100'],
     padding: unitVars.unit.gapPadding['050'],
   },
   variants: {
     cardType: {
-      default: {
-        gap: unitVars.unit.gapPadding['200'],
-      },
+      default: {},
       shopping: {
-        gap: unitVars.unit.gapPadding['100'],
         minHeight: '7.2rem',
       },
     },
@@ -153,7 +161,6 @@ export const productText = style({
 export const priceSection = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: unitVars.unit.gapPadding['100'],
 });
 
 export const originalPriceText = style({
