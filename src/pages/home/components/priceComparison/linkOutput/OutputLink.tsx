@@ -22,11 +22,9 @@ const OutputLink = ({
   onProductClick,
   onSearchNewLink,
 }: OutputLinkProps) => {
-  const { discountPriceText, discountRateText } = getPriceTexts(
-    price?.original,
-    price?.discount,
-    price?.discountRate
-  );
+  const { originalPriceText, discountPriceText, discountRateText } =
+    getPriceTexts(price?.original, price?.discount, price?.discountRate);
+  const priceText = discountPriceText ?? originalPriceText;
 
   return (
     <section className={styles.container} aria-label="검색한 상품">
@@ -35,43 +33,41 @@ const OutputLink = ({
         className={styles.contentButton}
         onClick={onProductClick}
       >
-        <div className={styles.titleRow}>
+        <span className={styles.titleRow}>
           <Icon name="Link" size="24" decorative />
-          <h2 className={styles.title}>검색한 상품</h2>
-        </div>
+          <span className={styles.title}>검색한 상품</span>
+        </span>
 
-        <div className={styles.productCard}>
-          <section className={styles.imgSection}>
+        <span className={styles.productCard}>
+          <span className={styles.imgSection}>
             <OptimizedImage
               src={product.imageUrl || emptyImage}
               fallbackSrc={emptyImage}
               placeholder="skeleton"
               className={styles.cardImage}
-              alt="카드 이미지"
+              alt=""
             />
-          </section>
+          </span>
 
-          <section className={styles.infoSection}>
+          <span className={styles.infoSection}>
             {product.brand ? (
-              <p className={styles.brandText}>{product.brand}</p>
+              <span className={styles.brandText}>{product.brand}</span>
             ) : null}
-            <p className={styles.productText}>{product.title}</p>
-            {(discountPriceText || discountRateText) && (
-              <div className={styles.priceRow}>
+            <span className={styles.productText}>{product.title}</span>
+            {(priceText || discountRateText) && (
+              <span className={styles.priceRow}>
                 {discountRateText ? (
                   <span className={styles.discountRateText}>
                     {discountRateText}
                   </span>
                 ) : null}
-                {discountPriceText ? (
-                  <span className={styles.discountPriceText}>
-                    {discountPriceText}
-                  </span>
+                {priceText ? (
+                  <span className={styles.discountPriceText}>{priceText}</span>
                 ) : null}
-              </div>
+              </span>
             )}
-          </section>
-        </div>
+          </span>
+        </span>
       </button>
 
       <button

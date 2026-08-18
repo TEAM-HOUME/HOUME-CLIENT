@@ -20,10 +20,15 @@ export const contentButton = style({
   display: 'flex',
   flexDirection: 'column',
   gap: unitVars.unit.gapPadding['300'],
-  border: 0,
-  backgroundColor: 'transparent',
   padding: `${unitVars.unit.gapPadding['400']}`,
   textAlign: 'left',
+  selectors: {
+    '&:focus-visible': {
+      outline: `2px solid ${colorVars.color.text.brand}`,
+      outlineOffset: '-2px',
+      borderRadius: unitVars.unit.radius['300'],
+    },
+  },
 });
 
 export const titleRow = style({
@@ -126,11 +131,16 @@ export const searchButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  border: 0,
   borderTop: `1px solid ${colorVars.color.border.secondary}`,
   backgroundColor: colorVars.color.fill.whitish,
   padding: unitVars.unit.gapPadding['400'],
   width: '100%',
+  selectors: {
+    '&:focus-visible': {
+      outline: `2px solid ${colorVars.color.text.brand}`,
+      outlineOffset: '-2px',
+    },
+  },
 });
 
 export const searchButtonContent = style({
