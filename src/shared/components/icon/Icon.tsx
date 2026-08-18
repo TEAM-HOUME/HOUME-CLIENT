@@ -1,3 +1,4 @@
+import ArrowDownFillGreen from '@assets/icons/ArrowDownFillGreen.svg?url';
 import ArrowLeft from '@assets/icons/ArrowLeft.svg?url';
 import ArrowLeftFill from '@assets/icons/ArrowLeftFill.svg?url';
 import ArrowLeftStrokeWhite from '@assets/icons/ArrowLeftStrokeWhite.svg?url';
@@ -55,6 +56,7 @@ import WarningFillDanger from '@assets/icons/WarningFillDanger.svg?url';
 import * as styles from './Icon.css';
 
 const IconsName = {
+  ArrowDownFillGreen,
   ArrowLeft,
   ArrowLeftFill,
   ArrowLeftStrokeWhite,
@@ -116,11 +118,17 @@ export type IconSize = '40' | '32' | '24' | '20' | '16' | '14' | '12';
 export interface IconProps {
   name: IconName;
   size?: IconSize;
+  decorative?: boolean;
 }
 
-const Icon = ({ name, size = '24' }: IconProps) => {
+const Icon = ({ name, size = '24', decorative = false }: IconProps) => {
   return (
-    <img className={styles.iconSize[size]} src={IconsName[name]} alt={name} />
+    <img
+      className={styles.iconSize[size]}
+      src={IconsName[name]}
+      alt={decorative ? '' : name}
+      aria-hidden={decorative ? true : undefined}
+    />
   );
 };
 
