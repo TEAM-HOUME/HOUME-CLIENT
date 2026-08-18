@@ -35,6 +35,9 @@ const primitives = createGlobalTheme(':root', {
     purple300: '#E8E3FC',
     purple200: '#EFEDFD',
 
+    green600: '#14940B',
+    green200: '#E5FAD7',
+
     red700: '#ED1212',
     red600: '#FF4D4D',
   },
@@ -54,6 +57,7 @@ const semantics = createGlobalTheme(':root', {
     },
     fill: {
       brand: primitives.color.purple600,
+      brandWeak: primitives.color.purple300,
       danger: primitives.color.red600,
       dim: primitives.color.gray999_a50,
       dimSecondary: primitives.color.gray999_a30,
@@ -61,10 +65,13 @@ const semantics = createGlobalTheme(':root', {
       inverse: primitives.color.gray000,
       inverseSecondary: primitives.color.gray000_a80,
       primary: primitives.color.gray900,
+      safe: primitives.color.green600,
+      safeWeak: primitives.color.green200,
       secondary: primitives.color.gray700,
       strong: primitives.color.gray999,
       tertiary: primitives.color.gray500,
       weak: primitives.color.gray100,
+      whitish: primitives.color.gray050,
     },
     shadow: {
       bottomSheet: primitives.color.gray999_a04,
