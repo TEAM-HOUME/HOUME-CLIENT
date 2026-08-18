@@ -1,5 +1,6 @@
+import Icon from '@components/icon/Icon';
+
 import * as styles from './BenefitBadge.css';
-import Icon from '../icon/Icon';
 
 interface BenefitBadgeProps {
   amount: number;
@@ -8,7 +9,7 @@ interface BenefitBadgeProps {
 const BenefitBadge = ({ amount }: BenefitBadgeProps) => (
   <span className={styles.badge}>
     <span className={styles.contents}>
-      <Icon name="ArrowDownFillGreen" size="20" />
+      <Icon name="ArrowDownFillGreen" size="20" decorative />
       <span className={styles.priceContainer}>
         <span className={styles.priceText}>
           {amount.toLocaleString('ko-KR')}
