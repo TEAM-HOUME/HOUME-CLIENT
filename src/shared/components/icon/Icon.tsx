@@ -1,3 +1,4 @@
+import ArrowDownFillGreen from '@assets/icons/ArrowDownFillGreen.svg?url';
 import ArrowLeft from '@assets/icons/ArrowLeft.svg?url';
 import ArrowLeftFill from '@assets/icons/ArrowLeftFill.svg?url';
 import ArrowLeftStrokeWhite from '@assets/icons/ArrowLeftStrokeWhite.svg?url';
@@ -55,6 +56,7 @@ import WarningFillDanger from '@assets/icons/WarningFillDanger.svg?url';
 import * as styles from './Icon.css';
 
 const IconsName = {
+  ArrowDownFillGreen,
   ArrowLeft,
   ArrowLeftFill,
   ArrowLeftStrokeWhite,
