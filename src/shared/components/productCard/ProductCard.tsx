@@ -72,13 +72,18 @@ const ProductCard = ({
     getPriceTexts(price?.original, price?.discount, price?.discountRate);
   const originalPrice = price?.original;
   const discountPrice = price?.discount;
-  const benefitAmount =
+  const priceDiff =
     typeof originalPrice === 'number' &&
     Number.isFinite(originalPrice) &&
+    originalPrice >= 0 &&
     typeof discountPrice === 'number' &&
     Number.isFinite(discountPrice) &&
-    originalPrice > discountPrice
+    discountPrice >= 0
       ? originalPrice - discountPrice
+      : null;
+  const benefitAmount =
+    priceDiff !== null && priceDiff > 0 && Number.isFinite(priceDiff)
+      ? priceDiff
       : null;
 
   const handleCardNavigate = () =>
