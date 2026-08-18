@@ -37,6 +37,7 @@ interface ProductCardProps {
   disabled?: boolean;
   onCardClick?: (area?: CardClickArea) => void;
   enableWholeCardLink?: boolean;
+  benefitAmount?: number;
   shoppingAction?: {
     label?: string;
     onClick: () => void;
@@ -55,6 +56,7 @@ const ProductCard = ({
   disabled = false,
   onCardClick,
   enableWholeCardLink = false,
+  benefitAmount,
   shoppingAction,
   onShoppingViewDetailClick,
 }: ProductCardProps) => {
@@ -70,21 +72,11 @@ const ProductCard = ({
   const { visibleColors, extraColorCount } = getColorChips(product.colorHexes);
   const { originalPriceText, discountPriceText, discountRateText } =
     getPriceTexts(price?.original, price?.discount, price?.discountRate);
-  const originalPrice = price?.original;
-  const discountPrice = price?.discount;
-  const priceDiff =
-    typeof originalPrice === 'number' &&
-    Number.isFinite(originalPrice) &&
-    originalPrice >= 0 &&
-    typeof discountPrice === 'number' &&
-    Number.isFinite(discountPrice) &&
-    discountPrice >= 0
-      ? originalPrice - discountPrice
-      : null;
-  const benefitAmount =
-    priceDiff !== null && priceDiff > 0 && Number.isFinite(priceDiff)
-      ? priceDiff
-      : null;
+  const shouldShowBenefitBadge =
+    isDefault &&
+    typeof benefitAmount === 'number' &&
+    Number.isFinite(benefitAmount) &&
+    benefitAmount > 0;
 
   const handleCardNavigate = () =>
     openProductLink(linkHref, undefined, LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SITE);
@@ -239,9 +231,7 @@ const ProductCard = ({
             </div>
           )}
 
-          {isDefault && benefitAmount !== null && (
-            <BenefitBadge amount={benefitAmount} />
-          )}
+          {shouldShowBenefitBadge && <BenefitBadge amount={benefitAmount} />}
         </div>
 
         {/* 저장(하트) 정보 */}
