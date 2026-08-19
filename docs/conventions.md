@@ -1,8 +1,20 @@
 # HOUME-CLIENT 컨벤션 가이드
 
-**이 문서가 컨벤션의 기준 원문(SSOT)입니다.** CLAUDE.md·AGENTS.md·.coderabbit.yaml은 요약과 이 문서로의 링크만 두고, 규칙 본문을 복사하지 않습니다. 규칙이 바뀌면 이 문서만 고칩니다.
+**이 문서가 컨벤션의 기준 원문(SSOT)입니다.** 규칙이 바뀌면 이 문서만 고칩니다.
 
-**마지막 업데이트**: 2026-08-12 (리팩토링 5차 — 문서 최신화 + 규칙 강제 수단 도입)
+문서 3종의 역할이 다릅니다.
+
+| 파일                                | 역할                                  | 읽는 쪽                           |
+| ----------------------------------- | ------------------------------------- | --------------------------------- |
+| **`docs/conventions.md`** (이 문서) | 규칙의 상세·예시·근거·변경 이력       | 사람, 리뷰 봇, 필요할 때 에이전트 |
+| **`AGENTS.md`**                     | 매 작업에 필요한 체크리스트 (약 70줄) | **Codex·Cursor가 자동으로 읽음**  |
+| **`CLAUDE.md`**                     | `@AGENTS.md` import 한 줄             | Claude Code                       |
+
+AGENTS.md가 본문이고 CLAUDE.md가 그것을 가져오는 구조입니다. 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 **Claude Code는 CLAUDE.md를, Codex와 Cursor는 AGENTS.md를 읽기** 때문입니다(2026-08-19 전환). 본문을 한 곳에만 두어 복사본이 낡는 것을 막습니다.
+
+`.coderabbit.yaml`도 규칙 본문을 복사하지 않고 이 문서를 참조합니다.
+
+**마지막 업데이트**: 2026-08-19 (리팩토링 5차 — 규칙 강제 수단 도입, ONNX 모듈 삭제, 문서 3종 역할 재편)
 
 새 규칙을 추가할 때는 아래 4가지를 통과해야 합니다. 통과하지 못하면 규칙이 아니라 취향이므로 넣지 않습니다.
 
@@ -924,3 +936,4 @@ position/z-index → display/flex → margin → border → padding → width/he
 | 2026-08-12 | 규칙마다 "왜 이 규칙인가"를 본문에 추가: query key factory 읽는 법·factory를 쓰는 이유·exhaustive-deps가 검사하는 것과 오탐 조건 / alias 두 규칙의 이유 분리 + alias 목록을 닫음 + 1~2단계 상대경로 허용 근거 / src 최상위 구분과 store 위치 근거 / cross-feature 규칙의 목적 3가지 / default·named export 근거와 barrel 금지 근거(+대가) / TanStack Query 두 축(status·fetchStatus) 설명과 enabled:false에서 갈리는 이유. Detection 모듈 상태를 실측으로 정정(legacy 아님 — 프리페치는 동작 중, hotspot UI만 복구 대기)                                                                                                                                                                                     |
 | 2026-08-12 | 규칙 강제 수단 도입(단계 2): "규칙을 무엇이 강제하는가" 섹션 신설(1계층 도구 / 2계층 봇 / 3계층 사람). ESLint에 `no-restricted-imports`(@/ · 최단 alias · 3단계 상대경로 · barrel), `import/no-restricted-paths`(shared·store→pages, 화면 간 교차), `src/**/index.ts` 생성 금지, `react-hooks/exhaustive-deps` error 승격, eslint-plugin-react 등록, 타입 정보를 읽는 규칙군(`projectService`) 추가. tsconfig에 `isolatedModules`·`noImplicitOverride`·`noImplicitReturns`·`noPropertyAccessFromIndexSignature`·`allowUnreachableCode:false`·`allowUnusedLabels:false` 추가. `ImportMetaEnv`에 미선언 환경변수 8개(`VITE_API_BASE_URL` 포함) 추가. knip 도입 + CI에 lint job 추가                            |
 | 2026-08-18 | **ONNX 가구 탐지 모듈 삭제** (팀 합의). 31파일 + 바이너리 53MB + `onnxruntime-web` 제거. 살아 있던 참조 3곳 정리(useUserStore 캐시 clear / GeneratedImagesSection prefetch 로직 / queryKey의 furniture 도메인). 복구 절차는 "Detection 모듈" 절에 기록. 남아 있는 큐레이션(v2 추천형)은 무관. 삭제로 `noUncheckedIndexedAccess` 위반이 75건→9건이 되어 9건을 고치고 플래그를 채택했고, knip 미사용 파일이 0이 되어 CI 게이트에 파일 검사를 추가했다 손으로 고른 규칙 24개를 typescript-eslint 표준 프리셋 `recommendedTypeChecked`로 교체(위반 11건 처리 — 그중 `no-unsafe-enum-comparison` 4건은 react-router `NavigationType` enum을 문자열 리터럴과 비교하던 것). `strictTypeChecked`는 234건이라 미채택. |
+| 2026-08-19 | 문서 3종 역할 재편 — **AGENTS.md를 본문(약 70줄), CLAUDE.md를 `@AGENTS.md` import 한 줄로.** 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 Codex와 Cursor는 AGENTS.md만 읽어서, 기존 구조(CLAUDE.md 본문)로는 두 명이 규칙을 못 받고 있었다. 본문에서 기술 스택·폴더 구조·alias 표를 삭제(package.json·`ls src/`·tsconfig로 알 수 있는 것은 넣지 않는다는 Anthropic 권장 기준). 도구가 막는 항목에 `[도구]` 표시 추가                                                                                                                                                                                                                                                                                          |
