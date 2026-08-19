@@ -65,7 +65,5 @@ pnpm build
 
 <!-- 유지보수 메모(에이전트 컨텍스트에는 들어가지 않음)
      이 파일이 본문이고 CLAUDE.md는 @AGENTS.md import 한 줄입니다.
-     팀이 Codex·Cursor·Claude Code를 함께 쓰는데 Codex와 Cursor는 AGENTS.md를,
-     Claude Code는 CLAUDE.md를 읽기 때문입니다. 내용을 CLAUDE.md로 옮기지 마세요.
-     기술 스택·폴더 구조·alias 표는 의도적으로 뺐습니다 — package.json, ls src/,
-     tsconfig.app.json을 읽으면 알 수 있는 것은 넣지 않습니다(Anthropic 권장 기준). -->
+     팀이 Codex·Cursor·Claude Code를 함께 쓰는데 Codex와 Cursor는 AGENTS.md를, Claude Code는 CLAUDE.md를 읽기 때문입니다. 내용을 CLAUDE.md로 옮기지 마세요.
+     기술 스택·폴더 구조·alias 표는 의도적으로 뺐습니다 — package.json, ls src/, tsconfig.app.json을 읽으면 알 수 있는 것은 넣지 않습니다(Anthropic 권장 기준). -->
