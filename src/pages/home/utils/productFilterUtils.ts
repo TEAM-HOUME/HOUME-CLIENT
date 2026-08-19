@@ -3,7 +3,7 @@ import type {
   SelectedProduct,
 } from '@pages/home/types/productTab';
 
-import type { FurnitureTypeFilterResponse } from '@shared/apis/__generated__/data-contracts';
+import type { FurnitureTypeFilterResponse } from '@apis/__generated__/data-contracts';
 
 /** 외부(탭 상태/요청 파라미터)와 내부(시트 선택 상태)를 연결할 때 사용하는 표준 "전체" 센티널 값 */
 const ALL_FILTER_SENTINEL = 'ALL';
@@ -50,7 +50,7 @@ const buildFilterMeta = (
   const labels = Object.fromEntries(
     options
       .filter((item) => item.id != null && !!item.label)
-      .map((item) => [String(item.id), item.label as string])
+      .map((item) => [String(item.id), item.label!])
   );
   const orderedOptionIds = options
     .filter((item) => item.id != null)
@@ -187,11 +187,15 @@ const buildSummaryLabel = (
   if (selected.length === 0) return null;
 
   const selectedSet = new Set(selected);
+  const [fallbackId] = selected;
   const firstId =
     meta.orderedOptionIds.find(
       (id) =>
         id !== ALL_FILTER_SENTINEL && id !== meta.allId && selectedSet.has(id)
-    ) ?? selected[0];
+    ) ?? fallbackId;
+
+  // 위에서 selected.length === 0을 걸렀으므로 여기 도달하면 firstId는 항상 있다
+  if (!firstId) return null;
 
   const first = meta.labels[firstId] ?? firstId;
   return selected.length === 1 ? first : `${first} 외 ${selected.length - 1}개`;

@@ -10,8 +10,6 @@ import { ROUTES } from '@routes/paths';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
-
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
@@ -21,6 +19,8 @@ import EmptyView from '@components/emptyView/EmptyView';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
 import ProductCard from '@components/productCard/ProductCard';
+
+import { EMPTY_VIEW_TEXT } from '@constants/emptyViewText';
 
 import * as styles from './CurationResult.css';
 import ImgFeedback from './feedbackSection/ImgFeedback';
@@ -83,7 +83,7 @@ const ProductListFallback = ({ state, onRetry }: ProductListFallbackProps) => {
           onRetry={
             onRetry
               ? () => {
-                  void onRetry();
+                  onRetry();
                 }
               : undefined
           }

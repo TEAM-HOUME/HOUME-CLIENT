@@ -19,10 +19,11 @@ export const getHouseTemplates = async (
   // query: HTTP query string data (?residenceType=""...)
   const query: Record<string, string[] | number> = {};
   // 빈 값(length==0) 제외하고 query 객체 생성
-  if (params.size !== undefined) query.size = params.size;
-  if (params.residenceType?.length) query.residenceType = params.residenceType;
-  if (params.layoutType?.length) query.layoutType = params.layoutType;
-  if (params.equilibrium?.length) query.equilibrium = params.equilibrium;
+  if (params.size !== undefined) query['size'] = params.size;
+  if (params.residenceType?.length)
+    query['residenceType'] = params.residenceType;
+  if (params.layoutType?.length) query['layoutType'] = params.layoutType;
+  if (params.equilibrium?.length) query['equilibrium'] = params.equilibrium;
 
   return request<ExploreHouseTemplateListResponse>({
     method: HTTPMethod.GET,

@@ -1,6 +1,7 @@
 import { ROUTES } from '@routes/paths';
 
-import { SCREEN_NAME, type ScreenName } from '@analytics/screenNames';
+import type { AnalyticsScreenName } from '@analytics/params/global';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { FUNNEL_ID } from '@constants/funnel';
 
@@ -23,7 +24,7 @@ const parsePathWithSearch = (pathWithSearch: string) => {
  */
 export const resolveScreenName = (
   pathWithSearch: string
-): ScreenName | string => {
+): AnalyticsScreenName => {
   const { pathname, searchParams } = parsePathWithSearch(pathWithSearch);
 
   if (pathname === ROUTES.HOME && searchParams.get('tab') === 'product') {

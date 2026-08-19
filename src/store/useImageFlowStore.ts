@@ -155,7 +155,7 @@ export const useImageFlowStore = create<ImageFlowStore>()(
       storage: createJSONStorage(() => sessionStorage),
       // sessionStorage에 예전 버전(implicit state machine 리팩토링 이전) 형식으로 저장돼 있던 값은 되살리지 않고 버린다(flow=null로 시작).
       // 배포 도중 퍼널을 밟던 탭만 홈으로 돌아가는 정도라 문제되지 않음.
-      migrate: () => ({ flow: null, flowSnapshot: null }) as ImageFlowStore,
+      migrate: () => ({ flow: null, flowSnapshot: null }),
     }
   )
 );

@@ -29,7 +29,7 @@ const buildEventParams = (
 ): Record<string, AnalyticsParamValue> => {
   return Object.fromEntries(
     Object.entries(params ?? {}).filter(([, value]) => value !== undefined)
-  ) as Record<string, AnalyticsParamValue>;
+  );
 };
 
 /**
@@ -42,7 +42,7 @@ const buildEventParams = (
 const toBreadcrumbData = (
   eventParams: Record<string, AnalyticsParamValue>
 ): Record<string, AnalyticsParamValue> => {
-  const pagePath = eventParams.page_path;
+  const pagePath = eventParams['page_path'];
   if (typeof pagePath !== 'string') return eventParams;
 
   return { ...eventParams, page_path: redactUrl(pagePath) };

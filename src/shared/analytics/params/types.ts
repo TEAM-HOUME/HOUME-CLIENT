@@ -3,6 +3,7 @@ import type { BannerChipParams } from '@analytics/params/bannerDetail';
 import type { ImageEntryRoute, LoginEntryRoute } from '@analytics/params/gate';
 import type {
   AnalyticsScreenName,
+  LooseLiteral,
   LoginStatus,
 } from '@analytics/params/global';
 import type {
@@ -49,7 +50,7 @@ export type TrackEventParams = {
 } & LandingParams &
   // --- 3. 게이트 ---
   {
-    login_entry_route?: LoginEntryRoute | string;
+    login_entry_route?: LooseLiteral<LoginEntryRoute>;
     image_entry_route?: ImageEntryRoute;
   } &
   // --- 4~6. 홈 콘텐츠 / 배너 상세 / 상품 카드 ---
@@ -72,6 +73,6 @@ export type TrackEventParams = {
   ResultParams &
   // --- 12. 토스트 / 에러 ---
   {
-    toast_type?: GaToastType | string;
+    toast_type?: LooseLiteral<GaToastType>;
     error_code?: string;
   };

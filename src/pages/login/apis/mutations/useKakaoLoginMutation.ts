@@ -16,6 +16,7 @@ import { clearLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLogi
 import { loginStatusParams } from '@analytics/utils/loginStatus';
 import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
+import { readAccessTokenHeader } from '@apis/config/accessTokenHeader';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { useToast } from '@components/toast/useToast';
@@ -42,7 +43,7 @@ export const getKakaoOAuthCallback = async (
 
   const data = response.data.data;
 
-  const accessToken = response.headers['access-token'];
+  const accessToken = readAccessTokenHeader(response);
   if (!data.isNewUser && !accessToken) {
     throw new Error(
       RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] || '액세스 토큰이 없습니다.'

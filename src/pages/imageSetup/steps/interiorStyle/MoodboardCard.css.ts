@@ -93,7 +93,7 @@ export const circle = recipe({
     state: {
       default: {
         border: `1px solid ${colorVars.color.border.secondary}`,
-        backgroundColor: `${colorVars.color.fill.inverseSecondary}`,
+        backgroundColor: colorVars.color.fill.inverseSecondary,
         width: '2.4rem',
         height: '2.4rem',
       },

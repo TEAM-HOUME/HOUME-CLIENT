@@ -6,11 +6,13 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
+import type { BaseResponse } from '@shared/types/apis';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@analytics/metaPixel';
 
 import type { SocialSignUpV2Request } from '@apis/__generated__/data-contracts';
+import { readAccessTokenHeader } from '@apis/config/accessTokenHeader';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { useToast } from '@components/toast/useToast';
@@ -33,7 +35,7 @@ export const postSignup = async (
     rawResponse: true,
   });
 
-  const accessToken = response.headers['access-token'];
+  const accessToken = readAccessTokenHeader(response);
   if (!accessToken) {
     throw new Error(
       RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] || '액세스 토큰이 없습니다.'
@@ -68,7 +70,7 @@ export const useSignupMutation = () => {
       });
     },
     onError: (error) => {
-      if (import.meta.env.DEV && isAxiosError(error)) {
+      if (import.meta.env.DEV && isAxiosError<BaseResponse<unknown>>(error)) {
         console.error('[useSignupMutation] 회원가입 실패:', {
           status: error.response?.status,
           message: error.response?.data?.message,

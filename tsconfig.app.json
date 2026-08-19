@@ -1,3 +1,6 @@
+// tsconfig.app.json: 브라우저에서 실행될 메인 서비스 코드 설정
+// 대상 폴더·파일: src/**/* 안의 모든 컴포넌트와 소스 코드
+
 {
   "compilerOptions": {
     "baseUrl": ".",
@@ -31,12 +34,51 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting */
+    /* 타입 검사 엄격도 — 타입 시스템이 검사하는 범위를 넓힌다 */
+
+    // strictNullChecks(null 가능성 검사)·noImplicitAny(암묵적 any 금지) 등 하위 플래그를 한 번에 on. 이게 꺼져 있으면 타입 검사가 사실상 무력해진다
     "strict": true,
+    // 선언에 없는 프로퍼티를 `a.b`로 읽는 것을 막고 `a['b']`를 요구한다.
+    // 이름 그대로 'no' 'property access' 'from Index Signature'
+    // 배열·객체를 인덱스로 꺼낸 값에 `| undefined`를 붙인다.
+    // arr[0]이 항상 있다고 가정하다 런타임에 undefined를 만지는 버그를 컴파일에서 잡는다
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
+    // 값을 반환하는 경로와 반환하지 않는 경로가 섞인 함수를 막는다.
+    // 호출부가 항상 값을 받는다고 믿다가 undefined를 받는 상황을 예방
+    "noImplicitReturns": true,
+    // 상위 클래스 메서드를 덮어쓸 때 override 키워드를 요구한다.
+    // 상위 메서드 이름이 바뀌었을 때 조용히 "새 메서드"가 되어버리는 것을 막는다
+    "noImplicitOverride": true,
+
+    /* 죽은 코드 검출 — 타입과 무관하지만 같은 컴파일에서 함께 잡힌다 */
+
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    // switch에서 break를 빠뜨려 다음 case로 흘러가는 것을 막는다
     "noFallthroughCasesInSwitch": true,
+    // return 뒤의 코드처럼 절대 실행되지 않는 코드를 경고가 아니라 에러로 올린다
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+
+    /*
+      빌드 도구와의 계약
+
+      Vite(esbuild)의 고속 빌드 방식과 TS의 타입 검사 방식에는 차이가 있음.
+      Vite가 프로젝트를 빌드할 때 사용하는 esbuild는 속도를 엄청나게 높이기 위해 독특한 방식을 사용함 - 전체 소스 코드의 관계를 분석하지 않고, 파일을 딱 한 개씩만 열어서 내부의 '타입'만 지운 뒤 JS로 바꾸는 방식.
+      
+      다음 설정들은 이로 인해 발생하는 문제들을 미리 방지하기 위한 3가지 설정
+    */
+
+    // 파일 하나만 보고 변환할 수 없는 코드를 막는다
+    // ex: 타입을 `export {}`로 re-export하면 런타임 값인지 타입인지 구분이 안 됨 → 타입은 `export type {}` 강제
+    "isolatedModules": true,
+    // esbuild의 원칙: 'TypeScript 문법만 자바스크립트에서 지워버리면 빌드 끝!'
+    // 하지만 TS 문법 중에는 타입을 지우는 것만으로는 처리되지 않고, 새로운 JS 코드(객체·함수)를 만들어야하는 문법이 있음 (ex: enum, namespace 등)
+    // 이런 문법은 JS 코드를 생성하는데 esbuild의 타입 제거 방식과 맞지 않으므로 아예 차단, 대신 JS 표준 문법을 사용하도록 유도
+    "erasableSyntaxOnly": true,
+    // `import './foo.css'`처럼 부수효과만 있는 import의 경로 오타를 잡는다.
+    // 기본값에서는 이런 import가 존재하지 않아도 조용히 통과 → TS가 폴더를 확인해 파일이 실존하는지 체크
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"],

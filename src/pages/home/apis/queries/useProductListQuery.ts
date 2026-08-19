@@ -1,7 +1,6 @@
 import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
 
-import type { CurationProductListResponse } from '@shared/apis/__generated__/data-contracts';
-
+import type { CurationProductListResponse } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 import type { RequestConfig } from '@apis/config/request';
 
@@ -15,14 +14,15 @@ const buildProductListQuery = (
 ): RequestConfig['query'] => {
   const query: RequestConfig['query'] = {};
 
-  if (params.keyword) query.keyword = params.keyword;
-  if (params.types && params.types.length > 0) query.types = params.types;
+  if (params.keyword) query['keyword'] = params.keyword;
+  if (params.types && params.types.length > 0) query['types'] = params.types;
   if (params.priceRanges && params.priceRanges.length > 0) {
-    query.priceRanges = params.priceRanges;
+    query['priceRanges'] = params.priceRanges;
   }
-  if (params.colors && params.colors.length > 0) query.colors = params.colors;
-  if (params.cursor !== undefined) query.cursor = params.cursor;
-  query.size = params.size ?? DEFAULT_PAGE_SIZE;
+  if (params.colors && params.colors.length > 0)
+    query['colors'] = params.colors;
+  if (params.cursor !== undefined) query['cursor'] = params.cursor;
+  query['size'] = params.size ?? DEFAULT_PAGE_SIZE;
 
   return query;
 };

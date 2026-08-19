@@ -1,4 +1,4 @@
-import { useQuery, type QueryClient } from '@tanstack/react-query';
+import { skipToken, useQuery, type QueryClient } from '@tanstack/react-query';
 
 import type { ExploreHouseTemplateDetailResponse } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
@@ -36,7 +36,12 @@ export const fetchHouseTemplateDetail = async (
 export const useHouseTemplateDetailQuery = (floorPlanId: number | null) => {
   return useQuery({
     queryKey: queryKeys.imageSetup.houseTemplateDetail(floorPlanId ?? -1),
-    queryFn: () => getHouseTemplateDetail(floorPlanId as number),
-    enabled: floorPlanId !== null,
+    // skipToken 사용 -> floorPlanId가 아직 없을 때(null일 때) 서버에 API 요청을 보내지 않도록 막을 수 있음
+    // 기존처럼 `enabled: floorPlanId !== null`로 막고 queryFn에서 floorPlanId!로 단언하면, 나중에 enabled를 고칠 때 단언이 조용히 거짓이 될 가능성이 있음(ex: enabled 항상 true로 고친다면, floorPlanId가 null인데도 단언은 그대로 유지해 오류가 발생할 수 있음)
+    // => Tanstack Query(v5+)에서 추가된 skipToken으로 queryFn 자리 하나에서 모든 걸 결정
+    queryFn:
+      floorPlanId === null
+        ? skipToken // 1. id가 null이면 -> API 요청 스킵(자동으로 enabled: false 처리)
+        : () => getHouseTemplateDetail(floorPlanId), // id가 있으면? 함수 실행
   });
 };

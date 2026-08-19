@@ -148,7 +148,7 @@ export const trackMypageSlideGenImgItemScroll = ({
   const selectedProductIds = joinAnalyticsIds(
     usedProducts
       .filter((product) => product.rawProductId != null)
-      .map((product) => ({ id: product.rawProductId as number }))
+      .map((product) => ({ id: product.rawProductId! }))
   );
 
   trackEvent(GA_EVENTS.mypage.SLIDE_GEN_IMG_ITEM_SCROLL, {

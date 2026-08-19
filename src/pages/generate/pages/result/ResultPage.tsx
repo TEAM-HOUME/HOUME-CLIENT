@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import {
+  NavigationType,
   Navigate,
   useLocation,
   useNavigate,
@@ -121,7 +122,8 @@ const ResultPage = () => {
   // - navigation 액션이 PUSH/REPLACE(자식 컴포넌트에서 다른 페이지로 이동, "다시 만들기"로 상품 탭 이동 등)일 때는 정상적으로 navigate
   useExitBlocker({
     enabled: isFromLoading,
-    shouldBlockNavigation: ({ historyAction }) => historyAction === 'POP',
+    shouldBlockNavigation: ({ historyAction }) =>
+      historyAction === NavigationType.Pop,
     onBlocked: ({ reset }) => {
       reset();
       // 브라우저 히스토리 꼬임 방지 - 복원 popstate가 처리된 다음 task에서 replace해야 Result 엔트리를 정확히 대체한다

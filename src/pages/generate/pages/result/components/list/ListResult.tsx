@@ -13,8 +13,6 @@ import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
-
 import { GA_EVENTS } from '@analytics/events';
 import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
 import { joinAnalyticsIds } from '@analytics/params/builders/productCard';
@@ -31,6 +29,8 @@ import Loading from '@components/loading/Loading';
 import ListProductCard from '@components/productCard/ListProductCard';
 import ProductCard from '@components/productCard/ProductCard';
 import StyleCard from '@components/styleCard/StyleCard';
+
+import { EMPTY_VIEW_TEXT } from '@constants/emptyViewText';
 
 import GeneratedImg from './imgSection/GeneratedImg';
 import * as styles from './ListResult.css';
@@ -113,7 +113,7 @@ const SectionFallback = ({
           onRetry={
             onRetry
               ? () => {
-                  void onRetry();
+                  onRetry();
                 }
               : undefined
           }

@@ -31,6 +31,18 @@ export type MypageMenuTab = 'generatedImages' | 'savedItems';
 
 const DEFAULT_MENU_TAB: MypageMenuTab = 'generatedImages';
 
+/** 라우터의 location.state는 any라 그대로 읽으면 any가 퍼지므로 여기서 unknown으로 좁힌다
+ *
+ * 1. state가 null이 아니고
+ * 2. state가 객체(Object) 형태여야 하며
+ * 3. 그 객체 안에 'activeTab'이라는 키가 있다면 state.activeTab의 값을 반환해라.
+ *    - 인덱스 시그니처가 객체가 아니라 activeTab이라는 key를 확실히 가지고 있는 정식 객체로 타입을 일시적으로 narrowing해주므로, `state.activeTab`처럼 property로 접근하더라도 `noPropertyAccessFromIndexSignature` 옵션에 걸리지 않음.
+ */
+const readActiveTabFromState = (state: unknown): unknown =>
+  state !== null && typeof state === 'object' && 'activeTab' in state
+    ? state.activeTab
+    : undefined;
+
 const getMypageMenuTab = (tab: unknown) => {
   if (tab === 'generatedImages' || tab === 'savedItems') {
     return tab;
@@ -44,11 +56,13 @@ const MyPage = () => {
   const location = useLocation();
 
   const [activeMenuTab, setActiveMenuTab] = useState<MypageMenuTab>(
-    () => getMypageMenuTab(location.state?.activeTab) ?? DEFAULT_MENU_TAB
+    () =>
+      getMypageMenuTab(readActiveTabFromState(location.state)) ??
+      DEFAULT_MENU_TAB
   );
 
   useEffect(() => {
-    const nextTab = getMypageMenuTab(location.state?.activeTab);
+    const nextTab = getMypageMenuTab(readActiveTabFromState(location.state));
 
     if (!nextTab) {
       return;
@@ -56,7 +70,7 @@ const MyPage = () => {
 
     setActiveMenuTab(nextTab);
     navigate(location.pathname, { replace: true, state: null });
-  }, [location.key, location.pathname, location.state?.activeTab, navigate]);
+  }, [location.key, location.pathname, location.state, navigate]);
 
   // 탭 상태 관리 (찜 토스트로 들어온 경우 찜 탭으로 이동을 위해 추가했었음.)
   // // sessionStorage에서 탭 정보 가져오기

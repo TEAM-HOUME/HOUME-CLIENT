@@ -2,7 +2,7 @@
 
 **이 문서가 컨벤션의 기준 원문(SSOT)입니다.** CLAUDE.md·AGENTS.md·.coderabbit.yaml은 요약과 이 문서로의 링크만 두고, 규칙 본문을 복사하지 않습니다. 규칙이 바뀌면 이 문서만 고칩니다.
 
-**마지막 업데이트**: 2026-08-12 (리팩토링 5차 — 문서와 코드가 어긋난 부분 수정)
+**마지막 업데이트**: 2026-08-12 (리팩토링 5차 — 문서 최신화 + 규칙 강제 수단 도입)
 
 새 규칙을 추가할 때는 아래 4가지를 통과해야 합니다. 통과하지 못하면 규칙이 아니라 취향이므로 넣지 않습니다.
 
@@ -10,6 +10,75 @@
 2. 어겼을 때 무엇이 나빠지는지 한 문장으로 쓸 수 있는가
 3. 위반을 어떻게 알아채는가 — 도구(ESLint·tsc·CI) / 리뷰 봇 / 사람 중 하나를 지정할 수 있는가
 4. 지키는 비용이 안 지키는 비용보다 작은가
+
+---
+
+## 규칙을 무엇이 강제하는가
+
+기준 3("위반을 어떻게 알아채는가")의 실제 배치입니다. 도구가 잡을 수 있는 것은 사람이 리뷰에서 보지 않습니다.
+
+### 1계층 — 도구가 막는다 (머지 전 자동 검출)
+
+CI(`.github/workflows/ci-cd.yml`)의 `lint` job과 `build` job에서 돌아갑니다. 로컬에서 같은 명령으로 재현할 수 있습니다.
+
+| 명령                | 무엇을 막나                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm lint:ci`      | ESLint 전체. 경고도 0으로 유지(`--max-warnings 0`) — 경고를 쌓으면 새 경고가 묻힌다 |
+| `pnpm format:check` | Prettier 포맷                                                                       |
+| `pnpm knip:ci`      | 미사용 파일, 미사용 의존성, package.json에 없는 import, 풀리지 않는 경로            |
+| `pnpm build`        | `tsc -b` 타입 검사 + Vite 빌드                                                      |
+
+ESLint가 막는 것 중 이 문서의 규칙에 해당하는 것:
+
+| 규칙                                                         | ESLint 규칙명                                     |
+| ------------------------------------------------------------ | ------------------------------------------------- |
+| `@/` 금지 · 최단 alias · 3단계 상대경로 · barrel 경유 import | `no-restricted-imports`                           |
+| barrel 파일(`index.ts`) 생성                                 | `src/**/index.ts`에 `no-restricted-syntax`        |
+| shared/store → pages, 화면 간 직접 import                    | `import/no-restricted-paths`                      |
+| import 순서                                                  | `import/order` (`--fix` 자동 정렬)                |
+| hook deps 누락                                               | `react-hooks/exhaustive-deps` (error)             |
+| 쿼리 키 deps 누락                                            | `@tanstack/query/exhaustive-deps` (error)         |
+| 스타일 토큰·단위                                             | `vanilla-extract/*`                               |
+| `any` 유입, Promise 오용, enum 비교, 불필요한 타입 단언      | typescript-eslint `recommendedTypeChecked` 프리셋 |
+
+#### 타입 정보를 읽는 규칙 — 표준 프리셋을 기준으로 둡니다
+
+**규칙을 하나하나 고르지 않고 typescript-eslint의 `recommendedTypeChecked` 프리셋을 기준으로 둡니다.** 프리셋 안의 규칙은 표준이라 근거를 따로 적지 않고, **하우미에서 표준과 다르게 가는 것만** `eslint.config.js`에 이유와 함께 적습니다. 개별 규칙 설명은 `typescript-eslint.io/rules/{규칙명}`에 있습니다.
+
+| 프리셋과 다르게 가는 것 | 무엇을                                                                                                                                                                                                                                                              | 왜                                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 끔                      | `no-floating-promises` · `no-misused-promises`                                                                                                                                                                                                                      | 아래 "아직 막지 않는 것" 참고                                                                                           |
+| 완화                    | `only-throw-error`                                                                                                                                                                                                                                                  | react-router가 라우트에서 `throw new Response(..., { status })`로 404를 errorElement에 넘긴다. 이 패턴만 `allow`에 등록 |
+| 완화                    | `no-unused-vars`                                                                                                                                                                                                                                                    | 기존 규약 유지 — `_` prefix는 미사용 허용                                                                               |
+| 추가 7개                | `non-nullable-type-assertion-style` · `no-unnecessary-type-arguments` · `no-unnecessary-template-expression` · `no-unnecessary-boolean-literal-compare` · `no-meaningless-void-operator` · `use-unknown-in-catch-callback-variable` · `switch-exhaustiveness-check` | 프리셋에는 없지만 도입 당시 25건을 잡아서 고쳤다 (대부분 `--fix`로 처리)                                                |
+
+**상위 프리셋 `strictTypeChecked`는 채택하지 않았습니다.** 위반 234건이고, 그중 `no-confusing-void-expression` 122건 · `restrict-template-expressions` 61건 · `no-non-null-assertion` 38건입니다. 특히 마지막은 하우미가 쓰는 `!` 표기와 정면으로 충돌합니다. `recommendedTypeChecked`는 같은 시점에 11건이었습니다.
+
+이 규칙들은 `parserOptions.projectService`를 켜야 동작합니다(2026-08-12 도입). 켜기 전에는 `no-floating-promises` 같은 규칙이 설정에 적혀 있어도 **아무 일도 하지 않았습니다.** src 전체 린트에 약 7초가 듭니다.
+
+tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
+
+`strict` · `noUnusedLocals` · `noUnusedParameters` · `noFallthroughCasesInSwitch` · `noUncheckedSideEffectImports` · `erasableSyntaxOnly` · `isolatedModules` · `noImplicitOverride` · `noImplicitReturns` · `noPropertyAccessFromIndexSignature` · `allowUnreachableCode: false` · `allowUnusedLabels: false` · `noUncheckedIndexedAccess`
+
+**환경변수는 `src/vite-env.d.ts`의 `ImportMetaEnv`에 반드시 선언합니다.** 선언하지 않은 이름은 Vite가 기본 제공하는 `[key: string]: any` 인덱스 시그니처로 떨어져서, 오타를 내도 컴파일이 통과하고 런타임에 `undefined`가 됩니다. `noPropertyAccessFromIndexSignature`가 이 누락을 컴파일 에러로 드러냅니다.
+
+**아직 도구로 막지 않기로 한 것** (이유가 있는 미채택):
+
+| 규칙                                                     | 위반 수        | 미채택 이유                                                                                                                                                                                                                                                                                                                                                            |
+| -------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-floating-promises` (프리셋에 있음 → 끔)              | 84건           | 건별로 "이 요청이 실패하면 사용자에게 보여줄 것인가"를 정해야 고칠 수 있다. 에러 처리 정책에서 정한 뒤 켠다. 지금 켜면 판단 없이 `void`만 붙이게 되어 규칙이 무력화된다                                                                                                                                                                                                |
+| `no-misused-promises` (프리셋에 있음 → 끔)               | 27건           | 같음. Promise를 돌려주는 함수를 `() => void` 자리에 넘기는 패턴(`onRetry={refetch}` 등)                                                                                                                                                                                                                                                                                |
+| `no-unnecessary-condition` (프리셋에 없음 → 안 넣음)     | 64건           | 서버 생성 타입(`__generated__`)이 실제보다 낙관적이라(nullable이어야 할 필드가 non-nullable) **실제로 필요한 방어 코드를 지우라고 시킨다.** 방향이 틀린 규칙이라 나중에도 안 켤 가능성이 높다                                                                                                                                                                          |
+| `exactOptionalPropertyTypes` (tsconfig)                  | 181건 / 78파일 | React prop 전달 패턴과 충돌. 비용 대비 이득이 작다                                                                                                                                                                                                                                                                                                                     |
+| `no-non-null-assertion` (strict 프리셋에 있음 → 안 넣음) | 38건           | `!`는 컴파일 시점 표기라 그 자체로 예외를 던지지 않지만, **검사를 끄기 때문에 가정이 틀리면 `undefined`가 흘러가 엉뚱한 곳에서 터진다.** 지금 38건은 대부분 서버 생성 타입이 optional로 나오지만 실제로는 항상 오는 필드(`plan.id!` 등)다. 규칙만 켜면 `?? 기본값`을 억지로 붙이게 되므로 **먼저 생성 타입의 nullable 표기를 서버와 맞추는 게 순서다.** 그 뒤에 재검토 |
+
+### 2계층 — 리뷰 봇이 본다
+
+기계 판정은 안 되지만 패턴 대조는 되는 것. `.coderabbit.yaml`이 이 문서를 기준으로 읽습니다. 네이밍 의미(`use{Subject}Query` 같은 형태는 도구가 보지만 이름이 대상을 제대로 가리키는지는 못 봄), 주석의 정확성, 규칙 예외에 이유가 붙어 있는지.
+
+### 3계층 — 사람이 판단한다
+
+폴더 배치, 공유 여부, 상태 위치, 캐시 값, 새 규칙의 채택 여부. 도구가 대신할 수 없는 것만 남깁니다.
 
 ---
 
@@ -168,9 +237,9 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
    import type { ToastType } from '@shared/types/toast';
    ```
 
-   **위 표가 alias의 전부다.** 표에 없는 shared 하위 폴더(`types` · `detection` · `monitoring` · `config`)는 `@shared/{폴더}/`가 최단 형태이며, 이것은 규칙 위반이 아니다.
+   **위 표가 alias의 전부다.** 표에 없는 shared 하위 폴더(`types` · `monitoring` · `config`)는 `@shared/{폴더}/`가 최단 형태이며, 이것은 규칙 위반이 아니다.
 
-   목록은 닫아 둔다. 위 두 규칙의 목적은 목록이 무엇이든 달성되는 반면, alias를 새로 추가하면 기존 `@shared/{폴더}/` import를 전부 함께 고쳐야 하기 때문이다. `@analytics/`는 사용량이 316줄로 압도적이어서 2026-08-12에 추가했고, 그때 316줄을 일괄 치환했다. 그 아래 규모(`detection` 51줄, `types` 45줄)는 추가하지 않는다.
+   목록은 닫아 둔다. 위 두 규칙의 목적은 목록이 무엇이든 달성되는 반면, alias를 새로 추가하면 기존 `@shared/{폴더}/` import를 전부 함께 고쳐야 하기 때문이다. `@analytics/`는 사용량이 316줄로 압도적이어서 2026-08-12에 추가했고, 그때 316줄을 일괄 치환했다. 그 아래 규모(`types` 45줄)는 추가하지 않는다.
 
 3. **3단계 이상 상대경로 금지**
 
@@ -197,8 +266,9 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 
 ### ESLint 설정
 
-- `import/order` pathGroups에 모든 alias가 `internal` 그룹으로 등록됨
-- `eslint --fix`로 import 순서 자동 정렬 가능
+- `import/order` pathGroups에 모든 alias가 `internal` 그룹으로 등록됨 → `eslint --fix`로 순서 자동 정렬
+- 위 금지 패턴 1·3은 `no-restricted-imports`로 막는다. `@/`, `@shared/{더 짧은 alias가 있는 폴더}`, `../../../`로 시작하는 경로가 모두 에러다
+- `import/no-restricted-paths`로 의존 방향을 막는다 (아래 Cross-Feature Import 참고)
 
 ---
 
@@ -291,45 +361,72 @@ export const useGenerateImageApi = () => useMutation({ ... });   // Api 접미�
    // ✅ Good — feature 내부로 이동하거나 shared로 추출
    ```
 
-6. **App-level (`layout/`, `routes/`, `main.tsx`)은 feature import 허용**
+6. **App-level (`routes/`, `main.tsx`)은 feature import 허용**
 
    ```typescript
    // ✅ OK — app-level 오케스트레이션
    import { prefetchStaticData } from '@pages/imageSetup/utils/staticDataPrefetch';
    ```
 
-### Detection 모듈 구조
+   `main.tsx`가 이 예외의 실제 사용처다. 정적 데이터 prefetch는 원래 `shared/apis/config/queryClient.ts`에서 호출했는데, 무엇을 미리 받을지는 imageSetup 화면이 정하는 내용이라 shared가 pages를 알게 됐다. 2026-08-12에 호출을 `main.tsx`로 옮겼다.
 
-Detection(가구 탐지) 시스템은 `src/shared/detection/`에 위치한다.
+**강제 수단**: 4·5번은 ESLint `import/no-restricted-paths`로 막는다. 화면 폴더 10개마다 "자기 폴더를 제외한 `src/pages` 전체"를 금지 구역으로 등록해 두었고(`eslint.config.js`의 `crossPageZones`), `src/shared`·`src/store`에서 `src/pages`로 가는 것도 함께 막는다. `src/routes`·`src/main.tsx`는 구역에 넣지 않아 위 6번 예외가 성립한다.
 
-**현재 상태 (2026-08-12 실측)**: **ONNX 추론은 런타임에 전혀 실행되지 않는다.** 끄는 작업이 따로 필요하지 않다.
+### Detection(ONNX 가구 탐지) 모듈 — 2026-08-18 삭제됨
 
-추적 결과는 이렇다.
+**삭제했다. 지금 이 코드는 레포에 없다.** 팀 합의로 제거했고, 필요해지면 아래 절차로 되살린다.
 
-- `useDetectionPrefetch.ts`는 `useDetectionPrefetchServer`를 re-export하는데, 그 훅의 `prefetchDetection`은 **본문이 비어 있는 함수**다. 마이페이지가 이 훅을 호출하지만 아무 일도 일어나지 않는다.
-- ONNX를 실제로 쓰는 쪽은 `useDetectionPrefetch.client.ts`와 `useFurnitureHotspots`인데, 전자는 어디에도 연결돼 있지 않고 후자는 호출부가 0건이다.
-- `onnxruntime-web`은 `useOnnxModel.ts` 안에서 `await import()`로만 불러오므로 별도 청크로 분리되며, 호출되지 않아 다운로드되지 않는다 (메인 번들에 문자열 0건으로 확인).
-- 다만 타입·상수(`FurnitureCategoryCode` 등)는 `queryKey.ts`를 포함해 8개 파일이 실제로 참조한다. **이 폴더를 통째로 지우면 빌드가 깨진다.**
-- 배포물에는 남는다: `dist/models/*.onnx` 40MB, `dist/onnxruntime/*.wasm` 11MB. 사용자가 내려받지는 않으므로 로딩 성능에는 영향이 없고, 배포 용량에만 영향을 준다.
+무엇을 지웠나 — 총 31파일 + 바이너리 2개 + 의존성 1개:
 
-**따라서 이 폴더의 파일은 "참조 0건"이라는 이유로 삭제하지 않는다.** 복구 대기 상태이며, 삭제 판단은 복구 여부가 확정된 뒤에 한다.
+| 대상                    | 내용                                                                                                                                            |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/shared/detection/` | 17파일 (모델 로더, 핫스팟 파이프라인, 캐시 스토어, obj365 클래스 표 등)                                                                         |
+| `src/pages/generate/`   | 6파일 (`useGeneratedCategoriesQuery` `useCurationState` `useCurationStore` `useCurationCacheStore` `hotspotCategoryResolver` `types/furniture`) |
+| `src/pages/mypage/`     | 5파일 (`useDetectionPrefetch` 3종 + `detectionPrefetch.types` + `resultNavigation`)                                                             |
+| 기타                    | `useWelcomePageModelPreload`(본문이 빈 함수였음)                                                                                                |
+| 바이너리                | `public/models/*.onnx` + `public/onnxruntime/*.wasm` — 합계 약 53MB                                                                             |
+| 의존성                  | `onnxruntime-web` (삭제 시점 1.23.2)                                                                                                            |
 
+지울 때 함께 정리한 것 — 살아 있던 코드에서 detection을 참조하던 3곳:
+
+- `store/useUserStore.ts` — 로그아웃 시 `useDetectionCacheStore.clear()` 호출 제거
+- `pages/mypage/.../GeneratedImagesSection.tsx` — 빈 함수를 부르던 prefetch 로직 제거 (useEffect 1개, useCallback 2개)
+- `shared/constants/queryKey.ts` — `CategoriesQueryVariables` · `ProductsQueryVariables` · `furniture` 도메인 제거 (전부 삭제된 코드에서만 쓰였다)
+
+그 밖에 `GenImgCard`의 `onImageLoad` prop(소비자 소멸), `apiEndpoints`의 `CURATION_CATEGORIES` v1 엔드포인트를 함께 제거했다.
+
+**남아 있는 큐레이션 기능은 이것과 별개다.** `CurationResult.tsx`는 `useCurationCategoriesQuery`(v2 추천형)를 쓰며 객체 인식을 거치지 않는다. 삭제 대상이 아니었다.
+
+#### 되살리는 방법
+
+커밋 해시는 rebase하면 바뀌므로 경로로 찾는다.
+
+```bash
+# 1) 삭제 커밋 찾기
+git log --oneline --diff-filter=D -- src/shared/detection/
+
+# 2) 그 커밋의 직전 상태에서 파일을 되돌린다
+git checkout <위에서 찾은 해시>^ -- \
+  src/shared/detection \
+  src/pages/generate/apis/queries/useGeneratedCategoriesQuery.ts \
+  src/pages/generate/hooks/useCurationState.ts \
+  src/pages/generate/stores/useCurationStore.ts \
+  src/pages/generate/stores/useCurationCacheStore.ts \
+  src/pages/generate/utils/hotspotCategoryResolver.ts \
+  src/pages/generate/types/furniture.ts \
+  src/pages/mypage/hooks \
+  src/pages/mypage/utils/resultNavigation.ts \
+  public/models public/onnxruntime
+
+# 3) 의존성 복구
+pnpm add onnxruntime-web@1.23.2
 ```
-shared/detection/
-├── constants.ts                    # OBJ365_MODEL_PATH, 임계값
-├── furnitureCategoryMapping.ts     # FurnitureCategoryCode, resolver
-├── types.ts                        # Detection, ProcessedDetections
-├── hooks/                          # useOnnxModel, useFurnitureHotspots 등
-├── stores/                         # useDetectionCacheStore
-└── utils/                          # 파이프라인, 매퍼, 전처리 유틸
-```
 
-```typescript
-// Detection import 패턴
-import { OBJ365_MODEL_PATH } from '@shared/detection/constants';
-import type { Detection } from '@shared/detection/types';
-import { useONNXModel } from '@shared/detection/hooks/useOnnxModel';
-```
+되돌린 뒤에는 위 "함께 정리한 것" 3곳을 다시 연결해야 한다. 삭제 커밋 하나만 통째로 뒤집는 `git revert <해시>`가 더 간단하다.
+
+삭제 결과 `pnpm knip`의 **미사용 파일이 20개에서 0개가 됐고**, 그래서 `pnpm knip:ci`(CI 게이트)에 파일 검사를 추가했다. 이제 참조되지 않는 파일이 새로 생기면 PR에서 막힌다.
+
+**주의**: 파일을 지워도 **git 히스토리에는 53MB 바이너리가 그대로 남는다.** 클론 용량은 줄지 않는다. 줄이려면 히스토리 재작성(`git filter-repo` 등)이 필요한데, 팀 전원이 다시 클론해야 하므로 별도 합의 사항으로 남긴다.
 
 ### shared/apis/ 구조
 
@@ -729,11 +826,6 @@ createRoot(rootElement, getSentryReactErrorHandlerOptions())
 - `src/routes/RootLayout.tsx` — router.tsx와 같은 폴더
 - `@layout` alias 삭제됨 → 상대경로 import (`./RootLayout`)
 
-### ONNX 모델 preload
-
-- RootLayout의 `useGenerateWarmup()`이 `/generate/*`, `/imageSetup` 경로에서 자동 preload
-- 개별 페이지에서 중복 preload 호출 금지
-
 <!-- Phase 9 완료 -->
 
 ## Vanilla Extract 스타일링 컨벤션
@@ -810,21 +902,23 @@ position/z-index → display/flex → margin → border → padding → width/he
 
 ## 변경 이력
 
-| 날짜       | 변경 내용                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-02-16 | 템플릿 생성                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 2026-02-16 | Phase 1: Query Key 컨벤션 추가 (factory 패턴, ESLint 설정)                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| 2026-02-16 | Phase 2: Path Alias 컨벤션 추가 (@/ 제거, 세부 alias 통일, @store 추가, @types 금지)                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2026-02-17 | Phase 3: 네이밍 컨벤션 추가 ({Feature}Page, Query/Mutation 접미사, 코드 네이밍 규칙)                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2026-02-17 | Phase 3 보완: mypage/login 훅 접미사, 컴포넌트명=파일명 규칙, 폴더 camelCase, dead code 삭제                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| 2026-02-17 | Phase 4: 폴더 구조 정규화 (Detection 분리, cross-feature import 해소, steps 리네임)                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| 2026-02-17 | Phase 4 보완: shared/apis/ 인프라-도메인 분리 (config/ 하위폴더)                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 2026-02-17 | Phase 5: Export 컨벤션 추가 (컴포넌트 default, 훅/유틸 named, barrel/mixed 금지)                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 2026-02-17 | Phase 6: API/데이터 페칭 컨벤션 추가 (queries/mutations 구조, request() rawResponse, 훅 위치 규칙)                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 2026-02-17 | Phase 9: Lazy Loading 컨벤션 추가 (eager/lazy 분류, RootLayout 이동, ONNX preload 정리)                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| 2026-02-17 | Phase 11: Vanilla Extract 스타일링 컨벤션 추가 (concentric order, 디자인 토큰 규칙, ESLint 플러그인)                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2026-02-17 | 컨벤션 감사: TanStack Query isPending 규칙 추가, 경로 상수 규칙 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2026-02-17 | P1 핫픽스: 조건부 쿼리(enabled) isPending→isLoading 구분 규칙 추가 (disabled 쿼리 영구 로딩 방지)                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| 2026-08-12 | 리팩토링 5차: 이 문서를 컨벤션 SSOT로 지정(다른 문서는 포인터만), 새 규칙 채택 기준 4가지 추가. 코드와 어긋난 부분 정정 — 폰트(fontStyle→fontVars), Eager/Lazy 목록, Vanilla Extract 예외 표, 쿼리 도메인 목록, shared/apis 구조. 신설 — Provider 구성(문서화 누락분), 공유 코드 배치 기준, 에러·로딩 정책 섹션(내용은 단계 4에서 확정)                                                                                                                                                                                  |
-| 2026-08-12 | `@analytics/` alias 추가(사용량 316줄로 최다 — 기존 `@shared/analytics/` 316줄 일괄 치환). analytics barrel 7개 해체로 **`src/` 아래 index.ts 0개 달성**(import 72줄/49파일 치환, 폴더 설명은 README.md로 이전). Detection 모듈 상태 실측 정정 — ONNX 추론은 런타임에 실행되지 않음(prefetch 훅이 빈 함수)                                                                                                                                                                                                               |
-| 2026-08-12 | 규칙마다 "왜 이 규칙인가"를 본문에 추가: query key factory 읽는 법·factory를 쓰는 이유·exhaustive-deps가 검사하는 것과 오탐 조건 / alias 두 규칙의 이유 분리 + alias 목록을 닫음 + 1~2단계 상대경로 허용 근거 / src 최상위 구분과 store 위치 근거 / cross-feature 규칙의 목적 3가지 / default·named export 근거와 barrel 금지 근거(+대가) / TanStack Query 두 축(status·fetchStatus) 설명과 enabled:false에서 갈리는 이유. Detection 모듈 상태를 실측으로 정정(legacy 아님 — 프리페치는 동작 중, hotspot UI만 복구 대기) |
+| 날짜       | 변경 내용                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-02-16 | 템플릿 생성                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 2026-02-16 | Phase 1: Query Key 컨벤션 추가 (factory 패턴, ESLint 설정)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 2026-02-16 | Phase 2: Path Alias 컨벤션 추가 (@/ 제거, 세부 alias 통일, @store 추가, @types 금지)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-02-17 | Phase 3: 네이밍 컨벤션 추가 ({Feature}Page, Query/Mutation 접미사, 코드 네이밍 규칙)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-02-17 | Phase 3 보완: mypage/login 훅 접미사, 컴포넌트명=파일명 규칙, 폴더 camelCase, dead code 삭제                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 2026-02-17 | Phase 4: 폴더 구조 정규화 (Detection 분리, cross-feature import 해소, steps 리네임)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 2026-02-17 | Phase 4 보완: shared/apis/ 인프라-도메인 분리 (config/ 하위폴더)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 2026-02-17 | Phase 5: Export 컨벤션 추가 (컴포넌트 default, 훅/유틸 named, barrel/mixed 금지)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 2026-02-17 | Phase 6: API/데이터 페칭 컨벤션 추가 (queries/mutations 구조, request() rawResponse, 훅 위치 규칙)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 2026-02-17 | Phase 9: Lazy Loading 컨벤션 추가 (eager/lazy 분류, RootLayout 이동, ONNX preload 정리)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| 2026-02-17 | Phase 11: Vanilla Extract 스타일링 컨벤션 추가 (concentric order, 디자인 토큰 규칙, ESLint 플러그인)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-02-17 | 컨벤션 감사: TanStack Query isPending 규칙 추가, 경로 상수 규칙 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-02-17 | P1 핫픽스: 조건부 쿼리(enabled) isPending→isLoading 구분 규칙 추가 (disabled 쿼리 영구 로딩 방지)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2026-08-12 | 리팩토링 5차: 이 문서를 컨벤션 SSOT로 지정(다른 문서는 포인터만), 새 규칙 채택 기준 4가지 추가. 코드와 어긋난 부분 정정 — 폰트(fontStyle→fontVars), Eager/Lazy 목록, Vanilla Extract 예외 표, 쿼리 도메인 목록, shared/apis 구조. 신설 — Provider 구성(문서화 누락분), 공유 코드 배치 기준, 에러·로딩 정책 섹션(내용은 단계 4에서 확정)                                                                                                                                                                                                                                                                                                                                                                      |
+| 2026-08-12 | `@analytics/` alias 추가(사용량 316줄로 최다 — 기존 `@shared/analytics/` 316줄 일괄 치환). analytics barrel 7개 해체로 **`src/` 아래 index.ts 0개 달성**(import 72줄/49파일 치환, 폴더 설명은 README.md로 이전). Detection 모듈 상태 실측 정정 — ONNX 추론은 런타임에 실행되지 않음(prefetch 훅이 빈 함수)                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 2026-08-12 | 규칙마다 "왜 이 규칙인가"를 본문에 추가: query key factory 읽는 법·factory를 쓰는 이유·exhaustive-deps가 검사하는 것과 오탐 조건 / alias 두 규칙의 이유 분리 + alias 목록을 닫음 + 1~2단계 상대경로 허용 근거 / src 최상위 구분과 store 위치 근거 / cross-feature 규칙의 목적 3가지 / default·named export 근거와 barrel 금지 근거(+대가) / TanStack Query 두 축(status·fetchStatus) 설명과 enabled:false에서 갈리는 이유. Detection 모듈 상태를 실측으로 정정(legacy 아님 — 프리페치는 동작 중, hotspot UI만 복구 대기)                                                                                                                                                                                     |
+| 2026-08-12 | 규칙 강제 수단 도입(단계 2): "규칙을 무엇이 강제하는가" 섹션 신설(1계층 도구 / 2계층 봇 / 3계층 사람). ESLint에 `no-restricted-imports`(@/ · 최단 alias · 3단계 상대경로 · barrel), `import/no-restricted-paths`(shared·store→pages, 화면 간 교차), `src/**/index.ts` 생성 금지, `react-hooks/exhaustive-deps` error 승격, eslint-plugin-react 등록, 타입 정보를 읽는 규칙군(`projectService`) 추가. tsconfig에 `isolatedModules`·`noImplicitOverride`·`noImplicitReturns`·`noPropertyAccessFromIndexSignature`·`allowUnreachableCode:false`·`allowUnusedLabels:false` 추가. `ImportMetaEnv`에 미선언 환경변수 8개(`VITE_API_BASE_URL` 포함) 추가. knip 도입 + CI에 lint job 추가                            |
+| 2026-08-18 | **ONNX 가구 탐지 모듈 삭제** (팀 합의). 31파일 + 바이너리 53MB + `onnxruntime-web` 제거. 살아 있던 참조 3곳 정리(useUserStore 캐시 clear / GeneratedImagesSection prefetch 로직 / queryKey의 furniture 도메인). 복구 절차는 "Detection 모듈" 절에 기록. 남아 있는 큐레이션(v2 추천형)은 무관. 삭제로 `noUncheckedIndexedAccess` 위반이 75건→9건이 되어 9건을 고치고 플래그를 채택했고, knip 미사용 파일이 0이 되어 CI 게이트에 파일 검사를 추가했다 손으로 고른 규칙 24개를 typescript-eslint 표준 프리셋 `recommendedTypeChecked`로 교체(위반 11건 처리 — 그중 `no-unsafe-enum-comparison` 4건은 react-router `NavigationType` enum을 문자열 리터럴과 비교하던 것). `strictTypeChecked`는 234건이라 미채택. |

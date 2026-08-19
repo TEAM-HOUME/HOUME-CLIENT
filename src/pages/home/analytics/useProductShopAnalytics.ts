@@ -178,7 +178,7 @@ const useProductShopAnalytics = (
         return nextExpanded;
       });
     },
-    [setSheetExpandedState]
+    [getSelectSheetContextRef, setSheetExpandedState]
   );
 
   const handleProductListRender = useCallback(
@@ -186,7 +186,7 @@ const useProductShopAnalytics = (
       productCountViewedRef.current = count;
       onProductViewedCountChange(count);
     },
-    [onProductViewedCountChange]
+    [onProductViewedCountChange, productCountViewedRef]
   );
 
   const handleFilterChipClickWithAnalytics = useCallback(
@@ -234,7 +234,12 @@ const useProductShopAnalytics = (
         COUNT_TRIGGER_EVENT.ADD_CLICK
       );
     },
-    [enrichProductSubCategory, handleSelectProduct, trackSelectSheetCountChange]
+    [
+      enrichProductSubCategory,
+      handleSelectProduct,
+      selectedProductsRef,
+      trackSelectSheetCountChange,
+    ]
   );
 
   const handleRemoveSelectedProductWithAnalytics = useCallback(
@@ -263,6 +268,7 @@ const useProductShopAnalytics = (
       enrichProductSubCategory,
       getSelectSheetContext,
       handleRemoveSelectedProduct,
+      selectedProductsRef,
       trackSelectSheetCountChange,
     ]
   );

@@ -1,6 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-import { useLocation, useNavigationType } from 'react-router-dom';
+import {
+  NavigationType,
+  useLocation,
+  useNavigationType,
+} from 'react-router-dom';
 
 /**
  * 네비게이션 스크롤 관리 훅
@@ -55,7 +59,7 @@ export const useScrollToTop = () => {
     // (2) POP이면 저장 위치 복원, 그 외(PUSH/REPLACE)는 최상단.
     //     useLayoutEffect(페인트 전)라 '최상단 → 복원 위치' 점프 깜빡임 방지
     const target =
-      navigationType === 'POP'
+      navigationType === NavigationType.Pop
         ? (positionsRef.current.get(location.key) ?? 0)
         : 0;
 

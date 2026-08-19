@@ -11,6 +11,39 @@ permissions:
   pull-requests: write
 
 jobs:
+  # 규칙 위반을 머지 전에 막는 게이트.
+  lint:
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 경고도 0으로 유지한다. 경고를 쌓아두면 새로 생긴 경고가 묻힌다
+      - name: ESLint
+        run: pnpm lint:ci
+
+      - name: Prettier 포맷 검사
+        run: pnpm format:check
+
+      # 미사용 의존성 / package.json에 없는 import / 풀리지 않는 경로
+      # (미사용 파일·export는 아직 정리 전이라 게이트에서 제외 — pnpm knip으로 로컬 확인)
+      - name: knip
+        run: pnpm knip:ci
+
   build:
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
     runs-on: ubuntu-latest # 24.04(Ubuntu LTS)

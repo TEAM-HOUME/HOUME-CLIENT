@@ -98,7 +98,7 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
     mutationKey: ['jjym'],
     mutationFn: (rawProductId) => postJjym({ rawProductId }),
 
-    onMutate: async (rawProductId) => {
+    onMutate: (rawProductId) => {
       toggleSaveProduct(rawProductId);
       return { rawProductId };
     },

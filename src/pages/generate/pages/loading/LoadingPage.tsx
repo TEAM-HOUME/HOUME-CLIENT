@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { overlay } from 'overlay-kit';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, NavigationType, useNavigate } from 'react-router-dom';
 
 import {
   trackLoadImgCardPreferenceClick,
@@ -62,7 +62,7 @@ const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
 const IMAGE_GENERATION_ERROR_CODES = new Set([50013, 50017, 50400]);
 
 const isImageGenerationServerError = (error: unknown) => {
-  if (!isAxiosError(error)) return false;
+  if (!isAxiosError<{ code?: unknown }>(error)) return false;
 
   const code = error.response?.data?.code;
 
@@ -103,7 +103,7 @@ const LoadingPage = () => {
       return true;
     },
     onBlocked: ({ reset, historyAction }) => {
-      if (historyAction === 'POP') {
+      if (historyAction === NavigationType.Pop) {
         trackLoadImgPageBackSwipe();
       }
       trackLoadImgMdGenImgQuitView();
@@ -319,7 +319,7 @@ const LoadingPage = () => {
   const hasError = isError || currentImages.length === 0;
 
   // 정상 데이터일 때 현재/다음 이미지 계산
-  const currentImage = hasError ? null : currentImages[currentIndex];
+  const currentImage = hasError ? null : (currentImages[currentIndex] ?? null);
 
   const nextImage = hasError
     ? null

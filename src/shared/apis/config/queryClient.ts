@@ -1,8 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 
-import { prefetchStaticData } from '@pages/imageSetup/utils/staticDataPrefetch';
-
 import { isSessionExpiredError } from '@shared/monitoring/classifyApiError';
 
 import { handleMutationError, handleQueryError } from './globalErrorHandler';
@@ -29,5 +27,3 @@ export const queryClient = new QueryClient({
     },
   },
 });
-
-prefetchStaticData(queryClient);

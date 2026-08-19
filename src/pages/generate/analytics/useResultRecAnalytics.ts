@@ -80,7 +80,12 @@ const useResultRecAnalytics = ({
       categories: renderableCategories,
       selectedCategoryId,
     });
-  }, [categoriesState, renderableCategories, resolvedProducts]);
+  }, [
+    categoriesState,
+    renderableCategories,
+    resolvedProducts,
+    selectedCategoryId,
+  ]);
 
   useEffect(() => {
     if (productsState !== 'content' || selectedCategoryId === null) return;
