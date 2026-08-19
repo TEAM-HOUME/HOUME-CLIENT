@@ -20,7 +20,7 @@ export const contentButton = style({
   display: 'flex',
   flexDirection: 'column',
   gap: unitVars.unit.gapPadding['300'],
-  padding: `${unitVars.unit.gapPadding['400']}`,
+  padding: unitVars.unit.gapPadding['400'],
   textAlign: 'left',
   selectors: {
     '&:focus-visible': {

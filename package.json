@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings 0",
     "knip": "knip",
-    "knip:ci": "knip --include files,dependencies,unlisted,unresolved,binaries",
+    "knip:ci": "knip --include dependencies,unlisted,unresolved,binaries",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
