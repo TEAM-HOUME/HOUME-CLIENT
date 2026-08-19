@@ -188,7 +188,6 @@ reviews:
         # 건드리면 안 되는 것
         - shared/apis/__generated__/ — swagger 자동 생성 파일
         - /api/v2·/api/v4 URL 값과 생성 타입의 V2 표기 — 서버 유래라 개명 제안 금지
-        - shared/detection/ (ONNX) — 현재 참조 0건이지만 복구 대기 상태라 삭제 제안 금지
 
         # 보안 및 성능
         - 환경 변수는 반드시 import.meta.env 사용

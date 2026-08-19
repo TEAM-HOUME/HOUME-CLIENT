@@ -47,7 +47,7 @@ export interface ApiErrorInfo {
 export const normalizeApiPath = (url?: string): string | undefined => {
   if (!url) return undefined;
 
-  const [path] = url.split('?');
+  const path = url.split('?')[0] ?? url;
 
   return path
     .split('/')

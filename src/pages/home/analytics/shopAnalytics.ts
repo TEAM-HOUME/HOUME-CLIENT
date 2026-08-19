@@ -167,7 +167,7 @@ export const trackShopSelectSheetCtaClick = ({
       { sheetExpanded, sheetCollapsed, selectedProducts },
       { includeLoginStatus: true }
     ),
-    ...getShopSelectedProductFields(lastProduct),
+    ...(lastProduct ? getShopSelectedProductFields(lastProduct) : {}),
     image_entry_route: imageEntryRoute,
     return_screen_name: returnScreenName,
     has_previous_space: hasPreviousSpace,

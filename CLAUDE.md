@@ -35,7 +35,6 @@ src/
 │   ├── components/ # 공통 UI
 │   ├── config/     # Sentry·Clarity 초기화
 │   ├── constants/  # queryKeys, API_ENDPOINT
-│   ├── detection/  # ONNX 가구 탐지
 │   ├── monitoring/ # 에러 분류·보고 정책
 │   ├── styles/     # 디자인 토큰
 │   └── types/ hooks/ utils/ assets/
@@ -81,7 +80,6 @@ src/
 ## 건드리면 안 되는 것
 
 - **서버 API의 V2 표기** — `shared/apis/__generated__/data-contracts.ts`의 타입명, `/api/v2`·`/api/v4` URL 값은 서버 유래
-- **ONNX 가구 탐지 모듈** — `shared/detection/`. 추론은 런타임에 실행되지 않지만(prefetch 훅이 빈 함수) 타입·상수는 8개 파일이 참조하므로 지우면 빌드가 깨진다. 복구 대기 상태
 
 ## Git 워크플로우
 

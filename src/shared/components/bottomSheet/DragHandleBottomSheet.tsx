@@ -147,9 +147,7 @@ const DragHandleBottomSheet = ({
   // 드래그 시작: 측정값 스냅샷 + 플래그 리셋 (capture는 호출부에서 처리)
   const beginDrag = useCallback(
     (clientY: number, panel: HTMLDivElement) => {
-      const collapsedPx = isPersistent
-        ? parsePxFromRem(collapsedHeight as string)
-        : 0;
+      const collapsedPx = isPersistent ? parsePxFromRem(collapsedHeight) : 0;
       const expandedPx = resolveExpandedPx();
       // 최소화 상태에서 드래그 시작 시엔 패널 실측(minimizedHeight)이 아니라 collapsed 높이를 기준으로 삼아, clamp 데드존/점프 없이 collapsed에서 확장 드래그가 이어지도록 함
       const startHeight =
@@ -288,15 +286,17 @@ const DragHandleBottomSheet = ({
   // pointer는 contentSlot의 touch-action:pan-y 때문에 스크롤 시 pointercancel로 끊김 →
   // body 드래그는 touch 이벤트로 구현. 조건 충족 시에만 시트 드래그로 takeover (그 외 native 스크롤).
   const handleBodyTouchStart = useCallback((e: React.TouchEvent) => {
-    if (e.touches.length !== 1) return;
-    bodyStartYRef.current = e.touches[0].clientY;
+    const touch = e.touches[0];
+    if (e.touches.length !== 1 || !touch) return;
+    bodyStartYRef.current = touch.clientY;
     bodyTakenOverRef.current = false;
   }, []);
 
   const handleBodyTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      const y = e.touches[0].clientY;
+      const touch = e.touches[0];
+      if (e.touches.length !== 1 || !touch) return;
+      const y = touch.clientY;
 
       // 이미 takeover 했으면 계속 시트 드래그
       if (bodyTakenOverRef.current) {

@@ -7,7 +7,6 @@ import {
   trackSignupCompCompleteRegistration,
   trackSignupCompCtaClick,
 } from '@pages/generate/analytics/signupCompAnalytics';
-import { useWelcomePageModelPreload } from '@pages/generate/hooks/useWelcomePageModelPreload';
 
 import { ROUTES } from '@routes/paths';
 
@@ -32,8 +31,6 @@ const WelcomePage = () => {
   // zustand에서 userName 가져오기
   const userName = useUserStore((state) => state.userName);
   const navigate = useNavigate();
-
-  useWelcomePageModelPreload(); // ONNX 모델 워밍업용 (현재 미사용)
 
   useAnalyticsPageView(
     GA_EVENTS.signupComp.PAGE_VIEW,
