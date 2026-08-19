@@ -2,10 +2,10 @@
 import { useSelectMoodboardAnalytics } from '@pages/imageSetup/analytics/useSelectMoodboardAnalytics';
 import { useMoodBoardQuery } from '@pages/imageSetup/apis/queries/useMoodBoardQuery';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import TextHeading from '@components/v2/textHeading/TextHeading';
+import TextHeading from '@components/textHeading/TextHeading';
 
 import * as styles from './InteriorStyle.css';
 import MoodBoard from './MoodBoard';

@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 
+import { useGenerateStore } from '@pages/generate/stores/useGenerateStore';
 import type { GeneratedImagePayload } from '@pages/generate/types/generate';
-import { useGenerateStore } from '@pages/generate/v2/stores/useGenerateStore';
+
+import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 
 import type {
   GenerateImageV4Response,
@@ -33,6 +35,8 @@ export const useGenerateFullFunnelImageMutation = () => {
 
   return useMutation<GeneratedImagePayload, Error, GenerateImageV4Request>({
     mutationFn: postGenerateFullFunnelImage,
+    // 실패 시 전역 에러 핸들러가 이 scope를 태그로 붙여 Sentry로 보낸다
+    meta: { sentry: { scope: MONITORING_SCOPE.IMAGE_GENERATE } },
     onSuccess: (data) => {
       resetGenerate();
       setNavigationData(data);

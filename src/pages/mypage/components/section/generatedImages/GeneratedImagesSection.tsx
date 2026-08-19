@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useMypageGeneratedImagesAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useGetGeneratedImageListQuery } from '@pages/mypage/apis/queries/useMyPageImagesQuery';
+import { useGeneratedImageListQuery } from '@pages/mypage/apis/queries/useGeneratedImageListQuery';
 import { useDetectionPrefetch } from '@pages/mypage/hooks/useDetectionPrefetch';
 import { formatDate } from '@pages/mypage/utils/formatting';
 
@@ -30,7 +30,7 @@ const GeneratedImagesSection = () => {
     data: imagesListData,
     isPending,
     isError,
-  } = useGetGeneratedImageListQuery();
+  } = useGeneratedImageListQuery();
 
   const groups = imagesListData?.groups ?? [];
   const isListReady = !isPending && !isError && !!imagesListData;

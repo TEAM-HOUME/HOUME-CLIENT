@@ -1,6 +1,6 @@
 import type { ActivityWithFurnitureResponse } from '@apis/__generated__/data-contracts';
 
-import Icon from '@components/v2/icon/Icon';
+import Icon from '@components/icon/Icon';
 
 import { getActivityIconName } from './activityIcons';
 import * as styles from './SelectTrigger.css';

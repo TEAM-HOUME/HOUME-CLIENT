@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const contentWrapper = style({
   position: 'relative',
@@ -24,11 +24,11 @@ export const textSection = style({
 });
 
 export const headerText = style({
-  ...fontStyle('heading_sb_20'),
+  ...fontVars.font.title_sb_20,
 });
 
 export const bodyText = style({
-  ...fontStyle('body_r_14'),
+  ...fontVars.font.body_r_14,
   textAlign: 'center',
   color: colorVars.color.gray600,
 });

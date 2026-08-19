@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useMypageSavedItemsAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useGetJjymListQuery } from '@pages/mypage/apis/queries/useGetJjymListQuery';
+import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
@@ -9,11 +9,11 @@ import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
+import ProductCard from '@components/productCard/ProductCard';
+
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
 
 import { normalizeColorHexes } from '@utils/normalizeColorHexes';
-
-import ProductCard from '@/shared/components/v2/productCard/ProductCard';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
@@ -26,7 +26,7 @@ const SavedItemsSection = () => {
     (state) => state.setSavedProductIds
   );
 
-  const { data: savedItems = [], isFetched } = useGetJjymListQuery({
+  const { data: savedItems = [], isFetched } = useJjymListQuery({
     gcTime: 0,
     refetchOnMount: 'always',
   });

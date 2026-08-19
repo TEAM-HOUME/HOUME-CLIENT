@@ -1,8 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
-import { zIndex } from '@/shared/styles/tokens/zIndex';
-import { fontVars } from '@/shared/styles/tokensV2/font.css';
-import { unitVars } from '@/shared/styles/tokensV2/unit.css';
+import { bottomFadeGradient } from '@styles/gradients';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
+import { zIndex } from '@styles/tokens/zIndex';
 
 export const wrapper = style({
   display: 'flex',
@@ -46,7 +47,7 @@ export const btnWrapper = style({
   alignItems: 'center',
   justifyContent: 'center',
   transform: 'translateX(-50%)',
-  backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)`,
+  backgroundImage: bottomFadeGradient,
   padding: unitVars.unit.gapPadding['500'],
   width: '100%',
   maxWidth: unitVars.unit.dimension.wMax,

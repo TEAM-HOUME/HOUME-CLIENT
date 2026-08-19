@@ -20,13 +20,14 @@ import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
-import { resolveShopFlowEntryRoute } from '@shared/analytics/utils/shop/resolveShopEntryRoute';
 import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { useLoginGate } from '@hooks/useLoginGate';
+
+import { resolveShopFlowEntryRoute } from '../analytics/resolveShopEntryRoute';
 
 /**
  * 필터 상단 칩 선택 상태 기본값

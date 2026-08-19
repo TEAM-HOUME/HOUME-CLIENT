@@ -32,7 +32,6 @@ reviews:
   path_filters:
     # 포함(allow-list)
     - 'src/**'
-    - '.storybook/**'
     - '.github/**'
     - 'vite.config.ts'
     - 'eslint.config.js'
@@ -44,7 +43,6 @@ reviews:
     # 제외(deny-list)
     - '!node_modules/**'
     - '!dist/**'
-    - '!storybook-static/**'
     - '!build/**'
     - '!coverage/**'
     - '!**/*.snap'
@@ -76,13 +74,6 @@ reviews:
         - path_filters의 포함/제외 패턴 검토
         - path_instructions의 중복 또는 누락 확인
         - 프로젝트 구조와 설정의 일치성 검토
-
-    - path: '**/*.stories.tsx'
-      instructions: |
-        Storybook 스토리 리뷰 시:
-        - 모든 props 변형에 대한 스토리 작성
-        - a11y 테스트 통과 여부
-        - 적절한 문서화와 컨트롤 제공
 
     - path: 'src/**/components/**/*.tsx'
       instructions: |

@@ -1,5 +1,4 @@
-import { FILTER_CATEGORIES } from '@pages/imageSetup/v2/constants/floorPlanFilters';
-import type { FloorPlanFilters } from '@pages/imageSetup/v2/types/floorPlan';
+import { FILTER_CATEGORIES } from '@pages/imageSetup/constants/floorPlanFilters';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {
@@ -21,6 +20,7 @@ import {
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 import { getPreviousScreenName } from '@shared/analytics/utils/screenName';
 import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+import type { FloorPlanFilters } from '@shared/types/floorPlan';
 
 import type {
   ExploreHouseTemplateDetailResponse,

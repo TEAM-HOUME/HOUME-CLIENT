@@ -13,6 +13,8 @@ import type {
   TrackEventParams,
 } from '@shared/analytics/params/types';
 import { analytics } from '@shared/config/firebase';
+import { addReportBreadcrumb } from '@shared/monitoring/report';
+import { redactUrl } from '@shared/monitoring/scrub';
 
 export type { LoginStatus, TrackEventParams } from '@shared/analytics/params';
 
@@ -29,6 +31,22 @@ const buildEventParams = (
 };
 
 /**
+ * breadcrumb에 실을 파라미터를 만든다.
+ *
+ * `page_path`만 URL 스크럽을 통과시킨다 — 주소에 카카오 인가코드(`?code=`)나 토큰이
+ * 실릴 수 있다. 나머지는 화면 이름·id·개수 계열이라 그대로 보낸다.
+ * (상품 검색어는 개인정보가 아니고 어떤 검색어에서 실패했는지가 진단에 쓰이므로 유지)
+ */
+const toBreadcrumbData = (
+  eventParams: Record<string, AnalyticsParamValue>
+): Record<string, AnalyticsParamValue> => {
+  const pagePath = eventParams.page_path;
+  if (typeof pagePath !== 'string') return eventParams;
+
+  return { ...eventParams, page_path: redactUrl(pagePath) };
+};
+
+/**
  * GA4 이벤트 전송
  *
  * - `VITE_ENABLE_FIREBASE_ANALYTICS=true` → Firebase Analytics 전송
@@ -41,6 +59,18 @@ export const trackEvent = (
   params?: TrackEventParams
 ): void => {
   const eventParams = buildEventParams(params);
+
+  // GA 이벤트를 Sentry breadcrumb으로도 남긴다.
+  // 에러 직전에 사용자가 어느 화면에서 무엇을 선택했는지 재구성하는 유일한 수단이다.
+  // (Sentry 기본 breadcrumb은 vanilla-extract 클래스명·원시 경로만 담아 화면을 특정할 수 없다)
+  //
+  // 아래 early return보다 위에 두는 이유 — GA가 꺼져 있거나 Firebase 초기화가 실패한 환경에서도 breadcrumb은 쌓여야 하므로(정작 그때가 관측이 가장 필요한 순간)
+  addReportBreadcrumb({
+    category: 'ga',
+    message: eventName,
+    level: 'info',
+    data: toBreadcrumbData(eventParams),
+  });
 
   if (!isAnalyticsEnabled) {
     console.info('[Analytics]', eventName, params);

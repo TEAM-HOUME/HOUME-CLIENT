@@ -18,12 +18,12 @@ import { useSignupFormAnalytics } from '@pages/signup/analytics/useSignupFormAna
 
 import { ROUTES } from '@routes/paths';
 
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
-import Chip from '@components/v2/chip/Chip';
-import Icon from '@components/v2/icon/Icon';
-import Popup from '@components/v2/popup/Popup';
-import DateField from '@components/v2/userFormField/DateField';
-import TextField from '@components/v2/userFormField/TextField';
+import ActionButton from '@components/button/actionButton/ActionButton';
+import Chip from '@components/chip/Chip';
+import Icon from '@components/icon/Icon';
+import Popup from '@components/popup/Popup';
+import DateField from '@components/userFormField/DateField';
+import TextField from '@components/userFormField/TextField';
 
 import { ERROR_MESSAGES } from '@constants/clientErrorMessage';
 
@@ -32,10 +32,10 @@ import {
   useBrowserBackTrap,
 } from '@hooks/useBrowserBackTrap';
 import { useExitBlocker } from '@hooks/useExitBlocker';
-import { useRandomNickname } from '@hooks/useGetRandomNickname';
+import { useRandomNickname } from '@hooks/useRandomNickname';
 import useUserForm from '@hooks/useUserForm';
 
-import { usePostSignupMutation } from './apis/mutations/usePostSignupMutation';
+import { useSignupMutation } from './apis/mutations/useSignupMutation';
 import * as styles from './SignupPage.css';
 
 interface SignupLocationState {
@@ -244,7 +244,7 @@ const SignupPage = () => {
     },
   });
 
-  const { mutate: signUp } = usePostSignupMutation();
+  const { mutate: signUp } = useSignupMutation();
   const { randomNickname, refresh } = useRandomNickname(trackNicknameChange);
 
   useEffect(() => {

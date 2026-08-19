@@ -10,6 +10,8 @@ import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
 import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
+import { reportMessage } from '@shared/monitoring/report';
+import { MONITORING_SCOPE } from '@shared/monitoring/scope';
 
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 
@@ -21,9 +23,9 @@ import { getLoginRedirect } from '@utils/loginRedirect';
 import FunnelLayout from './components/layout/FunnelLayout';
 import { useImageSetup } from './hooks/useImageSetup';
 import ActivityInfo from './steps/activityInfo/ActivityInfo';
+import FloorPlanSelectStep from './steps/floorPlanSelect/FloorPlanSelectStep';
 import InteriorStyle from './steps/interiorStyle/InteriorStyle';
-import FloorPlanSelectStep from './v2/steps/floorPlanSelect/FloorPlanSelectStep';
-import { useFloorPlanStore } from './v2/stores/useFloorPlanStore';
+import { useFloorPlanStore } from './stores/useFloorPlanStore';
 
 import type {
   CompletedFloorPlanSelect,
@@ -78,7 +80,28 @@ const ImageSetupPage = () => {
   // 그 외(URL로 바로 들어옴, 이미 퍼널을 나감)는 홈으로 보냄.
   // 새로고침·로그인 복귀 때는 flow가 sessionStorage에 남아 phase='funnel'이라 그대로 통과된다.
   const flow = useImageFlowStore.getState().flow;
-  if (flow?.phase !== 'funnel') {
+  const isBlockedByGuard = flow?.phase !== 'funnel';
+
+  // 가드에 걸려 홈으로 돌아간 경우를 남긴다.
+  // sessionStorage 복원 실패로 flow가 사라진 경우가 여기 섞여 있는데,
+  // 사용자는 아무 안내 없이 홈으로 이동하고 서버는 이 일을 전혀 모른다.
+  // (렌더 중이 아니라 effect에서 호출해 중복 전송을 막는다)
+  useEffect(() => {
+    if (!isBlockedByGuard) return;
+
+    reportMessage('imageSetup entry blocked by guard', {
+      scope: MONITORING_SCOPE.IMAGE_GENERATE,
+      level: 'warning',
+      fingerprint: ['imagesetup-guard-redirect'],
+      context: {
+        has_flow: Boolean(flow),
+        phase: flow?.phase ?? null,
+        route: flow?.route ?? null,
+      },
+    });
+  }, [isBlockedByGuard, flow]);
+
+  if (isBlockedByGuard) {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 

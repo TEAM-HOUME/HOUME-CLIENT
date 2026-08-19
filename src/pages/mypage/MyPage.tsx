@@ -10,17 +10,18 @@ import { useUserStore } from '@store/useUserStore';
 import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
 
+import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
+
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
-import MenuTab from '@components/v2/menuTab/MenuTab';
-import TitleNavBar from '@components/v2/navBar/TitleNavBar';
+import MenuTab from '@components/menuTab/MenuTab';
+import TitleNavBar from '@components/navBar/TitleNavBar';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 
 import { useMypageAnalytics } from './analytics/useMypageAnalytics';
 import { useMyPageProfileQuery } from './apis/queries/useEditProfileQuery';
-import { useMyPageUserQuery } from './apis/queries/useMyPageUserQuery';
 import GeneratedImagesSection from './components/section/generatedImages/GeneratedImagesSection';
 import ProfileSection from './components/section/profile/ProfileSection';
 import SavedItemsSection from './components/section/savedItems/SavedItemsSection';

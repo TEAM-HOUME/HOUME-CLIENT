@@ -1,4 +1,4 @@
-import CtaButton from '@components/button/ctaButton/CtaButton';
+import ActionButton from '@components/button/actionButton/ActionButton';
 import ErrorIllustration from '@components/errorFallback/ErrorIllustration';
 
 import * as styles from './FeatureErrorFallback.css';
@@ -23,9 +23,9 @@ export default function FeatureErrorFallback({
       </div>
 
       <div className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound" onClick={resetErrorBoundary}>
+        <ActionButton size="2XL" fullWidth onClick={resetErrorBoundary}>
           다시 시도
-        </CtaButton>
+        </ActionButton>
       </div>
     </section>
   );

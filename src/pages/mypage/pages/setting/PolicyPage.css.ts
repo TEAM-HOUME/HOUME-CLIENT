@@ -1,7 +1,7 @@
 import { style, globalStyle } from '@vanilla-extract/css';
 
-import { colorVars } from '@/shared/styles/tokensV2/color.css';
-import { fontVars } from '@/shared/styles/tokensV2/font.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
 
 export const container = style({
   width: '100%',

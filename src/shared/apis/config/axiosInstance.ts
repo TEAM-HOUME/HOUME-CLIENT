@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 
 import type { BaseResponse } from '@shared/types/apis';
 
+import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { ERROR_CODES } from '@constants/apiErrorCode';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
 
@@ -16,7 +17,10 @@ const axiosInstance = axios.create({
 });
 
 // 인증 제외 API 경로 (Authorization 헤더 제거 대상)
-const EXCLUDE_AUTH_URLS = ['/oauth/kakao', '/oauth/kakao/callback'];
+const EXCLUDE_AUTH_URLS: string[] = [
+  API_ENDPOINT.AUTH.KAKAO_AUTH,
+  API_ENDPOINT.AUTH.KAKAO_CALLBACK,
+];
 
 // 요청 시 accessToken 자동 삽입
 axiosInstance.interceptors.request.use((config) => {
@@ -52,7 +56,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/reissue`,
+          `${import.meta.env.VITE_API_BASE_URL}${API_ENDPOINT.AUTH.REISSUE}`,
           null,
           {
             withCredentials: true,

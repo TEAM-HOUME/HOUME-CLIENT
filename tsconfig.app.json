@@ -5,7 +5,6 @@
       "@/*": ["src/*"],
       "@pages/*": ["src/pages/*"],
       "@routes/*": ["src/routes/*"],
-      "@stories/*": ["src/stories/*"],
       "@shared/*": ["src/shared/*"],
       "@apis/*": ["src/shared/apis/*"],
       "@assets/*": ["src/shared/assets/*"],

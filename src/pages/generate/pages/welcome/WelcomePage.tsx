@@ -19,8 +19,8 @@ import { SCREEN_NAME } from '@shared/analytics/screenNames';
 
 import { LOTTIE_SPEED } from '@assets/lottie/lottieAssets';
 
+import ActionButton from '@components/button/actionButton/ActionButton';
 import DotLottiePlayer from '@components/lottie/DotLottiePlayer';
-import ActionButton from '@components/v2/button/actionButton/ActionButton';
 
 import { getLoginRedirect, consumeLoginRedirect } from '@utils/loginRedirect';
 

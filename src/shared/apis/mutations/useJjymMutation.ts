@@ -18,7 +18,7 @@ import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 import { queryClient } from '@apis/config/queryClient';
 import { HTTPMethod, request } from '@apis/config/request';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';

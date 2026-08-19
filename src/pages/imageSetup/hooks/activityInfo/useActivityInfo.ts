@@ -13,6 +13,8 @@ import {
   captureFullFunnelFlowSnapshot,
 } from '@shared/analytics/utils/imageFlow';
 
+import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
+
 import { useCreditGuard } from '@hooks/useCreditGuard';
 
 import { useActivitySelection } from './useActivitySelection';
@@ -21,7 +23,6 @@ import { useGlobalConstraints } from './useGlobalConstraints';
 import { useActivitiesQuery } from '../../apis/queries/useActivitiesQuery';
 import { useFurnitureCategoriesQuery } from '../../apis/queries/useFurnitureCategoriesQuery';
 import { CATEGORY_SELECTION_MODE } from '../../types/funnel/activityInfo';
-import { useRecentFloorPlanQuery } from '../../v2/apis/queries/useRecentFloorPlanQuery';
 
 import type { CategorySelectionAnalyticsCallbacks } from './useCategorySelection';
 import type { ActivityInfoFormData } from '../../types/funnel/activityInfo';

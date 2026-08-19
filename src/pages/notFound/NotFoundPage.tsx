@@ -5,7 +5,7 @@ import * as styles from '@pages/notFound/NotFoundPage.css';
 
 import { ROUTES } from '@routes/paths';
 
-import CtaButton from '@components/button/ctaButton/CtaButton';
+import ActionButton from '@components/button/actionButton/ActionButton';
 import ErrorIllustration from '@components/errorFallback/ErrorIllustration';
 
 const NotFoundPage = () => {
@@ -35,9 +35,9 @@ const NotFoundPage = () => {
       </section>
 
       <section className={styles.buttonSection}>
-        <CtaButton typeVariant="notFound" onClick={handleGoToHome}>
+        <ActionButton size="2XL" fullWidth onClick={handleGoToHome}>
           홈으로 돌아가기
-        </CtaButton>
+        </ActionButton>
       </section>
     </main>
   );

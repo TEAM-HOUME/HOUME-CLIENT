@@ -2,69 +2,124 @@ import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
-import LogoIcon from '@assets/icons/logoIcon.svg?react';
-import ProfileIcon from '@assets/icons/profileIcon.svg?react';
+import { TOP_NAV_RETURN_SCREEN } from '@shared/analytics/componentAnalytics';
+import { GA_EVENTS } from '@shared/analytics/events';
+import { type ScreenName } from '@shared/analytics/screenNames';
+import { trackCallback } from '@shared/analytics/track';
+import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+
+import imgProfile from '@assets/images/ImgProfile.svg';
+import logotypeBlack from '@assets/images/LogotypeBlack.svg';
+import logotypeWhite from '@assets/images/LogotypeWhite.svg';
 
 import * as styles from './LogoNavBar.css';
-import * as btnStyles from './NavBtn.css';
+import TextButton from '../btnText/TextButton';
+import ActionButton from '../button/actionButton/ActionButton';
 
-type ButtonType = 'login' | 'profile' | null;
+type AuthSlot = 'none' | 'login' | 'profile';
+type Page = 'landing' | 'home';
 
 interface LogoNavBarProps extends React.ComponentProps<'nav'> {
-  buttonType?: ButtonType;
-  onProfileClick?: () => void; // 프로필 버튼 클릭 시 실행할 콜백 (선택적)
+  screenName: ScreenName;
+  page?: Page;
+  showGenerateButton?: boolean;
+  authSlot?: AuthSlot;
+  onGenerateClick?: () => void;
+  onLoginClick?: () => void;
+  onProfileClick?: () => void;
 }
 
 const LogoNavBar = ({
-  buttonType = null,
+  screenName,
+  page = 'home',
+  showGenerateButton = false,
+  authSlot = 'none',
+  onGenerateClick,
+  onLoginClick,
   onProfileClick,
   ...props
 }: LogoNavBarProps) => {
   const navigate = useNavigate();
+  const logoSrc = page === 'home' ? logotypeBlack : logotypeWhite;
+  const hasAction = showGenerateButton || authSlot !== 'none';
 
-  const handleProfileClick = () => {
-    if (onProfileClick) {
-      onProfileClick();
-    } else {
-      navigate(ROUTES.MYPAGE);
-    }
-  };
+  const handleLogoClick = trackCallback(
+    GA_EVENTS.component.TOP_NAV_LOGO_CLICK,
+    screenName,
+    () => navigate(ROUTES.HOME),
+    { ...TOP_NAV_RETURN_SCREEN.LOGO, ...loginStatusParams() }
+  );
 
-  const handleRenderBtn = () => {
-    switch (buttonType) {
-      case 'login':
-        return (
-          <div
-            className={styles.rightdiv}
-            onClick={() => navigate(ROUTES.LOGIN)}
-            style={{ cursor: 'pointer' }}
-          >
-            <button type="button" className={btnStyles.loginNav}>
-              로그인
-            </button>
-          </div>
-        );
-      case 'profile':
-        return (
-          <button
-            type="button"
-            onClick={handleProfileClick}
-            className={styles.profileicon}
-          >
-            <ProfileIcon />
-          </button>
-        );
-      default:
-        return null;
-    }
-  };
+  const handleGenerateClick = trackCallback(
+    GA_EVENTS.component.TOP_NAV_CREATE_IMG_CLICK,
+    screenName,
+    onGenerateClick,
+    { ...TOP_NAV_RETURN_SCREEN.CREATE_IMG, ...loginStatusParams() }
+  );
+
+  const handleLoginClick = trackCallback(
+    GA_EVENTS.component.TOP_NAV_LOGIN_CLICK,
+    screenName,
+    onLoginClick,
+    { ...TOP_NAV_RETURN_SCREEN.LOGIN, ...loginStatusParams() }
+  );
+
+  const handleProfileClick = trackCallback(
+    GA_EVENTS.component.TOP_NAV_MYPAGE_CLICK,
+    screenName,
+    onProfileClick,
+    { ...TOP_NAV_RETURN_SCREEN.MYPAGE, ...loginStatusParams() }
+  );
 
   return (
     <nav className={styles.container} {...props}>
-      <div className={styles.leftdiv}>
-        <LogoIcon />
+      <div className={styles.leftContainer}>
+        <button
+          type="button"
+          className={styles.logoButton}
+          onClick={handleLogoClick}
+          aria-label="홈으로 이동"
+        >
+          <img src={logoSrc} alt="Houme" className={styles.logoImage} />
+        </button>
       </div>
-      {handleRenderBtn()}
+      <div className={styles.rightContainer({ hasAction })}>
+        {showGenerateButton && (
+          <ActionButton
+            variant="solid"
+            size="M"
+            color="primary"
+            leftIcon="DoubleStar"
+            onClick={handleGenerateClick}
+          >
+            AI로 집 꾸미기
+          </ActionButton>
+        )}
+        {authSlot === 'login' && (
+          <div className={styles.actionContainer}>
+            <TextButton color="primary" size="s" onClick={handleLoginClick}>
+              로그인
+            </TextButton>
+          </div>
+        )}
+        {authSlot === 'profile' && (
+          <div className={styles.actionContainer}>
+            <button
+              type="button"
+              aria-label="프로필"
+              className={styles.profileButton}
+              onClick={handleProfileClick}
+            >
+              <img
+                src={imgProfile}
+                alt=""
+                aria-hidden="true"
+                className={styles.profileImage}
+              />
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

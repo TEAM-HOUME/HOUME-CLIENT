@@ -7,8 +7,7 @@ import 'swiper/css';
 
 import { useBannerListQuery } from '@pages/home/apis/queries/useBannerListQuery';
 
-import Icon from '@shared/components/v2/icon/Icon';
-
+import Icon from '@components/icon/Icon';
 import OptimizedImage from '@components/image/OptimizedImage';
 
 import { IMAGE_SIZES } from '@utils/imageVariant';

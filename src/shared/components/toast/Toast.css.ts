@@ -1,50 +1,64 @@
+import type { CSSProperties } from 'react';
+
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
-import { fontStyle } from '@styles/fontStyle';
 import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = recipe({
   base: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '1.5rem',
-    borderRadius: '30px',
-    background: colorVars.color.gray900,
-    padding: '1rem 2rem',
+    gap: unitVars.unit.gapPadding['050'],
+    borderRadius: unitVars.unit.radius.full,
+    backgroundColor: colorVars.color.fill.secondary,
+    padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['400']}`,
+    minWidth: '8rem',
+    maxWidth: '33.5rem',
+    height: '4.4rem',
   },
   variants: {
     type: {
-      navigate: {
-        justifyContent: 'space-between',
-        gap: 0,
-        width: 'calc(100vw - 3.2rem)',
-        maxWidth: '40.8rem',
-        height: '4.4rem',
+      info: {},
+      success: {},
+      error: {},
+      action: {
+        gap: unitVars.unit.gapPadding['300'],
+        padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['500']}`,
       },
     },
   },
+  defaultVariants: {
+    type: 'info',
+  },
 });
 
-export const text = recipe({
+export const message = recipe({
   base: {
-    ...fontStyle('body_m_14'),
-    color: colorVars.color.gray000,
+    ...fontVars.font.body_r_14,
+    color: colorVars.color.text.inverse,
   },
   variants: {
     type: {
-      navigate: {
-        ...fontStyle('body_r_14'),
-        textAlign: 'center',
-        color: colorVars.color.gray300,
+      default: {
+        padding: `${unitVars.unit.gapPadding['000']} ${unitVars.unit.gapPadding['050']}`,
       },
+      action: {},
     },
   },
 });
 
-export const action = style({
-  ...fontStyle('body_m_14'),
-  flexShrink: 0,
+export const actionButton = style({
   textDecoration: 'underline',
-  color: colorVars.color.gray000,
+  ...fontVars.font.body_m_14,
 });
+
+export const toastStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  boxShadow: 'none',
+  backgroundColor: 'transparent',
+  width: '100%',
+};

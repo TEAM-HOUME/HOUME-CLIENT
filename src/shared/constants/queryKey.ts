@@ -53,9 +53,6 @@ export const queryKeys = {
   // 이미지 설정 (온보딩 퍼널)
   imageSetup: {
     all: ['imageSetup'] as const,
-    housingOptions: () =>
-      [...queryKeys.imageSetup.all, 'housingOptions'] as const,
-    floorPlan: () => [...queryKeys.imageSetup.all, 'floorPlan'] as const,
     houseTemplates: (params: {
       size?: number;
       residenceType?: string[];

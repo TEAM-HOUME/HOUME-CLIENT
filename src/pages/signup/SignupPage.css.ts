@@ -1,9 +1,10 @@
 import { style } from '@vanilla-extract/css';
 
+import { bottomFadeGradient } from '@styles/gradients';
 import { animationTokens } from '@styles/tokens/animation.css';
-import { colorVars } from '@styles/tokensV2/color.css';
-import { fontVars } from '@styles/tokensV2/font.css';
-import { unitVars } from '@styles/tokensV2/unit.css';
+import { colorVars } from '@styles/tokens/color.css';
+import { fontVars } from '@styles/tokens/font.css';
+import { unitVars } from '@styles/tokens/unit.css';
 
 export const wrapper = style({
   display: 'flex',
@@ -32,7 +33,7 @@ export const container = style({
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['600'],
   width: '100%',
-  animation: animationTokens.fadeInUpFast,
+  animation: animationTokens.fadeInUp,
 });
 
 export const title = style({
@@ -95,7 +96,7 @@ export const btnarea = style({
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['100'],
   transform: 'translateX(-50%)',
-  background: `linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)`,
+  background: bottomFadeGradient,
   padding: unitVars.unit.gapPadding['500'],
   width: '100%',
   maxWidth: unitVars.unit.dimension.wMax,

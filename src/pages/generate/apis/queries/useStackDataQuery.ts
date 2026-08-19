@@ -1,53 +1,27 @@
-import { useEffect } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
-
-import type {
-  CarouselItem,
-  ImageStackResponse,
-} from '@pages/generate/types/generate';
 
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
 
-export const getStackData = async (page: number): Promise<CarouselItem[]> => {
-  const res = await request<ImageStackResponse>({
+import type { GetCarouselV2ListResponseDTO } from '@/shared/apis/__generated__/data-contracts';
+
+export const getStackData = async (): Promise<GetCarouselV2ListResponseDTO> => {
+  const res = await request<GetCarouselV2ListResponseDTO>({
     method: HTTPMethod.GET,
-    url: API_ENDPOINT.GENERATE.CAROUSELS,
-    query: { page },
+    url: API_ENDPOINT.GENERATE.CAROUSELS_V2,
   });
-  return res.carouselResponseDTOS ?? [];
+  return res;
 };
 
-export const useStackDataQuery = (
-  page: number,
-  options: {
-    enabled: boolean;
-    onSuccess?: (data: CarouselItem[]) => void;
-    onError?: (err: unknown) => void;
-  }
-) => {
-  const query = useQuery<CarouselItem[], unknown>({
-    queryKey: queryKeys.generate.stack(page),
-    queryFn: () => getStackData(page),
+export const useStackDataQuery = (enabled: boolean) => {
+  return useQuery<GetCarouselV2ListResponseDTO, unknown>({
+    queryKey: queryKeys.generate.stack(),
+    queryFn: () => getStackData(),
     staleTime: 2 * 60 * 1000,
+    gcTime: 1000 * 60 * 60 * 24,
     retry: 2,
-    enabled: options.enabled,
+    enabled,
   });
-
-  useEffect(() => {
-    if (query.isSuccess && query.data) {
-      options.onSuccess?.(query.data);
-    }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError) {
-      options.onError?.(query.error);
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };

@@ -5,7 +5,7 @@ import type { SelectedProduct } from '@pages/home/types/productTab';
 import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
-import { useToast } from '@components/v2/toast/useToast';
+import { useToast } from '@components/toast/useToast';
 
 /**
  * 상품 선택 상한값 - 최대 6개 선택

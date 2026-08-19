@@ -1,13 +1,13 @@
 import { primeDetectionCacheEntry } from '@shared/detection/hooks/useDetectionCache';
 import { useDetectionCacheStore } from '@shared/detection/stores/useDetectionCacheStore';
 import type { DetectionCacheEntry } from '@shared/detection/stores/useDetectionCacheStore';
+import type { MyPageUserData } from '@shared/types/user';
 
 import type {
   MyPageImageDetail,
   MyPageImageDetailData,
   MyPageImageHistory,
 } from '../types/apis/generateList';
-import type { MyPageUserData } from '../types/apis/userData';
 
 interface BuildResultNavigationArgs {
   imageId: number;

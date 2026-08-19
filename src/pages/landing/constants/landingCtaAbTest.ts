@@ -1,9 +1,10 @@
+import type { ABTestGroup } from '@shared/types/abTest';
+
 import type {
   ActionButtonColor,
   ActionButtonVariant,
-} from '@shared/components/v2/button/actionButton/ActionButton';
-import type { IconName } from '@shared/components/v2/icon/Icon';
-import type { ABTestGroup } from '@shared/types/abTest';
+} from '@components/button/actionButton/ActionButton';
+import type { IconName } from '@components/icon/Icon';
 
 export interface LandingCtaStyle {
   buttonVariant: ActionButtonVariant;

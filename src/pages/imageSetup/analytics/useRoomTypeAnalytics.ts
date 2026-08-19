@@ -17,14 +17,12 @@ import {
   trackRoomTypeViewSheetSubmit,
   trackRoomTypeViewSheetView,
 } from '@pages/imageSetup/analytics/roomTypeAnalytics';
+import { useFloorPlanSelect } from '@pages/imageSetup/hooks/useFloorPlanSelect';
+import { useFloorPlanStore } from '@pages/imageSetup/stores/useFloorPlanStore';
 import type {
   CompletedFloorPlanSelect,
   ImageSetupSteps,
 } from '@pages/imageSetup/types/funnel/steps';
-import { fetchHouseTemplateDetail } from '@pages/imageSetup/v2/apis/queries/useHouseTemplateDetailQuery';
-import { ensureRecentFloorPlanForAnalytics } from '@pages/imageSetup/v2/apis/queries/useRecentFloorPlanQuery';
-import { useFloorPlanSelect } from '@pages/imageSetup/v2/hooks/useFloorPlanSelect';
-import { useFloorPlanStore } from '@pages/imageSetup/v2/stores/useFloorPlanStore';
 
 import { GA_EVENTS } from '@shared/analytics/events';
 import {
@@ -32,6 +30,9 @@ import {
   useScrollDepthTrack,
 } from '@shared/analytics/hooks';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
+
+import { fetchHouseTemplateDetail } from '@apis/queries/useHouseTemplateDetailQuery';
+import { ensureRecentFloorPlanForAnalytics } from '@apis/queries/useRecentFloorPlanQuery';
 
 export const useRoomTypeAnalytics = (
   context: ImageSetupSteps['FloorPlanSelect'],

@@ -1,4 +1,4 @@
-import Icon from '@components/v2/icon/Icon';
+import Icon from '@components/icon/Icon';
 
 import * as style from './CreditBox.css';
 
