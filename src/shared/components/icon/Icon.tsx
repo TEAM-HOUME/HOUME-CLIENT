@@ -24,6 +24,7 @@ import DislikeDefault from '@assets/icons/DislikeDefault.svg?url';
 import DislikeSelected from '@assets/icons/DislikeSelected.svg?url';
 import DislikeWhite from '@assets/icons/DislikeWhite.svg?url';
 import DoubleStar from '@assets/icons/DoubleStar.svg?url';
+import Fire from '@assets/icons/Fire.svg?url';
 import FlipHorizontal from '@assets/icons/FlipHorizontal.svg?url';
 import Grid1ColDefault from '@assets/icons/Grid1ColDefault.svg?url';
 import Grid1ColSelected from '@assets/icons/Grid1ColSelected.svg?url';
@@ -34,6 +35,7 @@ import HeartFillGray from '@assets/icons/HeartFillGray.svg?url';
 import HeartFillWhite from '@assets/icons/HeartFillWhite.svg?url';
 import HeartStrokeGray from '@assets/icons/HeartStrokeGray.svg?url';
 import HeartStrokeWhite from '@assets/icons/HeartStrokeWhite.svg?url';
+import History from '@assets/icons/History.svg?url';
 import Kakao from '@assets/icons/Kakao.svg?url';
 import LikeDefault from '@assets/icons/LikeDefault.svg?url';
 import LikeSelected from '@assets/icons/likeSelected.svg?url';
@@ -78,6 +80,7 @@ const IconsName = {
   DeskBlack,
   DeskGray,
   DoubleStar,
+  Fire,
   FlipHorizontal,
   Grid1ColDefault,
   Grid1ColSelected,
@@ -87,6 +90,7 @@ const IconsName = {
   HeartFillGray,
   HeartStrokeGray,
   HeartStrokeWhite,
+  History,
   Link,
   Lock,
   MouseBlack,
