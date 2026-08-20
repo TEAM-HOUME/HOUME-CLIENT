@@ -26,8 +26,7 @@ export const wrapper = recipe({
         backgroundColor: colorVars.color.fill.whitish,
       },
       popular: {
-        outline: `1px dashed ${colorVars.color.border.primary}`,
-        outlineOffset: '-1px',
+        border: `1px dashed ${colorVars.color.border.primary}`,
         backgroundColor: colorVars.color.fill.inverse,
       },
     },
