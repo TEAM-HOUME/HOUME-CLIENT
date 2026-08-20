@@ -21,6 +21,7 @@ import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import { SCREEN_NAME } from '@shared/analytics/screenNames';
 import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
 import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import StatusBadge from '@shared/components/statusBadge/StatusBadge';
 import type { HomeLocationState, HomeTab } from '@shared/types/tabNavigation';
 
 import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
