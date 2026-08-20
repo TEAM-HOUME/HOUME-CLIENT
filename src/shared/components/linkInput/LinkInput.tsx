@@ -7,7 +7,7 @@ import * as styles from './LinkInput.css';
 interface LinkInputProps
   extends Omit<
     React.ComponentProps<'textarea'>,
-    'value' | 'onChange' | 'onSubmit'
+    'value' | 'defaultValue' | 'onChange' | 'onSubmit'
   > {
   value?: string;
   placeholder?: string;
