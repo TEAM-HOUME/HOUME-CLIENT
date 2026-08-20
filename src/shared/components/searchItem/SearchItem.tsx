@@ -8,7 +8,7 @@ import * as styles from './SearchItem.css';
 interface SearchItemBaseProps {
   name: string;
   imageSrc?: string;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
 export type SearchItemProps =

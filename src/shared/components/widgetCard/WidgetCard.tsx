@@ -7,12 +7,12 @@ import * as styles from './WidgetCard.css';
 export interface WidgetCardProduct {
   name: string;
   imageSrc?: string;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
 interface WidgetCardProps {
   products: WidgetCardProduct[];
-  onSearchClick?: () => void;
+  onSearchClick: () => void;
 }
 
 const WidgetCard = ({ products, onSearchClick }: WidgetCardProps) => {
