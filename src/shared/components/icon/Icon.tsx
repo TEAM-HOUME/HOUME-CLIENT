@@ -5,6 +5,9 @@ import ArrowLeftStrokeWhite from '@assets/icons/ArrowLeftStrokeWhite.svg?url';
 import ArrowRight from '@assets/icons/ArrowRight.svg?url';
 import ArrowRightFill from '@assets/icons/ArrowRightFill.svg?url';
 import ArrowUp from '@assets/icons/ArrowUp.svg?url';
+import ArrowUpFillBlack from '@assets/icons/ArrowUpFillBlack.svg?url';
+import ArrowUpFillGrad from '@assets/icons/ArrowUpFillGrad.svg?url';
+import ArrowUpFillGray from '@assets/icons/ArrowUpFillGray.svg?url';
 import BookBlack from '@assets/icons/BookBlack.svg?url';
 import BookGray from '@assets/icons/BookGray.svg?url';
 import ChevronDown from '@assets/icons/ChevronDown.svg?url';
@@ -65,6 +68,9 @@ const IconsName = {
   ArrowRight,
   ArrowRightFill,
   ArrowUp,
+  ArrowUpFillBlack,
+  ArrowUpFillGrad,
+  ArrowUpFillGray,
   BookBlack,
   BookGray,
   ChevronDown,
