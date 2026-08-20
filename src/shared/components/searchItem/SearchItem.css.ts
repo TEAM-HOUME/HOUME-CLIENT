@@ -15,7 +15,6 @@ export const wrapper = recipe({
     ...pressInteraction(0.95),
     border: 0,
     borderRadius: unitVars.unit.radius.full,
-    backgroundColor: colorVars.color.fill.whitish,
     cursor: 'pointer',
     padding: `${unitVars.unit.gapPadding['200']} ${unitVars.unit.gapPadding['300']}`,
     width: 'fit-content',
@@ -23,8 +22,14 @@ export const wrapper = recipe({
   },
   variants: {
     type: {
-      recent: {},
-      popular: { outline: `1px dashed ${colorVars.color.border.primary}` },
+      recent: {
+        backgroundColor: colorVars.color.fill.whitish,
+      },
+      popular: {
+        outline: `1px dashed ${colorVars.color.border.primary}`,
+        outlineOffset: '-1px',
+        backgroundColor: colorVars.color.fill.inverse,
+      },
     },
   },
 });
