@@ -262,7 +262,7 @@ knowledge_base:
     enabled: true
     # 레포에 실제로 존재하는 경로만 나열한다 (없는 경로를 적으면 조용히 무시돼 지침 없이 리뷰됨)
     filePatterns:
-      - 'docs/conventions.md' # 컨벤션 기준 원문
+      - 'docs/conventions.md' # 컨벤션 SSOT
       - 'AGENTS.md' # 매 작업 체크리스트 (CLAUDE.md는 이 파일을 import만 함)
       - 'README.md'
       - 'eslint.config.js'

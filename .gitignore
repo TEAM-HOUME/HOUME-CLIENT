@@ -45,7 +45,7 @@ coverage
 .cursor
 answer-guide.md
 
-# docs/는 로컬 작업 문서라 제외하되, 컨벤션 기준 원문만 추적한다
+# docs/는 로컬 작업 문서라 제외하되, 컨벤션 SSOT만 추적한다
 docs/*
 !docs/conventions.md
 
