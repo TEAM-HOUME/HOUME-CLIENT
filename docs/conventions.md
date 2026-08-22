@@ -14,14 +14,20 @@ AGENTS.md가 본문이고 CLAUDE.md가 그것을 가져오는 구조입니다. �
 
 `.coderabbit.yaml`도 규칙 본문을 복사하지 않고 이 문서를 참조합니다.
 
-**마지막 업데이트**: 2026-08-19 (리팩토링 5차 — 규칙 강제 수단 도입, ONNX 모듈 삭제, 문서 3종 역할 재편)
+**마지막 업데이트**: 2026-08-22 (리팩토링 5차 PR #666 — 채택 기준·계층 서술 정비, alias 절차화)
 
-새 규칙을 추가할 때는 아래 4가지를 통과해야 합니다. 통과하지 못하면 규칙이 아니라 취향이므로 넣지 않습니다.
+새 컨벤션을 추가할 때는 아래 네 가지를 모두 통과해야 합니다.
 
-1. 실제로 갈린 적이 있는가 — 같은 것을 두 방식으로 쓴 코드가 실제로 있었는가
-2. 어겼을 때 무엇이 나빠지는지 한 문장으로 쓸 수 있는가
-3. 위반을 어떻게 알아채는가 — 도구(ESLint·tsc·CI) / 리뷰 봇 / 사람 중 하나를 지정할 수 있는가
-4. 지키는 비용이 안 지키는 비용보다 작은가
+1. **팀원들이 실제로 서로 다르게 작성한 적이 있는가**
+   모두가 이미 같은 방식으로 작성하고 있다면, 정해야 할 컨벤션이 아니라 이미 합의된 사실입니다. 문서에 넣어도 아무것도 바꾸지 못하고 문서 길이만 늘립니다.
+2. **이 컨벤션을 위반했을 때 코드베이스에 생기는 문제를 설명할 수 있는가**
+   설명하지 못한다면 그 항목은 개인의 선호를 팀 규약으로 올린 것입니다. 나중에 누군가 "왜 이렇게 해야 하나요"라고 물었을 때 답할 수 없으면 컨벤션에 포함하지 않습니다.
+3. **컨벤션 위반을 발견하는 주체를 특정할 수 있는가**
+   발견 수단을 지정하는 일이 곧 계층을 배정하는 일입니다(아래 "규칙을 무엇이 강제하는가"). 1·2·3계층 어디에도 배정할 수 없다면 지켜지는지 확인할 방법이 없으므로 채택하지 않습니다.
+4. **컨벤션을 지키는 데 드는 비용이 어겼을 때 수습하는 비용보다 작은가**
+   지키는 쪽이 더 비싸면 채택하지 않습니다. 이 기준으로 실제로 걷어낸 것 — CI 게이트의 knip 미사용 파일 검사(2026-08-19), alias 목록을 닫아 두는 규칙(2026-08-21).
+
+**컨벤션 항목의 출처**: 외부 스타일 가이드를 옮겨온 것이 아닙니다. 하우미 웹을 개발하면서 반복해서 등장한 형태 중에서, 팀원 모두가 같은 방식으로 작성했을 때 코드를 읽기 쉬워지고 고치기 쉬워지는 것만 골라 직접 작성했습니다. 그래서 모든 항목이 하우미 코드의 실제 사용처를 근거로 가지고 있습니다.
 
 ---
 
@@ -42,16 +48,17 @@ CI(`.github/workflows/ci-cd.yml`)의 `lint` job과 `build` job에서 돌아갑�
 
 ESLint가 막는 것 중 이 문서의 규칙에 해당하는 것:
 
-| 규칙                                                         | ESLint 규칙명                                     |
-| ------------------------------------------------------------ | ------------------------------------------------- |
-| `@/` 금지 · 최단 alias · 3단계 상대경로 · barrel 경유 import | `no-restricted-imports`                           |
-| barrel 파일(`index.ts`) 생성                                 | `src/**/index.ts`에 `no-restricted-syntax`        |
-| shared/store → pages, 화면 간 직접 import                    | `import/no-restricted-paths`                      |
-| import 순서                                                  | `import/order` (`--fix` 자동 정렬)                |
-| hook deps 누락                                               | `react-hooks/exhaustive-deps` (error)             |
-| 쿼리 키 deps 누락                                            | `@tanstack/query/exhaustive-deps` (error)         |
-| 스타일 토큰·단위                                             | `vanilla-extract/*`                               |
-| `any` 유입, Promise 오용, enum 비교, 불필요한 타입 단언      | typescript-eslint `recommendedTypeChecked` 프리셋 |
+| 규칙                                                         | ESLint 규칙명                                                                                                                                         |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@/` 금지 · 최단 alias · 3단계 상대경로 · barrel 경유 import | `no-restricted-imports`                                                                                                                               |
+| barrel 파일(`index.ts`) 생성                                 | `src/**/index.ts`에 `no-restricted-syntax`                                                                                                            |
+| shared/store → pages, 화면 간 직접 import                    | `import/no-restricted-paths`                                                                                                                          |
+| import 순서                                                  | `import/order` (`--fix` 자동 정렬)                                                                                                                    |
+| hook deps 누락                                               | `react-hooks/exhaustive-deps` (error)                                                                                                                 |
+| 쿼리 키 deps 누락                                            | `@tanstack/query/exhaustive-deps` (error)                                                                                                             |
+| 스타일 토큰·단위                                             | `vanilla-extract/*`                                                                                                                                   |
+| 컴포넌트 파일의 non-component export                         | `react-refresh/only-export-components` — **`allowConstantExport: true`라 상수는 허용. "mixed export 금지" 컨벤션보다 느슨하다(단계 4에서 정합 예정)** |
+| `any` 유입, Promise 오용, enum 비교, 불필요한 타입 단언      | typescript-eslint `recommendedTypeChecked` 프리셋                                                                                                     |
 
 #### 타입 정보를 읽는 규칙 — 표준 프리셋을 기준으로 둡니다
 
@@ -84,13 +91,13 @@ tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
 | `exactOptionalPropertyTypes` (tsconfig)                  | 181건 / 78파일 | React prop 전달 패턴과 충돌. 비용 대비 이득이 작다                                                                                                                                                                                                                                                                                                                     |
 | `no-non-null-assertion` (strict 프리셋에 있음 → 안 넣음) | 38건           | `!`는 컴파일 시점 표기라 그 자체로 예외를 던지지 않지만, **검사를 끄기 때문에 가정이 틀리면 `undefined`가 흘러가 엉뚱한 곳에서 터진다.** 지금 38건은 대부분 서버 생성 타입이 optional로 나오지만 실제로는 항상 오는 필드(`plan.id!` 등)다. 규칙만 켜면 `?? 기본값`을 억지로 붙이게 되므로 **먼저 생성 타입의 nullable 표기를 서버와 맞추는 게 순서다.** 그 뒤에 재검토 |
 
-### 2계층 — 리뷰 봇이 본다
+### 2계층 — 리뷰 봇·AI가 본다
 
-도구로는 검사가 안 되지만 패턴 대조는 되는 것. `.coderabbit.yaml`이 이 문서를 기준으로 읽습니다. 네이밍 의미(`use{Subject}Query` 같은 형태는 도구가 보지만 이름이 대상을 제대로 가리키는지는 못 봄), 주석의 정확성, 규칙 예외에 이유가 붙어 있는지.
+도구로는 검사가 안 되지만 패턴 대조는 되는 것. 판정이 결정론적이지 않아 실행마다 달라질 수 있습니다. 현재는 CodeRabbit이 담당하고 `.coderabbit.yaml`이 이 문서를 기준으로 읽습니다(Claude Code 리뷰 도입 검토 중). 네이밍 의미(`use{Subject}Query` 같은 형태는 도구가 보지만 이름이 대상을 제대로 가리키는지는 못 봄), 주석의 정확성, 규칙 예외에 이유가 붙어 있는지.
 
 ### 3계층 — 사람이 판단한다
 
-폴더 배치, 공유 여부, 상태 위치, 캐시 값, 새 규칙의 채택 여부. 도구가 대신할 수 없는 것만 남깁니다.
+폴더 배치, 공유 여부, 상태 위치, 캐시 값, 이름이 대상을 제대로 가리키는지, 도메인 지식이 필요한 판단, 새 컨벤션의 채택 여부. **정답이 코드 밖에 있는 것만 남깁니다** — 이 목록을 줄이는 것이 계층을 나눈 목적입니다.
 
 ---
 
@@ -407,7 +414,7 @@ export const useGenerateImageApi = () => useMutation({ ... });   // Api 접미�
 | `src/pages/generate/`   | 6파일 (`useGeneratedCategoriesQuery` `useCurationState` `useCurationStore` `useCurationCacheStore` `hotspotCategoryResolver` `types/furniture`) |
 | `src/pages/mypage/`     | 5파일 (`useDetectionPrefetch` 3종 + `detectionPrefetch.types` + `resultNavigation`)                                                             |
 | 기타                    | `useWelcomePageModelPreload`(본문이 빈 함수였음)                                                                                                |
-| 바이너리                | `public/models/*.onnx` + `public/onnxruntime/*.wasm` — 합계 약 53MB                                                                             |
+| 바이너리                | `public/models/*.onnx` + `public/onnxruntime/*.wasm` — 합계 약 52MB                                                                             |
 | 의존성                  | `onnxruntime-web` (삭제 시점 1.23.2)                                                                                                            |
 
 지울 때 함께 정리한 것 — 살아 있던 코드에서 detection을 참조하던 3곳:
@@ -451,7 +458,7 @@ pnpm add onnxruntime-web@1.23.2
 
 미사용 파일 검사는 `pnpm knip`(로컬 전체 리포트)에는 그대로 남아 있다. "컴포넌트를 사용처 없이 머지하는 것을 허용할지"를 팀이 정하면 그때 게이트에 다시 넣는다.
 
-**주의**: 파일을 지워도 **git 히스토리에는 53MB 바이너리가 그대로 남는다.** 클론 용량은 줄지 않는다. 줄이려면 히스토리 재작성(`git filter-repo` 등)이 필요한데, 팀 전원이 다시 클론해야 하므로 별도 합의 사항으로 남긴다.
+**주의**: 파일을 지워도 **git 히스토리에는 52MB 바이너리가 그대로 남는다.** 클론 용량은 줄지 않는다. 줄이려면 히스토리 재작성(`git filter-repo` 등)이 필요한데, 팀 전원이 다시 클론해야 하므로 별도 합의 사항으로 남긴다.
 
 ### shared/apis/ 구조
 
@@ -949,3 +956,4 @@ position/z-index → display/flex → margin → border → padding → width/he
 | 2026-08-18 | **ONNX 가구 탐지 모듈 삭제** (팀 합의). 삭제 33파일 + 바이너리 52MB + `onnxruntime-web` 제거(커밋 전체는 45파일). 바이너리 내역 = `dfine_s_obj365.onnx` 40MB + `ort-wasm-simd-threaded.wasm` 11MB. 살아 있던 참조 3곳 정리(useUserStore 캐시 clear / GeneratedImagesSection prefetch 로직 / queryKey의 furniture 도메인). 복구 절차는 "Detection 모듈" 절에 기록. 남아 있는 큐레이션(v2 추천형)은 무관. 삭제로 `noUncheckedIndexedAccess` 위반이 75건→9건이 되어 9건을 고치고 컴파일러 옵션을 채택했다. knip 미사용 파일이 0이 되어 CI 게이트에 파일 검사를 추가했으나 **2026-08-19 제외** — develop rebase 직후 "컴포넌트를 먼저 머지하고 나중에 연결"이라는 정상 작업 흐름을 위반으로 잡았다(채택 기준 4번 미통과). 손으로 고른 린트 규칙 24개를 typescript-eslint 표준 프리셋 `recommendedTypeChecked`로 교체(위반 11건 처리 — 그중 `no-unsafe-enum-comparison` 4건은 react-router `NavigationType` enum을 문자열 리터럴과 비교하던 것). `strictTypeChecked`는 234건이라 미채택. |
 | 2026-08-19 | 문서 3종 역할 재편 — **AGENTS.md를 본문(약 70줄), CLAUDE.md를 `@AGENTS.md` import 한 줄로.** 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 Codex와 Cursor는 AGENTS.md만 읽어서, 기존 구조(CLAUDE.md 본문)로는 두 명이 규칙을 못 받고 있었다. 본문에서 기술 스택·폴더 구조·alias 표를 삭제(package.json·`ls src/`·tsconfig로 알 수 있는 것은 넣지 않는다는 Anthropic 권장 기준). 도구가 막는 항목에 `[도구]` 표시 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 2026-08-21 | **"alias 목록은 더 이상 변경하지 않는다" 규칙 폐기.** 채택 기준 ③(위반을 무엇이 발견하나)에 답할 수 없고 — tsconfig `paths` 추가를 막는 검사가 없다 — ④(지키는 비용 < 어기는 비용)도 통과하지 못한다. `@analytics/` 추가 때 316줄을 grep으로 일괄 치환한 것이 "비용이 감당 가능하다"는 반례. 대신 **추가·제거 시 함께 고칠 네 곳**을 절차로 남김 — 특히 `eslint.config.js`의 `SHORTER_ALIAS_TARGETS`를 빠뜨리면 `@shared/{폴더}/`가 합법으로 남아 두 형태가 공존하는데 lint가 통과한다(계층 3 항목). 근거 문단이 `@types/` 금지 항목의 하위에 묻혀 있던 것도 독립 절로 분리                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-08-22 | PR #666 본문을 쓰면서 다듬은 서술을 이 문서에 반영. **채택 기준 4문항을 완결된 문장으로 재작성**(각 항목에 통과하지 못하면 어떻게 되는지 명시, 실제로 걷어낸 사례 2건 추가)하고 컨벤션 항목의 출처를 밝힘. 2계층을 "리뷰 봇·AI"로, 3계층에 도메인 지식·네이밍 의미 추가. ESLint 표에 `react-refresh/only-export-components` 추가 — `allowConstantExport: true`라 "mixed export 금지" 컨벤션보다 느슨하다는 것을 명시(단계 4 정합 대상). ONNX 바이너리 용량 실측 정정(53MB → 52MB). PR 리뷰어 2명 승인 규칙 폐지에 따라 AGENTS.md에서 해당 줄 삭제                                                                                                                                                                                                                                                                                                                                                                                                                                   |

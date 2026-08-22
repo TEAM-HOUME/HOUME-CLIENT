@@ -59,7 +59,6 @@ pnpm build
 - 브랜치: `develop`에서 분기 → `develop`으로 merge
 - 브랜치 이름: `type/description/#issue-number` (예: `feat/login-page/#12`)
 - 커밋: `type: 제목` (한국어). types: `feat` `fix` `refactor` `style` `design` `chore` `docs` `test` `rename` `remove`
-- PR: 리뷰어 2명 이상 승인
 
 ## 참고 문서
 
