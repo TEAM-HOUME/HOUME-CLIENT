@@ -1,18 +1,18 @@
 # HOUME-CLIENT 컨벤션 가이드
 
-**이 문서가 컨벤션의 SSOT(single source of truth)입니다.** 규칙이 바뀌면 이 문서만 고칩니다. `AGENTS.md`·`.coderabbit.yaml`은 여기서 뽑은 요약이라, 내용이 서로 어긋나면 이 문서가 맞습니다.
+**이 문서가 컨벤션의 SSOT(single source of truth)입니다.** 컨벤션이 바뀌면 이 문서만 고칩니다. `AGENTS.md`·`.coderabbit.yaml`은 여기서 뽑은 요약이라, 내용이 서로 어긋나면 이 문서가 맞습니다.
 
 문서 3종의 역할이 다릅니다.
 
 | 파일                                | 역할                                  | 읽는 쪽                           |
 | ----------------------------------- | ------------------------------------- | --------------------------------- |
-| **`docs/conventions.md`** (이 문서) | 규칙의 상세·예시·근거·변경 이력       | 사람, 리뷰 봇, 필요할 때 에이전트 |
+| **`docs/conventions.md`** (이 문서) | 컨벤션의 상세·예시·근거·변경 이력     | 사람, 리뷰 봇, 필요할 때 에이전트 |
 | **`AGENTS.md`**                     | 매 작업에 필요한 체크리스트 (약 70줄) | **Codex·Cursor가 자동으로 읽음**  |
 | **`CLAUDE.md`**                     | `@AGENTS.md` import 한 줄             | Claude Code                       |
 
 AGENTS.md가 본문이고 CLAUDE.md가 그것을 가져오는 구조입니다. 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 **Claude Code는 CLAUDE.md를, Codex와 Cursor는 AGENTS.md를 읽기** 때문입니다(2026-08-19 전환). 본문을 한 곳에만 두어 복사본이 낡는 것을 막습니다.
 
-`.coderabbit.yaml`도 규칙 본문을 복사하지 않고 이 문서를 참조합니다.
+`.coderabbit.yaml`도 컨벤션 본문을 복사하지 않고 이 문서를 참조합니다.
 
 **마지막 업데이트**: 2026-08-22 (리팩토링 5차 PR #666 — 채택 기준·계층 서술 정비, alias 절차화)
 
@@ -23,15 +23,15 @@ AGENTS.md가 본문이고 CLAUDE.md가 그것을 가져오는 구조입니다. �
 2. **이 컨벤션을 위반했을 때 코드베이스에 생기는 문제를 설명할 수 있는가**
    설명하지 못한다면 그 항목은 개인의 선호를 팀 규약으로 올린 것입니다. 나중에 누군가 "왜 이렇게 해야 하나요"라고 물었을 때 답할 수 없으면 컨벤션에 포함하지 않습니다.
 3. **컨벤션 위반을 발견하는 주체를 특정할 수 있는가**
-   발견 수단을 지정하는 일이 곧 계층을 배정하는 일입니다(아래 "규칙을 무엇이 강제하는가"). 1·2·3계층 어디에도 배정할 수 없다면 지켜지는지 확인할 방법이 없으므로 채택하지 않습니다.
+   발견 수단을 지정하는 일이 곧 계층을 배정하는 일입니다(아래 "컨벤션을 무엇이 강제하는가"). 1·2·3계층 어디에도 배정할 수 없다면 지켜지는지 확인할 방법이 없으므로 채택하지 않습니다.
 4. **컨벤션을 지키는 데 드는 비용이 어겼을 때 수습하는 비용보다 작은가**
-   지키는 쪽이 더 비싸면 채택하지 않습니다. 이 기준으로 실제로 걷어낸 것 — CI 게이트의 knip 미사용 파일 검사(2026-08-19), alias 목록을 닫아 두는 규칙(2026-08-21).
+   지키는 쪽이 더 비싸면 채택하지 않습니다. 이 기준으로 실제로 걷어낸 것 — CI 게이트의 knip 미사용 파일 검사(2026-08-19), alias 목록을 닫아 두는 컨벤션(2026-08-21).
 
 **컨벤션 항목의 출처**: 외부 스타일 가이드를 옮겨온 것이 아닙니다. 하우미 웹을 개발하면서 반복해서 등장한 형태 중에서, 팀원 모두가 같은 방식으로 작성했을 때 코드를 읽기 쉬워지고 고치기 쉬워지는 것만 골라 직접 작성했습니다. 그래서 모든 항목이 하우미 코드의 실제 사용처를 근거로 가지고 있습니다.
 
 ---
 
-## 규칙을 무엇이 강제하는가
+## 컨벤션을 무엇이 강제하는가
 
 기준 3("위반을 어떻게 알아채는가")의 실제 배치입니다. 도구가 잡을 수 있는 것은 사람이 리뷰에서 보지 않습니다.
 
@@ -46,9 +46,9 @@ CI(`.github/workflows/ci-cd.yml`)의 `lint` job과 `build` job에서 돌아갑�
 | `pnpm knip:ci`      | 미사용 의존성, package.json에 없는 import, 풀리지 않는 경로                         |
 | `pnpm build`        | `tsc -b` 타입 검사 + Vite 빌드                                                      |
 
-ESLint가 막는 것 중 이 문서의 규칙에 해당하는 것:
+ESLint가 막는 것 중 이 문서의 컨벤션에 해당하는 것:
 
-| 규칙                                                         | ESLint 규칙명                                                                                                                                         |
+| 컨벤션                                                       | 린트 규칙명                                                                                                                                           |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@/` 금지 · 최단 alias · 3단계 상대경로 · barrel 경유 import | `no-restricted-imports`                                                                                                                               |
 | barrel 파일(`index.ts`) 생성                                 | `src/**/index.ts`에 `no-restricted-syntax`                                                                                                            |
@@ -60,9 +60,9 @@ ESLint가 막는 것 중 이 문서의 규칙에 해당하는 것:
 | 컴포넌트 파일의 non-component export                         | `react-refresh/only-export-components` — **`allowConstantExport: true`라 상수는 허용. "mixed export 금지" 컨벤션보다 느슨하다(단계 4에서 정합 예정)** |
 | `any` 유입, Promise 오용, enum 비교, 불필요한 타입 단언      | typescript-eslint `recommendedTypeChecked` 프리셋                                                                                                     |
 
-#### 타입 정보를 읽는 규칙 — 표준 프리셋을 기준으로 둡니다
+#### 타입 정보를 읽는 린트 규칙 — 표준 프리셋을 기준으로 둡니다
 
-**규칙을 하나하나 고르지 않고 typescript-eslint의 `recommendedTypeChecked` 프리셋을 기준으로 둡니다.** 프리셋 안의 규칙은 표준이라 근거를 따로 적지 않고, **하우미에서 표준과 다르게 가는 것만** `eslint.config.js`에 이유와 함께 적습니다. 개별 규칙 설명은 `typescript-eslint.io/rules/{규칙명}`에 있습니다.
+**린트 규칙을 하나하나 고르지 않고 typescript-eslint의 `recommendedTypeChecked` 프리셋을 기준으로 둡니다.** 프리셋 안의 린트 규칙은 표준이라 근거를 따로 적지 않고, **하우미에서 표준과 다르게 가는 것만** `eslint.config.js`에 이유와 함께 적습니다. 개별 린트 규칙 설명은 `typescript-eslint.io/rules/{규칙명}`에 있습니다.
 
 | 프리셋과 다르게 가는 것 | 무엇을                                                                                                                                                                                                                                                              | 왜                                                                                                                      |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -73,7 +73,7 @@ ESLint가 막는 것 중 이 문서의 규칙에 해당하는 것:
 
 **상위 프리셋 `strictTypeChecked`는 채택하지 않았습니다.** 위반 234건이고, 그중 `no-confusing-void-expression` 122건 · `restrict-template-expressions` 61건 · `no-non-null-assertion` 38건입니다. 특히 마지막은 하우미가 쓰는 `!` 표기와 정면으로 충돌합니다. `recommendedTypeChecked`는 같은 시점에 11건이었습니다.
 
-이 규칙들은 `parserOptions.projectService`를 켜야 동작합니다(2026-08-12 도입). 켜기 전에는 `no-floating-promises` 같은 규칙이 설정에 적혀 있어도 **아무 일도 하지 않았습니다.** src 전체 린트에 약 7초가 듭니다.
+이 린트 규칙들은 `parserOptions.projectService`를 켜야 동작합니다(2026-08-12 도입). 켜기 전에는 `no-floating-promises` 같은 린트 규칙이 설정에 적혀 있어도 **아무 일도 하지 않았습니다.** src 전체 린트에 약 7초가 듭니다.
 
 tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
 
@@ -83,17 +83,17 @@ tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
 
 **아직 도구로 막지 않기로 한 것** (이유가 있는 미채택):
 
-| 규칙                                                     | 위반 수        | 미채택 이유                                                                                                                                                                                                                                                                                                                                                            |
-| -------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-floating-promises` (프리셋에 있음 → 끔)              | 84건           | 건별로 "이 요청이 실패하면 사용자에게 보여줄 것인가"를 정해야 고칠 수 있다. 에러 처리 정책에서 정한 뒤 켠다. 지금 켜면 판단 없이 `void`만 붙이게 되어 규칙이 무력화된다                                                                                                                                                                                                |
-| `no-misused-promises` (프리셋에 있음 → 끔)               | 27건           | 같음. Promise를 돌려주는 함수를 `() => void` 자리에 넘기는 패턴(`onRetry={refetch}` 등)                                                                                                                                                                                                                                                                                |
-| `no-unnecessary-condition` (프리셋에 없음 → 안 넣음)     | 64건           | 서버 생성 타입(`__generated__`)이 실제보다 낙관적이라(nullable이어야 할 필드가 non-nullable) **실제로 필요한 방어 코드를 지우라고 시킨다.** 방향이 틀린 규칙이라 나중에도 안 켤 가능성이 높다                                                                                                                                                                          |
-| `exactOptionalPropertyTypes` (tsconfig)                  | 181건 / 78파일 | React prop 전달 패턴과 충돌. 비용 대비 이득이 작다                                                                                                                                                                                                                                                                                                                     |
-| `no-non-null-assertion` (strict 프리셋에 있음 → 안 넣음) | 38건           | `!`는 컴파일 시점 표기라 그 자체로 예외를 던지지 않지만, **검사를 끄기 때문에 가정이 틀리면 `undefined`가 흘러가 엉뚱한 곳에서 터진다.** 지금 38건은 대부분 서버 생성 타입이 optional로 나오지만 실제로는 항상 오는 필드(`plan.id!` 등)다. 규칙만 켜면 `?? 기본값`을 억지로 붙이게 되므로 **먼저 생성 타입의 nullable 표기를 서버와 맞추는 게 순서다.** 그 뒤에 재검토 |
+| 검사                                                     | 위반 수        | 미채택 이유                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-floating-promises` (프리셋에 있음 → 끔)              | 84건           | 건별로 "이 요청이 실패하면 사용자에게 보여줄 것인가"를 정해야 고칠 수 있다. 에러 처리 정책에서 정한 뒤 켠다. 지금 켜면 판단 없이 `void`만 붙이게 되어 린트 규칙이 무력화된다                                                                                                                                                                                                |
+| `no-misused-promises` (프리셋에 있음 → 끔)               | 27건           | 같음. Promise를 돌려주는 함수를 `() => void` 자리에 넘기는 패턴(`onRetry={refetch}` 등)                                                                                                                                                                                                                                                                                     |
+| `no-unnecessary-condition` (프리셋에 없음 → 안 넣음)     | 64건           | 서버 생성 타입(`__generated__`)이 실제보다 낙관적이라(nullable이어야 할 필드가 non-nullable) **실제로 필요한 방어 코드를 지우라고 시킨다.** 방향이 틀린 린트 규칙이라 나중에도 안 켤 가능성이 높다                                                                                                                                                                          |
+| `exactOptionalPropertyTypes` (tsconfig)                  | 181건 / 78파일 | React prop 전달 패턴과 충돌. 비용 대비 이득이 작다                                                                                                                                                                                                                                                                                                                          |
+| `no-non-null-assertion` (strict 프리셋에 있음 → 안 넣음) | 38건           | `!`는 컴파일 시점 표기라 그 자체로 예외를 던지지 않지만, **검사를 끄기 때문에 가정이 틀리면 `undefined`가 흘러가 엉뚱한 곳에서 터진다.** 지금 38건은 대부분 서버 생성 타입이 optional로 나오지만 실제로는 항상 오는 필드(`plan.id!` 등)다. 린트 규칙만 켜면 `?? 기본값`을 억지로 붙이게 되므로 **먼저 생성 타입의 nullable 표기를 서버와 맞추는 게 순서다.** 그 뒤에 재검토 |
 
 ### 2계층 — 리뷰 봇·AI가 본다
 
-도구로는 검사가 안 되지만 패턴 대조는 되는 것. 판정이 결정론적이지 않아 실행마다 달라질 수 있습니다. 현재는 CodeRabbit이 담당하고 `.coderabbit.yaml`이 이 문서를 기준으로 읽습니다(Claude Code 리뷰 도입 검토 중). 네이밍 의미(`use{Subject}Query` 같은 형태는 도구가 보지만 이름이 대상을 제대로 가리키는지는 못 봄), 주석의 정확성, 규칙 예외에 이유가 붙어 있는지.
+도구로는 검사가 안 되지만 패턴 대조는 되는 것. 판정이 결정론적이지 않아 실행마다 달라질 수 있습니다. 현재는 CodeRabbit이 담당하고 `.coderabbit.yaml`이 이 문서를 기준으로 읽습니다(Claude Code 리뷰 도입 검토 중). 네이밍 의미(`use{Subject}Query` 같은 형태는 도구가 보지만 이름이 대상을 제대로 가리키는지는 못 봄), 주석의 정확성, 컨벤션 예외에 이유가 붙어 있는지.
 
 ### 3계층 — 사람이 판단한다
 
@@ -103,7 +103,7 @@ tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
 
 ## Query Key 컨벤션
 
-### 규칙
+### 지켜야 할 것
 
 1. **모든 쿼리 키는 `queryKeys` factory를 통해 생성한다**
    - 파일: `src/shared/constants/queryKey.ts`
@@ -178,14 +178,14 @@ landing: {
 `eslint.config.js`에 **`error`로 켜져 있다.** 검사 내용은 "`queryFn` 안에서 쓰는 값이 `queryKey`에도 들어 있는가"다.
 
 ```typescript
-// ❌ 규칙이 잡는 코드 — productId가 바뀌어도 키가 같아서 이전 상품이 캐시에서 나온다
+// ❌ 린트 규칙이 잡는 코드 — productId가 바뀌어도 키가 같아서 이전 상품이 캐시에서 나온다
 useQuery({
   queryKey: queryKeys.product.all,
   queryFn: () => getProduct(productId),
 });
 ```
 
-**오탐(false positive)이 나는 경우**: `queryKey`에 배열을 직접 쓰지 않고 미리 만들어 둔 변수를 넣으면, 규칙이 그 변수 안에 무엇이 들었는지 볼 수 없어 "빠졌다"고 판정한다. 이때만 사유 주석과 함께 끈다.
+**오탐(false positive)이 나는 경우**: `queryKey`에 배열을 직접 쓰지 않고 미리 만들어 둔 변수를 넣으면, 린트 규칙이 그 변수 안에 무엇이 들었는지 볼 수 없어 "빠졌다"고 판정한다. 이때만 사유 주석과 함께 끈다.
 
 ```typescript
 // 실물: useGeneratedCategoriesQuery.ts
@@ -193,13 +193,13 @@ useQuery({
 queryKey: categoriesQueryKey,
 ```
 
-> 참고: `@typescript-eslint/no-unused-vars`의 `_` prefix 허용(`const { houseType: _, ...rest } = prev;`)은 쿼리 키와 무관한 전체 공통 규칙이다. 설정은 `eslint.config.js`에 있다.
+> 참고: `@typescript-eslint/no-unused-vars`의 `_` prefix 허용(`const { houseType: _, ...rest } = prev;`)은 쿼리 키와 무관한 전체 공통 린트 규칙이다. 설정은 `eslint.config.js`에 있다.
 
 ---
 
 ## Import / Path Alias 컨벤션
 
-### 두 가지 규칙과 각각의 이유
+### 두 가지 컨벤션과 각각의 이유
 
 **① alias를 쓴다 (상대경로 대신).** 이유는 상대경로가 깊어질수록 깨지기 쉽기 때문이다. `../../../shared/apis/...`는 파일을 다른 폴더로 옮기는 순간 조용히 다른 곳을 가리키거나 깨지고, 읽을 때 몇 단계인지 세야 한다.
 
@@ -292,7 +292,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 
 치환은 grep 한 번으로 끝난다. `@analytics/`를 추가할 때 316줄을 이렇게 처리했다. 비용이 문제가 아니라 **네 곳의 동기화가 사람 몫이라는 것**이 이 절차를 적어두는 이유다.
 
-표에 없는 shared 하위 폴더(`types` · `monitoring` · `config`)는 `@shared/{폴더}/`가 최단 형태이며, 이것은 규칙 위반이 아니다.
+표에 없는 shared 하위 폴더(`types` · `monitoring` · `config`)는 `@shared/{폴더}/`가 최단 형태이며, 이것은 컨벤션 위반이 아니다.
 
 ### ESLint 설정
 
@@ -308,7 +308,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 
 ### 파일/폴더 네이밍
 
-| 대상          | 규칙              | 예시                                         |
+| 대상          | 컨벤션            | 예시                                         |
 | ------------- | ----------------- | -------------------------------------------- |
 | 폴더          | camelCase         | `floorPlan/`, `houseInfo/`, `imageSetup/`    |
 | 컴포넌트 파일 | PascalCase.tsx    | `FloorPlan.tsx`, `CardCuration.tsx`          |
@@ -320,7 +320,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 
 ### 코드 네이밍
 
-| 대상                  | 규칙                            | 예시                                                               |
+| 대상                  | 컨벤션                          | 예시                                                               |
 | --------------------- | ------------------------------- | ------------------------------------------------------------------ |
 | 컴포넌트              | PascalCase (파일명과 동일)      | `HomePage`, `FlipButton`, `LargeFilledButton`                      |
 | 페이지 컴포넌트       | `{Feature}Page`                 | `HomePage`, `LoginPage`, `ImageSetupPage`                          |
@@ -334,7 +334,7 @@ import { colorVars } from '@/shared/styles/tokens/color.css';
 | Zustand 스토어        | `use{Domain}Store`              | `useUserStore`, `useGenerateStore`                                 |
 | 쿼리키 팩토리         | `queryKeys.{domain}.{action}()` | `queryKeys.generate.result(houseId)`                               |
 
-### Query/Mutation 접미사 규칙
+### Query/Mutation 접미사 컨벤션
 
 - **`Query` 접미사**: `useQuery`를 래핑하는 훅에만 붙인다
 - **`Mutation` 접미사**: `useMutation`을 래핑하는 훅에만 붙인다
@@ -364,13 +364,13 @@ export const useGenerateImageApi = () => useMutation({ ... });   // Api 접미�
 - `store/`를 `shared/` 아래로 옮기는 것도 가능하지만 얻는 것이 없다. `@store/`로 이미 위치가 명확하고, 옮기면 import만 바뀐다.
 - 성격이 다르기도 하다. `shared/`는 가져다 쓰는 부품이고, `store/`는 앱 전체가 공유하는 하나뿐인 상태다 (`useUserStore`, `useFunnelStore`, `useImageFlowStore`, `useSavedItemsStore`).
 
-### Cross-Feature Import 규칙
+### Cross-Feature Import 컨벤션
 
-**이 규칙의 목적** — 의존 방향을 한쪽으로 고정하면 다음 세 가지를 얻는다.
+**이 컨벤션의 목적** — 의존 방향을 한쪽으로 고정하면 다음 세 가지를 얻는다.
 
 1. **파일의 위치가 변경 영향 범위를 알려준다.** `pages/mypage/` 안에 있으면 고칠 때 mypage만 확인하면 되고, `shared/`에 있으면 전체를 확인해야 한다. 양방향 참조가 있으면 위치가 거짓말을 한다 — 실제로 리팩토링 4차 이전의 `useMyPageUserQuery`는 mypage 폴더에 있으면서 home 헤더·크레딧 가드·인증 동기화까지 영향을 주고 있었다.
 2. **페이지 폴더 단위로 작업하는 것이 안전해진다.** 새 기능을 한 페이지에 붙일 때 그 폴더만 건드리면 되는지 판단할 수 있다.
-3. **규칙이 단순해야 도구로 검사할 수 있다.** "페이지끼리 금지, shared→pages 금지" 두 줄이면 ESLint `import/no-restricted-paths`로 자동 검출되지만, 예외가 늘어나면 사람이 매번 판단해야 한다.
+3. **컨벤션이 단순해야 도구로 검사할 수 있다.** "페이지끼리 금지, shared→pages 금지" 두 줄이면 ESLint `import/no-restricted-paths`로 자동 검출되지만, 예외가 늘어나면 사람이 매번 판단해야 한다.
 
 4. **Feature는 다른 Feature를 직접 import할 수 없다**
 
@@ -454,7 +454,7 @@ pnpm add onnxruntime-web@1.23.2
 
 되돌린 뒤에는 위 "함께 정리한 것" 3곳을 다시 연결해야 한다. 삭제 커밋 하나만 통째로 뒤집는 `git revert <해시>`가 더 간단하다.
 
-`pnpm knip:ci`(CI 게이트)에는 미사용 파일 검사를 넣지 않는다. 사용처 없이 컴포넌트를 먼저 구현하고, 다음 PR에서 컴포넌트(파일)를 실제로 사용하는 개발 플로우를 고려했을 때, 미사용 파일 규칙을 포함할 경우 일반적인 플로우에서도 PR이 머지되지 못할 가능성이 있다. **채택 기준 4번(지키는 비용 < 안 지키는 비용)을 통과하지 못한다.**
+`pnpm knip:ci`(CI 게이트)에는 미사용 파일 검사를 넣지 않는다. 사용처 없이 컴포넌트를 먼저 구현하고, 다음 PR에서 컴포넌트(파일)를 실제로 사용하는 개발 플로우를 고려했을 때, 미사용 파일 검사를 포함할 경우 일반적인 플로우에서도 PR이 머지되지 못할 가능성이 있다. **채택 기준 4번(지키는 비용 < 안 지키는 비용)을 통과하지 못한다.**
 
 미사용 파일 검사는 `pnpm knip`(로컬 전체 리포트)에는 그대로 남아 있다. "컴포넌트를 사용처 없이 머지하는 것을 허용할지"를 팀이 정하면 그때 게이트에 다시 넣는다.
 
@@ -529,7 +529,7 @@ import HomePage from '...';   // 받는 쪽이 이름을 마음대로 정할 수
 import Anything from '...';   // 이것도 동작한다
 ```
 
-### 핵심 규칙
+### 핵심 컨벤션
 
 | 대상                   | Export 방식      | 이유                                                               |
 | ---------------------- | ---------------- | ------------------------------------------------------------------ |
@@ -597,7 +597,7 @@ export const getCanHistoryGoBack = () => { ... };
    ```
 
    금지 이유는 두 가지다.
-   - **사용처 검색이 샌다.** barrel을 거쳐 import하면(`from '@shared/analytics/hooks'`) 실제 파일 경로로 grep해도 그 사용처가 나오지 않는다. 이 문서의 다른 규칙들이 목표로 하는 검색 가능성과 정면으로 충돌한다.
+   - **사용처 검색이 샌다.** barrel을 거쳐 import하면(`from '@shared/analytics/hooks'`) 실제 파일 경로로 grep해도 그 사용처가 나오지 않는다. 이 문서의 다른 컨벤션들이 목표로 하는 검색 가능성과 정면으로 충돌한다.
    - **순환 참조가 쉽게 생긴다.** barrel이 A·B·C를 모두 내보내는 상태에서 A가 barrel을 import하면 A → barrel → A 고리가 만들어진다.
 
    트리셰이킹은 주된 근거가 아니다. 요즘 번들러는 대체로 처리하며, 부작용이 있는 모듈이 섞였을 때만 문제가 된다.
@@ -660,9 +660,9 @@ export const useXxxQuery = () => {
 };
 ```
 
-### TanStack Query 상태값 규칙
+### TanStack Query 상태값 컨벤션
 
-TanStack Query v5는 쿼리 상태를 **서로 독립적인 두 축**으로 관리한다. 이걸 알면 아래 규칙이 전부 따라 나온다.
+TanStack Query v5는 쿼리 상태를 **서로 독립적인 두 축**으로 관리한다. 이걸 알면 아래 컨벤션이 전부 따라 나온다.
 
 | 축        | 필드          | 값                              | 무엇을 말하는가                 |
 | --------- | ------------- | ------------------------------- | ------------------------------- |
@@ -691,12 +691,12 @@ TanStack Query v5는 쿼리 상태를 **서로 독립적인 두 축**으로 관�
 
 그래서 조건부 쿼리에서 `isPending`으로 로딩 화면을 그리면 **조건이 false인 동안 로딩 화면이 영구히 남는다.** `isLoading`을 쓰면 "요청이 실제로 날아가는 중"일 때만 true가 되므로 이 문제가 없다.
 
-#### 사용 규칙
+#### 사용 컨벤션
 
 - **항상 활성 쿼리** (enabled 없음 또는 `enabled: true`): `isPending` 사용
 - **조건부 쿼리** (`enabled: someCondition`): `isLoading` 사용
   - `isPending`은 disabled 쿼리에서도 `true` → 영구 로딩 버그 유발
-- `useState`로 직접 만든 로컬 로딩 플래그의 이름은 `isLoading`이어도 된다. 위 규칙은 TanStack Query가 돌려주는 값에만 적용되며, 직접 만든 boolean과는 무관하다 (실물: `useABTest.ts:97`, `useOnnxModel.ts:171`)
+- `useState`로 직접 만든 로컬 로딩 플래그의 이름은 `isLoading`이어도 된다. 위 컨벤션은 TanStack Query가 돌려주는 값에만 적용되며, 직접 만든 boolean과는 무관하다 (실물: `shared/hooks/useABTest.ts:97`)
 
 ```typescript
 // ✅ Good — 항상 활성 쿼리
@@ -712,7 +712,7 @@ const { data, isPending } = useXxxQuery({ enabled: isLoggedIn });
 const [isLoading, setIsLoading] = useState(false);
 ```
 
-### 경로 상수 규칙
+### 경로 상수 컨벤션
 
 - **모든 `navigate()`, `<Navigate>` 경로는 `ROUTES` 상수 사용** (`@routes/paths`)
 - 하드코딩 문자열 경로 금지 (`'/'`, `'/mypage'` 등)
@@ -730,7 +730,7 @@ navigate(ROUTES.MYPAGE, { replace: true });
 <Navigate to={ROUTES.HOME} replace />;
 ```
 
-### `request()` 래퍼 규칙
+### `request()` 래퍼 컨벤션
 
 1. **모든 API 호출은 `request<T>()` 경유** — 직접 `axiosInstance` 사용 금지
 
@@ -760,7 +760,7 @@ navigate(ROUTES.MYPAGE, { replace: true });
 3. **`body` 타입은 `object`** — 인터페이스를 캐스트 없이 직접 전달 가능
 4. **모든 bare 함수에 explicit `Promise<T>` 리턴 타입 필수**
 
-### 훅 위치 규칙
+### 훅 위치 컨벤션
 
 | 훅 종류               | 위치                                   | 예시                                   |
 | --------------------- | -------------------------------------- | -------------------------------------- |
@@ -803,7 +803,7 @@ createRoot(rootElement, getSentryReactErrorHandlerOptions())
 
 ### StrictMode
 
-현재 **주석 처리 상태**다 (`chore: react strict mode 주석 처리`, 2025-07-10). 커밋 메시지에 사유가 없어 왜 껐는지 코드로는 확인되지 않는다. StrictMode는 개발 모드에서 effect를 두 번 실행해 정리(cleanup) 누락을 드러내는 장치이므로, 다시 켤지는 useEffect 규칙 확정과 함께 판단한다 (5차 단계 4 대상).
+현재 **주석 처리 상태**다 (`chore: react strict mode 주석 처리`, 2025-07-10). 커밋 메시지에 사유가 없어 왜 껐는지 코드로는 확인되지 않는다. StrictMode는 개발 모드에서 effect를 두 번 실행해 정리(cleanup) 누락을 드러내는 장치이므로, 다시 켤지는 useEffect 컨벤션 확정과 함께 판단한다 (5차 단계 4 대상).
 
 ---
 
@@ -874,7 +874,7 @@ position/z-index → display/flex → margin → border → padding → width/he
 - 저장 시 자동 정렬 (`.vscode/settings.json` ESLint autofix)
 - 커밋 시에도 husky + lint-staged로 autofix
 
-### 디자인 토큰 사용 규칙
+### 디자인 토큰 사용 컨벤션
 
 #### 색상
 
@@ -889,7 +889,7 @@ position/z-index → display/flex → margin → border → padding → width/he
 - raw `fontSize`, `fontWeight`, `lineHeight` 직접 사용 금지
 - `...fontVars.font.body_r_14` 형태로 spread
 
-> 2026-08-12 정정: 이전 문서는 `fontStyle()` 헬퍼를 규칙으로 적고 있었으나, 그 헬퍼는 리팩토링 2차의 폰트 토큰 전환에서 삭제됐다 (현재 `fontStyle` 사용 0건, `fontVars` 225건).
+> 2026-08-12 정정: 이전 문서는 `fontStyle()` 헬퍼를 컨벤션으로 적고 있었으나, 그 헬퍼는 리팩토링 2차의 폰트 토큰 전환에서 삭제됐다 (현재 `fontStyle` 사용 0건, `fontVars` 225건).
 
 #### 애니메이션·인터랙션
 
@@ -917,9 +917,9 @@ position/z-index → display/flex → margin → border → padding → width/he
 
 > 2026-08-12 정정: 표에 있던 `CtaButton.css.ts`·`BottomSheetWrapper.css.ts` 항목은 두 파일이 모두 삭제돼(리팩토링 2·3차) 제거했다.
 
-### ESLint 규칙 설정 사유
+### 린트 규칙 설정 사유
 
-| 규칙                    | 설정    | 사유                                                                        |
+| 린트 규칙               | 설정    | 사유                                                                        |
 | ----------------------- | ------- | --------------------------------------------------------------------------- |
 | `concentric-order`      | `error` | CSS 속성 순서 자동 정렬                                                     |
 | `no-empty-style-blocks` | `off`   | `recipe()` variant에서 빈 블록(`default: {}`)이 TypeScript 타입 추론에 필요 |
@@ -956,4 +956,4 @@ position/z-index → display/flex → margin → border → padding → width/he
 | 2026-08-18 | **ONNX 가구 탐지 모듈 삭제** (팀 합의). 삭제 33파일 + 바이너리 52MB + `onnxruntime-web` 제거(커밋 전체는 45파일). 바이너리 내역 = `dfine_s_obj365.onnx` 40MB + `ort-wasm-simd-threaded.wasm` 11MB. 살아 있던 참조 3곳 정리(useUserStore 캐시 clear / GeneratedImagesSection prefetch 로직 / queryKey의 furniture 도메인). 복구 절차는 "Detection 모듈" 절에 기록. 남아 있는 큐레이션(v2 추천형)은 무관. 삭제로 `noUncheckedIndexedAccess` 위반이 75건→9건이 되어 9건을 고치고 컴파일러 옵션을 채택했다. knip 미사용 파일이 0이 되어 CI 게이트에 파일 검사를 추가했으나 **2026-08-19 제외** — develop rebase 직후 "컴포넌트를 먼저 머지하고 나중에 연결"이라는 정상 작업 흐름을 위반으로 잡았다(채택 기준 4번 미통과). 손으로 고른 린트 규칙 24개를 typescript-eslint 표준 프리셋 `recommendedTypeChecked`로 교체(위반 11건 처리 — 그중 `no-unsafe-enum-comparison` 4건은 react-router `NavigationType` enum을 문자열 리터럴과 비교하던 것). `strictTypeChecked`는 234건이라 미채택. |
 | 2026-08-19 | 문서 3종 역할 재편 — **AGENTS.md를 본문(약 70줄), CLAUDE.md를 `@AGENTS.md` import 한 줄로.** 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 Codex와 Cursor는 AGENTS.md만 읽어서, 기존 구조(CLAUDE.md 본문)로는 두 명이 규칙을 못 받고 있었다. 본문에서 기술 스택·폴더 구조·alias 표를 삭제(package.json·`ls src/`·tsconfig로 알 수 있는 것은 넣지 않는다는 Anthropic 권장 기준). 도구가 막는 항목에 `[도구]` 표시 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 2026-08-21 | **"alias 목록은 더 이상 변경하지 않는다" 규칙 폐기.** 채택 기준 ③(위반을 무엇이 발견하나)에 답할 수 없고 — tsconfig `paths` 추가를 막는 검사가 없다 — ④(지키는 비용 < 어기는 비용)도 통과하지 못한다. `@analytics/` 추가 때 316줄을 grep으로 일괄 치환한 것이 "비용이 감당 가능하다"는 반례. 대신 **추가·제거 시 함께 고칠 네 곳**을 절차로 남김 — 특히 `eslint.config.js`의 `SHORTER_ALIAS_TARGETS`를 빠뜨리면 `@shared/{폴더}/`가 합법으로 남아 두 형태가 공존하는데 lint가 통과한다(계층 3 항목). 근거 문단이 `@types/` 금지 항목의 하위에 묻혀 있던 것도 독립 절로 분리                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 2026-08-22 | PR #666 본문을 쓰면서 다듬은 서술을 이 문서에 반영. **채택 기준 4문항을 완결된 문장으로 재작성**(각 항목에 통과하지 못하면 어떻게 되는지 명시, 실제로 걷어낸 사례 2건 추가)하고 컨벤션 항목의 출처를 밝힘. 2계층을 "리뷰 봇·AI"로, 3계층에 도메인 지식·네이밍 의미 추가. ESLint 표에 `react-refresh/only-export-components` 추가 — `allowConstantExport: true`라 "mixed export 금지" 컨벤션보다 느슨하다는 것을 명시(단계 4 정합 대상). ONNX 바이너리 용량 실측 정정(53MB → 52MB). PR 리뷰어 2명 승인 규칙 폐지에 따라 AGENTS.md에서 해당 줄 삭제                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 2026-08-22 | PR #666 본문을 쓰면서 다듬은 서술을 이 문서에 반영. **채택 기준 4문항을 완결된 문장으로 재작성**(각 항목에 통과하지 못하면 어떻게 되는지 명시, 실제로 걷어낸 사례 2건 추가)하고 컨벤션 항목의 출처를 밝힘. 2계층을 "리뷰 봇·AI"로, 3계층에 도메인 지식·네이밍 의미 추가. ESLint 표에 `react-refresh/only-export-components` 추가 — `allowConstantExport: true`라 "mixed export 금지" 컨벤션보다 느슨하다는 것을 명시(단계 4 정합 대상). ONNX 바이너리 용량 실측 정정(53MB → 52MB). PR 리뷰어 2명 승인 규칙 폐지에 따라 AGENTS.md에서 해당 줄 삭제 **본문 전체 용어 통일** — `컨벤션`(팀 규약) / `검사`(강제 수단 총칭) / `린트 규칙`(ESLint 개별 항목)으로 46곳 정리. 동사도 갈라 쓴다: 컨벤션은 _정한다·채택한다·어긴다_, 검사는 _켠다·끈다·통과한다_. 이 변경 이력 표는 과거 기록이라 소급 수정하지 않는다. 삭제된 `useOnnxModel.ts` 참조 1건 제거.                                                                                                                               |
