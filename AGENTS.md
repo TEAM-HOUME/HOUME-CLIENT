@@ -38,7 +38,7 @@ pnpm build
 
 **경로** — `navigate()`·`<Navigate>`는 `ROUTES` 상수(`@routes/paths`). 하드코딩 금지
 
-**스타일** — 색상은 `colorVars`, 폰트는 `fontVars`(`...fontVars.font.body_r_14`). `#hex`·`rgba()` 하드코딩 금지, 예외는 conventions.md의 예외 표에 등록 후 사용
+**스타일** — 폰트는 `fontVars`(`...fontVars.font.body_r_14`). raw `fontSize`·`fontWeight`·`lineHeight` 금지. 색상은 토큰에 있으면 `colorVars`를 쓰고, 토큰에 없으면 **두 곳 이상이 쓰는 값만** 토큰으로 추가한다. 한 컴포넌트에서만 쓰는 1회성 색상은 리터럴로 둔다 (conventions.md "디자인 토큰 사용 컨벤션")
 
 **Export** — 컴포넌트는 default, 훅·유틸·상수·타입은 named. mixed export 금지
 

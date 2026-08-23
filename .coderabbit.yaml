@@ -93,7 +93,7 @@ reviews:
         - 레이아웃 전제: global.css.ts의 layoutVars(minWidth 375px, maxWidth 440px) 범위 내 모바일 고정 레이아웃
         - 디자인 토큰 활용 확인: 색상은 colorVars, 폰트는 fontVars
         - fontVars 사용법: ...fontVars.font.토큰명 형태로 스프레드 연산자와 함께 사용 (구 fontStyle() 헬퍼는 삭제됐어요)
-        - #hex·rgba() 하드코딩은 conventions.md의 예외 표에 등록된 것만 허용
+        - 토큰에 이미 있는 색상을 #hex·rgba() 리터럴로 다시 적은 경우만 지적하기. 토큰에 없는 1회성 색상(한 컴포넌트에서만 쓰는 값)은 리터럴이 정상이므로 토큰 추가를 요구하지 않기. 두 곳 이상이 같은 리터럴을 쓰면 토큰 추가를 제안하기
         - recipe와 styleVariants 패턴의 적절한 사용
         - 불필요한 중복 스타일 제거
         - 전역 스타일 남용 금지, 컴포넌트 범위 캡슐화
@@ -181,7 +181,7 @@ reviews:
         - 최단 alias 위반 — 같은 경로에 더 짧은 alias가 있는데 긴 것을 쓴 경우 (@shared/styles/... → @styles/...)
         - @/ prefix 사용 (금지)
         - 페이지끼리 직접 import, shared/에서 pages/ import (경계 위반)
-        - 색상·폰트 리터럴 하드코딩 (colorVars·fontVars 사용, 예외는 문서의 예외 표에 등록된 것만)
+        - 폰트 리터럴 하드코딩 (fontVars 사용), 토큰에 이미 있는 색상을 리터럴로 다시 적은 경우 (colorVars 사용)
         - navigate() 경로 하드코딩 (ROUTES 상수 사용)
         - queryKeys factory를 거치지 않은 쿼리 키 배열
 

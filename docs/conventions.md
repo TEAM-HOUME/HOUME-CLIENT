@@ -145,11 +145,12 @@ tsconfig에서 켜 둔 검사(`tsconfig.app.json`의 `Linting` 블록):
 
 ### 현재 도메인 목록
 
-9개 도메인. 정확한 키 목록은 `src/shared/constants/queryKey.ts`가 원본이고, 여기에는 도메인 이름만 둡니다 (키가 추가될 때마다 문서가 낡는 것을 막기 위함 — 2026-08-12 변경).
+8개 도메인. 정확한 키 목록은 `src/shared/constants/queryKey.ts`가 원본이고, 여기에는 도메인 이름만 둡니다 (키가 추가될 때마다 문서가 낡는 것을 막기 위함 — 2026-08-12 변경).
 
-`landing` · `product` · `banner` · `imageSetup` · `generate` · `furniture` · `mypage` · `styles` · `signup`
+`landing` · `product` · `banner` · `imageSetup` · `generate` · `mypage` · `styles` · `signup`
 
 - 찜 목록 키는 독립 도메인이 아니라 `queryKeys.mypage.jjymList()`입니다.
+- 가구 관련 키도 독립 도메인이 아니라 `queryKeys.imageSetup.furnitureCategories()`입니다. 최상위 `furniture` 도메인은 ONNX 가구 탐지 모듈을 삭제하면서 함께 지웠습니다 (2026-08-18).
 
 ### factory 코드 읽는 법
 
@@ -878,10 +879,19 @@ position/z-index → display/flex → margin → border → padding → width/he
 
 #### 색상
 
-- **모든 색상은 `colorVars`** 사용 (`@styles/tokens/color.css`)
-- 하드코딩된 `#hex`, `rgba()` 금지
-- 필요한 색상이 없으면 `color.css.ts`에 토큰 추가 후 사용
+- **토큰에 있는 색상은 반드시 `colorVars`로 쓴다** (`@styles/tokens/color.css`). 같은 값을 리터럴로 다시 적지 않는다
 - 기존 토큰: grayscale (gray000~gray999 + 투명도 변형), brand (primary 계열), feedback (error)
+
+**토큰에 없는 색상이 필요할 때**는 그 값을 몇 곳에서 쓰는지로 판단한다.
+
+| 상황                                        | 처리                                                                          |
+| ------------------------------------------- | ----------------------------------------------------------------------------- |
+| 두 곳 이상의 컴포넌트·화면이 같은 값을 쓴다 | 디자인팀에 토큰 추가를 요청하고 `color.css.ts`에 등록한 뒤 `colorVars`로 쓴다 |
+| 한 컴포넌트에서만 쓰는 1회성 값이다         | 토큰을 만들지 않고 `#hex`·`rgba()` 리터럴을 그대로 둔다                       |
+
+1회성 값을 토큰으로 올리지 않는 것은 **디자인팀과 합의된 방식이다.** 재사용되지 않는 값까지 토큰으로 만들면 `color.css.ts`가 어느 화면에서 한 번 쓰인 값들로 채워져, 목록을 봐도 무엇이 공용 색상인지 알 수 없게 된다
+
+경계가 애매하면(지금은 한 곳이지만 곧 다른 화면에서도 쓸 것 같다) 토큰을 만드는 쪽으로 간다. 나중에 리터럴 여러 개를 토큰으로 모으는 것보다, 안 쓰이는 토큰 하나를 지우는 쪽이 싸다.
 
 #### 폰트
 
@@ -902,10 +912,6 @@ position/z-index → display/flex → margin → border → padding → width/he
 공식 디자인 토큰에 없지만 여러 화면이 같은 값을 쓰는 경우, 토큰을 임의로 신설하지 않고 공용 상수로 뺀다.
 
 - `bottomFadeGradient` (`@styles/gradients`) — 하단 고정 버튼 뒤 흰색 페이드. 5개 페이지가 공유
-
-### 예외 허용 사항
-
-토큰을 쓰지 않고 리터럴을 남겨둔 곳. **새로 추가하려면 이 표에 사유와 함께 등록한다.**
 
 | 항목                                                              | 허용 사유                                                                                       |
 | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -957,3 +963,4 @@ position/z-index → display/flex → margin → border → padding → width/he
 | 2026-08-19 | 문서 3종 역할 재편 — **AGENTS.md를 본문(약 70줄), CLAUDE.md를 `@AGENTS.md` import 한 줄로.** 팀이 Claude Code·Codex·Cursor를 함께 쓰는데 Codex와 Cursor는 AGENTS.md만 읽어서, 기존 구조(CLAUDE.md 본문)로는 두 명이 규칙을 못 받고 있었다. 본문에서 기술 스택·폴더 구조·alias 표를 삭제(package.json·`ls src/`·tsconfig로 알 수 있는 것은 넣지 않는다는 Anthropic 권장 기준). 도구가 막는 항목에 `[도구]` 표시 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 2026-08-21 | **"alias 목록은 더 이상 변경하지 않는다" 규칙 폐기.** 채택 기준 ③(위반을 무엇이 발견하나)에 답할 수 없고 — tsconfig `paths` 추가를 막는 검사가 없다 — ④(지키는 비용 < 어기는 비용)도 통과하지 못한다. `@analytics/` 추가 때 316줄을 grep으로 일괄 치환한 것이 "비용이 감당 가능하다"는 반례. 대신 **추가·제거 시 함께 고칠 네 곳**을 절차로 남김 — 특히 `eslint.config.js`의 `SHORTER_ALIAS_TARGETS`를 빠뜨리면 `@shared/{폴더}/`가 합법으로 남아 두 형태가 공존하는데 lint가 통과한다(계층 3 항목). 근거 문단이 `@types/` 금지 항목의 하위에 묻혀 있던 것도 독립 절로 분리                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 2026-08-22 | PR #666 본문을 쓰면서 다듬은 서술을 이 문서에 반영. **채택 기준 4문항을 완결된 문장으로 재작성**(각 항목에 통과하지 못하면 어떻게 되는지 명시, 실제로 걷어낸 사례 2건 추가)하고 컨벤션 항목의 출처를 밝힘. 2계층을 "리뷰 봇·AI"로, 3계층에 도메인 지식·네이밍 의미 추가. ESLint 표에 `react-refresh/only-export-components` 추가 — `allowConstantExport: true`라 "mixed export 금지" 컨벤션보다 느슨하다는 것을 명시(단계 4 정합 대상). ONNX 바이너리 용량 실측 정정(53MB → 52MB). PR 리뷰어 2명 승인 규칙 폐지에 따라 AGENTS.md에서 해당 줄 삭제 **본문 전체 용어 통일** — `컨벤션`(팀 규약) / `검사`(강제 수단 총칭) / `린트 규칙`(ESLint 개별 항목)으로 46곳 정리. 동사도 갈라 쓴다: 컨벤션은 _정한다·채택한다·어긴다_, 검사는 _켠다·끈다·통과한다_. 이 변경 이력 표는 과거 기록이라 소급 수정하지 않는다. 삭제된 `useOnnxModel.ts` 참조 1건 제거.                                                                                                                               |
+| 2026-08-23 | PR #666 리뷰 반영. **색상 컨벤션을 실제 팀 합의에 맞춰 완화** — "두 곳 이상이 쓰면 토큰, 한 곳에서만 쓰면 리터럴"로 판단 기준을 바꾸고, 예외 표는 판단이 필요했던 것만 남기도록 용도를 좁혔다. 같은 내용을 `AGENTS.md`·`.coderabbit.yaml`에도 반영. **쿼리 도메인 목록 정정** — 9개 → 8개, `furniture` 제거(2026-08-18 ONNX 삭제 때 `queryKey.ts`에서 사라졌는데 이 문서만 남아 있었다). 가구 키는 `queryKeys.imageSetup.furnitureCategories()`로 존재한다                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
