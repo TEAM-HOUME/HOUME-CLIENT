@@ -17,10 +17,10 @@ import { ROUTES } from '@routes/paths';
 import {
   trackSuccessionMdByeClick,
   trackSuccessionMdCancelClick,
-} from '@shared/analytics/componentAnalytics';
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+} from '@analytics/componentAnalytics';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import TextButton from '@components/btnText/TextButton';
 import TitleNavBar from '@components/navBar/TitleNavBar';

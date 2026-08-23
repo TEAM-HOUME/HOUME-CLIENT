@@ -22,7 +22,7 @@ export const postLogout = async (): Promise<LogoutResponse> => {
 export const useLogoutMutation = () => {
   const navigate = useNavigate();
 
-  return useMutation<LogoutResponse, Error, void>({
+  return useMutation<LogoutResponse>({
     mutationFn: postLogout,
     onSettled: () => {
       useUserStore.getState().clearUser();

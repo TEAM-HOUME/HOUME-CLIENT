@@ -19,7 +19,7 @@ import {
 import {
   joinAnalyticsIds,
   toProductCardInputFromProductInfo,
-} from '@shared/analytics/params/builders/productCard';
+} from '@analytics/params/builders/productCard';
 
 import type {
   FurnitureCategoryResponse,
@@ -80,7 +80,12 @@ const useResultRecAnalytics = ({
       categories: renderableCategories,
       selectedCategoryId,
     });
-  }, [categoriesState, renderableCategories, resolvedProducts]);
+  }, [
+    categoriesState,
+    renderableCategories,
+    resolvedProducts,
+    selectedCategoryId,
+  ]);
 
   useEffect(() => {
     if (productsState !== 'content' || selectedCategoryId === null) return;

@@ -1,9 +1,9 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { getHomeStyleParams } from '@shared/analytics/params/builders';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { GA_EVENTS } from '@analytics/events';
+import { getHomeStyleParams } from '@analytics/params/builders/homeContent';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 export interface StyleContext {
   styleId: number;

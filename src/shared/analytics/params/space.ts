@@ -1,4 +1,4 @@
-import type { ShopFilterCategory } from '@shared/analytics/params/shop';
+import type { ShopFilterCategory } from '@analytics/params/shop';
 
 /** 공간/도면 — space_view_type */
 export const SPACE_VIEW_TYPE = {

@@ -25,9 +25,9 @@ import {
 } from '@pages/home/hooks/useProductTabController';
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 
@@ -178,7 +178,7 @@ const useProductShopAnalytics = (
         return nextExpanded;
       });
     },
-    [setSheetExpandedState]
+    [getSelectSheetContextRef, setSheetExpandedState]
   );
 
   const handleProductListRender = useCallback(
@@ -186,7 +186,7 @@ const useProductShopAnalytics = (
       productCountViewedRef.current = count;
       onProductViewedCountChange(count);
     },
-    [onProductViewedCountChange]
+    [onProductViewedCountChange, productCountViewedRef]
   );
 
   const handleFilterChipClickWithAnalytics = useCallback(
@@ -234,7 +234,12 @@ const useProductShopAnalytics = (
         COUNT_TRIGGER_EVENT.ADD_CLICK
       );
     },
-    [enrichProductSubCategory, handleSelectProduct, trackSelectSheetCountChange]
+    [
+      enrichProductSubCategory,
+      handleSelectProduct,
+      selectedProductsRef,
+      trackSelectSheetCountChange,
+    ]
   );
 
   const handleRemoveSelectedProductWithAnalytics = useCallback(
@@ -263,6 +268,7 @@ const useProductShopAnalytics = (
       enrichProductSubCategory,
       getSelectSheetContext,
       handleRemoveSelectedProduct,
+      selectedProductsRef,
       trackSelectSheetCountChange,
     ]
   );

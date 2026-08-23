@@ -4,8 +4,8 @@ early_access: true  # 얼리 액세스 기능 활성화
 
 # 리뷰 톤 및 스타일 지정(스키마 maxLength=250을 준수해 축약)
 tone_instructions: |
-  한국어(ko-KR)로 간결하고 건설적인 코드 리뷰를 제공해요. 보안(security), 성능(performance), 유지보수성(maintainability)을 우선해요.
-  상세 컨벤션은 리포의 규칙 문서를 최우선으로 적용해요(knowledge_base.code_guidelines 참조).
+  한국어(ko-KR)로 간결하고 건설적인 코드 리뷰를 제공해요. 보안, 성능, 유지보수성을 우선해요.
+  컨벤션 판단은 docs/conventions.md를 기준으로 해요. 이 설정 파일의 지침과 어긋나면 conventions.md가 우선이에요.
 
 reviews:
   profile: 'assertive'  # 리뷰 스타일: assertive(엄격), chill(관대)
@@ -40,6 +40,9 @@ reviews:
     - 'tsconfig*.json'
     - 'package.json'
     - '.coderabbit.yaml'
+    - 'docs/conventions.md' # 컨벤션 변경도 리뷰 대상
+    - 'CLAUDE.md'
+    - 'AGENTS.md'
     # 제외(deny-list)
     - '!node_modules/**'
     - '!dist/**'
@@ -77,36 +80,33 @@ reviews:
 
     - path: 'src/**/components/**/*.tsx'
       instructions: |
-        컴포넌트 파일 리뷰 시:
-        - 파일명이 PascalCase인지 확인
-        - Props 타입이 '컴포넌트명Props' 형식인지 확인
-        - 단일 export는 default export 권장(팀 가이드 우선 적용)
-        - 이벤트 핸들러는 handle로 시작하는지 확인
-        - 접근성 준수: ARIA 속성, label 연결, 키보드 포커스
+        컴포넌트 파일 리뷰 시 (네이밍·export 규칙은 conventions.md 기준, 여기서는 그 외를 봐주세요):
+        - 접근성: ARIA 속성, label 연결, 키보드 포커스
         - 전체 클릭/링크 제안 시 내부에 <a>가 있는지 먼저 확인 (중첩 앵커 금지, 필요 시 overlay 링크 등 대안 제시)
         - 성능: memo/useMemo/useCallback 적절 사용
-        - ref 전달 시 forwardRef 사용 및 displayName 지정
+        - ref 전달 방식 (React 19이므로 forwardRef 없이 ref prop 사용 가능)
 
     - path: 'src/**/*.css.ts'
       instructions: |
         Vanilla Extract 스타일 파일 리뷰 시:
         - rem 계산 전제: reset.css.ts에서 html fontSize 62.5% 사용(1rem=10px) — 16px 가정으로 계산하지 않기
         - 레이아웃 전제: global.css.ts의 layoutVars(minWidth 375px, maxWidth 440px) 범위 내 모바일 고정 레이아웃
-        - 디자인 토큰 활용 확인: colorVars 직접 사용, fontStyle() 함수를 통한 폰트 토큰 변환
-        - fontStyle() 함수 사용법: ...fontStyle('토큰명') 형태로 스프레드 연산자와 함께 사용
+        - 디자인 토큰 활용 확인: 색상은 colorVars, 폰트는 fontVars
+        - fontVars 사용법: ...fontVars.font.토큰명 형태로 스프레드 연산자와 함께 사용 (구 fontStyle() 헬퍼는 삭제됐어요)
+        - 토큰에 이미 있는 색상을 #hex·rgba() 리터럴로 다시 적은 경우만 지적하기. 토큰에 없는 1회성 색상(한 컴포넌트에서만 쓰는 값)은 리터럴이 정상이므로 토큰 추가를 요구하지 않기. 두 곳 이상이 같은 리터럴을 쓰면 토큰 추가를 제안하기
         - recipe와 styleVariants 패턴의 적절한 사용
-        - 반응형 스타일 구현 방식
         - 불필요한 중복 스타일 제거
         - 전역 스타일 남용 금지, 컴포넌트 범위 캡슐화
 
     - path: 'src/**/hooks/**/*.ts'
       instructions: |
         커스텀 훅 리뷰 시:
-        - 파일명/함수명은 use* 접두사 사용
+        - 파일명과 훅 이름이 일치하는지, use* 접두사를 쓰는지
         - 의존성 배열(exhaustive-deps) 준수, 참조 안정성 유지(함수/객체 메모이제이션)
+        - useEffect가 정말 필요한지 — 렌더 중 계산으로 되는 파생 값이거나, 이벤트 핸들러에서 처리할 사용자 액션이면 지적해주세요.
+          외부 시스템(DOM·타이머·GA·Sentry·브라우저 API) 동기화일 때만 effect가 적절해요.
         - 반환 값 일관성(tuple/object), 에러/로딩 상태 명확화
-        - 제네릭 훅은 타입 매개변수 기본값 검토
-        - TanStack Query 훅 네이밍: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
+        - 쿼리 훅은 use{Subject}Query, mutation 훅은 use{Subject}Mutation (useGet* 형태는 폐기된 규칙이에요)
 
     - path: 'src/**/types/**/*.ts'
       instructions: |
@@ -139,7 +139,8 @@ reviews:
         - TanStack Query와의 통합(QueryKey Factory 사용) 
         - 재시도/취소 신호(AbortController) 처리 일관성
         - 타입 안정성 확보(응답 제네릭, 불변 데이터)
-        - HTTP메서드 + 명사 네이밍 규칙 확인 (getUserList, postComment 등)
+        - bare 함수는 HTTP메서드 + 명사 (getUserList, postComment 등), 훅은 use{Subject}Query / use{Subject}Mutation
+        - 에러를 호출부에서 개별로 Sentry에 보내지 않는지 — API 실패 전송은 globalErrorHandler 한 곳에서만 해요
         - async/await 패턴 일관성 확인
 
     - path: 'src/routes/**'
@@ -172,37 +173,30 @@ reviews:
       instructions: |
         전체 프로젝트 코드 리뷰 시:
 
-        # 기본 규칙
-        - 모든 컴포넌트는 반드시 TypeScript로 작성
-        - SVG는 ?react 쿼리를 통해 React 컴포넌트로 임포트
-        - 스타일은 반드시 Vanilla Extract(.css.ts)로 작성
-        - 절대 경로 임포트 사용 (@pages, @shared 등)
-        - overlay-kit을 통한 모달 관리 패턴 준수
+        # 컨벤션 판단 기준
+        네이밍·export·import·폴더 구조·스타일 토큰 규칙은 docs/conventions.md가 기준이에요.
+        규칙을 여기에 다시 적지 않으니 그 문서를 읽고 판단해주세요. 이 설정과 문서가 어긋나면 문서가 우선이에요.
 
-        # 네이밍 컨벤션
-        - 컴포넌트와 클래스는 PascalCase 사용
-        - 폴더명은 camelCase 사용
-        - 파일명은 camelCase 사용 (컴포넌트 파일 제외)
-        - 변수와 함수는 camelCase 사용
-        - 상수는 BIG_SNAKE_CASE 사용
-        - 모든 타입/인터페이스는 PascalCase, Type/I/T 접두사·접미사 금지 (제네릭 T 제외)
-        - Props 타입은 컴포넌트명 + Props 형식
-        - API Response 타입은 XXXResponse 형식
-        - 함수 네이밍: get/create/check/handle/is/has/can 접두사 활용
-        - API 함수는 HTTP메서드 + 명사 형식 (getUserList, postComment)
-        - TanStack Query 훅: use + 행위 + 대상 + Query/Mutation (예: useGetUserListQuery)
-        - 커스텀 훅 파일명: use*.ts
+        # 이 레포에서 특히 자주 어긋나는 것
+        - 최단 alias 위반 — 같은 경로에 더 짧은 alias가 있는데 긴 것을 쓴 경우 (@shared/styles/... → @styles/...)
+        - @/ prefix 사용 (금지)
+        - 페이지끼리 직접 import, shared/에서 pages/ import (경계 위반)
+        - 폰트 리터럴 하드코딩 (fontVars 사용), 토큰에 이미 있는 색상을 리터럴로 다시 적은 경우 (colorVars 사용)
+        - navigate() 경로 하드코딩 (ROUTES 상수 사용)
+        - queryKeys factory를 거치지 않은 쿼리 키 배열
+
+        # 건드리면 안 되는 것
+        - shared/apis/__generated__/ — swagger 자동 생성 파일
+        - /api/v2·/api/v4 URL 값과 생성 타입의 V2 표기 — 서버 유래라 개명 제안 금지
 
         # 보안 및 성능
         - 환경 변수는 반드시 import.meta.env 사용
         - API 키나 시크릿을 하드코딩하지 않음
         - React.memo, useMemo, useCallback의 적절한 사용
         - 큰 번들 사이즈 경고 (dynamic import 제안)
-        - 템플릿 리터럴 사용 권장 (문자열 조합 시)
-        - 구조 분해 할당 적극 활용
 
         # 커밋 및 브랜치 패턴
-        - 커밋 타입: feat, fix, docs, style, refactor, test, chore, design, comment, rename, remove
+        - 커밋 타입: feat, fix, docs, style, refactor, test, chore, design, rename, remove
         - 브랜치 패턴: type/description/#issue-number 형식
 
   auto_review:
@@ -266,16 +260,12 @@ knowledge_base:
     enabled: true  # 웹 검색 기능 활성화
   code_guidelines:
     enabled: true
+    # 레포에 실제로 존재하는 경로만 나열한다 (없는 경로를 적으면 조용히 무시돼 지침 없이 리뷰됨)
     filePatterns:
+      - 'docs/conventions.md' # 컨벤션 SSOT
+      - 'AGENTS.md' # 매 작업 체크리스트 (CLAUDE.md는 이 파일을 import만 함)
       - 'README.md'
-      - '.prettierrc'
-      - '.prettierignore'
       - 'eslint.config.js'
-      - 'docs/README.md'
-      - 'docs/architecture/**/*.md'
-      - 'docs/reference/**/*.md'
-      - 'docs/decisions/**/*.md'
-      - 'docs/changes/**/*.md'
-      - 'docs/operations/**/*.md'
+      - '.prettierrc'
       - 'src/shared/styles/reset.css.ts'
       - 'src/shared/styles/global.css.ts'

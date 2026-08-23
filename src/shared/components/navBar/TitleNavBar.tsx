@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 
-import TextButton from '@components/btnText/TextButton';
+import { ROUTES } from '@routes/paths';
 
-import { ROUTES } from '@/routes/paths';
+import TextButton from '@components/btnText/TextButton';
 
 import * as styles from './TitleNavBar.css';
 

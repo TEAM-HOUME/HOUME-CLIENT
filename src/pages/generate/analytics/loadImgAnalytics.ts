@@ -1,11 +1,9 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import {
-  getLoadImgReturnScreenName,
-  toLoadPreferenceType,
-} from '@shared/analytics/utils/imageFlow';
+import { GA_EVENTS } from '@analytics/events';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { toLoadPreferenceType } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { getLoadImgReturnScreenName } from '@analytics/utils/imageFlow/resolveFunnelReturnScreen';
 
 const loadImgScreenParams = () => ({
   screen_name: SCREEN_NAME.LOAD_IMG,

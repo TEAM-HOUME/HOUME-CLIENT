@@ -13,8 +13,8 @@ import { ROUTES } from '@routes/paths';
 import {
   trackResetInfoMdKeepClick,
   trackResetInfoMdQuitClick,
-} from '@shared/analytics/componentAnalytics';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+} from '@analytics/componentAnalytics';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import TitleNavBar from '@components/navBar/TitleNavBar';
 import Popup from '@components/popup/Popup';

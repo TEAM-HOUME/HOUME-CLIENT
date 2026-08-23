@@ -5,12 +5,12 @@ import type {
 } from '@pages/home/types/productTab';
 import { ALL_FILTER_SENTINEL } from '@pages/home/utils/productFilterUtils';
 
-import { getProductCardOnCardParams } from '@shared/analytics/params/builders/productCard';
-import { type CountTriggerEvent } from '@shared/analytics/params/shop';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { toSheetExpansionStatus } from '@shared/analytics/utils/imageFlow';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+import { getProductCardOnCardParams } from '@analytics/params/builders/productCard';
+import { type CountTriggerEvent } from '@analytics/params/shop';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { toSheetExpansionStatus } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
+import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
 import { resolveShopTriggerContext } from './resolveShopTriggerContext';
 

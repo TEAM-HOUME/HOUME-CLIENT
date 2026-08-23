@@ -1,10 +1,11 @@
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
 import type {
   ProductInfo,
   PriceInfo,
   SaveInfo,
   LinkInfo,
 } from '@shared/types/productCard';
+
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import emptyImage from '@assets/images/ImgEmpty.png';
 

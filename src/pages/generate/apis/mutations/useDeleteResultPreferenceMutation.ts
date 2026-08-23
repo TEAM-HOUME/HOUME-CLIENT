@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import type { ApiResponseVoid } from '@shared/apis/__generated__/data-contracts';
-
+import type { ApiResponseVoid } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';

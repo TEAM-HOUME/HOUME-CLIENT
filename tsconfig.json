@@ -1,3 +1,6 @@
+// tsconfig.app.json과 tsconfig.node.json 두 설정을 하나로 묶어주는 컨트롤 타워 역할
+// IDE(VSCode 등)가 프로젝트 전체 구조를 파악할 때 이 파일을 거쳐 각각의 전용 설정(app, node)을 알맞게 찾아가도록 경로를 안내한다.
+
 {
   "files": [],
   "references": [

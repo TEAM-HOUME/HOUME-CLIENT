@@ -10,11 +10,13 @@ export type ActivityInfoFormData = {
 export type CategorySelectionMode = 'single' | 'multiple';
 
 // 가구 카테고리별 선택 모드 매핑 (API 응답의 nameEng를 키로 사용)
-export const CATEGORY_SELECTION_MODE: Record<string, CategorySelectionMode> = {
+// `as const satisfies`로 두면 값은 CategorySelectionMode로 검사하면서 키 목록은 그대로 남는다.
+// Record<string, ...>로 적으면 키가 string으로 넓어져 CATEGORY_SELECTION_MODE.BEDD 같은 오타를 못 잡는다.
+export const CATEGORY_SELECTION_MODE = {
   BED: 'single',
   SOFA: 'multiple',
   STORAGE: 'multiple',
   TABLE: 'multiple',
   SELECTIVE: 'multiple',
   LIGHTING: 'multiple',
-};
+} as const satisfies Record<string, CategorySelectionMode>;

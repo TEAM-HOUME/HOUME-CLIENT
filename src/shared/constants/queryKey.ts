@@ -1,19 +1,3 @@
-import type { FurnitureCategoryCode } from '@shared/detection/furnitureCategoryMapping';
-
-// Furniture Query Variables
-export interface CategoriesQueryVariables {
-  groupId: number | null;
-  imageId: number | null;
-  detectionSignature: string;
-  codes: FurnitureCategoryCode[];
-}
-
-export interface ProductsQueryVariables {
-  groupId: number | null;
-  imageId: number | null;
-  categoryId: number | null;
-}
-
 export interface ProductListQueryVariables {
   keyword?: string;
   types?: number[];
@@ -103,20 +87,6 @@ export const queryKeys = {
         imageId,
         categoryId,
       ] as const,
-  },
-
-  // 가구 큐레이션
-  furniture: {
-    all: ['furniture'] as const,
-    dashboard: () => [...queryKeys.furniture.all, 'dashboard'] as const,
-    categoriesGroup: (vars: CategoriesQueryVariables) =>
-      [...queryKeys.furniture.all, 'categoriesGroup', vars] as const,
-    categories: (vars: CategoriesQueryVariables) =>
-      [...queryKeys.furniture.all, 'categories', vars] as const,
-    productsGroup: (vars: ProductsQueryVariables) =>
-      [...queryKeys.furniture.all, 'productsGroup', vars] as const,
-    products: (vars: ProductsQueryVariables) =>
-      [...queryKeys.furniture.all, 'products', vars] as const,
   },
 
   // 마이페이지

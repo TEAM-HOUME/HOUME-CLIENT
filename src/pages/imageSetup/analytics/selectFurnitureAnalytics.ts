@@ -1,10 +1,10 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { GA_TOAST_TYPE } from '@shared/analytics/params/toast';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { mapActivityCodeToChip } from '@shared/analytics/utils/imageFlow';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { GA_EVENTS } from '@analytics/events';
+import { GA_TOAST_TYPE } from '@analytics/params/toast';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { mapActivityCodeToChip } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 const selectFurnitureScreenParams = () => ({
   screen_name: SCREEN_NAME.SELECT_FURNITURE,

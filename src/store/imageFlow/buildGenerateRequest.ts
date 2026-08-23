@@ -68,9 +68,9 @@ const isFloorPlanValid = (
   if (!floorPlan || typeof floorPlan !== 'object') return false;
   const f = floorPlan as Record<string, unknown>;
   return (
-    Number.isInteger(f.floorPlanId) &&
-    typeof f.floorPlanView === 'string' &&
-    typeof f.isMirror === 'boolean'
+    Number.isInteger(f['floorPlanId']) &&
+    typeof f['floorPlanView'] === 'string' &&
+    typeof f['isMirror'] === 'boolean'
   );
 };
 

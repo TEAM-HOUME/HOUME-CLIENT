@@ -7,14 +7,16 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { GA_TOAST_TYPE } from '@shared/analytics/params/toast';
-import { trackEvent } from '@shared/analytics/track';
-import { clearLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { resolveScreenName } from '@shared/analytics/utils/screenName';
 import { TOAST_TYPE } from '@shared/types/toast';
 
+import { GA_EVENTS } from '@analytics/events';
+import { GA_TOAST_TYPE } from '@analytics/params/toast';
+import { trackEvent } from '@analytics/track';
+import { clearLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
+import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
+
+import { readAccessTokenHeader } from '@apis/config/accessTokenHeader';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { useToast } from '@components/toast/useToast';
@@ -41,7 +43,7 @@ export const getKakaoOAuthCallback = async (
 
   const data = response.data.data;
 
-  const accessToken = response.headers['access-token'];
+  const accessToken = readAccessTokenHeader(response);
   if (!data.isNewUser && !accessToken) {
     throw new Error(
       RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] || '액세스 토큰이 없습니다.'

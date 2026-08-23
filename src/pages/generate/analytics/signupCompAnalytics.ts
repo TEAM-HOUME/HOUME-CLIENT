@@ -1,9 +1,9 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@shared/analytics/metaPixel';
-import { VALID_LOGIN_STATUS } from '@shared/analytics/params/auth';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getLoginSocialParams } from '@shared/analytics/utils/loginEntryRoute';
+import { GA_EVENTS } from '@analytics/events';
+import { META_COMPLETE_REGISTRATION_PENDING_KEY } from '@analytics/metaPixel';
+import { VALID_LOGIN_STATUS } from '@analytics/params/auth';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getLoginSocialParams } from '@analytics/utils/loginEntryRoute/buildLoginSocialEventParams';
 
 const signupCompScreenParams = () => ({
   screen_name: SCREEN_NAME.SIGNUP_COMP,

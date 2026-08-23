@@ -1,14 +1,14 @@
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 import {
   getProductCardIdNameParams,
   getProductCardOnCardParams,
   joinAnalyticsIds,
-} from '@shared/analytics/params/builders/productCard';
-import type { ProductCardInput } from '@shared/analytics/params/builders/productCard';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { toResultPreferenceType } from '@shared/analytics/utils/imageFlow';
-import { getReturnScreenNameParams } from '@shared/analytics/utils/screenName';
+} from '@analytics/params/builders/productCard';
+import type { ProductCardInput } from '@analytics/params/builders/productCard';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { toResultPreferenceType } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
 
 import type {
   FurnitureCategoryResponse,

@@ -22,7 +22,7 @@ export const deleteUser = async (): Promise<DeleteUserResponse> => {
 export const useDeleteUserMutation = () => {
   const navigate = useNavigate();
 
-  return useMutation<DeleteUserResponse, Error, void>({
+  return useMutation<DeleteUserResponse>({
     mutationFn: deleteUser,
     retry: false,
     onSuccess: () => {

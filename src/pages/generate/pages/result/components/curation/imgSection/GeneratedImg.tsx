@@ -7,6 +7,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import type { ResultImageMeta } from '@pages/generate/pages/result/types';
+
 import generateResultLockedPreview from '@assets/images/generateResultLockedPreview.png';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
@@ -17,7 +19,6 @@ import CommunityComingSoonModal from '@components/overlay/modal/CommunityComingS
 
 import * as styles from './GeneratedImg.css';
 
-import type { ResultImageMeta } from '../../../types';
 import type { Swiper as SwiperType } from 'swiper';
 
 export interface GeneratedImgCurationProps {

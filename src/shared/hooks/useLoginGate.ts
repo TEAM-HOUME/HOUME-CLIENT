@@ -6,11 +6,11 @@ import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import type { LoginEntryRoute } from '@shared/analytics/params/gate';
+import type { LoginEntryRoute } from '@analytics/params/gate';
 import {
   clearLoginEntryRoute,
   persistLoginEntryRoute,
-} from '@shared/analytics/utils/loginEntryRoute';
+} from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 

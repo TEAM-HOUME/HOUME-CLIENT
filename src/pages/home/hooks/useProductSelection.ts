@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SelectedProduct } from '@pages/home/types/productTab';
 
-import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import { useToast } from '@components/toast/useToast';
+
+import { TOAST_MESSAGE } from '@constants/toastMessage';
 
 /**
  * 상품 선택 상한값 - 최대 6개 선택
