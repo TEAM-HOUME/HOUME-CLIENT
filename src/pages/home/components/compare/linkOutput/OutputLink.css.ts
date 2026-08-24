@@ -12,7 +12,7 @@ export const container = style({
   border: `1px solid ${colorVars.color.border.secondary}`,
   borderRadius: unitVars.unit.radius['600'],
   backgroundColor: colorVars.color.bg.primary,
-  width: '33.6rem',
+  width: '100%',
   overflow: 'hidden',
 });
 
