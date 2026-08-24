@@ -27,6 +27,7 @@ import DislikeDefault from '@assets/icons/DislikeDefault.svg?url';
 import DislikeSelected from '@assets/icons/DislikeSelected.svg?url';
 import DislikeWhite from '@assets/icons/DislikeWhite.svg?url';
 import DoubleStar from '@assets/icons/DoubleStar.svg?url';
+import DoubleStarFillBlack from '@assets/icons/DoubleStarFillBlack.svg?url';
 import Fire from '@assets/icons/Fire.svg?url';
 import FlipHorizontal from '@assets/icons/FlipHorizontal.svg?url';
 import Grid1ColDefault from '@assets/icons/Grid1ColDefault.svg?url';
@@ -86,6 +87,7 @@ const IconsName = {
   DeskBlack,
   DeskGray,
   DoubleStar,
+  DoubleStarFillBlack,
   Fire,
   FlipHorizontal,
   Grid1ColDefault,
