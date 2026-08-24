@@ -2,9 +2,9 @@ import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 import remarkGfm from 'remark-gfm';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import TitleNavBar from '@components/navBar/TitleNavBar';
 

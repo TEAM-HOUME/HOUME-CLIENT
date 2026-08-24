@@ -22,8 +22,6 @@ import type {
 } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
-import { EMPTY_VIEW_TEXT } from '@shared/constants/emptyViewText';
-
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';
 import EmptyView from '@components/emptyView/EmptyView';
@@ -32,6 +30,8 @@ import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
 import ProductCard from '@components/productCard/ProductCard';
 import SearchBar from '@components/textField/SearchBar';
+
+import { EMPTY_VIEW_TEXT } from '@constants/emptyViewText';
 
 import * as styles from './SearchSection.css';
 

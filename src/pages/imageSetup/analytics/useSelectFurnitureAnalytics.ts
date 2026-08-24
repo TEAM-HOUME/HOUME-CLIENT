@@ -11,14 +11,12 @@ import {
 import { useActivityInfo } from '@pages/imageSetup/hooks/activityInfo/useActivityInfo';
 import type { ImageSetupSteps } from '@pages/imageSetup/types/funnel/steps';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 export const useSelectFurnitureAnalytics = (
   context: ImageSetupSteps['ActivityInfo']

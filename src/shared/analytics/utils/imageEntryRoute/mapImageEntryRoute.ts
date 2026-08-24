@@ -14,7 +14,7 @@ import { ENTRY_ROUTE, type EntryRoute } from '@store/imageFlow/flowConfig';
 import {
   IMAGE_ENTRY_ROUTE,
   type ImageEntryRoute,
-} from '@shared/analytics/params/gate';
+} from '@analytics/params/gate';
 
 const ENTRY_TO_IMAGE_ENTRY_ROUTE: Record<EntryRoute, ImageEntryRoute> = {
   [ENTRY_ROUTE.GENERATE_BUTTON]: IMAGE_ENTRY_ROUTE.TOP_NAV,

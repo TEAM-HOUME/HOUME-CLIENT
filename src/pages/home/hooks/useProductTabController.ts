@@ -19,11 +19,13 @@ import { ENTRY_ROUTE } from '@store/imageFlow/flowConfig';
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
-import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
+import { mapEntryRouteToLoginEntry } from '@analytics/utils/loginEntryRoute/mapLoginEntryRoute';
+
 import { useToast } from '@components/toast/useToast';
+
+import { TOAST_MESSAGE } from '@constants/toastMessage';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { overlay } from 'overlay-kit';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, NavigationType, useNavigate } from 'react-router-dom';
 
 import {
   trackLoadImgCardPreferenceClick,
@@ -21,21 +21,20 @@ import { ROUTES } from '@routes/paths';
 import { FLOW_CONFIG } from '@store/imageFlow/flowConfig';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
+import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
+
 import {
   trackGenImgQuitMdKeepClick,
   trackGenImgQuitMdQuitClick,
-} from '@shared/analytics/componentAnalytics';
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import {
-  ensureShortFunnelFlowSnapshot,
-  getLoadImgReturnScreenName,
-} from '@shared/analytics/utils/imageFlow';
-import { isDocumentReloadOnPath } from '@shared/analytics/utils/isDocumentReloadOnPath';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
+} from '@analytics/componentAnalytics';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { ensureShortFunnelFlowSnapshot } from '@analytics/utils/imageFlow/captureFunnelInputSnapshot';
+import { getLoadImgReturnScreenName } from '@analytics/utils/imageFlow/resolveFunnelReturnScreen';
+import { isDocumentReloadOnPath } from '@analytics/utils/isDocumentReloadOnPath';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import type { GetCarouselResponseDTO } from '@apis/__generated__/data-contracts';
 
@@ -63,7 +62,7 @@ const ANIMATION_DURATION = 600; // 캐러셀 애니메이션 지속 시간 (ms)
 const IMAGE_GENERATION_ERROR_CODES = new Set([50013, 50017, 50400]);
 
 const isImageGenerationServerError = (error: unknown) => {
-  if (!isAxiosError(error)) return false;
+  if (!isAxiosError<{ code?: unknown }>(error)) return false;
 
   const code = error.response?.data?.code;
 
@@ -104,7 +103,7 @@ const LoadingPage = () => {
       return true;
     },
     onBlocked: ({ reset, historyAction }) => {
-      if (historyAction === 'POP') {
+      if (historyAction === NavigationType.Pop) {
         trackLoadImgPageBackSwipe();
       }
       trackLoadImgMdGenImgQuitView();
@@ -320,7 +319,7 @@ const LoadingPage = () => {
   const hasError = isError || currentImages.length === 0;
 
   // 정상 데이터일 때 현재/다음 이미지 계산
-  const currentImage = hasError ? null : currentImages[currentIndex];
+  const currentImage = hasError ? null : (currentImages[currentIndex] ?? null);
 
   const nextImage = hasError
     ? null

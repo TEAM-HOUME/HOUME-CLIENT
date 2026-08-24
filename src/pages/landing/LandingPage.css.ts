@@ -61,7 +61,7 @@ export const textContainer = style({
   alignSelf: 'stretch',
   justifyContent: 'center',
   gap: unitVars.unit.gapPadding['300'],
-  padding: `${unitVars.unit.gapPadding['000']}`,
+  padding: unitVars.unit.gapPadding['000'],
 });
 
 export const title = style({

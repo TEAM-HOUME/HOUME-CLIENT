@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackCallback } from '@shared/analytics/track';
-import { getLoginSocialParams } from '@shared/analytics/utils/loginEntryRoute';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackCallback } from '@analytics/track';
+import { getLoginSocialParams } from '@analytics/utils/loginEntryRoute/buildLoginSocialEventParams';
 
 import { LOTTIE_SPEED } from '@assets/lottie/lottieAssets';
 

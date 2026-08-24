@@ -1,4 +1,4 @@
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { getFlowAnalyticsSnapshot } from './captureFunnelInputSnapshot';
 import {

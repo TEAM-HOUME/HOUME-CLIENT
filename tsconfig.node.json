@@ -1,3 +1,6 @@
+// Node.js 환경에서 실행될 빌드 도구 설정
+// 대상 폴더·파일: vite.config.ts, 빌드 스크립트 등
+
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
@@ -13,13 +16,20 @@
     "moduleDetection": "force",
     "noEmit": true,
 
-    /* Linting */
+    /* Linting — 각 플래그의 목적은 tsconfig.app.json에 주석으로 정리 (설명 중복 방지) */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "isolatedModules": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false
   },
   "include": ["vite.config.ts"]
 }

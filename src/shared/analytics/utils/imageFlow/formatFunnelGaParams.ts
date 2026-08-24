@@ -1,14 +1,11 @@
-import {
-  ACTIVITY_CHIP,
-  type ActivityChip,
-} from '@shared/analytics/params/imageSetup';
+import { ACTIVITY_CHIP, type ActivityChip } from '@analytics/params/imageSetup';
 import {
   LOAD_PREFERENCE_TYPE,
   RESULT_PREFERENCE_TYPE,
   type LoadPreferenceType,
   type ResultPreferenceType,
-} from '@shared/analytics/params/result';
-import { SHEET_EXPANSION_STATUS } from '@shared/analytics/params/shop';
+} from '@analytics/params/result';
+import { SHEET_EXPANSION_STATUS } from '@analytics/params/shop';
 
 import type { FurnitureCategoryGroup } from '@apis/__generated__/data-contracts';
 

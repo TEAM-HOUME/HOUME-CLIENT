@@ -1,5 +1,6 @@
-import type { LandingResponse } from '@shared/apis/__generated__/data-contracts';
 import type { ABTestGroup } from '@shared/types/abTest';
+
+import type { LandingResponse } from '@apis/__generated__/data-contracts';
 
 /** 노션 test_type: A type = Solid, B type = Ghost */
 export type LandingTestType = 'Solid' | 'Ghost';

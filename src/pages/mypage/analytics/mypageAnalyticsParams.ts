@@ -2,11 +2,11 @@ import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
 
 import { isCurationViewType } from '@store/imageFlow/flowConfig';
 
-import { joinAnalyticsIds } from '@shared/analytics/params/builders/productCard';
-import { IMG_RESULT_TYPE } from '@shared/analytics/params/result';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { getReturnScreenNameParams } from '@shared/analytics/utils/screenName';
-import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
+import { joinAnalyticsIds } from '@analytics/params/builders/productCard';
+import { IMG_RESULT_TYPE } from '@analytics/params/result';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
+import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
 import type {
   DateGroupResponse,
@@ -41,7 +41,7 @@ export const getMypageGenImgListParams = (groups: DateGroupResponse[] = []) => {
   const gen_img_ids = joinAnalyticsIds(
     items
       .filter((item) => item.imageId != null)
-      .map((item) => ({ id: item.imageId as number }))
+      .map((item) => ({ id: item.imageId! }))
   );
 
   return {
@@ -52,7 +52,7 @@ export const getMypageGenImgListParams = (groups: DateGroupResponse[] = []) => {
 
 export const getMypageEmptyGenImgListParams = () => ({
   mypage_img_count: 0,
-  gen_img_ids: null as null,
+  gen_img_ids: null,
 });
 
 const mapViewTypeToImgResultType = (

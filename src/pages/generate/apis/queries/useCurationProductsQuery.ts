@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { FurnitureProductsInfoResponseV2 } from '@shared/apis/__generated__/data-contracts';
-
+import type { FurnitureProductsInfoResponseV2 } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';

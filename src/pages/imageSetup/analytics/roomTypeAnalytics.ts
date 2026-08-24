@@ -1,26 +1,22 @@
 import { FILTER_CATEGORIES } from '@pages/imageSetup/constants/floorPlanFilters';
 
-import { GA_EVENTS } from '@shared/analytics/events';
+import type { FloorPlanFilters } from '@shared/types/floorPlan';
+
+import { GA_EVENTS } from '@analytics/events';
 import {
   getScrollDepthFromElement,
   getScrollDepthFromWindow,
   scrollDepthParams,
-} from '@shared/analytics/params/scrollDepth';
-import {
-  SPACE_VIEW_TYPE,
-  type SpaceViewType,
-} from '@shared/analytics/params/space';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import {
-  getReturnScreenNameFromImageEntry,
-  toSheetExpansionStatus,
-} from '@shared/analytics/utils/imageFlow';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { getPreviousScreenName } from '@shared/analytics/utils/screenName';
-import { toAnalyticsNull } from '@shared/analytics/utils/toAnalyticsNull';
-import type { FloorPlanFilters } from '@shared/types/floorPlan';
+} from '@analytics/params/scrollDepth';
+import { SPACE_VIEW_TYPE, type SpaceViewType } from '@analytics/params/space';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { toSheetExpansionStatus } from '@analytics/utils/imageFlow/formatFunnelGaParams';
+import { getReturnScreenNameFromImageEntry } from '@analytics/utils/imageFlow/resolveFunnelReturnScreen';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
+import { getPreviousScreenName } from '@analytics/utils/screenName/updateScreenNameStack';
+import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
 import type {
   ExploreHouseTemplateDetailResponse,

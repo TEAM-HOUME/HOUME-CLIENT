@@ -1,6 +1,6 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
+import { GA_EVENTS } from '@analytics/events';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
 
 const editProfileScreenParams = () => ({
   screen_name: SCREEN_NAME.EDIT_PROFILE,

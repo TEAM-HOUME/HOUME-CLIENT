@@ -79,7 +79,11 @@ export const useExitBlocker = ({
   useEffect(() => {
     if (blocker.state === 'blocked') {
       onBlockedRef.current({
+        // react-router가 blocked 상태마다 새로 만들어 주는 함수라 this 바인딩이 없다.
+        // 타입 선언이 메서드 형태여서 unbound-method가 오탐한다
+        /* eslint-disable-next-line @typescript-eslint/unbound-method */
         proceed: blocker.proceed,
+        /* eslint-disable-next-line @typescript-eslint/unbound-method */
         reset: blocker.reset,
         historyAction: lastHistoryActionRef.current!,
       });

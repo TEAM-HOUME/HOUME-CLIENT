@@ -47,7 +47,7 @@ const RoomTypeSection = ({
 
       void queryClient.prefetchQuery({
         queryKey: queryKeys.imageSetup.houseTemplateDetail(plan.id),
-        queryFn: () => getHouseTemplateDetail(plan.id as number),
+        queryFn: () => getHouseTemplateDetail(plan.id!),
       });
     });
   }, [floorPlans, queryClient]);

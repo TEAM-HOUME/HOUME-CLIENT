@@ -5,7 +5,7 @@ import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 

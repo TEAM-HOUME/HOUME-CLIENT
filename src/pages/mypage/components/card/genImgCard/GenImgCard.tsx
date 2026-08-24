@@ -6,7 +6,7 @@ import { ROUTES } from '@routes/paths';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import type {
   ItemResponse,
@@ -33,7 +33,6 @@ interface GenImgCardProps {
   usedProducts?: UsedProductResponse[];
   onCardGenImgClick?: () => void;
   onBtnMoreGenImgClick?: () => void;
-  onImageLoad?: (imageId: number, imageUrl?: string) => void;
 }
 
 const GenImgCard = ({
@@ -47,7 +46,6 @@ const GenImgCard = ({
   usedProducts = [],
   onCardGenImgClick,
   onBtnMoreGenImgClick,
-  onImageLoad,
 }: GenImgCardProps) => {
   const isListType = cardType === 'list';
   const navigate = useNavigate();
@@ -71,10 +69,6 @@ const GenImgCard = ({
     isListType,
     usedProducts,
   });
-
-  const handleImageLoad = () => {
-    onImageLoad?.(imageId, imageUrl);
-  };
 
   const { mutate: toggleJjym } = useJjymMutation({
     savedToastType: 'stored',
@@ -131,7 +125,6 @@ const GenImgCard = ({
           alt={productSummaryText ?? '생성 이미지'}
           className={styles.cardImg({ mirrored: isMirror })}
           placeholder="skeleton"
-          onLoad={handleImageLoad}
         />
       </section>
 

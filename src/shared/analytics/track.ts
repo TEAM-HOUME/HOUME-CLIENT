@@ -7,16 +7,18 @@
  */
 import { logEvent } from 'firebase/analytics';
 
-import type { GaEventName } from '@shared/analytics/events';
-import type {
-  AnalyticsParamValue,
-  TrackEventParams,
-} from '@shared/analytics/params/types';
 import { analytics } from '@shared/config/firebase';
 import { addReportBreadcrumb } from '@shared/monitoring/report';
 import { redactUrl } from '@shared/monitoring/scrub';
 
-export type { LoginStatus, TrackEventParams } from '@shared/analytics/params';
+import type { GaEventName } from '@analytics/events';
+import type {
+  AnalyticsParamValue,
+  TrackEventParams,
+} from '@analytics/params/types';
+
+export type { LoginStatus } from '@analytics/params/global';
+export type { TrackEventParams } from '@analytics/params/types';
 
 /** Firebase Analytics 실제 전송 여부 (.env) */
 const isAnalyticsEnabled =
@@ -27,7 +29,7 @@ const buildEventParams = (
 ): Record<string, AnalyticsParamValue> => {
   return Object.fromEntries(
     Object.entries(params ?? {}).filter(([, value]) => value !== undefined)
-  ) as Record<string, AnalyticsParamValue>;
+  );
 };
 
 /**
@@ -40,7 +42,7 @@ const buildEventParams = (
 const toBreadcrumbData = (
   eventParams: Record<string, AnalyticsParamValue>
 ): Record<string, AnalyticsParamValue> => {
-  const pagePath = eventParams.page_path;
+  const pagePath = eventParams['page_path'];
   if (typeof pagePath !== 'string') return eventParams;
 
   return { ...eventParams, page_path: redactUrl(pagePath) };

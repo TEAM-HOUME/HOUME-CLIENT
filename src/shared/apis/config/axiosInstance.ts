@@ -6,6 +6,8 @@ import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { ERROR_CODES } from '@constants/apiErrorCode';
 import { RESPONSE_MESSAGE, HTTP_STATUS } from '@constants/response';
 
+import { readAccessTokenHeader } from './accessTokenHeader';
+
 import type { AxiosRequestConfig } from 'axios';
 
 const axiosInstance = axios.create({
@@ -64,7 +66,7 @@ axiosInstance.interceptors.response.use(
           }
         );
 
-        const newAccessToken = res.headers['access-token'];
+        const newAccessToken = readAccessTokenHeader(res);
         if (!newAccessToken) {
           throw new Error(
             RESPONSE_MESSAGE[HTTP_STATUS.UNAUTHORIZED] ||

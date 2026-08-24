@@ -12,23 +12,22 @@ import { ROUTES } from '@routes/paths';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import StatusBadge from '@shared/components/statusBadge/StatusBadge';
 import type { HomeLocationState, HomeTab } from '@shared/types/tabNavigation';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { persistLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 
 import MenuTab from '@components/menuTab/MenuTab';
 import LogoNavBar from '@components/navBar/LogoNavBar';
+import StatusBadge from '@components/statusBadge/StatusBadge';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 

@@ -1,12 +1,12 @@
-import { GA_EVENTS } from '@shared/analytics/events';
+import { GA_EVENTS } from '@analytics/events';
 import {
   getProductCardIdNameParams,
   getProductCardIdNamePriceParams,
-} from '@shared/analytics/params/builders/productCard';
-import type { ProductCardInput } from '@shared/analytics/params/builders/productCard';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getReturnScreenNameParams } from '@shared/analytics/utils/screenName';
+} from '@analytics/params/builders/productCard';
+import type { ProductCardInput } from '@analytics/params/builders/productCard';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
 
 const resultListScreenParams = () => ({
   screen_name: SCREEN_NAME.RESULT_LIST,

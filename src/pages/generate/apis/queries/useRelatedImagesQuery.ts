@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { RelatedImagesResponse } from '@shared/apis/__generated__/data-contracts';
-
+import type { RelatedImagesResponse } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';

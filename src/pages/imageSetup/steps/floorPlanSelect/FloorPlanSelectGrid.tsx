@@ -37,10 +37,11 @@ const getChipLabel = (category: FilterCategory, filterValues: string[]) => {
       (option): option is NonNullable<typeof option> => option !== undefined
     );
 
-  if (selectedOptions.length === 0) return category.label;
-  if (selectedOptions.length === 1) return selectedOptions[0].label;
+  const [firstOption] = selectedOptions;
+  if (!firstOption) return category.label;
+  if (selectedOptions.length === 1) return firstOption.label;
 
-  return `${selectedOptions[0].label} 외 ${selectedOptions.length - 1}개`;
+  return `${firstOption.label} 외 ${selectedOptions.length - 1}개`;
 };
 
 const FloorPlanSelectGrid = ({
@@ -70,7 +71,7 @@ const FloorPlanSelectGrid = ({
         label={plan.name ?? ''}
         imageSrc={plan.imageUrl ?? ''}
         showRecentBadge={plan.isLatest}
-        onClick={() => onCardClick(plan.id as number, fromRecommendation)}
+        onClick={() => onCardClick(plan.id!, fromRecommendation)}
       />
     );
   };

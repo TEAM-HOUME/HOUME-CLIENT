@@ -1,8 +1,5 @@
-import type {
-  SaveStatus,
-  TriggerContext,
-} from '@shared/analytics/params/product';
-import type { ProductCardParams } from '@shared/analytics/params/productCard';
+import type { SaveStatus, TriggerContext } from '@analytics/params/product';
+import type { ProductCardParams } from '@analytics/params/productCard';
 
 /** getProductCardParams 입력 — API/카드 뷰모델 공통 최소 필드 */
 export interface ProductCardInput {

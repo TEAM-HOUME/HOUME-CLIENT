@@ -1,7 +1,4 @@
-import type {
-  SaveStatus,
-  TriggerContext,
-} from '@shared/analytics/params/product';
+import type { SaveStatus, TriggerContext } from '@analytics/params/product';
 
 /** 상품 카드 공통 DB 파라미터 */
 export interface ProductCardParams {

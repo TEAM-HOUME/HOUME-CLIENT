@@ -64,7 +64,7 @@ const useProductFilterState = () => {
         .filter((type) => type.id != null && !!type.nameKr)
         .map((type) => ({
           id: String(type.id),
-          label: type.nameKr as string,
+          label: type.nameKr!,
         })),
     [filterData?.furnitureTypes]
   );
@@ -75,7 +75,7 @@ const useProductFilterState = () => {
         .filter((range) => range.id != null && !!range.label)
         .map((range) => ({
           id: String(range.id),
-          label: range.label as string,
+          label: range.label!,
         })),
     [filterData?.priceRanges]
   );
@@ -86,7 +86,7 @@ const useProductFilterState = () => {
         .filter((color) => color.id != null && !!color.label)
         .map((color) => ({
           id: String(color.id),
-          label: color.label as string,
+          label: color.label!,
           value: color.value ?? undefined,
         })),
     [filterData?.colors]

@@ -29,7 +29,7 @@ export function initClarity() {
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.clarity.ms/tag/${CLARITY_PROJECT_ID}`;
-  script.dataset.houmeClarity = 'true';
+  script.dataset['houmeClarity'] = 'true';
 
   document.head.appendChild(script);
 }

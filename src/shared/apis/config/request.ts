@@ -62,7 +62,7 @@ export async function request<T>(
 
     return response.data.data;
   } catch (error: unknown) {
-    if (!isAxiosError(error)) {
+    if (!isAxiosError<BaseResponse<unknown>>(error)) {
       if (import.meta.env.DEV) {
         console.error(`[실패] ${url} : 예상치 못한 오류`);
       }

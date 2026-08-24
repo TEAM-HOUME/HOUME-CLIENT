@@ -3,10 +3,11 @@ import { Outlet } from 'react-router-dom';
 
 import { useGenerateWarmup } from '@pages/generate/hooks/useGenerateWarmup';
 
-import { useScreenNavigation } from '@shared/analytics/hooks';
-import { useClaritySync } from '@shared/hooks/useClaritySync';
-import { useScrollToTop } from '@shared/hooks/useScrollToTop';
-import { useSentrySync } from '@shared/hooks/useSentrySync';
+import { useScreenNavigation } from '@analytics/hooks/useScreenNavigation';
+
+import { useClaritySync } from '@hooks/useClaritySync';
+import { useScrollToTop } from '@hooks/useScrollToTop';
+import { useSentrySync } from '@hooks/useSentrySync';
 
 import * as styles from './RootLayout.css';
 

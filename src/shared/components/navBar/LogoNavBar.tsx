@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
-import { TOP_NAV_RETURN_SCREEN } from '@shared/analytics/componentAnalytics';
-import { GA_EVENTS } from '@shared/analytics/events';
-import { type ScreenName } from '@shared/analytics/screenNames';
-import { trackCallback } from '@shared/analytics/track';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { TOP_NAV_RETURN_SCREEN } from '@analytics/componentAnalytics';
+import { GA_EVENTS } from '@analytics/events';
+import { type ScreenName } from '@analytics/screenNames';
+import { trackCallback } from '@analytics/track';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import imgProfile from '@assets/images/ImgProfile.svg';
 import logotypeBlack from '@assets/images/LogotypeBlack.svg';

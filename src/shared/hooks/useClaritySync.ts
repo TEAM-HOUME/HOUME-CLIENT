@@ -4,10 +4,11 @@ import { useLocation } from 'react-router-dom';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { getLoginStatus } from '@shared/analytics/utils/loginStatus';
-import { resolveScreenName } from '@shared/analytics/utils/screenName';
 import { setClarityTag } from '@shared/config/clarity';
 import { AB_TEST_STORAGE_KEY, isABTestGroup } from '@shared/types/abTest';
+
+import { getLoginStatus } from '@analytics/utils/loginStatus';
+import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
 /**
  * GA4 세그먼트 소스를 Clarity 커스텀 태그로 미러링하는 훅
