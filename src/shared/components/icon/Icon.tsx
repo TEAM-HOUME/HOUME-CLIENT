@@ -5,6 +5,9 @@ import ArrowLeftStrokeWhite from '@assets/icons/ArrowLeftStrokeWhite.svg?url';
 import ArrowRight from '@assets/icons/ArrowRight.svg?url';
 import ArrowRightFill from '@assets/icons/ArrowRightFill.svg?url';
 import ArrowUp from '@assets/icons/ArrowUp.svg?url';
+import ArrowUpFillBlack from '@assets/icons/ArrowUpFillBlack.svg?url';
+import ArrowUpFillGrad from '@assets/icons/ArrowUpFillGrad.svg?url';
+import ArrowUpFillGray from '@assets/icons/ArrowUpFillGray.svg?url';
 import BookBlack from '@assets/icons/BookBlack.svg?url';
 import BookGray from '@assets/icons/BookGray.svg?url';
 import ChevronDown from '@assets/icons/ChevronDown.svg?url';
@@ -24,6 +27,7 @@ import DislikeDefault from '@assets/icons/DislikeDefault.svg?url';
 import DislikeSelected from '@assets/icons/DislikeSelected.svg?url';
 import DislikeWhite from '@assets/icons/DislikeWhite.svg?url';
 import DoubleStar from '@assets/icons/DoubleStar.svg?url';
+import Fire from '@assets/icons/Fire.svg?url';
 import FlipHorizontal from '@assets/icons/FlipHorizontal.svg?url';
 import Grid1ColDefault from '@assets/icons/Grid1ColDefault.svg?url';
 import Grid1ColSelected from '@assets/icons/Grid1ColSelected.svg?url';
@@ -34,6 +38,7 @@ import HeartFillGray from '@assets/icons/HeartFillGray.svg?url';
 import HeartFillWhite from '@assets/icons/HeartFillWhite.svg?url';
 import HeartStrokeGray from '@assets/icons/HeartStrokeGray.svg?url';
 import HeartStrokeWhite from '@assets/icons/HeartStrokeWhite.svg?url';
+import History from '@assets/icons/History.svg?url';
 import Kakao from '@assets/icons/Kakao.svg?url';
 import LikeDefault from '@assets/icons/LikeDefault.svg?url';
 import LikeSelected from '@assets/icons/likeSelected.svg?url';
@@ -63,6 +68,9 @@ const IconsName = {
   ArrowRight,
   ArrowRightFill,
   ArrowUp,
+  ArrowUpFillBlack,
+  ArrowUpFillGrad,
+  ArrowUpFillGray,
   BookBlack,
   BookGray,
   ChevronDown,
@@ -78,6 +86,7 @@ const IconsName = {
   DeskBlack,
   DeskGray,
   DoubleStar,
+  Fire,
   FlipHorizontal,
   Grid1ColDefault,
   Grid1ColSelected,
@@ -87,6 +96,7 @@ const IconsName = {
   HeartFillGray,
   HeartStrokeGray,
   HeartStrokeWhite,
+  History,
   Link,
   Lock,
   MouseBlack,

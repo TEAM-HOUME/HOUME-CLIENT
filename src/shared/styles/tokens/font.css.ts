@@ -15,6 +15,7 @@ const primitives = createGlobalTheme(':root', {
       pretendard: 'Pretendard',
     },
     size: {
+      10: '1rem',
       11: '1.1rem',
       12: '1.2rem',
       13: '1.3rem',
@@ -154,6 +155,13 @@ const semantic = createGlobalTheme(':root', {
       fontFamily: primitives.typoPrimitive.font.pretendard,
       fontSize: primitives.typoPrimitive.size[11],
       fontWeight: primitives.typoPrimitive.weight[400],
+      lineHeight: '130%',
+      letterSpacing: LS,
+    },
+    caption_sb_10: {
+      fontFamily: primitives.typoPrimitive.font.pretendard,
+      fontSize: primitives.typoPrimitive.size[10],
+      fontWeight: primitives.typoPrimitive.weight[600],
       lineHeight: '130%',
       letterSpacing: LS,
     },
