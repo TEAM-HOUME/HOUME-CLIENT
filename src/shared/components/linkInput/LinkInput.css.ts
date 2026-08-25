@@ -9,7 +9,7 @@ export const wrapper = style({
   display: 'flex',
   gap: unitVars.unit.gapPadding['200'],
   transformOrigin: 'center center',
-  ...pressInteraction(0.97, '&:active, &:has(:active)'),
+  ...pressInteraction(0.97, '&:active:not(:has(button:active))'),
   borderRadius: unitVars.unit.radius['600'],
   backgroundColor: colorVars.color.fill.whitish,
   padding: unitVars.unit.gapPadding['100'],
@@ -47,9 +47,6 @@ export const buttonArea = style({
 export const submit = style({
   flexShrink: 0,
   selectors: {
-    '&:not(:disabled):active': {
-      transform: 'none',
-    },
     '&:disabled': {
       opacity: 1,
       cursor: 'default',
