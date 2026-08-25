@@ -1,0 +1,8 @@
+echo "🐕 Husky pre-push CI 검사 실행"
+
+pnpm lint:ci
+pnpm format:check
+pnpm knip:ci
+pnpm build
+
+echo "🎉 CI 검사 완료!"
