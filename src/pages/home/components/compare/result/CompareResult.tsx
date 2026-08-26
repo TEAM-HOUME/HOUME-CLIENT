@@ -1,4 +1,3 @@
-import TextButton from '@components/btnText/TextButton';
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
@@ -9,6 +8,7 @@ import {
   MOCK_SIMILAR_PRODUCT_COUNT,
   MOCK_SIMILAR_PRODUCTS,
 } from './mockCompareResult';
+import CompareSortDropdown from '../dropdown/SortDropdown';
 import OutputLink from '../linkOutput/OutputLink';
 
 const CompareResult = () => {
@@ -39,13 +39,7 @@ const CompareResult = () => {
           </div>
 
           <div className={styles.sortRow}>
-            {/*
-             * TODO: 드롭다운 컴포넌트 추가 후 낮은 가격순/높은 가격순/추천순
-             * 선택 상태를 연결
-             */}
-            <TextButton color="secondary" size="s" rightIcon="ChevronDown">
-              추천순
-            </TextButton>
+            <CompareSortDropdown />
           </div>
         </header>
 

@@ -151,14 +151,6 @@ export const chip = style({
   height: '3.6rem',
 });
 
-export const sortLabel = style({
-  ...fontVars.font.body_r_13,
-  display: 'flex',
-  alignItems: 'center',
-  gap: unitVars.unit.gapPadding['050'],
-  color: colorVars.color.text.tertiary,
-});
-
 export const productGrid = style({
   display: 'grid',
   gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
