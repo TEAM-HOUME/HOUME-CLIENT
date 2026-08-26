@@ -37,7 +37,7 @@ export const MOCK_SEARCHED_PRODUCT = {
 export const MOCK_SIMILAR_PRODUCT_COUNT = 20;
 
 export const MOCK_SIMILAR_PRODUCTS: MockCompareProduct[] = Array.from(
-  { length: 6 },
+  { length: MOCK_SIMILAR_PRODUCT_COUNT },
   (_, index) => ({
     id: index + 1,
     product: {

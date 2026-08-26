@@ -80,7 +80,8 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   gap: unitVars.unit.gapPadding['600'],
-  padding: `${unitVars.unit.gapPadding['600']} ${unitVars.unit.gapPadding['500']}`,
+  paddingBlock: unitVars.unit.gapPadding['600'],
+  paddingInline: unitVars.unit.gapPadding['500'],
   width: '100%',
 });
 
