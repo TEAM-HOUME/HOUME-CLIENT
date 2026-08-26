@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 
 import TextButton from '@components/btnText/TextButton';
 
-import * as styles from './CompareSortDropdown.css';
+import * as styles from './SortDropdown.css';
 
 const SORT_OPTIONS = ['낮은 가격순', '높은 가격순', '추천순'] as const;
 type SortOption = (typeof SORT_OPTIONS)[number];
