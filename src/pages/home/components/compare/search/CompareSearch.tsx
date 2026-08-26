@@ -1,7 +1,7 @@
 import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
-import * as styles from './Search.css';
+import * as styles from './CompareSearch.css';
 
 const MOCK_RECENT_ITEMS = [
   { name: '제품 이름', searchDayCount: 0 },
@@ -25,7 +25,7 @@ const MOCK_PRICE_COMPARE_PRESETS = {
   ],
 } as const;
 
-const Search = () => {
+const CompareSearch = () => {
   const handleSubmit = (_value: string) => {};
   const handleRecentClick = () => {};
   const handlePresetClick = (_presetId: number) => {};
@@ -67,4 +67,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default CompareSearch;
