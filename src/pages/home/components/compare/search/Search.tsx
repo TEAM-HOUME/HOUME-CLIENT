@@ -9,14 +9,26 @@ const MOCK_RECENT_ITEMS = [
   { name: '제품 이름', searchDayCount: 0 },
 ] as const;
 
-const MOCK_POPULAR_ITEMS = [
-  { name: '제품 이름' },
-  { name: '제품 이름' },
-] as const;
+// GET /api/v1/price-compare/presets 응답 data 형태
+const MOCK_PRICE_COMPARE_PRESETS = {
+  presets: [
+    {
+      presetId: 1,
+      thumbnailUrl: 'https://cdn.ohou.se/thumb/999999.jpg',
+      title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
+    },
+    {
+      presetId: 2,
+      thumbnailUrl: null,
+      title: '제품 이름',
+    },
+  ],
+} as const;
 
 const Search = () => {
   const handleSubmit = (_value: string) => {};
-  const handleItemClick = () => {};
+  const handleRecentClick = () => {};
+  const handlePresetClick = (_presetId: number) => {};
 
   return (
     <div className={styles.container}>
@@ -35,16 +47,17 @@ const Search = () => {
                 type="recent"
                 name={item.name}
                 searchDayCount={item.searchDayCount}
-                onClick={handleItemClick}
+                onClick={handleRecentClick}
               />
             </li>
           ))}
-          {MOCK_POPULAR_ITEMS.map((item, index) => (
-            <li key={`popular-${index}`}>
+          {MOCK_PRICE_COMPARE_PRESETS.presets.map((preset) => (
+            <li key={preset.presetId}>
               <SearchItem
                 type="popular"
-                name={item.name}
-                onClick={handleItemClick}
+                name={preset.title}
+                imageSrc={preset.thumbnailUrl ?? undefined}
+                onClick={() => handlePresetClick(preset.presetId)}
               />
             </li>
           ))}
