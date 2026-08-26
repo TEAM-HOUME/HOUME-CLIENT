@@ -3,23 +3,27 @@ import { useEffect, useId, useRef, useState } from 'react';
 import TextButton from '@components/btnText/TextButton';
 
 import * as styles from './SortDropdown.css';
-
-const SORT_OPTIONS = ['낮은 가격순', '높은 가격순', '추천순'] as const;
-type SortOption = (typeof SORT_OPTIONS)[number];
+import {
+  COMPARE_SORT_OPTIONS,
+  DEFAULT_COMPARE_SORT_OPTION,
+  type CompareSortOption,
+} from '../utils/sortCompareProducts';
 
 interface CompareSortDropdownProps {
   disabled?: boolean;
+  value?: CompareSortOption;
+  onChange?: (option: CompareSortOption) => void;
 }
 
 const CompareSortDropdown = ({
   disabled = false,
+  value = DEFAULT_COMPARE_SORT_OPTION,
+  onChange,
 }: CompareSortDropdownProps) => {
-  const [selectedOption, setSelectedOption] = useState<SortOption>(
-    SORT_OPTIONS[0]
-  );
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const isDisabled = disabled || !onChange;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -55,10 +59,10 @@ const CompareSortDropdown = ({
         aria-controls={menuId}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        disabled={disabled}
+        disabled={isDisabled}
         onClick={() => setIsOpen((open) => !open)}
       >
-        {selectedOption}
+        {value}
       </TextButton>
 
       {isOpen ? (
@@ -68,8 +72,8 @@ const CompareSortDropdown = ({
           role="menu"
           aria-label="상품 정렬"
         >
-          {SORT_OPTIONS.map((option) => {
-            const isSelected = selectedOption === option;
+          {COMPARE_SORT_OPTIONS.map((option) => {
+            const isSelected = value === option;
 
             return (
               <div className={styles.item} key={option}>
@@ -80,7 +84,7 @@ const CompareSortDropdown = ({
                   role="menuitemradio"
                   aria-checked={isSelected}
                   onClick={() => {
-                    setSelectedOption(option);
+                    onChange?.(option);
                     setIsOpen(false);
                   }}
                 >

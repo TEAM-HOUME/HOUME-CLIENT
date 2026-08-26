@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
@@ -10,8 +12,18 @@ import {
 } from './mockCompareResult';
 import CompareSortDropdown from '../dropdown/SortDropdown';
 import OutputLink from '../linkOutput/OutputLink';
+import {
+  DEFAULT_COMPARE_SORT_OPTION,
+  sortCompareProducts,
+  type CompareSortOption,
+} from '../utils/sortCompareProducts';
 
 const CompareResult = () => {
+  const [sortOption, setSortOption] = useState<CompareSortOption>(
+    DEFAULT_COMPARE_SORT_OPTION
+  );
+  const sortedProducts = sortCompareProducts(MOCK_SIMILAR_PRODUCTS, sortOption);
+
   return (
     <div className={styles.container}>
       {/*
@@ -39,12 +51,12 @@ const CompareResult = () => {
           </div>
 
           <div className={styles.sortRow}>
-            <CompareSortDropdown />
+            <CompareSortDropdown value={sortOption} onChange={setSortOption} />
           </div>
         </header>
 
         <div className={styles.productGrid}>
-          {MOCK_SIMILAR_PRODUCTS.map((item) => (
+          {sortedProducts.map((item) => (
             <ProductCard
               key={item.id}
               product={item.product}
