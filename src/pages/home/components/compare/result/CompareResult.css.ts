@@ -34,7 +34,7 @@ export const title = style({
 
 export const productCount = style({
   ...fontVars.font.title_sb_18,
-  color: colorVars.color.text.brand, // 생상 확인 필요
+  color: colorVars.color.text.brand,
 });
 
 export const sortRow = style({
