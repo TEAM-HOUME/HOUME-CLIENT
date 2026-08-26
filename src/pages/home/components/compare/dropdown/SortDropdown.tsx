@@ -48,6 +48,7 @@ const CompareSortDropdown = ({
   return (
     <div ref={dropdownRef} className={styles.container}>
       <TextButton
+        className={styles.pressable}
         color="secondary"
         size="s"
         rightIcon={isOpen ? 'ChevronUp' : 'ChevronDown'}
@@ -73,6 +74,7 @@ const CompareSortDropdown = ({
             return (
               <div className={styles.item} key={option}>
                 <TextButton
+                  className={styles.pressable}
                   color={isSelected ? 'primary' : 'secondary'}
                   size="s"
                   role="menuitemradio"

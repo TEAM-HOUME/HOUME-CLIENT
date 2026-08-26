@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
 import { colorVars } from '@styles/tokens/color.css';
+import { pressInteraction } from '@styles/tokens/interaction/presets';
 import { unitVars } from '@styles/tokens/unit.css';
 import { zIndex } from '@styles/tokens/zIndex';
 
@@ -9,6 +10,10 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
+});
+
+export const pressable = style({
+  ...pressInteraction(0.97, '&:not(:disabled):active'),
 });
 
 export const menu = style({
