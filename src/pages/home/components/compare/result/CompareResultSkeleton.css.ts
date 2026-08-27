@@ -80,7 +80,8 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   gap: unitVars.unit.gapPadding['600'],
-  padding: `${unitVars.unit.gapPadding['600']} ${unitVars.unit.gapPadding['500']}`,
+  paddingBlock: unitVars.unit.gapPadding['600'],
+  paddingInline: unitVars.unit.gapPadding['500'],
   width: '100%',
 });
 
@@ -149,14 +150,6 @@ export const chip = style({
   backgroundColor: colorVars.color.fill.weak,
   width: '5.8rem',
   height: '3.6rem',
-});
-
-export const sortLabel = style({
-  ...fontVars.font.body_r_13,
-  display: 'flex',
-  alignItems: 'center',
-  gap: unitVars.unit.gapPadding['050'],
-  color: colorVars.color.text.tertiary,
 });
 
 export const productGrid = style({

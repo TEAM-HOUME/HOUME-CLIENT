@@ -1,6 +1,7 @@
 import Icon from '@components/icon/Icon';
 
 import * as styles from './CompareResultSkeleton.css';
+import CompareSortDropdown from '../dropdown/SortDropdown';
 import * as outputStyles from '../linkOutput/OutputLink.css';
 
 const SKELETON_CARD_COUNT = 4;
@@ -74,10 +75,7 @@ const CompareResultSkeleton = () => {
               <span className={styles.chip} key={index} />
             ))}
           </div>
-          <div className={styles.sortLabel}>
-            <span>추천순</span>
-            <Icon name="ChevronDown" size="12" decorative />
-          </div>
+          <CompareSortDropdown disabled />
         </div>
 
         <div className={styles.productGrid}>

@@ -40,6 +40,7 @@ import HeartFillWhite from '@assets/icons/HeartFillWhite.svg?url';
 import HeartStrokeGray from '@assets/icons/HeartStrokeGray.svg?url';
 import HeartStrokeWhite from '@assets/icons/HeartStrokeWhite.svg?url';
 import History from '@assets/icons/History.svg?url';
+import InfoCircleGray from '@assets/icons/InfoCircleGray.svg?url';
 import Kakao from '@assets/icons/Kakao.svg?url';
 import LikeDefault from '@assets/icons/LikeDefault.svg?url';
 import LikeSelected from '@assets/icons/likeSelected.svg?url';
@@ -99,6 +100,7 @@ const IconsName = {
   HeartStrokeGray,
   HeartStrokeWhite,
   History,
+  InfoCircleGray,
   Link,
   Lock,
   MouseBlack,
