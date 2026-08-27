@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
 import {
+  COMPARE_ENTRY_SOURCE,
   COMPARE_JOB_STATUS,
   type CompareEntrySource,
   type CompareJobStage,
@@ -20,6 +21,14 @@ import {
 
 /** 진행 중인 비교를 가리키는 URL 쿼리 파라미터 이름 (`/?tab=compare&jobId=xxx`) */
 export const COMPARE_JOB_ID_PARAM = 'jobId';
+
+/**
+ *  DeepLinkRoute에서 상품 URL을 복원
+ * → URL 쿼리 파라미터에 상품 URL 추가
+ * → CompareTab이 읽어 job 생성 요청
+ * → job이 생성되면 ?productUrl=...은 지우고 ?jobId=... 추가
+ */
+export const COMPARE_PRODUCT_URL_PARAM = 'productUrl';
 
 /** 비교 탭이 지금 무엇을 그려야 하는지 */
 export const COMPARE_VIEW = {
@@ -96,8 +105,12 @@ export const usePriceCompareJob = (): PriceCompareJob => {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
-          if (nextJobId) next.set(COMPARE_JOB_ID_PARAM, nextJobId);
-          else next.delete(COMPARE_JOB_ID_PARAM);
+          if (nextJobId) {
+            next.set(COMPARE_JOB_ID_PARAM, nextJobId);
+            next.delete(COMPARE_PRODUCT_URL_PARAM);
+          } else {
+            next.delete(COMPARE_JOB_ID_PARAM);
+          }
           return next;
         },
         { replace }
@@ -108,19 +121,23 @@ export const usePriceCompareJob = (): PriceCompareJob => {
 
   const start = useCallback(
     (url: string, options: StartOptions = {}) => {
-      // 구조분해할당 + 기본값
-      // 다음과 같은 세 가지 케이스
       /**
-       * start('https://29cm.co.kr/p/1')
-// options = {}  →  source='input',    replace=false
-
-start('https://29cm.co.kr/p/1', { source: 'deeplink', replace: true })
-// →  source='deeplink', replace=true
-
-start('https://29cm.co.kr/p/1', { source: 'history' })
-// →  source='history',  replace=false  ← replace만 기본값
+       * 구조분해할당 + 기본값
+       * 다음과 같은 세 가지 케이스
+       *
+       * 1. start('https://29cm.co.kr/p/1')
+       * // →  source='input',    replace=false
+       *
+       * 2. start('https://29cm.co.kr/p/1', { source: 'deeplink', replace: true })
+       * // →  source='deeplink', replace=true
+       *
+       * 3. start('https://29cm.co.kr/p/1', { source: 'history' })
+       * // →  source='history',  replace=false  ← replace만 기본값
+       *
+       * +)
+       * - source는 서버로 나가지 않음 (request body에 url만 있음).
+       * - GA 연동 때 사용자 진입 경로를 여기서 꺼내 사용
        */
-      // source는 서버로 안 나간다 (request body에 url만 있음). GA 연동 때 여기서 꺼내 쓴다
       const { replace = false } = options;
 
       createJob(
@@ -130,6 +147,26 @@ start('https://29cm.co.kr/p/1', { source: 'history' })
     },
     [createJob, writeJobId]
   );
+
+  // 딥링크로 들어오면 주소에 ?productUrl= 만 쿼리로 붙어있는 상태
+  // 그 URL로 job 생성 요청이 시작됨
+  //
+  // job이 생성되면 ?productUrl= 이 지워져서 이 effect는 다시 실행 X
+  // 다만 url 쿼리가 지워지는 시점이 POST 응답을 받은 뒤라, 응답을 기다리는 동안 start가 새 함수로 다시 만들어지면
+  // effect가 한 번 더 돌아 POST가 두 번 요청됨. ref로 해당 케이스 방어
+  const hasStartedProductUrl = useRef(false);
+  const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
+
+  useEffect(() => {
+    if (hasStartedProductUrl.current) return;
+    if (!productUrl || jobId) return;
+
+    hasStartedProductUrl.current = true;
+    start(productUrl, {
+      source: COMPARE_ENTRY_SOURCE.DEEPLINK,
+      replace: true,
+    });
+  }, [productUrl, jobId, start]);
 
   const reset = useCallback(() => {
     resetCreateJob();
