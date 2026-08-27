@@ -1,5 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 
+import {
+  createMockCompareJob,
+  USE_COMPARE_MOCK,
+} from '@pages/home/apis/compareJobMock';
 import type {
   CreateCompareJobRequest,
   CreateCompareJobResponse,
@@ -20,6 +24,9 @@ import { API_ENDPOINT } from '@constants/apiEndpoints';
 export const postCompareJob = async (
   body: CreateCompareJobRequest
 ): Promise<CreateCompareJobResponse> => {
+  // 서버 API 연동 전 임시 — compareJobMock.ts와 함께 지운다
+  if (USE_COMPARE_MOCK) return createMockCompareJob(body.url);
+
   return request<CreateCompareJobResponse>({
     method: HTTPMethod.POST,
     url: API_ENDPOINT.COMPARE.CREATE_JOB,

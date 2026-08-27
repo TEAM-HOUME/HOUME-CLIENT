@@ -1,5 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
+import {
+  getMockCompareJobStatus,
+  isMockCompareJobId,
+  USE_COMPARE_MOCK,
+} from '@pages/home/apis/compareJobMock';
 import type { CompareJobStatusResponse } from '@pages/home/types/compare';
 import { COMPARE_JOB_STATUS } from '@pages/home/types/compare';
 import { isCompareJobNotFound } from '@pages/home/utils/compareJobError';
@@ -22,6 +27,11 @@ export const COMPARE_POLLING_INTERVAL_MS = 800;
 export const getCompareJobStatus = async (
   jobId: string
 ): Promise<CompareJobStatusResponse> => {
+  // 서버 API 연동 전 임시 — compareJobMock.ts와 함께 지운다
+  if (USE_COMPARE_MOCK && isMockCompareJobId(jobId)) {
+    return getMockCompareJobStatus(jobId);
+  }
+
   return request<CompareJobStatusResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.COMPARE.JOB_STATUS(jobId),
