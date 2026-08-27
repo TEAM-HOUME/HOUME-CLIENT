@@ -23,7 +23,7 @@ export const COMPARE_JOB_ID_PARAM = 'jobId';
 
 /** 비교 탭이 지금 무엇을 그려야 하는지 */
 export const COMPARE_VIEW = {
-  INPUT: 'input',
+  SEARCH: 'search', // 링크 입력창 + 히스토리 + 프리셋이 보이는 화면
   LOADING: 'loading',
   RESULT: 'result',
   EMPTY: 'empty',
@@ -186,7 +186,7 @@ const resolveView = ({
   if (isCreatingJob) return COMPARE_VIEW.LOADING;
   // 생성 실패는 jobId가 없는 상태로 발생하므로 입력 화면 판정보다 먼저 본다
   if (hasError) return COMPARE_VIEW.ERROR;
-  if (!hasJobId) return COMPARE_VIEW.INPUT;
+  if (!hasJobId) return COMPARE_VIEW.SEARCH;
 
   // 첫 조회 응답을 기다리는 중 — 아직 상태를 모름
   if (status === undefined) return COMPARE_VIEW.LOADING;

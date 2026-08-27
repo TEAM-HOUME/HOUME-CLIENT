@@ -25,8 +25,13 @@ const MOCK_PRICE_COMPARE_PRESETS = {
   ],
 } as const;
 
-const CompareSearch = () => {
-  const handleSubmit = (_value: string) => {};
+interface CompareSearchProps {
+  /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
+  onSubmit: (url: string) => void;
+}
+
+const CompareSearch = ({ onSubmit }: CompareSearchProps) => {
+  const handleSubmit = (value: string) => onSubmit(value);
   const handleRecentClick = () => {};
   const handlePresetClick = (_presetId: number) => {};
 
