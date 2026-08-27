@@ -1,7 +1,7 @@
 // ------------------------------
 // toCompareRequestUrl 검증 케이스
 // ------------------------------
-// 실행: node --experimental-strip-types src/pages/home/utils/compareRequestUrl.test.ts
+// 실행: node --experimental-strip-types src/pages/home/utils/compareRequestUrl.check.ts
 
 import { toCompareRequestUrl } from './compareRequestUrl.ts';
 

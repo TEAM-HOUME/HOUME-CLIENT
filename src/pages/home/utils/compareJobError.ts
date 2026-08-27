@@ -2,9 +2,16 @@ import { isAxiosError } from 'axios';
 
 import { COMPARE_REQUEST_ERROR_CODE } from '@pages/home/constants/compareErrorCode';
 
+/** 실패 응답 본문. 서버는 `msg`로 내려주고 레포의 `BaseResponse`는 `message`로 선언돼 있어 둘 다 받도록 처리 */
+interface ServerErrorBody {
+  code?: number;
+  msg?: string;
+  message?: string;
+}
+
 /** 서버 BaseResponse의 비즈니스 코드. HTTP 상태만으로는 갈리지 않는 경우가 있어 이 값으로 판별한다 */
 export const getServerErrorCode = (error: unknown): number | null => {
-  if (!isAxiosError(error)) return null;
+  if (!isAxiosError<ServerErrorBody>(error)) return null;
 
   const code = error.response?.data?.code;
   return typeof code === 'number' ? code : null;
@@ -24,7 +31,7 @@ export const isCompareJobNotFound = (error: unknown): boolean =>
  * (ex: 유효하지 않은 URL로 job 생성이 400에 막히는 경우)
  */
 export const getServerErrorMessage = (error: unknown): string | null => {
-  if (!isAxiosError(error)) return null;
+  if (!isAxiosError<ServerErrorBody>(error)) return null;
 
   const message = error.response?.data?.msg ?? error.response?.data?.message;
   return typeof message === 'string' && message.length > 0 ? message : null;

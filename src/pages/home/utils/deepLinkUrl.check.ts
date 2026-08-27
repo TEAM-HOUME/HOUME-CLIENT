@@ -1,7 +1,7 @@
 // ------------------------------
 // restoreDeepLinkUrl 검증 케이스
 // ------------------------------
-// 실행: node --experimental-strip-types src/pages/compare/utils/deepLinkUrl.test.ts
+// 실행: node --experimental-strip-types src/pages/compare/utils/deepLinkUrl.check.ts
 // (레포에 테스트 러너가 없어 node의 타입 제거 실행으로 돌린다. 러너를 도입하면 그 API로 옮긴다.)
 // tsconfig.app.json이 src/**/*.test.ts를 exclude하므로 pnpm build에는 포함되지 않는다.
 

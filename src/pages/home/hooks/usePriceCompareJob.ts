@@ -188,6 +188,9 @@ const resolveView = ({
   if (hasError) return COMPARE_VIEW.ERROR;
   if (!hasJobId) return COMPARE_VIEW.INPUT;
 
+  // 첫 조회 응답을 기다리는 중 — 아직 상태를 모름
+  if (status === undefined) return COMPARE_VIEW.LOADING;
+
   switch (status) {
     case COMPARE_JOB_STATUS.DONE:
       return productCount === 0 ? COMPARE_VIEW.EMPTY : COMPARE_VIEW.RESULT;
@@ -196,9 +199,6 @@ const resolveView = ({
     // PENDING(대기)·RUNNING(진행 중)은 둘 다 로딩 화면이다
     case COMPARE_JOB_STATUS.PENDING:
     case COMPARE_JOB_STATUS.RUNNING:
-      return COMPARE_VIEW.LOADING;
-    // 첫 응답을 기다리는 중(status undefined)도 로딩으로 둔다
-    default:
       return COMPARE_VIEW.LOADING;
   }
 };
