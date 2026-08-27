@@ -138,6 +138,13 @@ export const queryKeys = {
       [...queryKeys.styles.all, 'detail', styleId] as const,
   },
 
+  // 가격 비교(C-1)
+  compare: {
+    all: ['compare'] as const,
+    jobStatus: (jobId: string) =>
+      [...queryKeys.compare.all, 'jobStatus', jobId] as const,
+  },
+
   // 회원가입: 랜덤 닉네임
   signup: {
     all: ['signup'] as const,
