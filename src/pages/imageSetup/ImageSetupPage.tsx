@@ -9,9 +9,10 @@ import { FLOW_CONFIG } from '@store/imageFlow/flowConfig';
 import { useFunnelStore } from '@store/useFunnelStore';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 
-import { mapEntryRouteToLoginEntry } from '@shared/analytics/utils/loginEntryRoute';
 import { reportMessage } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
+
+import { mapEntryRouteToLoginEntry } from '@analytics/utils/loginEntryRoute/mapLoginEntryRoute';
 
 import FeatureErrorFallback from '@components/errorFallback/FeatureErrorFallback';
 

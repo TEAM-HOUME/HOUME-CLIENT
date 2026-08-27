@@ -6,13 +6,15 @@ import { useResultPreferenceMutation } from '@pages/generate/apis/mutations/useR
 import { useFactorsQuery } from '@pages/generate/apis/queries/useFactorsQuery';
 import type { ResultPageLikeState } from '@pages/generate/types/generate';
 
-import type { FactorItem } from '@shared/apis/__generated__/data-contracts';
-import { TOAST_MESSAGE } from '@shared/constants/toastMessage';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
+
+import type { FactorItem } from '@apis/__generated__/data-contracts';
 
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';
 import { useToast } from '@components/toast/useToast';
+
+import { TOAST_MESSAGE } from '@constants/toastMessage';
 
 import * as styles from './ImgFeedback.css.ts';
 

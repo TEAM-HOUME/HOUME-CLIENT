@@ -1,7 +1,7 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getLoginGatePageViewReturnParams } from '@shared/analytics/utils/screenName';
+import { GA_EVENTS } from '@analytics/events';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getLoginGatePageViewReturnParams } from '@analytics/utils/screenName/buildReturnScreenParams';
 
 const settingScreenParams = () => ({
   screen_name: SCREEN_NAME.SETTING,

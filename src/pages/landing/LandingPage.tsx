@@ -7,12 +7,13 @@ import { LANDING_CTA_BY_VARIANT } from '@pages/landing/constants/landingCtaAbTes
 
 import { ROUTES } from '@routes/paths';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { getLandingTestType } from '@shared/analytics/params/landing';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 import type { HomeLocationState } from '@shared/types/tabNavigation';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { getLandingTestType } from '@analytics/params/landing';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
 

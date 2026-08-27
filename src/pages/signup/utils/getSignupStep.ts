@@ -1,4 +1,4 @@
-import { SIGNUP_STEP, type SignupStep } from '@shared/analytics/params/auth';
+import { SIGNUP_STEP, type SignupStep } from '@analytics/params/auth';
 
 interface SignupStepInput {
   isNameSectionValid: boolean;

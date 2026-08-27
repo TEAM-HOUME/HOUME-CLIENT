@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { overlay } from 'overlay-kit';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavigationType, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   trackSignupBirthFocus,
@@ -50,7 +50,7 @@ const isSignupLocationState = (
   const state = value as Record<string, unknown>;
   if (!('signupToken' in state)) return false;
 
-  const signupToken = state.signupToken;
+  const signupToken = state['signupToken'];
   return signupToken == null || typeof signupToken === 'string';
 };
 
@@ -64,7 +64,7 @@ const SignupPage = () => {
   const shouldFocusBirthFieldRef = useRef(false);
 
   const routeSignupToken = isSignupLocationState(location.state)
-    ? (location.state.signupToken ?? null)
+    ? (location.state['signupToken'] ?? null)
     : null;
   const signupToken = routeSignupToken ?? sessionStorage.getItem('signupToken');
 
@@ -228,7 +228,7 @@ const SignupPage = () => {
       if (nextLocation.pathname === ROUTES.WELCOME) return false;
 
       // 브라우저 뒤로가기(POP)는 useBrowserBackTrap이 처리
-      if (historyAction === 'POP') return false;
+      if (historyAction === NavigationType.Pop) return false;
 
       return true;
     },

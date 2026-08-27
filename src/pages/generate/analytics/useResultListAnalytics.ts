@@ -20,7 +20,7 @@ import {
   joinAnalyticsIds,
   toProductCardInputFromGenerateResultProduct,
   toProductCardInputFromSimilarItem,
-} from '@shared/analytics/params/builders/productCard';
+} from '@analytics/params/builders/productCard';
 
 import type {
   GenerateImageResultProductResponse,

@@ -18,6 +18,9 @@ export const useRandomNickname = (
     } catch (error) {
       console.error('닉네임 새로고침 실패:', error);
     }
+
+    // 재요청이 실패했거나 빈 응답이면 호출자가 기존 닉네임을 유지하도록 undefined를 돌려준다
+    return undefined;
   }, [onSuccess, refetch]);
 
   return {

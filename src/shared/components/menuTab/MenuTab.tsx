@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react';
+
 import * as styles from './MenuTab.css';
 
 interface MenuTabItem<T extends string = string> {
   value: T;
   label: string;
+  badge?: ReactNode;
 }
 interface MenuTabProps<T extends string> {
   menuType?: 'default' | 'mypage';
@@ -21,7 +24,7 @@ const MenuTab = <T extends string>({
 }: MenuTabProps<T>) => {
   return (
     <div className={styles.menuTabBar({ sticky })} role="tablist">
-      {tabs.map(({ value, label }) => (
+      {tabs.map(({ value, label, badge }) => (
         <button
           key={value}
           type="button"
@@ -34,6 +37,7 @@ const MenuTab = <T extends string>({
           onClick={() => onTabChange(value)}
         >
           <span className={styles.tabButtonText}>{label}</span>
+          {badge}
         </button>
       ))}
     </div>

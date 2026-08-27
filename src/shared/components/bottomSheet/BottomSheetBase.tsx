@@ -100,8 +100,7 @@ const BottomSheetBase = ({
       if (typeof panelRef === 'function') {
         panelRef(node);
       } else if (panelRef && 'current' in panelRef) {
-        (panelRef as React.MutableRefObject<HTMLDivElement | null>).current =
-          node;
+        panelRef.current = node;
       }
     },
     [panelRef]

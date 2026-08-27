@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-import type { GaEventName } from '@shared/analytics/events';
-import type { AnalyticsScreenName } from '@shared/analytics/params/global';
-import type { TrackEventParams } from '@shared/analytics/params/types';
-import { trackEvent } from '@shared/analytics/track';
+import type { GaEventName } from '@analytics/events';
+import type { AnalyticsScreenName } from '@analytics/params/global';
+import type { TrackEventParams } from '@analytics/params/types';
+import { trackEvent } from '@analytics/track';
 
 type PageViewParams = Omit<TrackEventParams, 'screen_name'>;
 

@@ -8,7 +8,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { ROUTES } from '@routes/paths';
 
-import { clearLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
+import { clearLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
 
 import { useUserSync } from '@hooks/useUserSync';
 

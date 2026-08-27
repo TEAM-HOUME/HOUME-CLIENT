@@ -1,9 +1,9 @@
+import type { ResultImageMeta } from '@pages/generate/pages/result/types';
+
 import OptimizedImage from '@components/image/OptimizedImage';
 import { openImageZoom } from '@components/imageZoom/openImageZoom';
 
 import * as styles from './GeneratedImg.css';
-
-import type { ResultImageMeta } from '../../../types';
 
 export interface GeneratedImgListProps {
   /** 단일 생성 이미지 */

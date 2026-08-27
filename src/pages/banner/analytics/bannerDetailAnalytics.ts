@@ -1,13 +1,11 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  getBannerChipParams,
-  getHomeBannerParams,
-} from '@shared/analytics/params/builders';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getEntryRoute } from '@shared/analytics/utils/imageEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
-import { getReturnScreenNameParams } from '@shared/analytics/utils/screenName';
+import { GA_EVENTS } from '@analytics/events';
+import { getBannerChipParams } from '@analytics/params/builders/bannerDetail';
+import { getHomeBannerParams } from '@analytics/params/builders/homeContent';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getEntryRoute } from '@analytics/utils/imageEntryRoute/readImageEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
+import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
 
 export interface BannerDetailContext {
   bannerId: number;

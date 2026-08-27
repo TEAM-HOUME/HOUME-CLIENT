@@ -2,6 +2,9 @@ node_modules
 dist
 build
 *.lock
+# pnpm이 생성하는 파일이라 포맷을 건드리지 않는다.
+# `*.lock`으로는 잡히지 않아서 설치할 때마다 format:check가 깨졌다
+pnpm-lock.yaml
 package.json
 /.coderabbit.yaml
 *.hbs

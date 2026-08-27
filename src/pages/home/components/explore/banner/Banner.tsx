@@ -43,7 +43,7 @@ const Banner = ({ seedBannerId, onSlideClick, onBannerSwipe }: BannerProps) => {
     return banners
       .filter((b) => b.id != null)
       .map((b) => ({
-        id: b.id as number,
+        id: b.id!,
         title: b.name ?? '',
         imageUrl: b.imageUrl ?? '',
       }));

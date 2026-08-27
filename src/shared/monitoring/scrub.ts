@@ -90,7 +90,7 @@ export const redactBreadcrumb = (breadcrumb: Breadcrumb): Breadcrumb => {
 
   // xhr/fetch는 url, navigation은 from/to에 URL이 담긴다
   (['url', 'from', 'to'] as const).forEach((key) => {
-    const value = data[key];
+    const value: unknown = data[key];
     if (typeof value === 'string') {
       data[key] = redactUrl(value);
     }

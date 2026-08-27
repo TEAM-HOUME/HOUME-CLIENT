@@ -1,4 +1,4 @@
-import type { AnalyticsScreenName } from '@shared/analytics/params/global';
+import type { AnalyticsScreenName } from '@analytics/params/global';
 
 import { resolveScreenName } from './resolveScreenName';
 

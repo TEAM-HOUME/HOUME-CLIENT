@@ -5,7 +5,7 @@ import { ALL_FILTER_SENTINEL } from '@pages/home/utils/productFilterUtils';
 import {
   TRIGGER_CONTEXT,
   type TriggerContext,
-} from '@shared/analytics/params/product';
+} from '@analytics/params/product';
 
 const isAllFilter = (ids?: string[]) =>
   !ids?.length || (ids.length === 1 && ids[0] === ALL_FILTER_SENTINEL);

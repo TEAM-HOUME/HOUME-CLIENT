@@ -1,7 +1,7 @@
 // 원 계산
 export const formatKrw = (value?: number) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
-  return `${value.toLocaleString('ko-KR')}`;
+  return value.toLocaleString('ko-KR');
 };
 
 // 컬러칩
@@ -65,8 +65,11 @@ export const createCardClickHandler = ({
 }) => ({
   handleWrapperClick: (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement | null;
-    const areaElement = target?.closest?.('[data-click-area]') as HTMLElement;
-    const area = areaElement?.dataset?.clickArea as CardClickArea | undefined;
+    // closest는 기본이 Element라 dataset이 없다. HTMLElement로 받아야 dataset을 읽는다
+    const areaElement = target?.closest?.<HTMLElement>('[data-click-area]');
+    const area = areaElement?.dataset?.['clickArea'] as
+      | CardClickArea
+      | undefined;
     const resolvedArea: CardClickArea =
       area === 'image' || area === 'title' ? area : 'card';
 

@@ -12,25 +12,26 @@ import { ROUTES } from '@routes/paths';
 import { useImageFlowStore } from '@store/useImageFlowStore';
 import { useUserStore } from '@store/useUserStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import {
-  useAnalyticsPageView,
-  useScrollDepthTrack,
-} from '@shared/analytics/hooks';
-import { LOGIN_ENTRY_ROUTE } from '@shared/analytics/params/gate';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { persistLoginEntryRoute } from '@shared/analytics/utils/loginEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
 import type { HomeLocationState, HomeTab } from '@shared/types/tabNavigation';
+
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { useScrollDepthTrack } from '@analytics/hooks/useScrollDepthTrack';
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { persistLoginEntryRoute } from '@analytics/utils/loginEntryRoute/storeLoginEntryRoute';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import { useMyPageUserQuery } from '@apis/queries/useMyPageUserQuery';
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 
 import MenuTab from '@components/menuTab/MenuTab';
 import LogoNavBar from '@components/navBar/LogoNavBar';
+import StatusBadge from '@components/statusBadge/StatusBadge';
 
 import { setLoginRedirect } from '@utils/loginRedirect';
 
+import CompareTab from './components/compare/CompareTab';
 import ExploreTab from './components/explore/ExploreTab';
 import ProductTab from './components/product/ProductTab';
 import * as styles from './HomePage.css';
@@ -57,7 +58,7 @@ const HomePage = () => {
   }, []);
 
   const [activeMenuTab, setActiveMenuTab] = useState<HomeTab>(
-    tabParam === 'product' || tabParam === 'explore'
+    tabParam === 'product' || tabParam === 'explore' || tabParam === 'compare'
       ? tabParam
       : (homeState?.activeTab ??
           (presetHasProductsToBeRestored ? 'product' : 'explore'))
@@ -94,6 +95,7 @@ const HomePage = () => {
       (prev) => {
         const next = new URLSearchParams(prev);
         if (tab === 'product') next.set('tab', 'product');
+        else if (tab === 'compare') next.set('tab', 'compare');
         else next.delete('tab');
         return next;
       },
@@ -134,6 +136,11 @@ const HomePage = () => {
         tabs={[
           { value: 'explore', label: '탐색' },
           { value: 'product', label: '상품' },
+          {
+            value: 'compare',
+            label: '비교',
+            badge: <StatusBadge label="BETA" />,
+          },
         ]}
         activeTab={activeMenuTab}
         sticky={activeMenuTab === 'explore'}
@@ -158,6 +165,7 @@ const HomePage = () => {
         />
       )}
       {activeMenuTab === 'product' && <ProductTab />}
+      {activeMenuTab === 'compare' && <CompareTab />}
     </main>
   );
 };

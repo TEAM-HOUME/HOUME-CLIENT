@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useProductListQuery } from '@pages/home/apis/queries/useProductListQuery';
 
-import type { CurationProductResponse } from '@shared/apis/__generated__/data-contracts';
+import type { CurationProductResponse } from '@apis/__generated__/data-contracts';
 
 import type { ProductListQueryVariables } from '@constants/queryKey';
 
@@ -33,7 +33,7 @@ const toProductSearchCardItems = (
   products
     .filter((product) => product.id != null)
     .map((product) => ({
-      id: product.id as number,
+      id: product.id!,
       title: product.name ?? '',
       brand: product.brand ?? '',
       categoryName: product.categoryName,

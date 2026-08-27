@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
+import { PROGRESS_CONFIG } from '@pages/generate/constants/progressConfig';
+
 import { reportMessage } from '@shared/monitoring/report';
 import { MONITORING_SCOPE } from '@shared/monitoring/scope';
-
-import { PROGRESS_CONFIG } from '../../../constants/progressConfig';
 
 /**
  * 이미지 생성이 정지했다고 판정하는 시간 (ms)

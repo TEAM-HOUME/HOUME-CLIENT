@@ -7,15 +7,14 @@ import {
   trackSignupCompCompleteRegistration,
   trackSignupCompCtaClick,
 } from '@pages/generate/analytics/signupCompAnalytics';
-import { useWelcomePageModelPreload } from '@pages/generate/hooks/useWelcomePageModelPreload';
 
 import { ROUTES } from '@routes/paths';
 
 import { useUserStore } from '@store/useUserStore';
 
-import { GA_EVENTS } from '@shared/analytics/events';
-import { useAnalyticsPageView } from '@shared/analytics/hooks';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
+import { GA_EVENTS } from '@analytics/events';
+import { useAnalyticsPageView } from '@analytics/hooks/useAnalyticsPageView';
+import { SCREEN_NAME } from '@analytics/screenNames';
 
 import { LOTTIE_SPEED } from '@assets/lottie/lottieAssets';
 
@@ -32,8 +31,6 @@ const WelcomePage = () => {
   // zustand에서 userName 가져오기
   const userName = useUserStore((state) => state.userName);
   const navigate = useNavigate();
-
-  useWelcomePageModelPreload(); // ONNX 모델 워밍업용 (현재 미사용)
 
   useAnalyticsPageView(
     GA_EVENTS.signupComp.PAGE_VIEW,

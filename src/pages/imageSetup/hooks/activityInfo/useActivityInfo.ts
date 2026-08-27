@@ -8,10 +8,8 @@ import { ROUTES } from '@routes/paths';
 
 import { useFunnelStore } from '@store/useFunnelStore';
 
-import {
-  buildSelectedFurnitureChips,
-  captureFullFunnelFlowSnapshot,
-} from '@shared/analytics/utils/imageFlow';
+import { captureFullFunnelFlowSnapshot } from '@analytics/utils/imageFlow/captureFunnelInputSnapshot';
+import { buildSelectedFurnitureChips } from '@analytics/utils/imageFlow/formatFunnelGaParams';
 
 import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 

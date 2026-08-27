@@ -1,10 +1,10 @@
-import { GA_EVENTS, type GaEventName } from '@shared/analytics/events';
-import { type SignupStep } from '@shared/analytics/params/auth';
-import type { TrackEventParams } from '@shared/analytics/params/types';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { getLoginEntryRouteParams } from '@shared/analytics/utils/loginEntryRoute';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { GA_EVENTS, type GaEventName } from '@analytics/events';
+import { type SignupStep } from '@analytics/params/auth';
+import type { TrackEventParams } from '@analytics/params/types';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { getLoginEntryRouteParams } from '@analytics/utils/loginEntryRoute/buildLoginSocialEventParams';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 const signupFormScreenParams = () => ({
   screen_name: SCREEN_NAME.SIGNUP_FORM,

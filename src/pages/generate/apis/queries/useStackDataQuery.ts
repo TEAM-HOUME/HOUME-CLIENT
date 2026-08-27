@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
+import type { GetCarouselV2ListResponseDTO } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
 import { queryKeys } from '@constants/queryKey';
-
-import type { GetCarouselV2ListResponseDTO } from '@/shared/apis/__generated__/data-contracts';
 
 export const getStackData = async (): Promise<GetCarouselV2ListResponseDTO> => {
   const res = await request<GetCarouselV2ListResponseDTO>({

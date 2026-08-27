@@ -11,7 +11,7 @@
 import {
   LOGIN_ENTRY_ROUTE,
   type LoginEntryRoute,
-} from '@shared/analytics/params/gate';
+} from '@analytics/params/gate';
 
 const LOGIN_ENTRY_ROUTE_KEY = 'loginEntryRoute';
 

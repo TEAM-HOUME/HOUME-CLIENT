@@ -157,7 +157,7 @@ export const handleMutationError = (
   error: unknown,
   _variables: unknown,
   _context: unknown,
-  mutation: Mutation<unknown, unknown, unknown>
+  mutation: Mutation<unknown, unknown>
 ) => {
   handleGlobalError(error);
 

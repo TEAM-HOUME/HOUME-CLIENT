@@ -1,8 +1,8 @@
-import { GA_EVENTS } from '@shared/analytics/events';
-import { getLandingCtaParams } from '@shared/analytics/params/landing';
-import { SCREEN_NAME } from '@shared/analytics/screenNames';
-import { trackEvent } from '@shared/analytics/track';
-import { loginStatusParams } from '@shared/analytics/utils/loginStatus';
+import { GA_EVENTS } from '@analytics/events';
+import { getLandingCtaParams } from '@analytics/params/landing';
+import { SCREEN_NAME } from '@analytics/screenNames';
+import { trackEvent } from '@analytics/track';
+import { loginStatusParams } from '@analytics/utils/loginStatus';
 
 import type { LandingResponse } from '@apis/__generated__/data-contracts';
 

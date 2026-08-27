@@ -19,12 +19,12 @@
  * track(EVENTS.LOGIN_SOCIAL_PAGE_VIEW, getLoginSocialParams());
  * // → { login_entry_route: 'home_banner', return_screen_name: 'home' }
  *
- * @see `@shared/analytics/utils/screenName`
+ * @see `@analytics/utils/screenName`
  */
 import { ROUTES } from '@routes/paths';
 
-import type { LoginEntryRoute } from '@shared/analytics/params/gate';
-import { resolveScreenName } from '@shared/analytics/utils/screenName';
+import type { LoginEntryRoute } from '@analytics/params/gate';
+import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
 import { getLoginRedirect } from '@utils/loginRedirect';
 

@@ -38,9 +38,10 @@ export const menuTabBar = recipe({
 export const tabButton = recipe({
   base: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: unitVars.unit.gapPadding['100'],
     transformOrigin: 'center center',
     ...pressInteraction(0.95),
     margin: `${unitVars.unit.gapPadding['000']} ${unitVars.unit.gapPadding['100']}`,
