@@ -12,7 +12,8 @@ export const container = style({
   border: `1px solid ${colorVars.color.border.secondary}`,
   borderRadius: unitVars.unit.radius['600'],
   backgroundColor: colorVars.color.bg.primary,
-  width: '33.6rem',
+  width: '100%',
+  minWidth: '33.6rem',
   overflow: 'hidden',
 });
 
@@ -60,7 +61,6 @@ export const imgSection = style({
   flexShrink: 0,
   border: `1px solid ${colorVars.color.border.tertiary}`,
   borderRadius: unitVars.unit.radius['300'],
-  background: 'transparent',
   width: '8rem',
   height: '8rem',
   overflow: 'hidden',
