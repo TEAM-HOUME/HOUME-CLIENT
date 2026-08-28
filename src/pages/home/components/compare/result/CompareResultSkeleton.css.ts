@@ -23,7 +23,7 @@ const opacityFadeBackInEndMs =
 const scaleAnimation = keyframes({
   '0%': {
     transform: 'scale(0.9)',
-    animationTimingFunction: interactionVars.interaction.easing['bezier.inout'],
+    animationTimingFunction: interactionVars.interaction.easing['bezier.back'],
   },
   [toKeyframePercent(interactionDurationValues.slowest)]: {
     transform: 'scale(1)',
