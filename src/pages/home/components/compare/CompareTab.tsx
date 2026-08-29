@@ -26,7 +26,9 @@ const CompareTab = () => {
         {view === COMPARE_VIEW.LOADING && <CompareResultSkeleton />}
 
         {/* TODO: 서버 응답을 ProductCard 형태로 바꿔 result를 props로 넘기기. 지금 CompareResult는 목데이터 */}
-        {view === COMPARE_VIEW.RESULT && <CompareResult />}
+        {view === COMPARE_VIEW.RESULT && (
+          <CompareResult onSearchNewLink={reset} />
+        )}
 
         {view === COMPARE_VIEW.EMPTY && (
           <CompareFallback

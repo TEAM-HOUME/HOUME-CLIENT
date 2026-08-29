@@ -18,7 +18,12 @@ import {
   type CompareSortOption,
 } from '../utils/sortCompareProducts';
 
-const CompareResult = () => {
+interface CompareResultProps {
+  /** "새로운 링크 검색하기"를 누르면 호출된다. 입력 화면으로 되돌아간다 */
+  onSearchNewLink?: () => void;
+}
+
+const CompareResult = ({ onSearchNewLink }: CompareResultProps) => {
   const [sortOption, setSortOption] = useState<CompareSortOption>(
     DEFAULT_COMPARE_SORT_OPTION
   );
@@ -33,6 +38,7 @@ const CompareResult = () => {
       <OutputLink
         product={MOCK_SEARCHED_PRODUCT.product}
         price={MOCK_SEARCHED_PRODUCT.price}
+        onSearchNewLink={onSearchNewLink}
       />
 
       <section
