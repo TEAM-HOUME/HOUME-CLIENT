@@ -173,7 +173,7 @@ export const router = createBrowserRouter([
         children: protectedRoutes,
       },
       {
-        // 라우터에 없는 경로 — 딥링크(houme.kr/{상품 URL})인지 판별해 비교 탭으로 보내거나 NotFound를 띄운다
+        // 등록된 라우트와 하나도 맞지 않는 주소 — 딥링크(houme.kr/{상품 URL})인지 판별해 비교 탭으로 보내거나 NotFound를 띄운다
         path: '*',
         lazy: async () => {
           const { default: DeepLinkRoute } = await import(

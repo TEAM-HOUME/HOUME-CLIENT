@@ -129,7 +129,7 @@ interface CompareJobBase {
 
 /**
  * 상태 조회 응답. status로 갈라진다.
- * 진행 중과 실패일 때 result가 null이라는 것을 타입에서 보장해 뷰가 옵셔널 체이닝을 안 쓰게 한다.
+ * 진행 중과 실패일 때 result가 null이라는 것을 타입에서 보장해 뷰에서 옵셔널 체이닝을 사용하지 않는다.
  */
 export type CompareJobStatusResponse = CompareJobBase &
   (

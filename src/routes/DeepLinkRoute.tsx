@@ -7,7 +7,7 @@ import NotFoundPage from '@pages/notFound/NotFoundPage';
 import { ROUTES } from '@routes/paths';
 
 /**
- * 라우터에 없는 모든 경로를 받는 자리.
+ * `path: '*'`에 걸리는 컴포넌트. 등록된 라우트와 하나도 맞지 않는 주소로 들어왔을 때 렌더된다.
  *
  * `houme.kr/https://29cm.co.kr/product/123`처럼 상품 URL을 뒤에 붙여 들어온 요청이면 원본 URL을 복원해 비교 탭으로 넘기고, 아니면 NotFound를 보여준다.
  *
