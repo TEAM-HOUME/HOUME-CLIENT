@@ -4,7 +4,7 @@ import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
 import * as styles from './CompareSearch.css';
-import { getSearchDayCountFromCreatedAt } from '../utils/getSearchDayCount';
+import { getSearchDayCount } from '../utils/getSearchDayCount';
 
 // GET /api/v1/price-compare/jobs/history 응답 data.items[] 형태 (limit=3)
 const PRICE_COMPARE_HISTORY_LIMIT = 3;
@@ -86,7 +86,7 @@ const CompareSearch = () => {
                 type="recent"
                 name={item.title}
                 imageSrc={item.thumbnailUrl}
-                searchDayCount={getSearchDayCountFromCreatedAt(item.createdAt)}
+                searchDayCount={getSearchDayCount(item.createdAt)}
                 onClick={() => handleHistoryClick(item.sourceUrl)}
               />
             </li>
