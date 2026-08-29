@@ -17,15 +17,6 @@ export const COMPARE_JOB_ERROR_CODE = {
   TIMEOUT: 50025,
 } as const;
 
-export type CompareJobErrorCode =
-  (typeof COMPARE_JOB_ERROR_CODE)[keyof typeof COMPARE_JOB_ERROR_CODE];
-
-/** 재시도 버튼을 보여줄 실패 — 나머지는 URL을 바꿔야 하므로 입력으로 되돌린다 */
-export const RETRYABLE_COMPARE_JOB_ERROR_CODES: readonly number[] = [
-  COMPARE_JOB_ERROR_CODE.PAGE_LOAD_FAILED,
-  COMPARE_JOB_ERROR_CODE.TIMEOUT,
-];
-
 /** HTTP 에러 응답의 `code` — job 실패가 아니라 요청 자체가 거절된 경우 */
 export const COMPARE_REQUEST_ERROR_CODE = {
   /** 404 — 없는 jobId. 만료됐거나 조작된 값 */

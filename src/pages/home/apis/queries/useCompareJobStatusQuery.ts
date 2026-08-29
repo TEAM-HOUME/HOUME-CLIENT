@@ -55,6 +55,10 @@ export const useCompareJobStatusQuery = (jobId: string | null) => {
     queryFn: () => getCompareJobStatus(jobId ?? ''),
     enabled: Boolean(jobId),
     refetchInterval: (query) => {
+      // 요청이 실패하면 화면은 이미 에러로 넘어간 상태다. 여기서 멈추지 않으면
+      // 사용자가 떠난 화면에서 800ms마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨)
+      if (query.state.status === 'error') return false;
+
       const status = query.state.data?.status;
       if (
         status === COMPARE_JOB_STATUS.DONE ||

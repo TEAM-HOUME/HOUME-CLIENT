@@ -5,6 +5,7 @@
 // 2026-08-27 확정 명세의 응답 예시를 그대로 옮겨 만들었다. 실제 상품 정보가 아니다.
 // 서버 연동이 끝나면 이 파일은 지운다.
 
+import { COMPARE_JOB_ERROR_CODE } from '@pages/home/constants/compareErrorCode';
 import {
   COMPARE_JOB_STAGE,
   COMPARE_JOB_STATUS,
@@ -42,6 +43,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.92,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12345.jpg',
+    productUrl: 'https://houme.kr/products/12345',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225189423',
@@ -51,6 +56,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.87,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225189423.jpg',
+    productUrl: 'https://houme.kr/products/7225189423',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12377',
@@ -60,6 +69,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.85,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12377.jpg',
+    productUrl: 'https://houme.kr/products/12377',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225190011',
@@ -69,6 +82,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.83,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225190011.jpg',
+    productUrl: 'https://houme.kr/products/7225190011',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '204488317755',
@@ -78,6 +95,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.EBAY,
     similarityScore: 0.81,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/204488317755.jpg',
+    productUrl: 'https://houme.kr/products/204488317755',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12402',
@@ -87,6 +108,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.79,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12402.jpg',
+    productUrl: 'https://houme.kr/products/12402',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225191288',
@@ -96,6 +121,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.77,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225191288.jpg',
+    productUrl: 'https://houme.kr/products/7225191288',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12455',
@@ -105,6 +134,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.75,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12455.jpg',
+    productUrl: 'https://houme.kr/products/12455',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '204488319902',
@@ -114,6 +147,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.EBAY,
     similarityScore: 0.73,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/204488319902.jpg',
+    productUrl: 'https://houme.kr/products/204488319902',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225193040',
@@ -123,6 +160,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.71,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225193040.jpg',
+    productUrl: 'https://houme.kr/products/7225193040',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12490',
@@ -132,6 +173,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.69,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12490.jpg',
+    productUrl: 'https://houme.kr/products/12490',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225194511',
@@ -141,6 +186,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.67,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225194511.jpg',
+    productUrl: 'https://houme.kr/products/7225194511',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12512',
@@ -150,6 +199,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.65,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12512.jpg',
+    productUrl: 'https://houme.kr/products/12512',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '204488322341',
@@ -159,6 +212,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.EBAY,
     similarityScore: 0.63,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/204488322341.jpg',
+    productUrl: 'https://houme.kr/products/204488322341',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225196077',
@@ -168,6 +225,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.61,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225196077.jpg',
+    productUrl: 'https://houme.kr/products/7225196077',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12540',
@@ -177,6 +238,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.59,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12540.jpg',
+    productUrl: 'https://houme.kr/products/12540',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225197655',
@@ -186,6 +251,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.57,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225197655.jpg',
+    productUrl: 'https://houme.kr/products/7225197655',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '12566',
@@ -195,6 +264,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.CATALOG,
     similarityScore: 0.55,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/12566.jpg',
+    productUrl: 'https://houme.kr/products/12566',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '204488325518',
@@ -204,6 +277,10 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.EBAY,
     similarityScore: 0.53,
     isAffiliate: false,
+    imageUrl: 'https://cdn.houme.kr/products/204488325518.jpg',
+    productUrl: 'https://houme.kr/products/204488325518',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
   {
     productId: '7225199120',
@@ -213,14 +290,12 @@ const MOCK_SIMILAR_PRODUCTS: CompareSimilarProduct[] = [
     source: COMPARE_SOURCE.COUPANG,
     similarityScore: 0.51,
     isAffiliate: true,
+    imageUrl: 'https://cdn.houme.kr/products/7225199120.jpg',
+    productUrl: 'https://houme.kr/products/7225199120',
+    currency: 'KRW',
+    priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
   },
-].map((product) => ({
-  ...product,
-  imageUrl: `https://cdn.houme.kr/products/${product.productId}.jpg`,
-  productUrl: `https://houme.kr/products/${product.productId}`,
-  currency: 'KRW',
-  priceUpdatedAt: MOCK_PRICE_UPDATED_AT,
-}));
+];
 
 const MOCK_JOB_BASE = {
   jobId: MOCK_JOB_ID,
@@ -230,20 +305,6 @@ const MOCK_JOB_BASE = {
     ebay: COMPARE_SOURCE_STATUS.DONE,
   },
   startedAt: MOCK_STARTED_AT,
-};
-
-/** 진행 중 — 로딩 뷰 확인용. coupang만 아직 도는 중 */
-export const MOCK_COMPARE_JOB_RUNNING: CompareJobStatusResponse = {
-  ...MOCK_JOB_BASE,
-  status: COMPARE_JOB_STATUS.RUNNING,
-  currentStage: COMPARE_JOB_STAGE.SEARCHING,
-  sources: {
-    catalog: COMPARE_SOURCE_STATUS.DONE,
-    coupang: COMPARE_SOURCE_STATUS.RUNNING,
-    ebay: COMPARE_SOURCE_STATUS.DONE,
-  },
-  completedAt: null,
-  result: null,
 };
 
 /** 완료 — 결과 뷰 확인용. 원본 149,000원보다 싼 상품이 12개라 "저렴" 배지 케이스가 나온다 */
@@ -283,7 +344,7 @@ export const MOCK_COMPARE_JOB_FAILED: CompareJobStatusResponse = {
     ebay: COMPARE_SOURCE_STATUS.WAITING,
   },
   completedAt: '2026-08-23T14:02:13+09:00',
-  errorCode: 50204,
+  errorCode: COMPARE_JOB_ERROR_CODE.PAGE_LOAD_FAILED,
   errorMessage: '상품 페이지를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
   result: null,
 };

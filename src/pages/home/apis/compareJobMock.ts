@@ -17,9 +17,7 @@ import {
   COMPARE_JOB_STAGE,
   COMPARE_JOB_STATUS,
   COMPARE_SOURCE_STATUS,
-  type CompareJobStage,
   type CompareJobStatusResponse,
-  type CompareSourceStatus,
   type CreateCompareJobResponse,
 } from '@pages/home/types/compare';
 
@@ -40,10 +38,10 @@ type MockScenario = (typeof MOCK_SCENARIO)[keyof typeof MOCK_SCENARIO];
 
 /** 서버가 알려준 단계별 예상 시간(SCRAPING 2초 · SEARCHING 3~5초 · MERGING 5초)을 그대로 따랐다 */
 const STAGE_TIMELINE_MS = {
-  PENDING_UNTIL: 500,
-  SCRAPING_UNTIL: 2_000,
-  SEARCHING_UNTIL: 7_000,
-  MERGING_UNTIL: 12_000,
+  PENDING_UNTIL: 300,
+  SCRAPING_UNTIL: 1_000,
+  SEARCHING_UNTIL: 3_000,
+  MERGING_UNTIL: 5_000,
 } as const;
 
 const JOB_ID_PREFIX = 'mock';
@@ -77,58 +75,49 @@ const parseMockJobId = (
   };
 };
 
+const ALL_WAITING = {
+  catalog: COMPARE_SOURCE_STATUS.WAITING,
+  coupang: COMPARE_SOURCE_STATUS.WAITING,
+  ebay: COMPARE_SOURCE_STATUS.WAITING,
+} as const;
+
+const ALL_DONE = {
+  catalog: COMPARE_SOURCE_STATUS.DONE,
+  coupang: COMPARE_SOURCE_STATUS.DONE,
+  ebay: COMPARE_SOURCE_STATUS.DONE,
+} as const;
+
+/** SEARCHING 동안 3개 소스가 서로 다른 시점에 끝나는 것을 흉내낸다 */
+const SOURCE_DONE_AT_MS = { catalog: 2_000, coupang: 2_600, ebay: 1_500 };
+
 const buildRunningResponse = (
   jobId: string,
-  elapsedMs: number,
   startedAt: number
 ): CompareJobStatusResponse => {
-  const isPending = elapsedMs < STAGE_TIMELINE_MS.PENDING_UNTIL;
-  const isScraping = elapsedMs < STAGE_TIMELINE_MS.SCRAPING_UNTIL;
-  const isSearching = elapsedMs < STAGE_TIMELINE_MS.SEARCHING_UNTIL;
+  const elapsedMs = Date.now() - startedAt;
+  const doneBy = (ms: number) =>
+    elapsedMs > ms ? COMPARE_SOURCE_STATUS.DONE : COMPARE_SOURCE_STATUS.RUNNING;
 
-  // SEARCHING 동안 3개 소스가 서로 다른 속도로 끝나는 것을 흉내낸다
-  const searchingSources = {
-    catalog:
-      elapsedMs > 4_000
-        ? COMPARE_SOURCE_STATUS.DONE
-        : COMPARE_SOURCE_STATUS.RUNNING,
-    coupang:
-      elapsedMs > 6_000
-        ? COMPARE_SOURCE_STATUS.DONE
-        : COMPARE_SOURCE_STATUS.RUNNING,
-    ebay:
-      elapsedMs > 3_000
-        ? COMPARE_SOURCE_STATUS.DONE
-        : COMPARE_SOURCE_STATUS.RUNNING,
-  };
-
-  const waitingSources = {
-    catalog: COMPARE_SOURCE_STATUS.WAITING,
-    coupang: COMPARE_SOURCE_STATUS.WAITING,
-    ebay: COMPARE_SOURCE_STATUS.WAITING,
-  };
-
-  const doneSources = {
-    catalog: COMPARE_SOURCE_STATUS.DONE,
-    coupang: COMPARE_SOURCE_STATUS.DONE,
-    ebay: COMPARE_SOURCE_STATUS.DONE,
-  };
-
-  let currentStage: CompareJobStage = COMPARE_JOB_STAGE.MERGING;
-  let sources: Record<'catalog' | 'coupang' | 'ebay', CompareSourceStatus> =
-    doneSources;
-
-  if (isScraping) {
-    currentStage = COMPARE_JOB_STAGE.SCRAPING;
-    sources = waitingSources;
-  } else if (isSearching) {
-    currentStage = COMPARE_JOB_STAGE.SEARCHING;
-    sources = searchingSources;
-  }
+  const { currentStage, sources } =
+    elapsedMs < STAGE_TIMELINE_MS.SCRAPING_UNTIL
+      ? { currentStage: COMPARE_JOB_STAGE.SCRAPING, sources: ALL_WAITING }
+      : elapsedMs < STAGE_TIMELINE_MS.SEARCHING_UNTIL
+        ? {
+            currentStage: COMPARE_JOB_STAGE.SEARCHING,
+            sources: {
+              catalog: doneBy(SOURCE_DONE_AT_MS.catalog),
+              coupang: doneBy(SOURCE_DONE_AT_MS.coupang),
+              ebay: doneBy(SOURCE_DONE_AT_MS.ebay),
+            },
+          }
+        : { currentStage: COMPARE_JOB_STAGE.MERGING, sources: ALL_DONE };
 
   return {
     jobId,
-    status: isPending ? COMPARE_JOB_STATUS.PENDING : COMPARE_JOB_STATUS.RUNNING,
+    status:
+      elapsedMs < STAGE_TIMELINE_MS.PENDING_UNTIL
+        ? COMPARE_JOB_STATUS.PENDING
+        : COMPARE_JOB_STATUS.RUNNING,
     currentStage,
     sources,
     startedAt: new Date(startedAt).toISOString(),
@@ -145,7 +134,7 @@ export const getMockCompareJobStatus = (
   const elapsedMs = Date.now() - startedAt;
 
   if (elapsedMs < STAGE_TIMELINE_MS.MERGING_UNTIL) {
-    return buildRunningResponse(jobId, elapsedMs, startedAt);
+    return buildRunningResponse(jobId, startedAt);
   }
 
   const finished = {

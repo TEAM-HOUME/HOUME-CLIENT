@@ -5,8 +5,12 @@ import { useSearchParams } from 'react-router-dom';
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
 import {
+  buildCompareTabPath,
+  COMPARE_JOB_ID_PARAM,
+  COMPARE_PRODUCT_URL_PARAM,
+} from '@pages/home/constants/compareParams';
+import {
   COMPARE_JOB_STATUS,
-  type CompareEntrySource,
   type CompareJobStage,
   type CompareJobStatus,
   type CompareResult,
@@ -18,22 +22,9 @@ import {
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
 
-import { ROUTES } from '@routes/paths';
-
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import { useLoginGate } from '@hooks/useLoginGate';
-
-/** 진행 중인 비교를 가리키는 URL 쿼리 파라미터 이름 (`/?tab=compare&jobId=xxx`) */
-export const COMPARE_JOB_ID_PARAM = 'jobId';
-
-/**
- *  DeepLinkRoute에서 상품 URL을 복원
- * → URL 쿼리 파라미터에 상품 URL 추가
- * → CompareTab이 읽어 job 생성 요청
- * → job이 생성되면 ?productUrl=...은 지우고 ?jobId=... 추가
- */
-export const COMPARE_PRODUCT_URL_PARAM = 'productUrl';
 
 /** 비교 탭이 지금 무엇을 그려야 하는지 */
 export const COMPARE_VIEW = {
@@ -45,16 +36,6 @@ export const COMPARE_VIEW = {
 } as const;
 
 export type CompareView = (typeof COMPARE_VIEW)[keyof typeof COMPARE_VIEW];
-
-interface StartOptions {
-  /**
-   * 유입 경로 (딥링크·입력창·히스토리·프리셋).
-   *
-   * 확정된 job 생성 API의 request body에는 url만 있어서 서버로 보내지 않는다.
-   * GA 이벤트 파라미터로 쓸 값이며, GA 연동(9단계) 전까지는 아무 데도 소비되지 않는다.
-   */
-  source?: CompareEntrySource;
-}
 
 interface PriceCompareJob {
   jobId: string | null;
@@ -72,7 +53,7 @@ interface PriceCompareJob {
   errorMessage: string | null;
   /** 없는 jobId로 조회한 경우 — 만료 안내로 분기하기 위해 일반 오류와 구분한다 */
   isJobMissing: boolean;
-  start: (url: string, options?: StartOptions) => void;
+  start: (url: string) => void;
   /** 결과·에러 화면을 닫고 입력 화면으로 되돌린다 */
   reset: () => void;
 }
@@ -127,13 +108,13 @@ export const usePriceCompareJob = (): PriceCompareJob => {
   );
 
   const start = useCallback(
-    (url: string, _options: StartOptions = {}) => {
+    (url: string) => {
       // 비로그인이면 로그인 화면으로 보낸다.
       // 이때 로그인 후 복귀할 경로에 상품 URL을 넣어, 돌아왔을 때 비교 탭 입력창에 그 값이 복원되도록 한다
       // 게이트는 기본적으로 게이트가 열린 시점의 주소를 복귀 경로로 저장하는데,
       // 사용자가 입력창에 붙여넣은 값은 React 상태에만 있고 주소(/?tab=compare)에는 없다.
       // 기본 동작에 맡기면 로그인 후 입력창이 빈 채로 돌아오므로 복귀 경로를 직접 만들어 넘긴다.
-      const returnPath = `${ROUTES.HOME}?tab=compare&${COMPARE_PRODUCT_URL_PARAM}=${encodeURIComponent(url)}`;
+      const returnPath = buildCompareTabPath(url);
 
       requireLogin(
         () => {

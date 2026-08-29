@@ -50,11 +50,9 @@ export const restoreDeepLinkUrl = ({
     return null;
   }
 
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
   // 호스트에 점이 없으면 외부 상품 URL이 아니라 앱 경로 오타로 본다 (`/mypagee` 등)
   if (!url.hostname.includes('.')) return null;
 
-  // url.toString()이 아니라 원문을 돌려준다. toString은 인코딩·기본 포트·빈 경로를 다시 손대서
-  // 서버가 스크래핑할 URL의 바이트가 사용자가 넣은 것과 달라진다.
+  // url.toString()이 아니라 원문을 돌려준다. 이 값은 주소창과 입력창에 그대로 보이는 값이라 사용자가 넣은 형태를 유지한다. 서버로 보낼 때의 인코딩은 toCompareRequestUrl이 맞춘다.
   return candidate;
 };

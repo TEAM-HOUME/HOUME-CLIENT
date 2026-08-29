@@ -3,7 +3,10 @@ import {
   COMPARE_VIEW,
 } from '@pages/home/hooks/usePriceCompareJob';
 
-import CompareFallback from './CompareFallback';
+import ActionButton from '@components/button/actionButton/ActionButton';
+import EmptyView from '@components/emptyView/EmptyView';
+import InlineError from '@components/inlineError/InlineError';
+
 import * as styles from './CompareTab.css';
 import CompareResult from './result/CompareResult';
 import CompareResultSkeleton from './result/CompareResultSkeleton';
@@ -19,7 +22,7 @@ const CompareTab = () => {
         {view === COMPARE_VIEW.SEARCH && (
           <CompareSearch
             initialUrl={productUrl ?? undefined}
-            onSubmit={(url: string) => start(url)}
+            onSubmit={start}
           />
         )}
 
@@ -31,22 +34,24 @@ const CompareTab = () => {
         )}
 
         {view === COMPARE_VIEW.EMPTY && (
-          <CompareFallback
-            title="찾는 상품이 없어요"
-            description="다른 URL로 검색해주세요"
-            actionLabel="새로운 링크 검색하기"
-            onAction={reset}
-          />
+          <div className={styles.fallback}>
+            <EmptyView
+              title="찾는 상품이 없어요"
+              description="다른 URL로 검색해주세요"
+            />
+            <ActionButton variant="outlined" size="S" onClick={reset}>
+              새로운 링크 검색하기
+            </ActionButton>
+          </div>
         )}
 
         {view === COMPARE_VIEW.ERROR && (
-          <CompareFallback
-            title={
-              isJobMissing ? '검색 결과가 만료되었어요' : '비교에 실패했어요'
+          <InlineError
+            message={
+              errorMessage ??
+              (isJobMissing ? '검색 결과가 만료되었어요' : '비교에 실패했어요')
             }
-            description={errorMessage ?? '잠시 후 다시 시도해주세요'}
-            actionLabel="새로운 링크 검색하기"
-            onAction={reset}
+            onRetry={reset}
           />
         )}
       </div>

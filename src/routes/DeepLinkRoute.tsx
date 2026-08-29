@@ -1,10 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { COMPARE_PRODUCT_URL_PARAM } from '@pages/home/hooks/usePriceCompareJob';
+import { buildCompareTabPath } from '@pages/home/constants/compareParams';
 import { restoreDeepLinkUrl } from '@pages/home/utils/deepLinkUrl';
 import NotFoundPage from '@pages/notFound/NotFoundPage';
-
-import { ROUTES } from '@routes/paths';
 
 /**
  * `path: '*'`에 걸리는 컴포넌트. 등록된 라우트와 하나도 맞지 않는 주소로 들어왔을 때 렌더된다.
@@ -19,9 +17,7 @@ const DeepLinkRoute = () => {
 
   if (!productUrl) return <NotFoundPage />;
 
-  const compareTabPath = `${ROUTES.HOME}?tab=compare&${COMPARE_PRODUCT_URL_PARAM}=${encodeURIComponent(productUrl)}`;
-
-  return <Navigate to={compareTabPath} replace />;
+  return <Navigate to={buildCompareTabPath(productUrl)} replace />;
 };
 
 export default DeepLinkRoute;

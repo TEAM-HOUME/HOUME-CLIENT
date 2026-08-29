@@ -1,9 +1,9 @@
 // ------------------------------
 // restoreDeepLinkUrl 검증 케이스
 // ------------------------------
-// 실행: node --experimental-strip-types src/pages/compare/utils/deepLinkUrl.check.ts
+// 실행: node --experimental-strip-types src/pages/home/utils/deepLinkUrl.check.ts
 // (레포에 테스트 러너가 없어 node의 타입 제거 실행으로 돌린다. 러너를 도입하면 그 API로 옮긴다.)
-// tsconfig.app.json이 src/**/*.test.ts를 exclude하므로 pnpm build에는 포함되지 않는다.
+// 아무 데서도 import하지 않으므로 vite 번들에는 안 들어간다. 다만 tsc -b의 타입 검사 대상에는 포함된다.
 
 import { restoreDeepLinkUrl } from './deepLinkUrl.ts';
 
