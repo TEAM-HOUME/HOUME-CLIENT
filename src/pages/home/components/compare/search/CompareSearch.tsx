@@ -1,12 +1,42 @@
+import { useUserStore } from '@store/useUserStore';
+
 import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
 import * as styles from './CompareSearch.css';
+import { getSearchDayCountFromCreatedAt } from '../utils/getSearchDayCount';
 
-const MOCK_RECENT_ITEMS = [
-  { name: '제품 이름', searchDayCount: 0 },
-  { name: '제품 이름', searchDayCount: 0 },
-  { name: '제품 이름', searchDayCount: 0 },
+// GET /api/v1/price-compare/jobs/history 응답 data.items[] 형태 (limit=3)
+const PRICE_COMPARE_HISTORY_LIMIT = 3;
+
+const MOCK_PRICE_COMPARE_HISTORY = [
+  {
+    sourceUrl: 'https://store.ohou.se/goods/3603649',
+    thumbnailUrl:
+      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-393443018530944.jpg',
+    title: '노엘 반자동 리프트업 통수납 침대프레임 SS/Q',
+    price: 149_000,
+    currency: 'KRW',
+    createdAt: '2026-08-23T14:02:11+09:00',
+  },
+  {
+    sourceUrl: 'https://store.ohou.se/goods/2981274',
+    thumbnailUrl:
+      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+    title: '플렌토 속 깊은 5단 서랍장 800',
+    price: null,
+    currency: null,
+    createdAt: '2026-08-20T09:15:44+09:00',
+  },
+  {
+    sourceUrl: 'https://store.ohou.se/goods/1234567',
+    thumbnailUrl:
+      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+    title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
+    price: 89_000,
+    currency: 'KRW',
+    createdAt: '2026-08-18T10:00:00+09:00',
+  },
 ] as const;
 
 // GET /api/v1/price-compare/presets 응답 data 형태
@@ -26,8 +56,17 @@ const MOCK_PRICE_COMPARE_PRESETS = {
 } as const;
 
 const CompareSearch = () => {
+  const isLoggedIn = !!useUserStore((state) => state.accessToken);
+
+  // TODO: API 연동 시 GET /api/v1/price-compare/jobs/history?limit=3
+  const historyItems = isLoggedIn
+    ? MOCK_PRICE_COMPARE_HISTORY.slice(0, PRICE_COMPARE_HISTORY_LIMIT)
+    : [];
+
   const handleSubmit = (_value: string) => {};
-  const handleRecentClick = () => {};
+  const handleHistoryClick = (_sourceUrl: string) => {
+    // TODO: POST /jobs { url: sourceUrl } — 로그인 게이트는 별도 처리
+  };
   const handlePresetClick = (_presetId: number) => {};
 
   return (
@@ -41,13 +80,14 @@ const CompareSearch = () => {
       <div className={styles.contents}>
         <LinkInput onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
-          {MOCK_RECENT_ITEMS.map((item, index) => (
-            <li key={`recent-${index}`}>
+          {historyItems.map((item) => (
+            <li key={item.sourceUrl}>
               <SearchItem
                 type="recent"
-                name={item.name}
-                searchDayCount={item.searchDayCount}
-                onClick={handleRecentClick}
+                name={item.title}
+                imageSrc={item.thumbnailUrl}
+                searchDayCount={getSearchDayCountFromCreatedAt(item.createdAt)}
+                onClick={() => handleHistoryClick(item.sourceUrl)}
               />
             </li>
           ))}
