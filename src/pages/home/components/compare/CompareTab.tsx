@@ -10,14 +10,17 @@ import CompareResultSkeleton from './result/CompareResultSkeleton';
 import CompareSearch from './search/CompareSearch';
 
 const CompareTab = () => {
-  const { view, errorMessage, isJobMissing, start, reset } =
+  const { view, productUrl, errorMessage, isJobMissing, start, reset } =
     usePriceCompareJob();
 
   return (
     <section className={styles.container}>
       <div className={styles.content}>
         {view === COMPARE_VIEW.SEARCH && (
-          <CompareSearch onSubmit={(url: string) => start(url)} />
+          <CompareSearch
+            initialUrl={productUrl ?? undefined}
+            onSubmit={(url: string) => start(url)}
+          />
         )}
 
         {view === COMPARE_VIEW.LOADING && <CompareResultSkeleton />}

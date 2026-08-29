@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
 import {
-  COMPARE_ENTRY_SOURCE,
   COMPARE_JOB_STATUS,
   type CompareEntrySource,
   type CompareJobStage,
@@ -18,6 +17,12 @@ import {
   getServerErrorMessage,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
+
+import { ROUTES } from '@routes/paths';
+
+import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
+
+import { useLoginGate } from '@hooks/useLoginGate';
 
 /** 진행 중인 비교를 가리키는 URL 쿼리 파라미터 이름 (`/?tab=compare&jobId=xxx`) */
 export const COMPARE_JOB_ID_PARAM = 'jobId';
@@ -49,12 +54,12 @@ interface StartOptions {
    * GA 이벤트 파라미터로 쓸 값이며, GA 연동(9단계) 전까지는 아무 데도 소비되지 않는다.
    */
   source?: CompareEntrySource;
-  /** true면 히스토리에 쌓지 않고 현재 항목을 바꾼다. 딥링크 진입 시 사용 */
-  replace?: boolean;
 }
 
 interface PriceCompareJob {
   jobId: string | null;
+  /** 입력창에 채워둘 상품 URL. 딥링크 진입·로그인 복귀로 주소에 실려 온 값 */
+  productUrl: string | null;
   view: CompareView;
   /** 진행 중일 때의 파이프라인 단계 — 로딩 뷰의 문구가 이 값에 매핑된다 */
   stage: CompareJobStage | null;
@@ -85,7 +90,9 @@ interface PriceCompareJob {
 export const usePriceCompareJob = (): PriceCompareJob => {
   const [searchParams, setSearchParams] = useSearchParams();
   const jobId = searchParams.get(COMPARE_JOB_ID_PARAM);
+  const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
 
+  const { requireLogin } = useLoginGate();
   const {
     mutate: createJob,
     isPending: isCreatingJob,
@@ -120,53 +127,28 @@ export const usePriceCompareJob = (): PriceCompareJob => {
   );
 
   const start = useCallback(
-    (url: string, options: StartOptions = {}) => {
-      /**
-       * 구조분해할당 + 기본값
-       * 다음과 같은 세 가지 케이스
-       *
-       * 1. start('https://29cm.co.kr/p/1')
-       * // →  source='input',    replace=false
-       *
-       * 2. start('https://29cm.co.kr/p/1', { source: 'deeplink', replace: true })
-       * // →  source='deeplink', replace=true
-       *
-       * 3. start('https://29cm.co.kr/p/1', { source: 'history' })
-       * // →  source='history',  replace=false  ← replace만 기본값
-       *
-       * +)
-       * - source는 서버로 나가지 않음 (request body에 url만 있음).
-       * - GA 연동 때 사용자 진입 경로를 여기서 꺼내 사용
-       */
-      const { replace = false } = options;
+    (url: string, _options: StartOptions = {}) => {
+      // 비로그인이면 로그인 화면으로 보낸다.
+      // 이때 로그인 후 복귀할 경로에 상품 URL을 넣어, 돌아왔을 때 비교 탭 입력창에 그 값이 복원되도록 한다
+      // 게이트는 기본적으로 게이트가 열린 시점의 주소를 복귀 경로로 저장하는데,
+      // 사용자가 입력창에 붙여넣은 값은 React 상태에만 있고 주소(/?tab=compare)에는 없다.
+      // 기본 동작에 맡기면 로그인 후 입력창이 빈 채로 돌아오므로 복귀 경로를 직접 만들어 넘긴다.
+      const returnPath = `${ROUTES.HOME}?tab=compare&${COMPARE_PRODUCT_URL_PARAM}=${encodeURIComponent(url)}`;
 
-      createJob(
-        { url },
-        { onSuccess: (response) => writeJobId(response.jobId, replace) }
+      requireLogin(
+        () => {
+          createJob(
+            { url },
+            // jobId는 항상 replace로 쓴다. 뒤로가기 목적지는 이 시점 이전 항목 (입력창에서 제출했으면 입력 화면, 딥링크로 들어왔으면 직전에 보던 사이트)이어야 한다
+            { onSuccess: (response) => writeJobId(response.jobId, true) }
+          );
+        },
+        LOGIN_ENTRY_ROUTE.COMPARE_SEARCH,
+        returnPath
       );
     },
-    [createJob, writeJobId]
+    [createJob, requireLogin, writeJobId]
   );
-
-  // 딥링크로 들어오면 주소에 ?productUrl= 만 쿼리로 붙어있는 상태
-  // 그 URL로 job 생성 요청이 시작됨
-  //
-  // job이 생성되면 ?productUrl= 이 지워져서 이 effect는 다시 실행 X
-  // 다만 url 쿼리가 지워지는 시점이 POST 응답을 받은 뒤라, 응답을 기다리는 동안 start가 새 함수로 다시 만들어지면
-  // effect가 한 번 더 돌아 POST가 두 번 요청됨. ref로 해당 케이스 방어
-  const hasStartedProductUrl = useRef(false);
-  const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
-
-  useEffect(() => {
-    if (hasStartedProductUrl.current) return;
-    if (!productUrl || jobId) return;
-
-    hasStartedProductUrl.current = true;
-    start(productUrl, {
-      source: COMPARE_ENTRY_SOURCE.DEEPLINK,
-      replace: true,
-    });
-  }, [productUrl, jobId, start]);
 
   const reset = useCallback(() => {
     resetCreateJob();
@@ -186,6 +168,7 @@ export const usePriceCompareJob = (): PriceCompareJob => {
 
   return {
     jobId,
+    productUrl,
     view,
     stage: data?.currentStage ?? null,
     result: data?.status === COMPARE_JOB_STATUS.DONE ? data.result : null,

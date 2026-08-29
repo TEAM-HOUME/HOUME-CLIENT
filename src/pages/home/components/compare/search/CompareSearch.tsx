@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
@@ -26,11 +28,18 @@ const MOCK_PRICE_COMPARE_PRESETS = {
 } as const;
 
 interface CompareSearchProps {
+  /**
+   * 입력창에 처음 채워둘 상품 URL.
+   * 딥링크로 진입했거나 로그인 게이트를 거쳐 돌아온 경우 주소의 productUrl이 들어온다.
+   */
+  initialUrl?: string;
   /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
   onSubmit: (url: string) => void;
 }
 
-const CompareSearch = ({ onSubmit }: CompareSearchProps) => {
+const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
+  const [url, setUrl] = useState(initialUrl);
+
   const handleSubmit = (value: string) => onSubmit(value);
   const handleRecentClick = () => {};
   const handlePresetClick = (_presetId: number) => {};
@@ -44,7 +53,7 @@ const CompareSearch = ({ onSubmit }: CompareSearchProps) => {
         <p className={styles.description}>설명을 입력하는 공간이에요.</p>
       </header>
       <div className={styles.contents}>
-        <LinkInput onSubmit={handleSubmit} />
+        <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
           {MOCK_RECENT_ITEMS.map((item, index) => (
             <li key={`recent-${index}`}>
