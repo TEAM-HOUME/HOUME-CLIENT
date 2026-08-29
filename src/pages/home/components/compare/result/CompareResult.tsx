@@ -86,6 +86,7 @@ const CompareResult = ({ onSearchNewLink }: CompareResultProps) => {
             color="inverse"
             size="M"
             leftIcon="Search"
+            onClick={onSearchNewLink}
           >
             새로운 링크 검색하기
           </ActionButton>

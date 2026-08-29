@@ -20,7 +20,9 @@ const CompareTab = () => {
     <section className={styles.container}>
       <div className={styles.content}>
         {view === COMPARE_VIEW.SEARCH && (
+          /* key: 뒤로가기 등으로 주소의 productUrl이 바뀌면 입력창도 그 값으로 다시 시작한다 */
           <CompareSearch
+            key={productUrl ?? ''}
             initialUrl={productUrl ?? undefined}
             onSubmit={start}
           />
