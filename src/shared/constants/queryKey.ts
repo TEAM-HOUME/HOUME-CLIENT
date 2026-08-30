@@ -37,12 +37,15 @@ export const queryKeys = {
   // 이미지 설정 (온보딩 퍼널)
   imageSetup: {
     all: ['imageSetup'] as const,
+    /** 필터 조건이 다른 도면 목록 전체를 한 번에 무효화할 때 쓰는 prefix */
+    houseTemplatesAll: () =>
+      [...queryKeys.imageSetup.all, 'houseTemplates'] as const,
     houseTemplates: (params: {
       size?: number;
       residenceType?: string[];
       layoutType?: string[];
       equilibrium?: string[];
-    }) => [...queryKeys.imageSetup.all, 'houseTemplates', params] as const,
+    }) => [...queryKeys.imageSetup.houseTemplatesAll(), params] as const,
     houseTemplateDetail: (floorPlanId: number) =>
       [
         ...queryKeys.imageSetup.all,
@@ -106,6 +109,13 @@ export const queryKeys = {
     list: (size?: number) => [...queryKeys.styles.all, 'list', size] as const,
     detail: (styleId: number) =>
       [...queryKeys.styles.all, 'detail', styleId] as const,
+  },
+
+  // 가격 비교(C-1)
+  compare: {
+    all: ['compare'] as const,
+    jobStatus: (jobId: string) =>
+      [...queryKeys.compare.all, 'jobStatus', jobId] as const,
   },
 
   // 회원가입: 랜덤 닉네임

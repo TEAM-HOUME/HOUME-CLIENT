@@ -173,12 +173,13 @@ export const router = createBrowserRouter([
         children: protectedRoutes,
       },
       {
+        // 등록된 라우트와 하나도 맞지 않는 주소 — 딥링크(houme.kr/{상품 URL})인지 판별해 비교 탭으로 보내거나 NotFound를 띄운다
         path: '*',
         lazy: async () => {
-          const { default: NotFoundPage } = await import(
-            '@pages/notFound/NotFoundPage'
+          const { default: DeepLinkRoute } = await import(
+            '@routes/DeepLinkRoute'
           );
-          return { Component: NotFoundPage };
+          return { Component: DeepLinkRoute };
         },
       },
     ],
