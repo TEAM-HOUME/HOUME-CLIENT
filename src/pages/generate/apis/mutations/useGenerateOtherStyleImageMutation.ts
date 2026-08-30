@@ -52,6 +52,10 @@ export const useGenerateOtherStyleImageMutation = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.imageSetup.recentFloorPlan(),
       });
+      // 도면 목록 그리드의 '최근 생성됨' 뱃지(isLatest)도 갱신
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.imageSetup.houseTemplatesAll(),
+      });
     },
   });
 };

@@ -10,6 +10,7 @@ export const LOGIN_ENTRY_ROUTE = {
   PRODUCT_CARD_SITE: 'product_card_site',
   PRODUCT_LIST_SAVE: 'product_list_save',
   PRODUCT_LIST_SITE: 'product_list_site',
+  COMPARE_SEARCH: 'compare_search',
 } as const;
 
 export type LoginEntryRoute =

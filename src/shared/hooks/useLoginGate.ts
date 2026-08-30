@@ -25,11 +25,19 @@ export const useLoginGate = () => {
   const navigate = useNavigate();
 
   const requireLogin = useCallback(
-    (action: () => void, entryRoute?: LoginEntryRoute) => {
+    (
+      action: () => void,
+      entryRoute?: LoginEntryRoute,
+      /** 로그인 후 복귀할 경로. 생략하면 현재 주소로 돌아온다.
+       *  현재 주소에 없는 값(사용자가 입력창에 입력한 값 등)을 복귀 시 살려야 할 때 넘긴다. ex) 가격비교탭에서 사용자가 입력창에 입력한 값을 URL 쿼리에 넣어 복귀해야 할 때 */
+      redirectPath?: string
+    ) => {
       const isLoggedIn = !!useUserStore.getState().accessToken;
 
       if (!isLoggedIn) {
-        setLoginRedirect(window.location.pathname + window.location.search);
+        setLoginRedirect(
+          redirectPath ?? window.location.pathname + window.location.search
+        );
         if (entryRoute) {
           persistLoginEntryRoute(entryRoute);
         } else {

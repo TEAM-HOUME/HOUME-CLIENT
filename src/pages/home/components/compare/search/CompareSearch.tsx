@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { useUserStore } from '@store/useUserStore';
 
 import LinkInput from '@components/linkInput/LinkInput';
@@ -55,7 +57,18 @@ const MOCK_PRICE_COMPARE_PRESETS = {
   ],
 } as const;
 
-const CompareSearch = () => {
+interface CompareSearchProps {
+  /**
+   * 입력창에 처음 채워둘 상품 URL.
+   * 딥링크로 진입했거나 로그인 게이트를 거쳐 돌아온 경우 주소의 productUrl이 들어온다.
+   */
+  initialUrl?: string;
+  /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
+  onSubmit: (url: string) => void;
+}
+
+const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
+  const [url, setUrl] = useState(initialUrl);
   const isLoggedIn = !!useUserStore((state) => state.accessToken);
 
   // TODO: API 연동 시 GET /api/v1/price-compare/jobs/history?limit=3
@@ -63,10 +76,8 @@ const CompareSearch = () => {
     ? MOCK_PRICE_COMPARE_HISTORY.slice(0, PRICE_COMPARE_HISTORY_LIMIT)
     : [];
 
-  const handleSubmit = (_value: string) => {};
-  const handleHistoryClick = (_sourceUrl: string) => {
-    // TODO: POST /jobs { url: sourceUrl } — 로그인 게이트는 별도 처리
-  };
+  const handleSubmit = (value: string) => onSubmit(value);
+  const handleHistoryClick = (sourceUrl: string) => onSubmit(sourceUrl);
   const handlePresetClick = (_presetId: number) => {};
 
   return (
@@ -78,7 +89,7 @@ const CompareSearch = () => {
         <p className={styles.description}>설명을 입력하는 공간이에요.</p>
       </header>
       <div className={styles.contents}>
-        <LinkInput onSubmit={handleSubmit} />
+        <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
           {historyItems.map((item) => (
             <li key={item.sourceUrl}>

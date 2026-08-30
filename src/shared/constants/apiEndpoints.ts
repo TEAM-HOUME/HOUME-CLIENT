@@ -64,4 +64,8 @@ export const API_ENDPOINT = {
     STYLE_LIST: '/api/v1/other-styles',
     STYLE_DETAIL: (styleId: number) => `/api/v1/other-styles/${styleId}`,
   },
+  COMPARE: {
+    CREATE_JOB: '/api/v1/price-compare/jobs', // POST 비교 job 생성 → jobId 반환 (202)
+    JOB_STATUS: (jobId: string) => `/api/v1/price-compare/jobs/${jobId}`, // GET 진행 단계·결과 조회 (폴링 대상)
+  },
 } as const;
