@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+import { useCompareHistoryQuery } from '@pages/home/apis/queries/useCompareHistoryQuery';
+import { useComparePresetsQuery } from '@pages/home/apis/queries/useComparePresetsQuery';
+
 import { useUserStore } from '@store/useUserStore';
 
 import LinkInput from '@components/linkInput/LinkInput';
@@ -7,55 +10,6 @@ import SearchItem from '@components/searchItem/SearchItem';
 
 import * as styles from './CompareSearch.css';
 import { getSearchDayCount } from '../utils/getSearchDayCount';
-
-// GET /api/v1/price-compare/jobs/history 응답 data.items[] 형태 (limit=3)
-const PRICE_COMPARE_HISTORY_LIMIT = 3;
-
-const MOCK_PRICE_COMPARE_HISTORY = [
-  {
-    sourceUrl: 'https://store.ohou.se/goods/3603649',
-    thumbnailUrl:
-      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-393443018530944.jpg',
-    title: '노엘 반자동 리프트업 통수납 침대프레임 SS/Q',
-    price: 149_000,
-    currency: 'KRW',
-    createdAt: '2026-08-23T14:02:11+09:00',
-  },
-  {
-    sourceUrl: 'https://store.ohou.se/goods/2981274',
-    thumbnailUrl:
-      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
-    title: '플렌토 속 깊은 5단 서랍장 800',
-    price: null,
-    currency: null,
-    createdAt: '2026-08-20T09:15:44+09:00',
-  },
-  {
-    sourceUrl: 'https://store.ohou.se/goods/1234567',
-    thumbnailUrl:
-      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
-    title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
-    price: 89_000,
-    currency: 'KRW',
-    createdAt: '2026-08-18T10:00:00+09:00',
-  },
-] as const;
-
-// GET /api/v1/price-compare/presets 응답 data 형태
-const MOCK_PRICE_COMPARE_PRESETS = {
-  presets: [
-    {
-      presetId: 1,
-      thumbnailUrl: 'https://cdn.ohou.se/thumb/999999.jpg',
-      title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
-    },
-    {
-      presetId: 2,
-      thumbnailUrl: null,
-      title: '제품 이름',
-    },
-  ],
-} as const;
 
 interface CompareSearchProps {
   /**
@@ -65,20 +19,32 @@ interface CompareSearchProps {
   initialUrl?: string;
   /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
   onSubmit: (url: string) => void;
+  /** 히스토리 클릭 시 주소에 productUrl을 넣고 입력창을 채운다 */
+  onSelectUrl: (url: string) => void;
+  /** 프리셋 클릭 시 고정 결과 조회를 시작한다 */
+  onSelectPreset: (presetId: number) => void;
 }
 
-const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
+const CompareSearch = ({
+  initialUrl = '',
+  onSubmit,
+  onSelectUrl,
+  onSelectPreset,
+}: CompareSearchProps) => {
   const [url, setUrl] = useState(initialUrl);
   const isLoggedIn = !!useUserStore((state) => state.accessToken);
 
-  // TODO: API 연동 시 GET /api/v1/price-compare/jobs/history?limit=3
-  const historyItems = isLoggedIn
-    ? MOCK_PRICE_COMPARE_HISTORY.slice(0, PRICE_COMPARE_HISTORY_LIMIT)
-    : [];
+  const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
+  const { data: presetsData } = useComparePresetsQuery();
+
+  // 비로그인이면 캐시에 이전 로그인 사용자의 히스토리가 남아있어도 절대 안 보여준다.
+  // useCompareHistoryQuery의 캐시 삭제는 정리용일 뿐이라 화면 정확성은 이 가드가 최종 보장한다
+  const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
+  const presets = presetsData?.presets ?? [];
 
   const handleSubmit = (value: string) => onSubmit(value);
-  const handleHistoryClick = (sourceUrl: string) => onSubmit(sourceUrl);
-  const handlePresetClick = (_presetId: number) => {};
+  const handleHistoryClick = (sourceUrl: string) => onSelectUrl(sourceUrl);
+  const handlePresetClick = (presetId: number) => onSelectPreset(presetId);
 
   return (
     <div className={styles.container}>
@@ -96,13 +62,13 @@ const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
               <SearchItem
                 type="recent"
                 name={item.title}
-                imageSrc={item.thumbnailUrl}
+                imageSrc={item.thumbnailUrl ?? undefined}
                 searchDayCount={getSearchDayCount(item.createdAt)}
                 onClick={() => handleHistoryClick(item.sourceUrl)}
               />
             </li>
           ))}
-          {MOCK_PRICE_COMPARE_PRESETS.presets.map((preset) => (
+          {presets.map((preset) => (
             <li key={preset.presetId}>
               <SearchItem
                 type="popular"

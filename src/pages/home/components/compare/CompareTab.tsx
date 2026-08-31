@@ -1,7 +1,4 @@
-import {
-  usePriceCompareJob,
-  COMPARE_VIEW,
-} from '@pages/home/hooks/usePriceCompareJob';
+import { useCompareTab, COMPARE_VIEW } from '@pages/home/hooks/useCompareTab';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import EmptyView from '@components/emptyView/EmptyView';
@@ -13,8 +10,16 @@ import CompareResultSkeleton from './result/CompareResultSkeleton';
 import CompareSearch from './search/CompareSearch';
 
 const CompareTab = () => {
-  const { view, productUrl, errorMessage, isJobMissing, start, reset } =
-    usePriceCompareJob();
+  const {
+    view,
+    productUrl,
+    errorMessage,
+    start,
+    selectProductUrl,
+    selectPreset,
+    presetResult,
+    reset,
+  } = useCompareTab();
 
   return (
     <section className={styles.container}>
@@ -25,14 +30,19 @@ const CompareTab = () => {
             key={productUrl ?? ''}
             initialUrl={productUrl ?? undefined}
             onSubmit={start}
+            onSelectUrl={selectProductUrl}
+            onSelectPreset={selectPreset}
           />
         )}
 
         {view === COMPARE_VIEW.LOADING && <CompareResultSkeleton />}
 
-        {/* TODO: 서버 응답을 ProductCard 형태로 바꿔 result를 props로 넘기기. 지금 CompareResult는 목데이터 */}
+        {/* TODO: job 결과(result)도 ProductCard 형태로 바꿔 props로 넘기기. 지금은 프리셋만 실데이터, job은 UI 목데이터 */}
         {view === COMPARE_VIEW.RESULT && (
-          <CompareResult onSearchNewLink={reset} />
+          <CompareResult
+            onSearchNewLink={reset}
+            presetResult={presetResult ?? undefined}
+          />
         )}
 
         {view === COMPARE_VIEW.EMPTY && (
@@ -49,10 +59,7 @@ const CompareTab = () => {
 
         {view === COMPARE_VIEW.ERROR && (
           <InlineError
-            message={
-              errorMessage ??
-              (isJobMissing ? '검색 결과가 만료되었어요' : '비교에 실패했어요')
-            }
+            message={errorMessage ?? '비교에 실패했어요'}
             onRetry={reset}
           />
         )}
