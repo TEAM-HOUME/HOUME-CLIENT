@@ -12,8 +12,11 @@ import {
   COMPARE_QUALITY,
   COMPARE_SOURCE,
   COMPARE_SOURCE_STATUS,
+  type CompareHistoryResponse,
   type CompareJobStatusResponse,
   type CompareOriginalProduct,
+  type ComparePresetResult,
+  type ComparePresetsResponse,
   type CompareSimilarProduct,
 } from '@pages/home/types/compare';
 
@@ -347,4 +350,105 @@ export const MOCK_COMPARE_JOB_FAILED: CompareJobStatusResponse = {
   errorCode: COMPARE_JOB_ERROR_CODE.PAGE_LOAD_FAILED,
   errorMessage: '상품 페이지를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
   result: null,
+};
+
+/** GET /api/v1/price-compare/presets/{presetId} — 명세 성공 예시. 검색 화면 presetId=1과 대응 */
+export const MOCK_COMPARE_PRESET_1: ComparePresetResult = {
+  originalProduct: {
+    sourceUrl: 'https://www.ohou.se/productions/999999/selling',
+    title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
+    thumbnailUrl: 'https://cdn.ohou.se/thumb/999999.jpg',
+    brand: null,
+    price: 299000,
+    currency: 'KRW',
+  },
+  similarProducts: [
+    {
+      source: COMPARE_SOURCE.EBAY,
+      productId: 'A',
+      title: 'Storage bed frame no headboard - A',
+      imageUrl: 'https://example.com/a.jpg',
+      price: 300000,
+      currency: 'KRW',
+      siteName: 'eBay',
+      productUrl: 'https://example.com/a',
+      priceUpdatedAt: '2026-08-24T05:10:00Z',
+    },
+  ],
+  totalCount: 1,
+};
+
+/** 검색 화면 presetId=2(썸네일 없음)와 대응 */
+export const MOCK_COMPARE_PRESET_2: ComparePresetResult = {
+  originalProduct: {
+    sourceUrl: 'https://www.ohou.se/productions/888888/selling',
+    title: '제품 이름',
+    thumbnailUrl: null,
+    brand: null,
+    price: 89000,
+    currency: 'KRW',
+  },
+  similarProducts: [
+    {
+      source: COMPARE_SOURCE.CATALOG,
+      productId: 'B',
+      title: '비슷한 수납 침대 프레임',
+      imageUrl: 'https://cdn.houme.kr/products/preset-2.jpg',
+      price: 79000,
+      currency: 'KRW',
+      siteName: '하우미',
+      productUrl: 'https://houme.kr/products/preset-2',
+      priceUpdatedAt: '2026-08-24T05:10:00Z',
+    },
+  ],
+  totalCount: 1,
+};
+
+/** GET /api/v1/price-compare/jobs/history — 검색 화면 최근 비교 목록용 */
+export const MOCK_COMPARE_HISTORY: CompareHistoryResponse = {
+  items: [
+    {
+      sourceUrl: 'https://store.ohou.se/goods/3603649',
+      thumbnailUrl:
+        'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-393443018530944.jpg',
+      title: '노엘 반자동 리프트업 통수납 침대프레임 SS/Q',
+      price: 149_000,
+      currency: 'KRW',
+      createdAt: '2026-08-23T14:02:11+09:00',
+    },
+    {
+      sourceUrl: 'https://store.ohou.se/goods/2981274',
+      thumbnailUrl:
+        'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+      title: '플렌토 속 깊은 5단 서랍장 800',
+      price: null,
+      currency: null,
+      createdAt: '2026-08-20T09:15:44+09:00',
+    },
+    {
+      sourceUrl: 'https://store.ohou.se/goods/1234567',
+      thumbnailUrl:
+        'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+      title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
+      price: 89_000,
+      currency: 'KRW',
+      createdAt: '2026-08-18T10:00:00+09:00',
+    },
+  ],
+};
+
+/** GET /api/v1/price-compare/presets — 검색 화면 프리셋 목록용 */
+export const MOCK_COMPARE_PRESETS: ComparePresetsResponse = {
+  presets: [
+    {
+      presetId: 1,
+      thumbnailUrl: 'https://cdn.ohou.se/thumb/999999.jpg',
+      title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
+    },
+    {
+      presetId: 2,
+      thumbnailUrl: null,
+      title: '제품 이름',
+    },
+  ],
 };
