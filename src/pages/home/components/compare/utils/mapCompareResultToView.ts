@@ -1,5 +1,5 @@
 import type {
-  ComparePresetResult,
+  ComparePresetResponse,
   CompareResult,
 } from '@pages/home/types/compare';
 
@@ -38,10 +38,11 @@ export interface CompareResultViewModel {
  * 화면이 쓰는 필드만 맞춘다. job의 quality·similarityScore 등은 여기서 버린다.
  */
 export const mapCompareResultToView = (
-  result: CompareResult | ComparePresetResult
+  result: CompareResult | ComparePresetResponse
 ): CompareResultViewModel => {
   const { originalProduct, similarProducts, totalCount } = result;
   const originalPrice = originalProduct.price;
+  const originalCurrency = originalProduct.currency;
 
   return {
     searchedProduct: {
@@ -57,26 +58,34 @@ export const mapCompareResultToView = (
             }
           : undefined,
     },
-    similarProducts: similarProducts.map((item, index) => ({
-      id: index + 1,
-      product: {
-        brand: item.siteName ?? undefined,
-        title: item.title,
-        imageUrl: item.imageUrl ?? undefined,
-      },
-      // TODO: item.currency 미반영. KRW가 아닌 항목(eBay 등)도 원화처럼 표시된다 —
-      // ProductCard/PriceInfo가 통화를 안 받는 구조라 함께 손봐야 한다
-      price: {
-        original: item.price,
-      },
-      save: NOOP_SAVE,
-      link: {
-        href: item.productUrl,
-        label: item.siteName ?? undefined,
-      },
-      benefitAmount:
-        originalPrice != null ? Math.max(0, originalPrice - item.price) : 0,
-    })),
+    similarProducts: similarProducts.map((item, index) => {
+      // TODO: PriceInfo/ProductCard가 통화를 안 받아 KRW가 아닌 금액도 원화처럼 표시된다.
+      // 환율 변환 없이 다른 통화끼리 빼면 절감액이 틀리므로, 통화가 같을 때만 계산한다.
+      const canCompareBenefit =
+        originalPrice != null &&
+        originalCurrency != null &&
+        originalCurrency === item.currency;
+
+      return {
+        id: index + 1,
+        product: {
+          brand: item.siteName ?? undefined,
+          title: item.title,
+          imageUrl: item.imageUrl ?? undefined,
+        },
+        price: {
+          original: item.price,
+        },
+        save: NOOP_SAVE,
+        link: {
+          href: item.productUrl,
+          label: item.siteName ?? undefined,
+        },
+        benefitAmount: canCompareBenefit
+          ? Math.max(0, originalPrice - item.price)
+          : 0,
+      };
+    }),
     productCount: totalCount,
   };
 };
