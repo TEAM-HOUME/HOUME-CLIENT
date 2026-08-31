@@ -116,6 +116,12 @@ export const queryKeys = {
     all: ['compare'] as const,
     jobStatus: (jobId: string) =>
       [...queryKeys.compare.all, 'jobStatus', jobId] as const,
+    historyAll: () => [...queryKeys.compare.all, 'history'] as const,
+    history: (limit: number) =>
+      [...queryKeys.compare.historyAll(), limit] as const,
+    presetList: () => [...queryKeys.compare.all, 'presetList'] as const,
+    presetResult: (presetId: number) =>
+      [...queryKeys.compare.all, 'presetResult', presetId] as const,
   },
 
   // 회원가입: 랜덤 닉네임

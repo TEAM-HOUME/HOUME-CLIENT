@@ -15,6 +15,11 @@ export const COMPARE_JOB_ID_PARAM = 'jobId';
  */
 export const COMPARE_PRODUCT_URL_PARAM = 'productUrl';
 
+/**
+ * 프리셋 고정 결과를 가리키는 URL 쿼리 파라미터 이름 (`/?tab=compare&presetId=1`)
+ */
+export const COMPARE_PRESET_ID_PARAM = 'presetId';
+
 const TAB_PARAM = 'tab';
 const COMPARE_TAB: HomeTab = 'compare';
 
