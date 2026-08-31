@@ -36,6 +36,7 @@ export const getCompareHistory = async (
 
 /**
  * @param enabled 로그인 여부로 켠다. 비로그인이면 요청하지 않는다.
+ * queryKey에 userId를 넣지 않는다 — mypage 등과 같이 토큰 기준 응답 + 로그아웃 시 캐시 정리에 맡긴다.
  */
 export const useCompareHistoryQuery = (
   enabled: boolean,
@@ -45,12 +46,13 @@ export const useCompareHistoryQuery = (
 
   // 토큰 만료로 인한 강제 로그아웃은 axiosInstance의 인터셉터가 clearUser()만 하고
   // queryClient는 안 지운다(명시적 로그아웃 mutation만 clear() 함). enabled(=로그인 여부)가
-  // false인 동안엔 항상 캐시를 지워서, 로그인 상태를 잃은 채로 이 훅이 다시 마운트되는
-  // 경우(예: 결과 화면에서 세션이 끊긴 뒤 검색 화면으로 돌아옴)에도 이전 캐시가 안 남게 한다.
-  // 그래도 화면에 표시되는 값의 최종 방어는 CompareSearch의 isLoggedIn 가드가 한다 —
-  // 이 캐시 삭제는 정리용이지, 이것만으로 화면 정확성을 보장하지 않는다.
+  // false인 동안엔 진행 중 요청을 취소하고 캐시를 지운다.
+  // 화면 정확성의 최종 방어는 CompareSearch의 isLoggedIn 가드가 한다.
   useEffect(() => {
     if (!enabled) {
+      void queryClient.cancelQueries({
+        queryKey: queryKeys.compare.historyAll(),
+      });
       queryClient.removeQueries({ queryKey: queryKeys.compare.historyAll() });
     }
   }, [enabled, queryClient]);
