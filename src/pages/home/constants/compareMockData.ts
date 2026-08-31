@@ -15,7 +15,7 @@ import {
   type CompareHistoryResponse,
   type CompareJobStatusResponse,
   type CompareOriginalProduct,
-  type ComparePresetResult,
+  type ComparePresetResponse,
   type ComparePresetsResponse,
   type CompareSimilarProduct,
 } from '@pages/home/types/compare';
@@ -353,7 +353,7 @@ export const MOCK_COMPARE_JOB_FAILED: CompareJobStatusResponse = {
 };
 
 /** GET /api/v1/price-compare/presets/{presetId} — 명세 성공 예시. 검색 화면 presetId=1과 대응 */
-export const MOCK_COMPARE_PRESET_1: ComparePresetResult = {
+export const MOCK_COMPARE_PRESET_1: ComparePresetResponse = {
   originalProduct: {
     sourceUrl: 'https://www.ohou.se/productions/999999/selling',
     title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
@@ -379,7 +379,7 @@ export const MOCK_COMPARE_PRESET_1: ComparePresetResult = {
 };
 
 /** 검색 화면 presetId=2(썸네일 없음)와 대응 */
-export const MOCK_COMPARE_PRESET_2: ComparePresetResult = {
+export const MOCK_COMPARE_PRESET_2: ComparePresetResponse = {
   originalProduct: {
     sourceUrl: 'https://www.ohou.se/productions/888888/selling',
     title: '제품 이름',

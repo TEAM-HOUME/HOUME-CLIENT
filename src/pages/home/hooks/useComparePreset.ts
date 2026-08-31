@@ -10,7 +10,7 @@ import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
-import type { ComparePresetResult } from '@pages/home/types/compare';
+import type { ComparePresetResponse } from '@pages/home/types/compare';
 import {
   getServerErrorCode,
   getServerErrorMessage,
@@ -23,7 +23,7 @@ interface ComparePresetFlow {
   /** URL에 presetId가 있으면 true. 탭 view 합성 시 job보다 우선한다 */
   isActive: boolean;
   view: CompareView | null;
-  presetResult: ComparePresetResult | null;
+  presetResult: ComparePresetResponse | null;
   errorCode: number | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 preset 사유(존재하지 않음 등)에 맞는 기본 문구로 채운다 */
@@ -91,7 +91,9 @@ export const useComparePreset = (
 
 const parsePresetId = (value: string | null): number | null => {
   if (value === null || !/^\d+$/.test(value)) return null;
-  return Number(value);
+  const presetId = Number(value);
+  // Number()는 MAX_SAFE_INTEGER를 넘는 정수를 반올림한다 — API/queryKey에 다른 id가 실리면 안 된다
+  return Number.isSafeInteger(presetId) ? presetId : null;
 };
 
 const resolvePresetView = ({

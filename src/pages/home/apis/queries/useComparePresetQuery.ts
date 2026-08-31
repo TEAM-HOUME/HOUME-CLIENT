@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { USE_COMPARE_MOCK } from '@pages/home/apis/compareJobMock';
 import { getMockComparePreset } from '@pages/home/apis/comparePresetMock';
-import type { ComparePresetResult } from '@pages/home/types/compare';
+import type { ComparePresetResponse } from '@pages/home/types/compare';
 import { isComparePresetNotFound } from '@pages/home/utils/compareJobError';
 
 import { HTTPMethod, request } from '@apis/config/request';
@@ -16,11 +16,11 @@ import { queryKeys } from '@constants/queryKey';
  */
 export const getComparePreset = async (
   presetId: number
-): Promise<ComparePresetResult> => {
+): Promise<ComparePresetResponse> => {
   // 서버 API 연동 전 임시 — comparePresetMock.ts와 함께 지운다
   if (USE_COMPARE_MOCK) return getMockComparePreset(presetId);
 
-  return request<ComparePresetResult>({
+  return request<ComparePresetResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.COMPARE.PRESET(presetId),
   });

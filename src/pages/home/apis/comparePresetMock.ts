@@ -5,10 +5,12 @@ import {
   MOCK_COMPARE_PRESET_1,
   MOCK_COMPARE_PRESET_2,
 } from '@pages/home/constants/compareMockData';
-import type { ComparePresetResult } from '@pages/home/types/compare';
+import type { ComparePresetResponse } from '@pages/home/types/compare';
 
 /** 검색 화면 mock 프리셋 id와 같은 키. 없는 id는 명세의 404를 흉내 내 던진다 */
-export const getMockComparePreset = (presetId: number): ComparePresetResult => {
+export const getMockComparePreset = (
+  presetId: number
+): ComparePresetResponse => {
   if (presetId === 1) return MOCK_COMPARE_PRESET_1;
   if (presetId === 2) return MOCK_COMPARE_PRESET_2;
   throw new AxiosError(

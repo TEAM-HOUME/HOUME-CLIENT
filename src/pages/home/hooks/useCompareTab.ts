@@ -10,7 +10,7 @@ import {
 import type { CompareView } from '@pages/home/constants/compareView';
 import { useComparePreset } from '@pages/home/hooks/useComparePreset';
 import { usePriceCompareJob } from '@pages/home/hooks/usePriceCompareJob';
-import type { ComparePresetResult } from '@pages/home/types/compare';
+import type { ComparePresetResponse } from '@pages/home/types/compare';
 
 export {
   COMPARE_VIEW,
@@ -21,7 +21,7 @@ interface CompareTabState {
   view: CompareView;
   productUrl: string | null;
   errorMessage: string | null;
-  presetResult: ComparePresetResult | null;
+  presetResult: ComparePresetResponse | null;
   start: (url: string) => void;
   selectProductUrl: (url: string) => void;
   selectPreset: (presetId: number) => void;

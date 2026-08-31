@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { ComparePresetResult } from '@pages/home/types/compare';
+import type { ComparePresetResponse } from '@pages/home/types/compare';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
@@ -30,7 +30,7 @@ interface CompareResultProps {
    * 프리셋 고정 결과. 있으면 프리셋 API 데이터를 그리고,
    * 없으면 job 결과용 UI 목데이터(mockCompareResult)를 쓴다.
    */
-  presetResult?: ComparePresetResult;
+  presetResult?: ComparePresetResponse;
 }
 
 const CompareResult = ({

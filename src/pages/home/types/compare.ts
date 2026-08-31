@@ -170,15 +170,15 @@ export interface ComparePresetSimilarProduct {
   title: string;
   imageUrl: string | null;
   price: number;
-  /** job의 CompareSimilarProduct와 마찬가지로 eBay 소스면 USD가 올 수 있음(미확인) —
-   * mapCompareResultToView가 이 값을 아직 안 써서 어떤 통화든 원화처럼 표시된다 */
+  /** job의 CompareSimilarProduct와 마찬가지로 eBay 소스면 USD가 올 수 있음(미확인).
+   * ProductCard가 통화를 안 받아 화면 숫자는 원화처럼 보일 수 있다. 절감액은 통화가 같을 때만 계산한다 */
   currency: string;
   siteName: string | null;
   productUrl: string;
   priceUpdatedAt: string;
 }
 
-export interface ComparePresetResult {
+export interface ComparePresetResponse {
   originalProduct: ComparePresetOriginalProduct;
   similarProducts: ComparePresetSimilarProduct[];
   totalCount: number;
