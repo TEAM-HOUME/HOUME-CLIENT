@@ -16,6 +16,15 @@ export const pressable = style({
   ...pressInteraction(0.97, '&:not(:disabled):active'),
 });
 
+export const backdrop = style({
+  position: 'fixed',
+  zIndex: zIndex.backdrop,
+  inset: 0,
+  border: 0,
+  background: 'transparent',
+  padding: 0,
+});
+
 export const menu = style({
   boxSizing: 'border-box',
   position: 'absolute',
