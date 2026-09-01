@@ -4,6 +4,7 @@ import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
 import {
   interactionDurationValues,
+  interactionEasingValues,
   interactionVars,
 } from '@styles/tokens/interaction/tokens.css';
 import { unitVars } from '@styles/tokens/unit.css';
@@ -23,7 +24,7 @@ const opacityFadeBackInEndMs =
 const scaleAnimation = keyframes({
   '0%': {
     transform: 'scale(0.9)',
-    animationTimingFunction: interactionVars.interaction.easing['bezier.back'],
+    animationTimingFunction: interactionEasingValues['bezier.back'],
   },
   [toKeyframePercent(interactionDurationValues.slow)]: {
     transform: 'scale(1)',
@@ -37,18 +38,18 @@ const scaleAnimation = keyframes({
 const opacityAnimation = keyframes({
   '0%': {
     opacity: 0,
-    animationTimingFunction: interactionVars.interaction.easing['bezier.inout'],
+    animationTimingFunction: interactionEasingValues['bezier.inout'],
   },
   [toKeyframePercent(opacityFadeInEndMs)]: {
     opacity: 1,
   },
   [toKeyframePercent(opacityHoldEndMs)]: {
     opacity: 1,
-    animationTimingFunction: interactionVars.interaction.easing['bezier.inout'],
+    animationTimingFunction: interactionEasingValues['bezier.inout'],
   },
   [toKeyframePercent(opacityFadeOutEndMs)]: {
     opacity: 0,
-    animationTimingFunction: interactionVars.interaction.easing['bezier.inout'],
+    animationTimingFunction: interactionEasingValues['bezier.inout'],
   },
   [toKeyframePercent(opacityFadeBackInEndMs)]: {
     opacity: 1,

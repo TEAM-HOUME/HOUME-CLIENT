@@ -21,6 +21,13 @@ export const interactionDurationValues = {
   slowest: 1200,
 } as const;
 
+/** @keyframes 등 CSS 변수 참조를 사용할 수 없는 곳을 위한 easing 원본값 */
+export const interactionEasingValues = {
+  'bezier.out': 'cubic-bezier(0, 0.56, 0.33, 1)',
+  'bezier.inout': 'cubic-bezier(0.59, 0.14, 0.38, 1)',
+  'bezier.back': 'cubic-bezier(0.25, 1.45, 0.65, 1.03)',
+} as const;
+
 export const interactionVars = createGlobalTheme(':root', {
   interaction: {
     duration: {
@@ -32,11 +39,7 @@ export const interactionVars = createGlobalTheme(':root', {
       slower: `${interactionDurationValues.slower}ms`,
       slowest: `${interactionDurationValues.slowest}ms`,
     },
-    easing: {
-      'bezier.out': 'cubic-bezier(0, 0.56, 0.33, 1)',
-      'bezier.inout': 'cubic-bezier(0.59, 0.14, 0.38, 1)',
-      'bezier.back': 'cubic-bezier(0.25, 1.45, 0.65, 1.03)',
-    },
+    easing: interactionEasingValues,
     trigger: {
       tap: 'tap',
       whilePressing: 'whilePressing',
