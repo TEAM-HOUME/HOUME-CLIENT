@@ -25,7 +25,7 @@ const scaleAnimation = keyframes({
     transform: 'scale(0.9)',
     animationTimingFunction: interactionVars.interaction.easing['bezier.back'],
   },
-  [toKeyframePercent(interactionDurationValues.slowest)]: {
+  [toKeyframePercent(interactionDurationValues.slow)]: {
     transform: 'scale(1)',
   },
   '100%': {
