@@ -37,8 +37,7 @@ const CompareSearch = ({
   const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
   const { data: presetsData } = useComparePresetsQuery();
 
-  // 비로그인이면 캐시에 이전 로그인 사용자의 히스토리가 남아있어도 절대 안 보여준다.
-  // useCompareHistoryQuery의 캐시 삭제는 정리용일 뿐이라 화면 정확성은 이 가드가 최종 보장한다
+  // 비로그인이면 캐시에 이전 데이터가 있어도 목록을 그리지 않는다.
   const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
   const presets = presetsData?.presets ?? [];
 
