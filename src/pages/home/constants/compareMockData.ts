@@ -378,23 +378,25 @@ export const MOCK_COMPARE_PRESET_1: ComparePresetResponse = {
   totalCount: 1,
 };
 
-/** 검색 화면 presetId=2(썸네일 없음)와 대응 */
+/** 검색 화면 presetId=2와 대응 */
 export const MOCK_COMPARE_PRESET_2: ComparePresetResponse = {
   originalProduct: {
-    sourceUrl: 'https://www.ohou.se/productions/888888/selling',
-    title: '제품 이름',
-    thumbnailUrl: null,
-    brand: null,
-    price: 89000,
+    sourceUrl: 'https://store.ohou.se/goods/2981274',
+    title: '플렌토 속 깊은 5단 서랍장 800',
+    thumbnailUrl:
+      'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+    brand: '플렌토',
+    price: 189_000,
     currency: 'KRW',
   },
   similarProducts: [
     {
       source: COMPARE_SOURCE.CATALOG,
       productId: 'B',
-      title: '비슷한 수납 침대 프레임',
-      imageUrl: 'https://cdn.houme.kr/products/preset-2.jpg',
-      price: 79000,
+      title: '5단 서랍장 800mm',
+      imageUrl:
+        'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+      price: 175_000,
       currency: 'KRW',
       siteName: '하우미',
       productUrl: 'https://houme.kr/products/preset-2',
@@ -447,8 +449,9 @@ export const MOCK_COMPARE_PRESETS: ComparePresetsResponse = {
     },
     {
       presetId: 2,
-      thumbnailUrl: null,
-      title: '제품 이름',
+      thumbnailUrl:
+        'https://prs.ohousecdn.com/apne2/any/uploads/productions/v1-372918822210048.jpg',
+      title: '플렌토 속 깊은 5단 서랍장 800',
     },
   ],
 };

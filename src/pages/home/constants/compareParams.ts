@@ -36,3 +36,7 @@ export const buildCompareTabPath = (productUrl?: string): string => {
     ? `${base}&${COMPARE_PRODUCT_URL_PARAM}=${encodeURIComponent(productUrl)}`
     : base;
 };
+
+/** 탐색 위젯·딥링크 등에서 프리셋 고정 결과 화면으로 진입할 때 쓴다 */
+export const buildComparePresetTabPath = (presetId: number): string =>
+  `${ROUTES.HOME}?${TAB_PARAM}=${COMPARE_TAB}&${COMPARE_PRESET_ID_PARAM}=${presetId}`;

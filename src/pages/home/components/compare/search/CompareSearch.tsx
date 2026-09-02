@@ -53,7 +53,7 @@ const CompareSearch = ({
         <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
           {historyItems.map((item) => (
-            <li key={item.sourceUrl}>
+            <li key={item.sourceUrl} className={styles.item}>
               <SearchItem
                 type="recent"
                 name={item.title}
@@ -64,7 +64,7 @@ const CompareSearch = ({
             </li>
           ))}
           {presets.map((preset) => (
-            <li key={preset.presetId}>
+            <li key={preset.presetId} className={styles.item}>
               <SearchItem
                 type="popular"
                 name={preset.title}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -6,6 +6,11 @@ import {
   trackHomeTapExploreClick,
   trackHomeTapShopClick,
 } from '@pages/home/analytics/homeAnalytics';
+import {
+  COMPARE_JOB_ID_PARAM,
+  COMPARE_PRESET_ID_PARAM,
+  COMPARE_PRODUCT_URL_PARAM,
+} from '@pages/home/constants/compareParams';
 
 import { ROUTES } from '@routes/paths';
 
@@ -103,6 +108,31 @@ const HomePage = () => {
     );
   };
 
+  const navigateToCompareTab = useCallback(
+    (options?: { presetId?: number }) => {
+      setActiveMenuTab('compare');
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('tab', 'compare');
+          next.delete(COMPARE_JOB_ID_PARAM);
+          next.delete(COMPARE_PRODUCT_URL_PARAM);
+
+          const presetId = options?.presetId;
+          if (presetId != null) {
+            next.set(COMPARE_PRESET_ID_PARAM, String(presetId));
+          } else {
+            next.delete(COMPARE_PRESET_ID_PARAM);
+          }
+
+          return next;
+        },
+        { replace: false }
+      );
+    },
+    [setSearchParams]
+  );
+
   // TODO: v1에서 로그인 확인용으로 사용, v2 구현 과정에서 임시 미사용 처리함
   useMyPageUserQuery({ enabled: isLoggedIn });
 
@@ -162,6 +192,7 @@ const HomePage = () => {
           }}
           hasPreviousImage={hasPreviousImage}
           hasPreviousSpace={hasPreviousImage}
+          onNavigateToCompareTab={navigateToCompareTab}
         />
       )}
       {activeMenuTab === 'product' && <ProductTab />}

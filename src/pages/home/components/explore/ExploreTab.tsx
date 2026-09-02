@@ -6,6 +6,7 @@ import {
   trackHomeBannerSlideEvent,
   trackHomeWebBannerClick,
 } from '@pages/home/analytics/homeAnalytics';
+import { useComparePresetsQuery } from '@pages/home/apis/queries/useComparePresetsQuery';
 import Banner, {
   type BannerSlide,
 } from '@pages/home/components/explore/banner/Banner';
@@ -18,6 +19,8 @@ import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
 
 import promoBanner from '@assets/images/PromoBanner.svg';
 
+import WidgetCard from '@components/widgetCard/WidgetCard';
+
 import * as styles from './ExploreTab.css';
 import RoomTypeSection from './roomTypeSection/RoomTypeSection';
 import StyleSection from './styleSection/StyleSection';
@@ -27,6 +30,8 @@ type ExploreTabProps = {
   onPromoBannerClick?: () => void;
   hasPreviousImage?: boolean;
   hasPreviousSpace?: boolean;
+  /** 비교 탭으로 이동한다. presetId가 있으면 프리셋 고정 결과 조회를 시작한다 */
+  onNavigateToCompareTab: (options?: { presetId?: number }) => void;
 };
 
 const ExploreTab = ({
@@ -34,9 +39,11 @@ const ExploreTab = ({
   onPromoBannerClick,
   hasPreviousImage = false,
   hasPreviousSpace = false,
+  onNavigateToCompareTab,
 }: ExploreTabProps) => {
   const navigate = useNavigate();
   const { data: landingData } = useLandingListQuery();
+  const { data: presetsData } = useComparePresetsQuery();
 
   const seedBannerId = useMemo(() => {
     if (exploreSeedBannerId != null && exploreSeedBannerId > 0) {
@@ -48,6 +55,17 @@ const ExploreTab = ({
     }
     return 0;
   }, [exploreSeedBannerId, landingData?.landings]);
+
+  const widgetProducts = useMemo(
+    () =>
+      (presetsData?.presets ?? []).map((preset) => ({
+        presetId: preset.presetId,
+        name: preset.title,
+        imageSrc: preset.thumbnailUrl ?? undefined,
+        onClick: () => onNavigateToCompareTab({ presetId: preset.presetId }),
+      })),
+    [onNavigateToCompareTab, presetsData?.presets]
+  );
 
   const handlePromoBannerClick = () => {
     trackHomeWebBannerClick();
@@ -90,6 +108,10 @@ const ExploreTab = ({
         >
           <img src={promoBanner} alt="" className={styles.promoBannerImage} />
         </button>
+        <WidgetCard
+          products={widgetProducts}
+          onSearchClick={() => onNavigateToCompareTab()}
+        />
         <StyleSection />
       </div>
     </div>
