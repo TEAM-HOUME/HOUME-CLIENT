@@ -48,7 +48,7 @@ export const useComparePreset = (
 ): ComparePresetFlow => {
   const presetId = parsePresetId(searchParams.get(COMPARE_PRESET_ID_PARAM));
 
-  const { data, error, isPending } = useComparePresetQuery(presetId);
+  const { data, error, isLoading } = useComparePresetQuery(presetId);
   const [isMinLoadingDone, setIsMinLoadingDone] = useState(false);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export const useComparePreset = (
     // similarProducts는 전체가 아니라 일부만 올 수 있어(명세 예시: 2건+totalCount 17)
     // 0건 판정은 배열 길이가 아니라 totalCount로 한다
     totalCount: data?.totalCount,
-    isShowingLoadingSkeleton: isActive && (isPending || !isMinLoadingDone),
+    isShowingLoadingSkeleton: isActive && (isLoading || !isMinLoadingDone),
   });
 
   return {
