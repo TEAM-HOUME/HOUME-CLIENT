@@ -6,11 +6,6 @@ import {
   trackHomeTapExploreClick,
   trackHomeTapShopClick,
 } from '@pages/home/analytics/homeAnalytics';
-import {
-  COMPARE_JOB_ID_PARAM,
-  COMPARE_PRESET_ID_PARAM,
-  COMPARE_PRODUCT_URL_PARAM,
-} from '@pages/home/constants/compareParams';
 
 import { ROUTES } from '@routes/paths';
 
@@ -39,6 +34,11 @@ import { setLoginRedirect } from '@utils/loginRedirect';
 import CompareTab from './components/compare/CompareTab';
 import ExploreTab from './components/explore/ExploreTab';
 import ProductTab from './components/product/ProductTab';
+import {
+  COMPARE_JOB_ID_PARAM,
+  COMPARE_PRESET_ID_PARAM,
+  COMPARE_PRODUCT_URL_PARAM,
+} from './constants/compareParams';
 import * as styles from './HomePage.css';
 
 const HomePage = () => {
