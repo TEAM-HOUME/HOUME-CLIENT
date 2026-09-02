@@ -15,7 +15,6 @@ const CompareTab = () => {
     productUrl,
     errorMessage,
     start,
-    selectProductUrl,
     selectPreset,
     presetResult,
     reset,
@@ -30,7 +29,6 @@ const CompareTab = () => {
             key={productUrl ?? ''}
             initialUrl={productUrl ?? undefined}
             onSubmit={start}
-            onSelectUrl={selectProductUrl}
             onSelectPreset={selectPreset}
           />
         )}

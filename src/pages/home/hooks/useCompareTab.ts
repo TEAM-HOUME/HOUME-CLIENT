@@ -23,7 +23,6 @@ interface CompareTabState {
   errorMessage: string | null;
   presetResult: ComparePresetResponse | null;
   start: (url: string) => void;
-  selectProductUrl: (url: string) => void;
   selectPreset: (presetId: number) => void;
   reset: () => void;
 }
@@ -45,7 +44,6 @@ export const useCompareTab = (): CompareTabState => {
     productUrl,
     errorMessage: jobErrorMessage,
     start,
-    selectProductUrl,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
 
@@ -92,7 +90,6 @@ export const useCompareTab = (): CompareTabState => {
     errorMessage: isPresetActive ? presetErrorMessage : jobErrorMessage,
     presetResult,
     start,
-    selectProductUrl,
     selectPreset,
     reset,
   };

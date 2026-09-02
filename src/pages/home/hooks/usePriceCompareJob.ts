@@ -51,8 +51,6 @@ interface PriceCompareJob {
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
   start: (url: string) => void;
-  /** 히스토리 클릭 시 주소에 productUrl을 넣어 입력창을 채운다 */
-  selectProductUrl: (url: string) => void;
   /** job 생성 mutation 에러만 지운다. URL은 건드리지 않는다 */
   dismissCreateError: () => void;
 }
@@ -128,23 +126,6 @@ export const usePriceCompareJob = (
     [setSearchParams]
   );
 
-  const selectProductUrl = useCallback(
-    (url: string) => {
-      setSearchParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          next.set(COMPARE_PRODUCT_URL_PARAM, url);
-          next.delete(COMPARE_JOB_ID_PARAM);
-          next.delete(COMPARE_PRESET_ID_PARAM);
-          return next;
-        },
-        // push — 뒤로가기로 이전 입력 상태로 돌아갈 수 있게 한다
-        { replace: false }
-      );
-    },
-    [setSearchParams]
-  );
-
   const start = useCallback(
     (url: string) => {
       // 비로그인이면 로그인 화면으로 보낸다.
@@ -205,7 +186,6 @@ export const usePriceCompareJob = (
         : getServerErrorMessage(jobRequestError),
     }),
     start,
-    selectProductUrl,
     dismissCreateError,
   };
 };

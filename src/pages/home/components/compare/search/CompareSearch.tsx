@@ -17,10 +17,8 @@ interface CompareSearchProps {
    * 딥링크로 진입했거나 로그인 게이트를 거쳐 돌아온 경우 주소의 productUrl이 들어온다.
    */
   initialUrl?: string;
-  /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
+  /** 입력창 확인 또는 최근 비교 히스토리 클릭 시 비교 job을 시작한다 */
   onSubmit: (url: string) => void;
-  /** 히스토리 클릭 시 주소에 productUrl을 넣고 입력창을 채운다 */
-  onSelectUrl: (url: string) => void;
   /** 프리셋 클릭 시 고정 결과 조회를 시작한다 */
   onSelectPreset: (presetId: number) => void;
 }
@@ -28,7 +26,6 @@ interface CompareSearchProps {
 const CompareSearch = ({
   initialUrl = '',
   onSubmit,
-  onSelectUrl,
   onSelectPreset,
 }: CompareSearchProps) => {
   const [url, setUrl] = useState(initialUrl);
@@ -42,7 +39,6 @@ const CompareSearch = ({
   const presets = presetsData?.presets ?? [];
 
   const handleSubmit = (value: string) => onSubmit(value);
-  const handleHistoryClick = (sourceUrl: string) => onSelectUrl(sourceUrl);
   const handlePresetClick = (presetId: number) => onSelectPreset(presetId);
 
   return (
@@ -63,7 +59,7 @@ const CompareSearch = ({
                 name={item.title}
                 imageSrc={item.thumbnailUrl ?? undefined}
                 searchDayCount={getSearchDayCount(item.createdAt)}
-                onClick={() => handleHistoryClick(item.sourceUrl)}
+                onClick={() => onSubmit(item.sourceUrl)}
               />
             </li>
           ))}
