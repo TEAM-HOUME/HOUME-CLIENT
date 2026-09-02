@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useComparePresetQuery } from '@pages/home/apis/queries/useComparePresetQuery';
 import {
@@ -19,6 +19,8 @@ import {
 
 import type { SetURLSearchParams } from 'react-router-dom';
 
+const COMPARE_PRESET_MIN_LOADING_MS = 3_000;
+
 interface ComparePresetFlow {
   /** URL에 presetId가 있으면 true. 탭 view 합성 시 job보다 우선한다 */
   isActive: boolean;
@@ -35,6 +37,7 @@ interface ComparePresetFlow {
 /**
  * 프리셋 고정 결과 조회 흐름.
  * 라이브 job이 아니라 DB 스냅샷 GET — usePriceCompareJob과 수명이 다르다.
+ * API는 빨리 오지만 job과 같은 CompareResultSkeleton을 최소 COMPARE_PRESET_MIN_LOADING_MS 동안 보여준다.
  *
  * searchParams/setSearchParams는 useCompareTab이 useSearchParams()를 한 번만 호출해 내려준다.
  * 이유는 usePriceCompareJob 쪽 주석 참고.
@@ -45,7 +48,22 @@ export const useComparePreset = (
 ): ComparePresetFlow => {
   const presetId = parsePresetId(searchParams.get(COMPARE_PRESET_ID_PARAM));
 
-  const { data, error } = useComparePresetQuery(presetId);
+  const { data, error, isPending } = useComparePresetQuery(presetId);
+  const [isMinLoadingDone, setIsMinLoadingDone] = useState(false);
+
+  useEffect(() => {
+    if (presetId === null) {
+      setIsMinLoadingDone(false);
+      return;
+    }
+
+    setIsMinLoadingDone(false);
+    const timer = window.setTimeout(() => {
+      setIsMinLoadingDone(true);
+    }, COMPARE_PRESET_MIN_LOADING_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [presetId]);
 
   const selectPreset = useCallback(
     (nextPresetId: number) => {
@@ -72,6 +90,7 @@ export const useComparePreset = (
     // similarProducts는 전체가 아니라 일부만 올 수 있어(명세 예시: 2건+totalCount 17)
     // 0건 판정은 배열 길이가 아니라 totalCount로 한다
     totalCount: data?.totalCount,
+    isShowingLoadingSkeleton: isActive && (isPending || !isMinLoadingDone),
   });
 
   return {
@@ -100,12 +119,15 @@ const resolvePresetView = ({
   isActive,
   hasError,
   totalCount,
+  isShowingLoadingSkeleton,
 }: {
   isActive: boolean;
   hasError: boolean;
   totalCount: number | undefined;
+  isShowingLoadingSkeleton: boolean;
 }): CompareView | null => {
   if (!isActive) return null;
+  if (isShowingLoadingSkeleton) return COMPARE_VIEW.LOADING;
   if (hasError) return COMPARE_VIEW.ERROR;
   if (totalCount === undefined) return COMPARE_VIEW.LOADING;
   return totalCount === 0 ? COMPARE_VIEW.EMPTY : COMPARE_VIEW.RESULT;
