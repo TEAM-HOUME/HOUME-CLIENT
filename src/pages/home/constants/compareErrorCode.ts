@@ -27,4 +27,11 @@ export const COMPARE_REQUEST_ERROR_CODE = {
   INVALID_URL: 40033,
   /** 400 — 접근이 허용되지 않은 주소 */
   FORBIDDEN_URL: 40034,
+  /**
+   * 404 — 존재하지 않는 프리셋.
+   * 2026-08-30 확정 스펙엔 전용 코드가 없고 40400("지원하지 않는 URL입니다")만 확인됨 —
+   * 프리셋 조회 API 연동 후 실제 code로 채운다. 그 전까진 undefined라 항상 false로 비교돼
+   * isComparePresetNotFound가 잘못 감지하지 않는다
+   */
+  PRESET_NOT_FOUND: undefined as number | undefined,
 } as const;

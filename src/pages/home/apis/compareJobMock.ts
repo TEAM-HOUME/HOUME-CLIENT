@@ -5,6 +5,11 @@
 // 서버가 붙으면 이 파일과 이 파일을 부르는 두 군데(useCreateCompareJobMutation·useCompareJobStatusQuery)를
 // 지우면 된다. 프로덕션 빌드에서는 USE_COMPARE_MOCK이 false라 절대 타지 않는다.
 //
+// 주의: USE_COMPARE_MOCK만 따로 떼어 useCompareHistoryQuery·useComparePresetQuery·
+// useComparePresetsQuery도 가져다 쓴다. job이 먼저 연동돼 이 파일을 지우면 저 세 곳도
+// import 에러로 같이 깨지니, 그쪽 mock이 아직 필요하면 USE_COMPARE_MOCK만 다른 곳으로
+// 옮기고 이 파일의 나머지(job 전용 mock 로직)만 지운다.
+//
 // 시작 시각을 jobId 안에 넣어 두기 때문에 모듈 상태가 없다.
 // 새로고침해도 URL의 jobId로 같은 진행 상황이 이어져 복원 동작까지 그대로 확인할 수 있다.
 

@@ -1,31 +1,15 @@
 import { useState } from 'react';
 
+import { useCompareHistoryQuery } from '@pages/home/apis/queries/useCompareHistoryQuery';
+import { useComparePresetsQuery } from '@pages/home/apis/queries/useComparePresetsQuery';
+
+import { useUserStore } from '@store/useUserStore';
+
 import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
 import * as styles from './CompareSearch.css';
-
-const MOCK_RECENT_ITEMS = [
-  { name: '제품 이름', searchDayCount: 0 },
-  { name: '제품 이름', searchDayCount: 0 },
-  { name: '제품 이름', searchDayCount: 0 },
-] as const;
-
-// GET /api/v1/price-compare/presets 응답 data 형태
-const MOCK_PRICE_COMPARE_PRESETS = {
-  presets: [
-    {
-      presetId: 1,
-      thumbnailUrl: 'https://cdn.ohou.se/thumb/999999.jpg',
-      title: '룬드 무헤드 수납 침대 프레임 SS Q 슈퍼싱글 퀸',
-    },
-    {
-      presetId: 2,
-      thumbnailUrl: null,
-      title: '제품 이름',
-    },
-  ],
-} as const;
+import { getSearchDayCount } from '../utils/getSearchDayCount';
 
 interface CompareSearchProps {
   /**
@@ -33,16 +17,29 @@ interface CompareSearchProps {
    * 딥링크로 진입했거나 로그인 게이트를 거쳐 돌아온 경우 주소의 productUrl이 들어온다.
    */
   initialUrl?: string;
-  /** 입력창에서 링크를 넣고 확인을 누르면 호출된다 */
+  /** 입력창 확인 또는 최근 비교 히스토리 클릭 시 비교 job을 시작한다 */
   onSubmit: (url: string) => void;
+  /** 프리셋 클릭 시 고정 결과 조회를 시작한다 */
+  onSelectPreset: (presetId: number) => void;
 }
 
-const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
+const CompareSearch = ({
+  initialUrl = '',
+  onSubmit,
+  onSelectPreset,
+}: CompareSearchProps) => {
   const [url, setUrl] = useState(initialUrl);
+  const isLoggedIn = !!useUserStore((state) => state.accessToken);
+
+  const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
+  const { data: presetsData } = useComparePresetsQuery();
+
+  // 비로그인이면 캐시에 이전 데이터가 있어도 목록을 그리지 않는다.
+  const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
+  const presets = presetsData?.presets ?? [];
 
   const handleSubmit = (value: string) => onSubmit(value);
-  const handleRecentClick = () => {};
-  const handlePresetClick = (_presetId: number) => {};
+  const handlePresetClick = (presetId: number) => onSelectPreset(presetId);
 
   return (
     <div className={styles.container}>
@@ -55,18 +52,19 @@ const CompareSearch = ({ initialUrl = '', onSubmit }: CompareSearchProps) => {
       <div className={styles.contents}>
         <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
-          {MOCK_RECENT_ITEMS.map((item, index) => (
-            <li key={`recent-${index}`}>
+          {historyItems.map((item) => (
+            <li key={item.sourceUrl} className={styles.item}>
               <SearchItem
                 type="recent"
-                name={item.name}
-                searchDayCount={item.searchDayCount}
-                onClick={handleRecentClick}
+                name={item.title}
+                imageSrc={item.thumbnailUrl ?? undefined}
+                searchDayCount={getSearchDayCount(item.createdAt)}
+                onClick={() => onSubmit(item.sourceUrl)}
               />
             </li>
           ))}
-          {MOCK_PRICE_COMPARE_PRESETS.presets.map((preset) => (
-            <li key={preset.presetId}>
+          {presets.map((preset) => (
+            <li key={preset.presetId} className={styles.item}>
               <SearchItem
                 type="popular"
                 name={preset.title}

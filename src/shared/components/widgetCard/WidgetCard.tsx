@@ -5,6 +5,7 @@ import StatusBadge from '@components/statusBadge/StatusBadge';
 import * as styles from './WidgetCard.css';
 
 export interface WidgetCardProduct {
+  presetId: number;
   name: string;
   imageSrc?: string;
   onClick: () => void;
@@ -38,9 +39,9 @@ const WidgetCard = ({ products, onSearchClick }: WidgetCardProps) => {
         </button>
         {products.length > 0 && (
           <div className={styles.itemRow}>
-            {products.map((product, index) => (
+            {products.map((product) => (
               <SearchItem
-                key={`${product.name}-${index}`}
+                key={product.presetId}
                 type="popular"
                 name={product.name}
                 imageSrc={product.imageSrc}

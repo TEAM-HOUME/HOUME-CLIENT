@@ -26,6 +26,10 @@ export const getServerErrorCode = (error: unknown): number | null => {
 export const isCompareJobNotFound = (error: unknown): boolean =>
   getServerErrorCode(error) === COMPARE_REQUEST_ERROR_CODE.JOB_NOT_FOUND;
 
+/** 존재하지 않는 presetId로 조회한 경우 */
+export const isComparePresetNotFound = (error: unknown): boolean =>
+  getServerErrorCode(error) === COMPARE_REQUEST_ERROR_CODE.PRESET_NOT_FOUND;
+
 /**
  * 서버가 내려준 실패 사유를 꺼낸다. 서버가 내려준 실패 사유가 없으면 null이고, 뷰에서 기본 에러 문구를 제공한다.
  * (ex: 유효하지 않은 URL로 job 생성이 400에 막히는 경우)

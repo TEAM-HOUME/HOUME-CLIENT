@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import type { ComparePresetResponse } from '@pages/home/types/compare';
+
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
@@ -12,22 +14,45 @@ import {
 } from './mockCompareResult';
 import CompareSortDropdown from '../dropdown/SortDropdown';
 import OutputLink from '../linkOutput/OutputLink';
+import { mapCompareResultToView } from '../utils/mapCompareResultToView';
 import {
   DEFAULT_COMPARE_SORT_OPTION,
   sortCompareProducts,
   type CompareSortOption,
 } from '../utils/sortCompareProducts';
 
+import type { CompareResultViewModel } from '../utils/mapCompareResultToView';
+
 interface CompareResultProps {
   /** "새로운 링크 검색하기"를 누르면 호출된다. 입력 화면으로 되돌아간다 */
   onSearchNewLink?: () => void;
+  /**
+   * 프리셋 고정 결과. 있으면 프리셋 API 데이터를 그리고,
+   * 없으면 job 결과용 UI 목데이터(mockCompareResult)를 쓴다.
+   */
+  presetResult?: ComparePresetResponse;
 }
 
-const CompareResult = ({ onSearchNewLink }: CompareResultProps) => {
+const CompareResult = ({
+  onSearchNewLink,
+  presetResult,
+}: CompareResultProps) => {
   const [sortOption, setSortOption] = useState<CompareSortOption>(
     DEFAULT_COMPARE_SORT_OPTION
   );
-  const sortedProducts = sortCompareProducts(MOCK_SIMILAR_PRODUCTS, sortOption);
+
+  const viewModel: CompareResultViewModel = presetResult
+    ? mapCompareResultToView(presetResult)
+    : {
+        searchedProduct: MOCK_SEARCHED_PRODUCT,
+        similarProducts: MOCK_SIMILAR_PRODUCTS,
+        productCount: MOCK_SIMILAR_PRODUCT_COUNT,
+      };
+
+  const sortedProducts = sortCompareProducts(
+    viewModel.similarProducts,
+    sortOption
+  );
 
   return (
     <div className={styles.container}>
@@ -36,8 +61,8 @@ const CompareResult = ({ onSearchNewLink }: CompareResultProps) => {
        * 동일한 화면 전환 handler를 연결
        */}
       <OutputLink
-        product={MOCK_SEARCHED_PRODUCT.product}
-        price={MOCK_SEARCHED_PRODUCT.price}
+        product={viewModel.searchedProduct.product}
+        price={viewModel.searchedProduct.price}
         onSearchNewLink={onSearchNewLink}
       />
 
@@ -52,7 +77,7 @@ const CompareResult = ({ onSearchNewLink }: CompareResultProps) => {
               비슷한 상품
             </h2>
             <span className={styles.productCount}>
-              {MOCK_SIMILAR_PRODUCT_COUNT}
+              {viewModel.productCount}
             </span>
           </div>
 

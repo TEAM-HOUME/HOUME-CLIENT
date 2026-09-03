@@ -67,5 +67,8 @@ export const API_ENDPOINT = {
   COMPARE: {
     CREATE_JOB: '/api/v1/price-compare/jobs', // POST 비교 job 생성 → jobId 반환 (202)
     JOB_STATUS: (jobId: string) => `/api/v1/price-compare/jobs/${jobId}`, // GET 진행 단계·결과 조회 (폴링 대상)
+    HISTORY: '/api/v1/price-compare/jobs/history', // GET 최근 비교 히스토리
+    PRESET_LIST: '/api/v1/price-compare/presets', // GET 프리셋 목록
+    PRESET: (presetId: number) => `/api/v1/price-compare/presets/${presetId}`, // GET 프리셋 고정 결과 조회
   },
 } as const;

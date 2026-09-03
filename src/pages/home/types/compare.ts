@@ -2,8 +2,11 @@
 // 가격 비교(C-1) API 타입
 // ------------------------------
 // 2026-08-27 서버 확정 명세 기준.
-//   POST /api/v1/price-compare/jobs           — job 생성
-//   GET  /api/v1/price-compare/jobs/{jobId}   — 상태·결과 조회 (폴링 대상)
+//   POST /api/v1/price-compare/jobs                 — job 생성
+//   GET  /api/v1/price-compare/jobs/{jobId}         — 상태·결과 조회 (폴링 대상)
+//   GET  /api/v1/price-compare/jobs/history         — 최근 비교 히스토리
+//   GET  /api/v1/price-compare/presets              — 프리셋 목록
+//   GET  /api/v1/price-compare/presets/{presetId}   — 프리셋 고정 결과 조회
 //
 // 주의: job 실패는 HTTP 에러가 아니라 200 + `status: 'FAILED'`로 온다.
 // 실패 판단은 HTTP 상태가 아니라 `status`로, 분기는 `errorMessage`가 아니라 `errorCode`로 한다.
@@ -147,6 +150,64 @@ export type CompareJobStatusResponse = CompareJobBase &
         result: null;
       }
   );
+
+/**
+ * GET /api/v1/price-compare/presets/{presetId} 응답.
+ * job 결과와 달리 quality·similarityScore·isAffiliate가 없고, 원본 title·currency는 항상 온다.
+ */
+export interface ComparePresetOriginalProduct {
+  sourceUrl: string;
+  title: string;
+  thumbnailUrl: string | null;
+  brand: string | null;
+  price: number | null;
+  currency: string;
+}
+
+export interface ComparePresetSimilarProduct {
+  source: CompareSource;
+  productId: string;
+  title: string;
+  imageUrl: string | null;
+  price: number;
+  /** job의 CompareSimilarProduct와 마찬가지로 eBay 소스면 USD가 올 수 있음(미확인).
+   * ProductCard가 통화를 안 받아 화면 숫자는 원화처럼 보일 수 있다. 절감액은 통화가 같을 때만 계산한다 */
+  currency: string;
+  siteName: string | null;
+  productUrl: string;
+  priceUpdatedAt: string;
+}
+
+export interface ComparePresetResponse {
+  originalProduct: ComparePresetOriginalProduct;
+  similarProducts: ComparePresetSimilarProduct[];
+  totalCount: number;
+}
+
+/** GET /api/v1/price-compare/jobs/history 응답 data.items[] 항목 */
+export interface CompareHistoryItem {
+  sourceUrl: string;
+  thumbnailUrl: string | null;
+  title: string;
+  price: number | null;
+  currency: string | null;
+  createdAt: string;
+}
+
+export interface CompareHistoryResponse {
+  items: CompareHistoryItem[];
+}
+
+/** GET /api/v1/price-compare/presets 목록 항목 */
+export interface ComparePresetListItem {
+  presetId: number;
+  thumbnailUrl: string | null;
+  title: string;
+}
+
+export interface ComparePresetsResponse {
+  presets: ComparePresetListItem[];
+}
 
 export interface CreateCompareJobRequest {
   url: string;

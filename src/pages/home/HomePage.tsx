@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -34,6 +34,11 @@ import { setLoginRedirect } from '@utils/loginRedirect';
 import CompareTab from './components/compare/CompareTab';
 import ExploreTab from './components/explore/ExploreTab';
 import ProductTab from './components/product/ProductTab';
+import {
+  COMPARE_JOB_ID_PARAM,
+  COMPARE_PRESET_ID_PARAM,
+  COMPARE_PRODUCT_URL_PARAM,
+} from './constants/compareParams';
 import * as styles from './HomePage.css';
 
 const HomePage = () => {
@@ -103,6 +108,31 @@ const HomePage = () => {
     );
   };
 
+  const navigateToCompareTab = useCallback(
+    (options?: { presetId?: number }) => {
+      setActiveMenuTab('compare');
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('tab', 'compare');
+          next.delete(COMPARE_JOB_ID_PARAM);
+          next.delete(COMPARE_PRODUCT_URL_PARAM);
+
+          const presetId = options?.presetId;
+          if (presetId != null) {
+            next.set(COMPARE_PRESET_ID_PARAM, String(presetId));
+          } else {
+            next.delete(COMPARE_PRESET_ID_PARAM);
+          }
+
+          return next;
+        },
+        { replace: false }
+      );
+    },
+    [setSearchParams]
+  );
+
   // TODO: v1에서 로그인 확인용으로 사용, v2 구현 과정에서 임시 미사용 처리함
   useMyPageUserQuery({ enabled: isLoggedIn });
 
@@ -162,6 +192,7 @@ const HomePage = () => {
           }}
           hasPreviousImage={hasPreviousImage}
           hasPreviousSpace={hasPreviousImage}
+          onNavigateToCompareTab={navigateToCompareTab}
         />
       )}
       {activeMenuTab === 'product' && <ProductTab />}

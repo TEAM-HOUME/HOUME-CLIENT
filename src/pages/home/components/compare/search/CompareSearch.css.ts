@@ -39,9 +39,14 @@ export const contents = style({
 export const itemList = style({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-start',
+  alignItems: 'stretch',
   gap: unitVars.unit.gapPadding['200'],
   margin: 0,
   padding: 0,
   listStyle: 'none',
+});
+
+export const item = style({
+  width: '100%',
+  minWidth: 0,
 });
