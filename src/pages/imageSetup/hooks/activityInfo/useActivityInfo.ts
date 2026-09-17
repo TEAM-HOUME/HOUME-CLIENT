@@ -16,6 +16,7 @@ import { useRecentFloorPlanQuery } from '@apis/queries/useRecentFloorPlanQuery';
 import { useCreditGuard } from '@hooks/useCreditGuard';
 
 import { useActivitySelection } from './useActivitySelection';
+import { useCompareJobGuard } from '../useCompareJobGuard';
 import { useCategorySelection } from './useCategorySelection';
 import { useGlobalConstraints } from './useGlobalConstraints';
 import { useActivitiesQuery } from '../../apis/queries/useActivitiesQuery';
@@ -35,7 +36,7 @@ interface UseActivityInfoOptions {
  * - 사용자 입력값 관리 (formData 상태 + Zustand persist)
  * - 주요활동 선택 / 카테고리별 가구 토글 / 전역 제약 훅 위임
  * - 활동 변경 시 가구 초기화 + 필수 가구 자동 선택
- * - 제출(크레딧 체크 → sessionStorage → /generate)
+ * - 제출(비교 진행 중 가드 → 크레딧 체크 → sessionStorage → /generate)
  */
 export const useActivityInfo = (
   context: ImageSetupSteps['ActivityInfo'],
@@ -45,6 +46,7 @@ export const useActivityInfo = (
 
   // 크레딧 가드 훅 (이미지 생성 시 1크레딧 필요)
   const { checkCredit, isChecking } = useCreditGuard(1);
+  const { blockIfComparing } = useCompareJobGuard();
   // 버튼 비활성화 상태 (토스트 표시 후 비활성화)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
@@ -218,6 +220,11 @@ export const useActivityInfo = (
 
     // 중복 클릭 방지
     if (isChecking || isButtonDisabled) return;
+
+    // 가격 비교가 진행 중이면 생성 요청을 보내지 않는다.
+    // 1차 가드는 공간 선택 CTA(useFloorPlanSelect)에 있지만, 그 뒤 취향·활동 단계에 있다가 비교를 시작하고
+    // 뒤로가기로 퍼널에 돌아오면(퍼널 상태는 sessionStorage에 남는다) 1차 가드를 지나친 채 여기까지 온다
+    if (blockIfComparing()) return;
 
     // 이미지 생성 전 크레딧 확인
     const hasCredit = await checkCredit();

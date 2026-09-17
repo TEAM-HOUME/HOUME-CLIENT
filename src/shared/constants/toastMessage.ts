@@ -18,10 +18,12 @@ export const TOAST_MESSAGE = {
   COMPARE_JOB_DONE: '상품 비교 검색이 완료되었어요!',
   /** 실패 토스트는 시안·문구 미확정. 디자인 확정 전 임시 문구 */
   COMPARE_JOB_FAILED: '상품 비교 검색에 실패했어요',
+  COMPARE_JOB_IN_PROGRESS: '비교 검색 중에는 이미지 생성이 불가해요',
 } as const;
 
 export const TOAST_ACTION_LABEL = {
   VIEW: '보러가기',
   UNDO: '되돌리기',
   CHECK: '확인하기',
+  GO_BACK: '돌아가기',
 } as const;
