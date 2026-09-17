@@ -39,12 +39,22 @@ export const getCompareJobStatus = async (
  * - 프론트 자체 타임아웃은 두지 않으며, 로딩 중 다른 화면으로 이동하는 것을 허용한다.
  * - 요청 처리 시간 초과는 서버가 errorCode 50025로 알려준다.
  */
-export const useCompareJobStatusQuery = (jobId: string | null) => {
+export const useCompareJobStatusQuery = (
+  jobId: string | null,
+  /**
+   * polling=false면 이 구독자는 주기 요청을 보내지 않고 캐시만 본다.
+   * 같은 job을 비교 탭과 CompareJobWatcher(routes/)가 동시에 구독할 때 요청이 두 배가 되지 않게,
+   * 한쪽(비교 탭이 그 job을 보고 있으면 비교 탭)만 폴링한다. queryKey가 같아 응답은 양쪽이 같이 본다
+   */
+  { polling = true }: { polling?: boolean } = {}
+) => {
   return useQuery({
     queryKey: queryKeys.compare.jobStatus(jobId ?? ''),
     queryFn: () => getCompareJobStatus(jobId ?? ''),
     enabled: Boolean(jobId),
     refetchInterval: (query) => {
+      if (!polling) return false;
+
       // 요청이 실패하면 화면은 이미 에러로 넘어간 상태다. 여기서 멈추지 않으면
       // 사용자가 떠난 화면에서 1초마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨)
       if (query.state.status === 'error') return false;

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
@@ -15,6 +15,8 @@ import {
   getServerErrorMessage,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
+
+import { useCompareJobStore } from '@store/useCompareJobStore';
 
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
@@ -95,6 +97,19 @@ export const usePriceCompareJob = (
     reset: resetCreateJob,
   } = useCreateCompareJobMutation();
   const { data, error: jobStatusError } = useCompareJobStatusQuery(jobId);
+  const setActiveJobId = useCompareJobStore((state) => state.setActiveJobId);
+
+  // 주소의 job이 진행 중이면 전역 스토어에 올린다 — 새로고침·공유 링크·뒤로가기로 들어온 job도 다른 화면에서 완료 토스트를 받는다.
+  // 끝난 job은 CompareJobWatcher(routes/)가 스토어에서 비우므로 여기서는 올리기만 한다
+  useEffect(() => {
+    if (!jobId) return;
+    if (
+      data?.status === COMPARE_JOB_STATUS.PENDING ||
+      data?.status === COMPARE_JOB_STATUS.RUNNING
+    ) {
+      setActiveJobId(jobId);
+    }
+  }, [jobId, data?.status, setActiveJobId]);
 
   // job 생성 실패(원본 페이지 로드 실패 502 등)와 상태 조회 실패를 같은 자리에서 다룬다.
   // - job 생성이 실패하면 URL에 jobId가 없어 입력 화면으로 되돌아감
@@ -131,7 +146,10 @@ export const usePriceCompareJob = (
             {
               onSuccess: (response) => {
                 // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
-                if (response.jobId) writeJobId(response.jobId, true);
+                if (!response.jobId) return;
+                // 첫 폴링 응답 전에 다른 화면으로 가도 지켜볼 수 있게 생성 즉시 올린다. 진행 중이던 이전 job은 덮어쓴다
+                setActiveJobId(response.jobId);
+                writeJobId(response.jobId, true);
               },
             }
           );
@@ -140,7 +158,7 @@ export const usePriceCompareJob = (
         returnPath
       );
     },
-    [createJob, requireLogin, writeJobId]
+    [createJob, requireLogin, setActiveJobId, writeJobId]
   );
 
   const dismissCreateError = useCallback(() => {
