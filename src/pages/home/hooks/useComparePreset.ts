@@ -10,12 +10,13 @@ import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
-import type { ComparePresetResponse } from '@pages/home/types/compare';
 import {
   getServerErrorCode,
   getServerErrorMessage,
   isComparePresetNotFound,
 } from '@pages/home/utils/compareJobError';
+
+import type { PresetDetailResponse } from '@apis/__generated__/data-contracts';
 
 import type { SetURLSearchParams } from 'react-router-dom';
 
@@ -25,7 +26,7 @@ interface ComparePresetFlow {
   /** URL에 presetId가 있으면 true. 탭 view 합성 시 job보다 우선한다 */
   isActive: boolean;
   view: CompareView | null;
-  presetResult: ComparePresetResponse | null;
+  presetResult: PresetDetailResponse | null;
   errorCode: number | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 preset 사유(존재하지 않음 등)에 맞는 기본 문구로 채운다 */

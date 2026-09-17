@@ -10,11 +10,45 @@
  * ---------------------------------------------------------------
  */
 
+export interface SavePresetRequest {
+  sourceUrl: string;
+  title: string;
+  thumbnailUrl: string;
+  brand?: string;
+  /** @format int64 */
+  price?: number;
+  currency: string;
+  similarProducts: SimilarProductRequest[];
+}
+
+export interface SimilarProductRequest {
+  source: string;
+  productId: string;
+  title: string;
+  imageUrl?: string;
+  /** @format double */
+  price: number;
+  currency: string;
+  siteName?: string;
+  productUrl: string;
+  /** @format date-time */
+  priceUpdatedAt: string;
+}
+
+export interface ApiResponseVoid {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: object;
+  traceId?: string;
+}
+
 export interface ApiResponseString {
   /** @format int32 */
   code?: number;
   msg?: string;
   data?: string;
+  traceId?: string;
 }
 
 export interface GenerateImageV4Request {
@@ -40,6 +74,7 @@ export interface ApiResponseGenerateImageV4Response {
   code?: number;
   msg?: string;
   data?: GenerateImageV4Response;
+  traceId?: string;
 }
 
 export interface GenerateImageV4Response {
@@ -78,6 +113,7 @@ export interface ApiResponseImageInfoListResponse {
   code?: number;
   msg?: string;
   data?: ImageInfoListResponse;
+  traceId?: string;
 }
 
 export interface ImageInfoListResponse {
@@ -122,6 +158,7 @@ export interface ApiResponseImageInfoResponse {
   code?: number;
   msg?: string;
   data?: ImageInfoResponse;
+  traceId?: string;
 }
 
 export interface ApiResponseJjymToggleResponse {
@@ -129,6 +166,7 @@ export interface ApiResponseJjymToggleResponse {
   code?: number;
   msg?: string;
   data?: JjymToggleResponse;
+  traceId?: string;
 }
 
 export interface JjymToggleResponse {
@@ -144,6 +182,53 @@ export interface SocialSignUpRequest {
   birthday: string;
 }
 
+export interface ProductScrapeRequest {
+  url: string;
+}
+
+export interface ApiResponseScrapedProductResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: ScrapedProductResponse;
+  traceId?: string;
+}
+
+export interface ScrapedProductResponse {
+  sourceUrl?: string;
+  title?: string;
+  thumbnailUrl?: string;
+  brand?: string;
+  /** @format int64 */
+  price?: number;
+  currency?: string;
+  additionalImageUrls?: string[];
+  description?: string;
+  quality?: string;
+}
+
+export interface CreateCompareJobRequest {
+  url: string;
+}
+
+export interface ApiResponseCreateJobResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: CreateJobResponse;
+  traceId?: string;
+}
+
+export interface CreateJobResponse {
+  jobId?: string;
+  status?: string;
+  sourceUrl?: string;
+  title?: string;
+  thumbnail?: string;
+  /** @format int64 */
+  price?: number;
+}
+
 export interface HouseSelectRequest {
   houseType: string;
   roomType: string;
@@ -156,6 +241,7 @@ export interface ApiResponseHouseIdResponse {
   code?: number;
   msg?: string;
   data?: HouseIdResponse;
+  traceId?: string;
 }
 
 export interface HouseIdResponse {
@@ -165,13 +251,6 @@ export interface HouseIdResponse {
 
 export interface IsLikeRequest {
   isLike?: boolean;
-}
-
-export interface ApiResponseVoid {
-  /** @format int32 */
-  code?: number;
-  msg?: string;
-  data?: object;
 }
 
 export interface ProductGenerateImageRequest {
@@ -200,6 +279,7 @@ export interface ApiResponseOtherStyleGenerateImageResponse {
   code?: number;
   msg?: string;
   data?: OtherStyleGenerateImageResponse;
+  traceId?: string;
 }
 
 export interface OtherStyleGenerateImageResponse {
@@ -225,6 +305,7 @@ export interface ApiResponseBannerGenerateImageResponse {
   code?: number;
   msg?: string;
   data?: BannerGenerateImageResponse;
+  traceId?: string;
 }
 
 export interface BannerGenerateImageResponse {
@@ -287,6 +368,7 @@ export interface ApiResponseAdminStyleResponse {
   code?: number;
   msg?: string;
   data?: AdminStyleResponse;
+  traceId?: string;
 }
 
 export interface AdminBannerImageUploadRequest {
@@ -304,6 +386,7 @@ export interface ApiResponseAdminBannerImageUploadResponse {
   code?: number;
   msg?: string;
   data?: AdminBannerImageUploadResponse;
+  traceId?: string;
 }
 
 export interface AdminMoodBoardCreateRequestDTO {
@@ -324,6 +407,32 @@ export interface ApiResponseAdminMoodBoardCreateResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminMoodBoardCreateResponseDTO;
+  traceId?: string;
+}
+
+export interface AdminCreditGrantRequest {
+  /**
+   * @format int32
+   * @max 1000
+   */
+  amount: number;
+}
+
+export interface AdminCreditGrantResponse {
+  /** @format int64 */
+  memberId?: number;
+  /** @format int32 */
+  grantedAmount?: number;
+  /** @format int64 */
+  creditBalance?: number;
+}
+
+export interface ApiResponseAdminCreditGrantResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: AdminCreditGrantResponse;
+  traceId?: string;
 }
 
 export interface AdminLandingCreateRequest {
@@ -347,6 +456,7 @@ export interface ApiResponseAdminLandingResponse {
   code?: number;
   msg?: string;
   data?: AdminLandingResponse;
+  traceId?: string;
 }
 
 export interface AdminFurnitureRequestDTO {
@@ -400,6 +510,7 @@ export interface ApiResponseAdminFurniturePromptCreateResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminFurniturePromptCreateResponseDTO;
+  traceId?: string;
 }
 
 export interface AdminFloorPlanCreateRequest {
@@ -463,6 +574,7 @@ export interface ApiResponseAdminFloorPlanResponse {
   code?: number;
   msg?: string;
   data?: AdminFloorPlanResponse;
+  traceId?: string;
 }
 
 export interface AdminFloorPlanImageUploadRequest {
@@ -479,6 +591,7 @@ export interface ApiResponseAdminFloorPlanImageUploadResponse {
   code?: number;
   msg?: string;
   data?: AdminFloorPlanImageUploadResponse;
+  traceId?: string;
 }
 
 export interface ApiResponseSoozipRawProductSaveResponse {
@@ -486,6 +599,7 @@ export interface ApiResponseSoozipRawProductSaveResponse {
   code?: number;
   msg?: string;
   data?: SoozipRawProductSaveResponse;
+  traceId?: string;
 }
 
 export interface SoozipRawProductSaveResponse {
@@ -638,6 +752,7 @@ export interface ApiResponseAdminCurationRawProductResponse {
   code?: number;
   msg?: string;
   data?: AdminCurationRawProductResponse;
+  traceId?: string;
 }
 
 export interface AdminCurationRawProductFurnitureTagCreateRequest {
@@ -650,6 +765,7 @@ export interface ApiResponseAdminCurationRawProductFurnitureTagResponse {
   code?: number;
   msg?: string;
   data?: AdminCurationRawProductFurnitureTagResponse;
+  traceId?: string;
 }
 
 export interface AdminBannerCreateRequest {
@@ -713,11 +829,91 @@ export interface ApiResponseAdminBannerResponse {
   code?: number;
   msg?: string;
   data?: AdminBannerResponse;
+  traceId?: string;
 }
 
 export interface AddressRequest {
   sigungu: string;
   roadName: string;
+}
+
+export interface AdminTextSearchRequest {
+  title: string;
+  imageUrl?: string;
+  /** @format double */
+  priceKrw: number;
+  category?: string;
+}
+
+export interface AdminSearchCandidate {
+  title?: string;
+  imageUrl?: string;
+  /** @format double */
+  priceUsd?: number;
+  productUrl?: string;
+  /** @format double */
+  textSimilarity?: number;
+  /** @format double */
+  imageSimilarity?: number;
+  /** @format double */
+  combinedScore?: number;
+}
+
+export interface AdminSearchResult {
+  items?: AdminSearchCandidate[];
+  filterStats?: FilterStats;
+}
+
+export interface ApiResponseAdminSearchResult {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: AdminSearchResult;
+  traceId?: string;
+}
+
+export interface FilterStats {
+  /** @format int32 */
+  totalFetched?: number;
+  /** @format int32 */
+  afterCategoryFilter?: number;
+  /** @format int32 */
+  afterPriceFilter?: number;
+  /** @format int32 */
+  scored?: number;
+}
+
+export interface ApiResponseLong {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  /** @format int64 */
+  data?: number;
+  traceId?: string;
+}
+
+export interface KeywordCheckRequest {
+  productName: string;
+}
+
+export interface ApiResponseKeywordCheckResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: KeywordCheckResponse;
+  traceId?: string;
+}
+
+export interface KeywordCheckResponse {
+  english?: string;
+  korean?: string;
+}
+
+export interface AdminImageSearchRequest {
+  imageUrl: string;
+  /** @format double */
+  priceKrw: number;
+  category?: string;
 }
 
 export interface CreateUserV2Request {
@@ -749,6 +945,7 @@ export interface ApiResponseMyPageProfileResponse {
   code?: number;
   msg?: string;
   data?: MyPageProfileResponse;
+  traceId?: string;
 }
 
 export interface MyPageProfileResponse {
@@ -828,6 +1025,7 @@ export interface ApiResponseAdminFurnitureUpdateResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminFurnitureUpdateResponseDTO;
+  traceId?: string;
 }
 
 export interface AdminUpdateFurnitureTypeRequest {
@@ -933,6 +1131,7 @@ export interface ApiResponseKakaoLoginResponse {
   code?: number;
   msg?: string;
   data?: KakaoLoginResponse;
+  traceId?: string;
 }
 
 export interface KakaoLoginResponse {
@@ -951,6 +1150,7 @@ export interface ApiResponseRecentFloorPlanResponse {
   code?: number;
   msg?: string;
   data?: RecentFloorPlanResponse;
+  traceId?: string;
 }
 
 export interface RecentFloorPlanItemResponse {
@@ -973,6 +1173,7 @@ export interface ApiResponseMyPageGeneratedImageV2Response {
   code?: number;
   msg?: string;
   data?: MyPageGeneratedImageV2Response;
+  traceId?: string;
 }
 
 export interface DateGroupResponse {
@@ -1019,6 +1220,7 @@ export interface ApiResponseJjymV2ListResponse {
   code?: number;
   msg?: string;
   data?: JjymV2ListResponse;
+  traceId?: string;
 }
 
 export interface JjymV2ItemResponse {
@@ -1049,6 +1251,7 @@ export interface ApiResponseExploreHouseTemplateListResponse {
   code?: number;
   msg?: string;
   data?: ExploreHouseTemplateListResponse;
+  traceId?: string;
 }
 
 export interface ExploreHouseTemplateItemResponse {
@@ -1069,6 +1272,7 @@ export interface ApiResponseExploreHouseTemplateDetailResponse {
   code?: number;
   msg?: string;
   data?: ExploreHouseTemplateDetailResponse;
+  traceId?: string;
 }
 
 export interface ExploreHouseTemplateDetailItemResponse {
@@ -1089,6 +1293,7 @@ export interface ApiResponseFurnitureCategoriesResponse {
   code?: number;
   msg?: string;
   data?: FurnitureCategoriesResponse;
+  traceId?: string;
 }
 
 export interface FurnitureCategoriesResponse {
@@ -1106,6 +1311,7 @@ export interface ApiResponseDashboardCategoriesResponse {
   code?: number;
   msg?: string;
   data?: DashboardCategoriesResponse;
+  traceId?: string;
 }
 
 export interface DashboardCategoriesResponse {
@@ -1142,6 +1348,7 @@ export interface ApiResponseActivityFurnitureMappingsResponse {
   code?: number;
   msg?: string;
   data?: ActivityFurnitureMappingsResponse;
+  traceId?: string;
 }
 
 export interface FurnitureItem {
@@ -1158,6 +1365,7 @@ export interface ApiResponseCurationProductListResponse {
   code?: number;
   msg?: string;
   data?: CurationProductListResponse;
+  traceId?: string;
 }
 
 export interface CurationProductAppliedFilterResponse {
@@ -1205,6 +1413,7 @@ export interface ApiResponseGetCarouselV2ListResponseDTO {
   code?: number;
   msg?: string;
   data?: GetCarouselV2ListResponseDTO;
+  traceId?: string;
 }
 
 export interface GetCarouselResponseDTO {
@@ -1217,11 +1426,140 @@ export interface GetCarouselV2ListResponseDTO {
   carousels?: GetCarouselResponseDTO[];
 }
 
+export interface ApiResponsePresetListResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: PresetListResponse;
+  traceId?: string;
+}
+
+export interface PresetItemResponse {
+  /** @format int64 */
+  presetId?: number;
+  thumbnailUrl?: string;
+  title?: string;
+}
+
+export interface PresetListResponse {
+  presets?: PresetItemResponse[];
+}
+
+export interface ApiResponsePresetDetailResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: PresetDetailResponse;
+  traceId?: string;
+}
+
+export interface PresetDetailResponse {
+  originalProduct?: PresetOriginalProductResponse;
+  similarProducts?: PresetSimilarProductResponse[];
+  /** @format int64 */
+  totalCount?: number;
+}
+
+export interface PresetOriginalProductResponse {
+  sourceUrl?: string;
+  title?: string;
+  thumbnailUrl?: string;
+  brand?: string;
+  /** @format int64 */
+  price?: number;
+  currency?: string;
+}
+
+export interface PresetSimilarProductResponse {
+  source?: string;
+  productId?: string;
+  title?: string;
+  imageUrl?: string;
+  /** @format double */
+  price?: number;
+  currency?: string;
+  siteName?: string;
+  productUrl?: string;
+  /** @format date-time */
+  priceUpdatedAt?: string;
+}
+
+export interface ApiResponseCompareJobResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: CompareJobResponse;
+  traceId?: string;
+}
+
+export interface CompareJobResponse {
+  jobId?: string;
+  status?: string;
+  sources?: SourcesStatusResponse;
+  originalProduct?: OriginalProductResponse;
+  result?: JobResultResponse;
+}
+
+export interface JobResultResponse {
+  /** @format int32 */
+  totalCount?: number;
+  similarProducts?: SimilarProductItemResponse[];
+}
+
+export interface OriginalProductResponse {
+  title?: string;
+  imageUrl?: string;
+  /** @format double */
+  price?: number;
+  currency?: string;
+  quality?: string;
+}
+
+export interface SimilarProductItemResponse {
+  source?: string;
+  title?: string;
+  imageUrl?: string;
+  /** @format double */
+  price?: number;
+  currency?: string;
+  productUrl?: string;
+}
+
+export interface SourcesStatusResponse {
+  ebay?: string;
+  coupang?: string;
+  catalog?: string;
+}
+
+export interface ApiResponseCompareHistoryResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: CompareHistoryResponse;
+  traceId?: string;
+}
+
+export interface CompareHistoryResponse {
+  items?: HistoryItem[];
+}
+
+export interface HistoryItem {
+  sourceUrl?: string;
+  thumbnailUrl?: string;
+  title?: string;
+  /** @format int64 */
+  price?: number;
+  currency?: string;
+  /** @format date-time */
+  createdAt?: string;
+}
+
 export interface ApiResponseOtherStyleListResponse {
   /** @format int32 */
   code?: number;
   msg?: string;
   data?: OtherStyleListResponse;
+  traceId?: string;
 }
 
 export interface OtherStyleListResponse {
@@ -1240,6 +1578,7 @@ export interface ApiResponseOtherStyleDetailResponse {
   code?: number;
   msg?: string;
   data?: OtherStyleDetailResponse;
+  traceId?: string;
 }
 
 export interface OtherStyleDetailProductResponse {
@@ -1275,6 +1614,7 @@ export interface ApiResponseMyPageInfoResponse {
   code?: number;
   msg?: string;
   data?: MyPageInfoResponse;
+  traceId?: string;
 }
 
 export interface MyPageInfoResponse {
@@ -1291,6 +1631,7 @@ export interface ApiResponseUserImageHistoryListResponse {
   code?: number;
   msg?: string;
   data?: UserImageHistoryListResponse;
+  traceId?: string;
 }
 
 export interface UserImageHistoryDTO {
@@ -1314,6 +1655,7 @@ export interface ApiResponseImageHistoriesResultPageResponse {
   code?: number;
   msg?: string;
   data?: ImageHistoriesResultPageResponse;
+  traceId?: string;
 }
 
 export interface ImageHistoriesResultPageResponse {
@@ -1344,6 +1686,7 @@ export interface ApiResponseMoodBoardListResponse {
   code?: number;
   msg?: string;
   data?: MoodBoardListResponse;
+  traceId?: string;
 }
 
 export interface MoodBoardListResponse {
@@ -1362,6 +1705,7 @@ export interface ApiResponseLandingListResponse {
   code?: number;
   msg?: string;
   data?: LandingListResponse;
+  traceId?: string;
 }
 
 export interface LandingListResponse {
@@ -1382,6 +1726,7 @@ export interface ApiResponseJjymListResponse {
   code?: number;
   msg?: string;
   data?: JjymListResponse;
+  traceId?: string;
 }
 
 export interface JjymItemResponse {
@@ -1403,6 +1748,7 @@ export interface ApiResponseHouseOptionsResponse {
   code?: number;
   msg?: string;
   data?: HouseOptionsResponse;
+  traceId?: string;
 }
 
 export interface HouseOptionDTO {
@@ -1421,6 +1767,7 @@ export interface ApiResponseFloorPlanListResponse {
   code?: number;
   msg?: string;
   data?: FloorPlanListResponse;
+  traceId?: string;
 }
 
 export interface FloorPlanListResponse {
@@ -1445,6 +1792,7 @@ export interface ApiResponseFurnitureProductsInfoResponseForPlan {
   code?: number;
   msg?: string;
   data?: FurnitureProductsInfoResponseForPlan;
+  traceId?: string;
 }
 
 export interface FurnitureProductInfo {
@@ -1468,6 +1816,7 @@ export interface ApiResponseGeneratedImageMetaResponse {
   code?: number;
   msg?: string;
   data?: GeneratedImageMetaResponse;
+  traceId?: string;
 }
 
 export interface GeneratedImageMetaResponse {
@@ -1483,6 +1832,7 @@ export interface ApiResponseFurnitureProductsInfoResponseV2 {
   code?: number;
   msg?: string;
   data?: FurnitureProductsInfoResponseV2;
+  traceId?: string;
 }
 
 export interface FurnitureProductsInfoResponseV2 {
@@ -1521,6 +1871,7 @@ export interface ApiResponseSimilarItemsResponse {
   code?: number;
   msg?: string;
   data?: SimilarItemsResponse;
+  traceId?: string;
 }
 
 export interface SimilarItemResponse {
@@ -1551,6 +1902,7 @@ export interface ApiResponseRelatedImagesResponse {
   code?: number;
   msg?: string;
   data?: RelatedImagesResponse;
+  traceId?: string;
 }
 
 export interface RelatedImageResponse {
@@ -1570,6 +1922,7 @@ export interface ApiResponseGenerateImageResultResponse {
   code?: number;
   msg?: string;
   data?: GenerateImageResultResponse;
+  traceId?: string;
 }
 
 export interface GenerateImageResultProductResponse {
@@ -1599,6 +1952,7 @@ export interface ApiResponseFactorsResponse {
   code?: number;
   msg?: string;
   data?: FactorsResponse;
+  traceId?: string;
 }
 
 export interface FactorItem {
@@ -1621,6 +1975,7 @@ export interface ApiResponseFurnitureAndActivityResponse {
   code?: number;
   msg?: string;
   data?: FurnitureAndActivityResponse;
+  traceId?: string;
 }
 
 export interface FurnitureAndActivityResponse {
@@ -1633,6 +1988,7 @@ export interface ApiResponseCurationProductDetailResponse {
   code?: number;
   msg?: string;
   data?: CurationProductDetailResponse;
+  traceId?: string;
 }
 
 export interface CurationProductDetailResponse {
@@ -1673,6 +2029,7 @@ export interface ApiResponseCurationProductFilterResponse {
   code?: number;
   msg?: string;
   data?: CurationProductFilterResponse;
+  traceId?: string;
 }
 
 export interface ColorFilterResponse {
@@ -1704,11 +2061,34 @@ export interface PriceRangeFilterResponse {
   max?: number;
 }
 
+export interface ApiResponseCompareCatalogJjymListResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: CompareCatalogJjymListResponse;
+  traceId?: string;
+}
+
+export interface CompareCatalogJjymItemResponse {
+  /** @format int64 */
+  catalogItemId?: number;
+  title?: string;
+  imageUrl?: string;
+  /** @format double */
+  priceUsd?: number;
+  productUrl?: string;
+}
+
+export interface CompareCatalogJjymListResponse {
+  items?: CompareCatalogJjymItemResponse[];
+}
+
 export interface ApiResponseBoolean {
   /** @format int32 */
   code?: number;
   msg?: string;
   data?: boolean;
+  traceId?: string;
 }
 
 export interface ApiResponseGetCarouselListResponseDTO {
@@ -1716,6 +2096,7 @@ export interface ApiResponseGetCarouselListResponseDTO {
   code?: number;
   msg?: string;
   data?: GetCarouselListResponseDTO;
+  traceId?: string;
 }
 
 export interface GetCarouselListResponseDTO {
@@ -1727,6 +2108,7 @@ export interface ApiResponseBannerExploreListResponse {
   code?: number;
   msg?: string;
   data?: BannerExploreListResponse;
+  traceId?: string;
 }
 
 export interface BannerExploreListResponse {
@@ -1745,6 +2127,7 @@ export interface ApiResponseBannerDetailResponse {
   code?: number;
   msg?: string;
   data?: BannerDetailResponse;
+  traceId?: string;
 }
 
 export interface BannerDetailAnswerResponse {
@@ -1779,6 +2162,7 @@ export interface ApiResponseAdminTagGetAllResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminTagGetAllResponseDTO;
+  traceId?: string;
 }
 
 export interface AdminStyleListResponse {
@@ -1790,6 +2174,7 @@ export interface ApiResponseAdminStyleListResponse {
   code?: number;
   msg?: string;
   data?: AdminStyleListResponse;
+  traceId?: string;
 }
 
 export interface AdminBannerRawProductSearchResponse {
@@ -1801,6 +2186,7 @@ export interface ApiResponseAdminBannerRawProductSearchResponse {
   code?: number;
   msg?: string;
   data?: AdminBannerRawProductSearchResponse;
+  traceId?: string;
 }
 
 export interface AdminMoodBoardGetAllResponseDTO {
@@ -1818,6 +2204,29 @@ export interface ApiResponseAdminMoodBoardGetAllResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminMoodBoardGetAllResponseDTO;
+  traceId?: string;
+}
+
+export interface AdminMemberResponse {
+  /** @format int64 */
+  memberId?: number;
+  nickname?: string;
+  nicknameTag?: string;
+  email?: string;
+  /** @format int64 */
+  creditBalance?: number;
+}
+
+export interface AdminMemberSearchResponse {
+  members?: AdminMemberResponse[];
+}
+
+export interface ApiResponseAdminMemberSearchResponse {
+  /** @format int32 */
+  code?: number;
+  msg?: string;
+  data?: AdminMemberSearchResponse;
+  traceId?: string;
 }
 
 export interface AdminLandingListResponse {
@@ -1829,6 +2238,7 @@ export interface ApiResponseAdminLandingListResponse {
   code?: number;
   msg?: string;
   data?: AdminLandingListResponse;
+  traceId?: string;
 }
 
 export interface AdminFurnitureGetDTO {
@@ -1840,6 +2250,7 @@ export interface ApiResponseAdminFurnitureGetDTO {
   code?: number;
   msg?: string;
   data?: AdminFurnitureGetDTO;
+  traceId?: string;
 }
 
 export interface FurnitureInfo {
@@ -1902,6 +2313,7 @@ export interface ApiResponseAdminFurnitureTypeListResponse {
   code?: number;
   msg?: string;
   data?: AdminFurnitureTypeListResponse;
+  traceId?: string;
 }
 
 export interface AdminFurnitureTagOptionListResponse {
@@ -1951,6 +2363,7 @@ export interface ApiResponseAdminFurnitureTagOptionListResponse {
   code?: number;
   msg?: string;
   data?: AdminFurnitureTagOptionListResponse;
+  traceId?: string;
 }
 
 export interface AdminFurnitureOptionListResponse {
@@ -1974,6 +2387,7 @@ export interface ApiResponseAdminFurnitureOptionListResponse {
   code?: number;
   msg?: string;
   data?: AdminFurnitureOptionListResponse;
+  traceId?: string;
 }
 
 export interface AdminFurnitureTagGetDTO {
@@ -1988,6 +2402,7 @@ export interface ApiResponseAdminFurnitureTagGetDTO {
   code?: number;
   msg?: string;
   data?: AdminFurnitureTagGetDTO;
+  traceId?: string;
 }
 
 export interface AdminFurnitureDetailsResponseDTO {
@@ -1999,6 +2414,7 @@ export interface ApiResponseAdminFurnitureDetailsResponseDTO {
   code?: number;
   msg?: string;
   data?: AdminFurnitureDetailsResponseDTO;
+  traceId?: string;
 }
 
 export interface AdminFloorPlanListResponse {
@@ -2010,6 +2426,7 @@ export interface ApiResponseAdminFloorPlanListResponse {
   code?: number;
   msg?: string;
   data?: AdminFloorPlanListResponse;
+  traceId?: string;
 }
 
 export interface AdminCurationRawProductListResponse {
@@ -2031,6 +2448,7 @@ export interface ApiResponseAdminCurationRawProductListResponse {
   code?: number;
   msg?: string;
   data?: AdminCurationRawProductListResponse;
+  traceId?: string;
 }
 
 export interface AdminCurationRawProductColorOptionResponse {
@@ -2043,6 +2461,7 @@ export interface ApiResponseListAdminCurationRawProductColorOptionResponse {
   code?: number;
   msg?: string;
   data?: AdminCurationRawProductColorOptionResponse[];
+  traceId?: string;
 }
 
 export interface AdminBannerListResponse {
@@ -2054,6 +2473,7 @@ export interface ApiResponseAdminBannerListResponse {
   code?: number;
   msg?: string;
   data?: AdminBannerListResponse;
+  traceId?: string;
 }
 
 export interface AdminTagDeleteRequestDTO {
@@ -2083,6 +2503,10 @@ export interface AdminFurnitureTagDeleteDTO {
    */
   tagId?: number;
 }
+
+export type UpdatePresetData = ApiResponseVoid;
+
+export type DeletePresetData = ApiResponseVoid;
 
 export type ReissueData = ApiResponseString;
 
@@ -2117,6 +2541,10 @@ export type UpdateUser1Data = ApiResponseString;
 
 export type ToggleJjymData = ApiResponseJjymToggleResponse;
 
+export type ScrapeData = ApiResponseScrapedProductResponse;
+
+export type CreateJobData = ApiResponseCreateJobResponse;
+
 export type Generate1Data = ApiResponseString;
 
 export type HousingSelectionsData = ApiResponseHouseIdResponse;
@@ -2145,6 +2573,8 @@ export type CreateFurnitureRecommendBtnClickLogData = ApiResponseVoid;
 
 export type CreatePaymentBtnClickLogData = ApiResponseVoid;
 
+export type ToggleCatalogItemJjymData = ApiResponseJjymToggleResponse;
+
 export type LikeCarouselData = ApiResponseString;
 
 export type HateCarouselData = ApiResponseString;
@@ -2165,6 +2595,8 @@ export type CreateStyleImageUploadUrlData =
 export type CreateMoodBoardData = ApiResponseAdminMoodBoardCreateResponseDTO;
 
 export type DeleteMoodBoardData = ApiResponseString;
+
+export type GrantCreditsData = ApiResponseAdminCreditGrantResponse;
 
 export type GetLandings1Data = ApiResponseAdminLandingListResponse;
 
@@ -2215,6 +2647,16 @@ export type CreateBannerImageUploadUrlData =
   ApiResponseAdminBannerImageUploadResponse;
 
 export type CreateAddressData = ApiResponseVoid;
+
+export type TextSearchData = ApiResponseAdminSearchResult;
+
+export type GetPresets1Data = ApiResponsePresetListResponse;
+
+export type CreatePresetData = ApiResponseLong;
+
+export type KeywordCheckData = ApiResponseKeywordCheckResponse;
+
+export type ImageSearchData = ApiResponseAdminSearchResult;
 
 export type GetMyPageProfileData = ApiResponseMyPageProfileResponse;
 
@@ -2288,6 +2730,14 @@ export type GetProductsData = ApiResponseCurationProductListResponse;
 
 export type GetCarouselsV2Data = ApiResponseGetCarouselV2ListResponseDTO;
 
+export type GetPresetsData = ApiResponsePresetListResponse;
+
+export type GetPresetDetailData = ApiResponsePresetDetailResponse;
+
+export type GetJobData = ApiResponseCompareJobResponse;
+
+export type GetHistoryData = ApiResponseCompareHistoryResponse;
+
 export type GetOtherStylesData = ApiResponseOtherStyleListResponse;
 
 export type GetOtherStyleDetailData = ApiResponseOtherStyleDetailResponse;
@@ -2342,6 +2792,8 @@ export type GetProductDetailData = ApiResponseCurationProductDetailResponse;
 
 export type GetFiltersData = ApiResponseCurationProductFilterResponse;
 
+export type GetMyEbayJjymsData = ApiResponseCompareCatalogJjymListResponse;
+
 export type CheckHasGeneratedImageData = ApiResponseBoolean;
 
 export type GetCarouselsData = ApiResponseGetCarouselListResponseDTO;
@@ -2358,6 +2810,8 @@ export type SearchRawProductsData =
   ApiResponseAdminBannerRawProductSearchResponse;
 
 export type GetAllData = ApiResponseAdminMoodBoardGetAllResponseDTO;
+
+export type SearchMembersData = ApiResponseAdminMemberSearchResponse;
 
 export type GetFurnituresData = ApiResponseAdminFurnitureGetDTO;
 

@@ -1,6 +1,4 @@
-import { useCallback, useEffect } from 'react';
-
-import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
@@ -16,10 +14,7 @@ import {
 } from '@pages/home/constants/compareView';
 import {
   COMPARE_JOB_STATUS,
-  type CompareJobStage,
   type CompareJobStatus,
-  type CompareResult,
-  type CompareSourceStatus,
 } from '@pages/home/types/compare';
 import {
   getServerErrorCode,
@@ -29,7 +24,11 @@ import {
 
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
-import { queryKeys } from '@constants/queryKey';
+import type {
+  JobResultResponse,
+  OriginalProductResponse,
+  SourcesStatusResponse,
+} from '@apis/__generated__/data-contracts';
 
 import { useLoginGate } from '@hooks/useLoginGate';
 
@@ -40,12 +39,17 @@ interface PriceCompareJob {
   /** 입력창에 채워둘 상품 URL. 딥링크 진입·로그인 복귀로 주소에 실려 온 값 */
   productUrl: string | null;
   view: CompareView;
-  /** 진행 중일 때의 파이프라인 단계 — 로딩 뷰의 문구가 이 값에 매핑된다 */
-  stage: CompareJobStage | null;
-  result: CompareResult | null;
-  /** SEARCHING 단계에서 3개 소스가 각각 어디까지 갔는지. 로딩 뷰의 소스별 표시가 쓴다 */
-  sources: Record<'catalog' | 'coupang' | 'ebay', CompareSourceStatus> | null;
-  /** 실패 분기용 코드. 서버 안내대로 문구가 아니라 이 값으로 분기한다 */
+  /** DONE일 때의 결과. 원본 상품 정보는 여기 없고 originalProduct에 따로 있다 */
+  result: JobResultResponse | null;
+  /**
+   * 검색한 상품(원본 상품). 진행 중에도 온다.
+   * 상태 응답이 오기 전(생성 직후 첫 폴링 전)에는 생성 응답의 title·thumbnail·price로 채워
+   * 로딩 화면의 "검색한 상품" 카드가 생성 응답 즉시 그려지게 한다. 새로고침 복원처럼 생성 응답이 없으면 첫 폴링 응답부터 채워진다
+   */
+  originalProduct: OriginalProductResponse | null;
+  /** 3개 소스(catalog·coupang·ebay)가 각각 어디까지 갔는지. 서버가 파이프라인 단계를 따로 주지 않아 진행 표시는 이 값으로만 가능하다 */
+  sources: SourcesStatusResponse | null;
+  /** 생성·조회 요청이 거절됐을 때의 서버 비즈니스 코드. job이 FAILED로 끝난 응답에는 코드가 없다 */
   errorCode: number | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
@@ -64,6 +68,9 @@ interface PriceCompareJob {
  * jobId를 URL에 두는 이유: 새로고침·뒤로가기·(공유)가 전부 URL 하나로 해결되기 때문.
  * 마운트 시 URL에 jobId가 있으면 그 job을 이어서 조회하므로 새로고침 복원 로직 불필요
  *
+ * 히스토리는 job이 끝나도 여기서 무효화하지 않는다. 히스토리 쿼리가 staleTime 0이라
+ * 검색 화면(CompareSearch)이 다시 마운트될 때 알아서 새로 받는다.
+ *
  * searchParams/setSearchParams는 useCompareTab이 useSearchParams()를 한 번만 호출해 내려준다.
  * 이 훅이 따로 useSearchParams()를 부르면 useComparePreset과 서로 다른 스냅샷을 들고 있게 되어,
  * 같은 틱에서 두 훅이 연달아 setSearchParams를 호출할 때 나중 호출이 앞의 변경을 덮어쓸 수 있다.
@@ -72,34 +79,20 @@ export const usePriceCompareJob = (
   searchParams: URLSearchParams,
   setSearchParams: SetURLSearchParams
 ): PriceCompareJob => {
-  const queryClient = useQueryClient();
   const jobId = searchParams.get(COMPARE_JOB_ID_PARAM);
   const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
 
   const { requireLogin } = useLoginGate();
   const {
     mutate: createJob,
+    data: createdJob,
     isPending: isCreatingJob,
     error: jobCreateError,
     reset: resetCreateJob,
   } = useCreateCompareJobMutation();
   const { data, error: jobStatusError } = useCompareJobStatusQuery(jobId);
 
-  // job이 끝나면 히스토리만 무효화한다. 프리셋은 고정값이라 건드리지 않는다
-  useEffect(() => {
-    if (
-      data?.status !== COMPARE_JOB_STATUS.DONE &&
-      data?.status !== COMPARE_JOB_STATUS.FAILED
-    ) {
-      return;
-    }
-
-    void queryClient.invalidateQueries({
-      queryKey: queryKeys.compare.historyAll(),
-    });
-  }, [data?.status, queryClient]);
-
-  // job 생성 실패(400 등)와 상태 조회 실패를 같은 자리에서 다룬다.
+  // job 생성 실패(원본 페이지 로드 실패 502 등)와 상태 조회 실패를 같은 자리에서 다룬다.
   // - job 생성이 실패하면 URL에 jobId가 없어 입력 화면으로 되돌아감
   // - 이때 아무런 피드백이 없으면 사용자는 요청이 어떻게 진행되었는지 알 수 없으므로 예외처리 필요
   const jobRequestError = jobCreateError ?? jobStatusError;
@@ -140,7 +133,12 @@ export const usePriceCompareJob = (
           createJob(
             { url },
             // jobId는 항상 replace로 쓴다. 뒤로가기 목적지는 이 시점 이전 항목 (입력창에서 제출했으면 입력 화면, 딥링크로 들어왔으면 직전에 보던 사이트)이어야 한다
-            { onSuccess: (response) => writeJobId(response.jobId, true) }
+            {
+              onSuccess: (response) => {
+                // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
+                if (response.jobId) writeJobId(response.jobId, true);
+              },
+            }
           );
         },
         LOGIN_ENTRY_ROUTE.COMPARE_SEARCH,
@@ -155,35 +153,44 @@ export const usePriceCompareJob = (
   }, [resetCreateJob]);
 
   const isJobFailed = data?.status === COMPARE_JOB_STATUS.FAILED;
-  const hasError = isJobFailed || Boolean(jobRequestError);
+  // 실패 문구를 보여줄 상황 전체 — job이 FAILED로 끝났거나, 생성·조회 요청이 거절됐거나
+  const hasJobError = isJobFailed || Boolean(jobRequestError);
 
   const view = resolveJobView({
     hasJobId: Boolean(jobId),
     isCreatingJob,
-    hasError: Boolean(jobRequestError),
+    hasRequestError: Boolean(jobRequestError),
     status: data?.status,
+    // 0건 판정은 프리셋과 같이 totalCount로 한다 (similarProducts는 일부만 올 수 있다는 프리셋 명세와 맞춤)
     productCount:
       data?.status === COMPARE_JOB_STATUS.DONE
-        ? data.result.similarProducts.length
+        ? (data.result.totalCount ?? data.result.similarProducts?.length ?? 0)
         : undefined,
   });
+
+  // 생성 응답은 방금 만든 job의 것일 때만 쓴다. 뒤로가기 등으로 URL의 jobId가 다른 job이면 그 job의 상태 응답만 믿는다
+  const createdOriginalProduct: OriginalProductResponse | null =
+    createdJob && createdJob.jobId === jobId
+      ? {
+          title: createdJob.title,
+          imageUrl: createdJob.thumbnail,
+          price: createdJob.price ?? undefined,
+        }
+      : null;
 
   return {
     jobId,
     productUrl,
     view,
-    stage: data?.currentStage ?? null,
     result: data?.status === COMPARE_JOB_STATUS.DONE ? data.result : null,
+    originalProduct: data?.originalProduct ?? createdOriginalProduct,
     sources: data?.sources ?? null,
-    errorCode: isJobFailed
-      ? data.errorCode
-      : getServerErrorCode(jobRequestError),
+    // FAILED 응답에는 코드·문구가 없다(2026-09-17 실측). 요청 자체가 거절된 경우의 서버 코드·문구만 꺼낸다
+    errorCode: getServerErrorCode(jobRequestError),
     errorMessage: resolveJobErrorMessage({
-      hasError,
+      hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
-      serverMessage: isJobFailed
-        ? data.errorMessage
-        : getServerErrorMessage(jobRequestError),
+      serverMessage: getServerErrorMessage(jobRequestError),
     }),
     start,
     dismissCreateError,
@@ -193,7 +200,8 @@ export const usePriceCompareJob = (
 interface ResolveJobViewParams {
   hasJobId: boolean;
   isCreatingJob: boolean;
-  hasError: boolean;
+  /** 생성·조회 요청 자체가 거절됨. job이 FAILED로 끝난 경우는 status로 본다 */
+  hasRequestError: boolean;
   status: CompareJobStatus | undefined;
   productCount: number | undefined;
 }
@@ -202,14 +210,14 @@ interface ResolveJobViewParams {
 const resolveJobView = ({
   hasJobId,
   isCreatingJob,
-  hasError,
+  hasRequestError,
   status,
   productCount,
 }: ResolveJobViewParams): CompareView => {
   if (isCreatingJob) return COMPARE_VIEW.LOADING;
 
   // 생성 실패는 jobId가 없는 상태로 발생하므로 입력 화면 판정보다 먼저 본다
-  if (hasError) return COMPARE_VIEW.ERROR;
+  if (hasRequestError) return COMPARE_VIEW.ERROR;
   if (!hasJobId) return COMPARE_VIEW.SEARCH;
 
   // 첫 조회 응답을 기다리는 중 — 아직 상태를 모름

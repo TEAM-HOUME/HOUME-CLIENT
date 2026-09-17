@@ -1,12 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
-  getMockCompareJobStatus,
-  isMockCompareJobId,
-  USE_COMPARE_MOCK,
-} from '@pages/home/apis/compareJobMock';
-import type { CompareJobStatusResponse } from '@pages/home/types/compare';
-import { COMPARE_JOB_STATUS } from '@pages/home/types/compare';
+  COMPARE_JOB_STATUS,
+  type CompareJobStatusResponse,
+} from '@pages/home/types/compare';
 import { isCompareJobNotFound } from '@pages/home/utils/compareJobError';
 
 import { HTTPMethod, request } from '@apis/config/request';
@@ -17,21 +14,14 @@ import { queryKeys } from '@constants/queryKey';
 /**
  * 폴링 주기.
  *
- * 서버가 알려준 단계별 예상 시간
- * - SCRAPING 2초 · SEARCHING 3~5초 · MERGING 5초 · SORTING 0.2초 미만
- * - 비교 job 한 건이 10~12초로 예상
- * - 우선 800ms로 설정해두고, API 연동 후 필요 시 재설정
+ * 서버 명세의 단계별 예상 시간은 SCRAPING 2초 · SEARCHING 3~5초 · MERGING 5초였고,
+ * 2026-09-17 dev 실측에서는 생성 후 2~3초 안에 DONE이 됐다. 1초면 완료를 최대 1초 늦게 본다.
  */
-export const COMPARE_POLLING_INTERVAL_MS = 800;
+export const COMPARE_POLLING_INTERVAL_MS = 1_000;
 
 export const getCompareJobStatus = async (
   jobId: string
 ): Promise<CompareJobStatusResponse> => {
-  // 서버 API 연동 전 임시 — compareJobMock.ts와 함께 지운다
-  if (USE_COMPARE_MOCK && isMockCompareJobId(jobId)) {
-    return getMockCompareJobStatus(jobId);
-  }
-
   return request<CompareJobStatusResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.COMPARE.JOB_STATUS(jobId),
@@ -42,7 +32,7 @@ export const getCompareJobStatus = async (
  * job 진행 상태 조회. DONE·FAILED가 오면 폴링 중지
  *
  * 에러 처리 관련)
- * - job 실패는 HTTP 에러가 아니라 200 + status FAILED 판단하므로 여기서 에러로 잡히지 않는다. 에러 종류 판별은 compareJobError.ts에서 담당한다.
+ * - job 실패는 HTTP 에러가 아니라 200 + status FAILED로 판단하므로 여기서 에러로 잡히지 않는다. 에러 종류 판별은 compareJobError.ts에서 담당한다.
  * - 이 쿼리의 error는 요청 자체가 거절된 경우(존재x jobId·인증·서버 오류)만 의미한다.
  *
  * 타임아웃 관련)
@@ -56,7 +46,7 @@ export const useCompareJobStatusQuery = (jobId: string | null) => {
     enabled: Boolean(jobId),
     refetchInterval: (query) => {
       // 요청이 실패하면 화면은 이미 에러로 넘어간 상태다. 여기서 멈추지 않으면
-      // 사용자가 떠난 화면에서 800ms마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨)
+      // 사용자가 떠난 화면에서 1초마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨)
       if (query.state.status === 'error') return false;
 
       const status = query.state.data?.status;

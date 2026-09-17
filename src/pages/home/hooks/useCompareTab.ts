@@ -1,7 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
+import {
+  mapCompareJobToView,
+  mapComparePresetToView,
+  type CompareResultViewModel,
+  type CompareSearchedProductView,
+  toSearchedProductView,
+} from '@pages/home/components/compare/utils/mapCompareResultToView';
 import {
   COMPARE_JOB_ID_PARAM,
   COMPARE_PRESET_ID_PARAM,
@@ -10,7 +17,6 @@ import {
 import type { CompareView } from '@pages/home/constants/compareView';
 import { useComparePreset } from '@pages/home/hooks/useComparePreset';
 import { usePriceCompareJob } from '@pages/home/hooks/usePriceCompareJob';
-import type { ComparePresetResponse } from '@pages/home/types/compare';
 
 export {
   COMPARE_VIEW,
@@ -21,7 +27,10 @@ interface CompareTabState {
   view: CompareView;
   productUrl: string | null;
   errorMessage: string | null;
-  presetResult: ComparePresetResponse | null;
+  /** RESULT 뷰가 그릴 값. job이든 프리셋이든 같은 형태로 맞춰 CompareResult는 출처를 모른다 */
+  resultViewModel: CompareResultViewModel | null;
+  /** 로딩 중에 먼저 그릴 "검색한 상품" 카드. job은 생성 응답 즉시, 프리셋은 응답이 오면 채워진다 */
+  searchedProduct: CompareSearchedProductView | null;
   start: (url: string) => void;
   selectPreset: (presetId: number) => void;
   reset: () => void;
@@ -43,6 +52,8 @@ export const useCompareTab = (): CompareTabState => {
     view: jobView,
     productUrl,
     errorMessage: jobErrorMessage,
+    result: jobResult,
+    originalProduct: jobOriginalProduct,
     start,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
@@ -84,11 +95,29 @@ export const useCompareTab = (): CompareTabState => {
   // 프리셋은 job이 아니다. URL에 presetId가 있으면 job view보다 우선한다
   const view = presetView ?? jobView;
 
+  const resultViewModel = useMemo(() => {
+    if (isPresetActive) {
+      return presetResult ? mapComparePresetToView(presetResult) : null;
+    }
+    return jobResult
+      ? mapCompareJobToView(jobOriginalProduct ?? undefined, jobResult)
+      : null;
+  }, [isPresetActive, presetResult, jobResult, jobOriginalProduct]);
+
+  const searchedProduct = useMemo(() => {
+    if (resultViewModel) return resultViewModel.searchedProduct;
+    if (isPresetActive) return null;
+    return jobOriginalProduct
+      ? toSearchedProductView(jobOriginalProduct)
+      : null;
+  }, [resultViewModel, isPresetActive, jobOriginalProduct]);
+
   return {
     view,
     productUrl,
     errorMessage: isPresetActive ? presetErrorMessage : jobErrorMessage,
-    presetResult,
+    resultViewModel,
+    searchedProduct,
     start,
     selectPreset,
     reset,

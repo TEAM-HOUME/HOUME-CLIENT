@@ -13,6 +13,8 @@ import Banner, {
 
 import { ROUTES } from '@routes/paths';
 
+import { useUserStore } from '@store/useUserStore';
+
 import { GA_EVENTS } from '@analytics/events';
 
 import { useLandingListQuery } from '@apis/queries/useLandingListQuery';
@@ -43,7 +45,9 @@ const ExploreTab = ({
 }: ExploreTabProps) => {
   const navigate = useNavigate();
   const { data: landingData } = useLandingListQuery();
-  const { data: presetsData } = useComparePresetsQuery();
+  // 프리셋 목록은 서버가 비로그인 요청을 403으로 거절해 로그인 상태에서만 받는다 (useComparePresetsQuery 주석 참고)
+  const isLoggedIn = !!useUserStore((state) => state.accessToken);
+  const { data: presetsData } = useComparePresetsQuery(isLoggedIn);
 
   const seedBannerId = useMemo(() => {
     if (exploreSeedBannerId != null && exploreSeedBannerId > 0) {
@@ -58,12 +62,20 @@ const ExploreTab = ({
 
   const widgetProducts = useMemo(
     () =>
-      (presetsData?.presets ?? []).map((preset) => ({
-        presetId: preset.presetId,
-        name: preset.title,
-        imageSrc: preset.thumbnailUrl ?? undefined,
-        onClick: () => onNavigateToCompareTab({ presetId: preset.presetId }),
-      })),
+      (presetsData?.presets ?? []).flatMap((preset) => {
+        // 생성 타입은 전 필드가 optional이다. id가 없는 프리셋은 열 수 없으니 그리지 않는다
+        const { presetId } = preset;
+        if (presetId == null) return [];
+
+        return [
+          {
+            presetId,
+            name: preset.title ?? '',
+            imageSrc: preset.thumbnailUrl,
+            onClick: () => onNavigateToCompareTab({ presetId }),
+          },
+        ];
+      }),
     [onNavigateToCompareTab, presetsData?.presets]
   );
 

@@ -32,7 +32,7 @@ const CompareSearch = ({
   const isLoggedIn = !!useUserStore((state) => state.accessToken);
 
   const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
-  const { data: presetsData } = useComparePresetsQuery();
+  const { data: presetsData } = useComparePresetsQuery(isLoggedIn);
 
   // 비로그인이면 캐시에 이전 데이터가 있어도 목록을 그리지 않는다.
   const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
@@ -52,27 +52,41 @@ const CompareSearch = ({
       <div className={styles.contents}>
         <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
         <ul className={styles.itemList}>
-          {historyItems.map((item) => (
-            <li key={item.sourceUrl} className={styles.item}>
-              <SearchItem
-                type="recent"
-                name={item.title}
-                imageSrc={item.thumbnailUrl ?? undefined}
-                searchDayCount={getSearchDayCount(item.createdAt)}
-                onClick={() => onSubmit(item.sourceUrl)}
-              />
-            </li>
-          ))}
-          {presets.map((preset) => (
-            <li key={preset.presetId} className={styles.item}>
-              <SearchItem
-                type="popular"
-                name={preset.title}
-                imageSrc={preset.thumbnailUrl ?? undefined}
-                onClick={() => handlePresetClick(preset.presetId)}
-              />
-            </li>
-          ))}
+          {historyItems.map((item) => {
+            // 생성 타입은 전 필드가 optional이다. URL이 없는 항목은 클릭해도 시작할 수 없으니 그리지 않는다
+            const { sourceUrl } = item;
+            if (!sourceUrl) return null;
+
+            return (
+              <li
+                key={`${sourceUrl}-${item.createdAt}`}
+                className={styles.item}
+              >
+                <SearchItem
+                  type="recent"
+                  name={item.title ?? ''}
+                  imageSrc={item.thumbnailUrl}
+                  searchDayCount={getSearchDayCount(item.createdAt ?? '')}
+                  onClick={() => onSubmit(sourceUrl)}
+                />
+              </li>
+            );
+          })}
+          {presets.map((preset) => {
+            const { presetId } = preset;
+            if (presetId == null) return null;
+
+            return (
+              <li key={presetId} className={styles.item}>
+                <SearchItem
+                  type="popular"
+                  name={preset.title ?? ''}
+                  imageSrc={preset.thumbnailUrl}
+                  onClick={() => handlePresetClick(presetId)}
+                />
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

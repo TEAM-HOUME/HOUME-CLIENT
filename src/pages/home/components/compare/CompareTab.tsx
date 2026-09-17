@@ -16,7 +16,8 @@ const CompareTab = () => {
     errorMessage,
     start,
     selectPreset,
-    presetResult,
+    resultViewModel,
+    searchedProduct,
     reset,
   } = useCompareTab();
 
@@ -33,14 +34,16 @@ const CompareTab = () => {
           />
         )}
 
-        {view === COMPARE_VIEW.LOADING && <CompareResultSkeleton />}
-
-        {/* TODO: job 결과(result)도 ProductCard 형태로 바꿔 props로 넘기기. 지금은 프리셋만 실데이터, job은 UI 목데이터 */}
-        {view === COMPARE_VIEW.RESULT && (
-          <CompareResult
+        {/* 로딩 중에도 "검색한 상품" 카드는 값이 오는 즉시 그리고, "비슷한 상품" 영역만 스켈레톤을 유지한다 */}
+        {view === COMPARE_VIEW.LOADING && (
+          <CompareResultSkeleton
+            searchedProduct={searchedProduct}
             onSearchNewLink={reset}
-            presetResult={presetResult ?? undefined}
           />
+        )}
+
+        {view === COMPARE_VIEW.RESULT && resultViewModel && (
+          <CompareResult viewModel={resultViewModel} onSearchNewLink={reset} />
         )}
 
         {view === COMPARE_VIEW.EMPTY && (
