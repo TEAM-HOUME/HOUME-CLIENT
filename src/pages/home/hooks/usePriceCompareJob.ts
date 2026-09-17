@@ -3,12 +3,6 @@ import { useCallback } from 'react';
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
 import {
-  buildCompareTabPath,
-  COMPARE_JOB_ID_PARAM,
-  COMPARE_PRESET_ID_PARAM,
-  COMPARE_PRODUCT_URL_PARAM,
-} from '@pages/home/constants/compareParams';
-import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
@@ -30,7 +24,17 @@ import type {
   SourcesStatusResponse,
 } from '@apis/__generated__/data-contracts';
 
+import {
+  COMPARE_JOB_ID_PARAM,
+  COMPARE_PRODUCT_URL_PARAM,
+} from '@constants/compareParams';
+
 import { useLoginGate } from '@hooks/useLoginGate';
+
+import {
+  applyCompareTabParams,
+  buildCompareTabPath,
+} from '@utils/compareTabPath';
 
 import type { SetURLSearchParams } from 'react-router-dom';
 
@@ -97,23 +101,14 @@ export const usePriceCompareJob = (
   // - 이때 아무런 피드백이 없으면 사용자는 요청이 어떻게 진행되었는지 알 수 없으므로 예외처리 필요
   const jobRequestError = jobCreateError ?? jobStatusError;
 
-  /** /?tab=compare&jobId=nextJobId와 같이 URL 쿼리 스트링을 write */
+  /** /?tab=compare&jobId=nextJobId로 URL을 쓴다. productUrl·presetId는 함께 지워진다 (applyCompareTabParams) */
   const writeJobId = useCallback(
-    (nextJobId: string | null, replace: boolean) => {
+    (nextJobId: string, replace: boolean) => {
       setSearchParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          if (nextJobId) {
-            next.set(COMPARE_JOB_ID_PARAM, nextJobId);
-            next.delete(COMPARE_PRODUCT_URL_PARAM);
-            // job과 프리셋은 동시에 진행하지 않는다
-            next.delete(COMPARE_PRESET_ID_PARAM);
-          } else {
-            next.delete(COMPARE_JOB_ID_PARAM);
-          }
-          return next;
-        },
-        { replace }
+        (prev) => applyCompareTabParams(prev, { jobId: nextJobId }),
+        {
+          replace,
+        }
       );
     },
     [setSearchParams]
@@ -126,7 +121,7 @@ export const usePriceCompareJob = (
       // 게이트는 기본적으로 게이트가 열린 시점의 주소를 복귀 경로로 저장하는데,
       // 사용자가 입력창에 붙여넣은 값은 React 상태에만 있고 주소(/?tab=compare)에는 없다.
       // 기본 동작에 맡기면 로그인 후 입력창이 빈 채로 돌아오므로 복귀 경로를 직접 만들어 넘긴다.
-      const returnPath = buildCompareTabPath(url);
+      const returnPath = buildCompareTabPath({ productUrl: url });
 
       requireLogin(
         () => {

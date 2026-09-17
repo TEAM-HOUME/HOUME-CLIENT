@@ -2,11 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useComparePresetQuery } from '@pages/home/apis/queries/useComparePresetQuery';
 import {
-  COMPARE_JOB_ID_PARAM,
-  COMPARE_PRESET_ID_PARAM,
-  COMPARE_PRODUCT_URL_PARAM,
-} from '@pages/home/constants/compareParams';
-import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
@@ -17,6 +12,10 @@ import {
 } from '@pages/home/utils/compareJobError';
 
 import type { PresetDetailResponse } from '@apis/__generated__/data-contracts';
+
+import { COMPARE_PRESET_ID_PARAM } from '@constants/compareParams';
+
+import { applyCompareTabParams } from '@utils/compareTabPath';
 
 import type { SetURLSearchParams } from 'react-router-dom';
 
@@ -68,14 +67,9 @@ export const useComparePreset = (
 
   const selectPreset = useCallback(
     (nextPresetId: number) => {
+      // jobId·productUrl은 함께 지워진다 (applyCompareTabParams)
       setSearchParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          next.set(COMPARE_PRESET_ID_PARAM, String(nextPresetId));
-          next.delete(COMPARE_JOB_ID_PARAM);
-          next.delete(COMPARE_PRODUCT_URL_PARAM);
-          return next;
-        },
+        (prev) => applyCompareTabParams(prev, { presetId: nextPresetId }),
         { replace: false }
       );
     },

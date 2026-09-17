@@ -9,14 +9,11 @@ import {
   type CompareSearchedProductView,
   toSearchedProductView,
 } from '@pages/home/components/compare/utils/mapCompareResultToView';
-import {
-  COMPARE_JOB_ID_PARAM,
-  COMPARE_PRESET_ID_PARAM,
-  COMPARE_PRODUCT_URL_PARAM,
-} from '@pages/home/constants/compareParams';
 import type { CompareView } from '@pages/home/constants/compareView';
 import { useComparePreset } from '@pages/home/hooks/useComparePreset';
 import { usePriceCompareJob } from '@pages/home/hooks/usePriceCompareJob';
+
+import { applyCompareTabParams } from '@utils/compareTabPath';
 
 export {
   COMPARE_VIEW,
@@ -80,16 +77,9 @@ export const useCompareTab = (): CompareTabState => {
     dismissCreateError();
     // jobId·presetId·productUrl을 한 번의 setSearchParams 호출로 같이 지운다.
     // 두 번 나눠 부르면 두 번째 호출이 첫 번째가 지운 파라미터를 되살릴 수 있다
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete(COMPARE_JOB_ID_PARAM);
-        next.delete(COMPARE_PRESET_ID_PARAM);
-        next.delete(COMPARE_PRODUCT_URL_PARAM);
-        return next;
-      },
-      { replace: false }
-    );
+    setSearchParams((prev) => applyCompareTabParams(prev, null), {
+      replace: false,
+    });
   }, [dismissCreateError, setSearchParams]);
 
   // 프리셋은 job이 아니다. URL에 presetId가 있으면 job view보다 우선한다
