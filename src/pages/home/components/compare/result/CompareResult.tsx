@@ -59,7 +59,11 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
             </span>
           </div>
 
-          <div className={styles.sortRow}>
+          <div className={styles.controlRow}>
+            <p className={styles.priceNotice}>
+              <Icon name="InfoCircleGray" size="12" decorative />
+              판매처와 실시간 가격이 상이할 수 있습니다.
+            </p>
             <CompareSortDropdown value={sortOption} onChange={setSortOption} />
           </div>
         </header>

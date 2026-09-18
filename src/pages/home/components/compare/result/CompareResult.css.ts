@@ -37,9 +37,20 @@ export const productCount = style({
   color: colorVars.color.text.brand,
 });
 
-export const sortRow = style({
+export const controlRow = style({
   display: 'flex',
-  justifyContent: 'flex-end',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
+export const priceNotice = style({
+  ...fontVars.font.caption_r_11,
+  display: 'flex',
+  alignItems: 'center',
+  gap: unitVars.unit.gapPadding['050'],
+  margin: 0,
+  paddingInline: unitVars.unit.gapPadding['050'],
+  color: colorVars.color.text.tertiary,
 });
 
 export const productGrid = style({
