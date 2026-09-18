@@ -6,7 +6,6 @@ import {
   type CompareView,
 } from '@pages/home/constants/compareView';
 import {
-  getServerErrorCode,
   getServerErrorMessage,
   isComparePresetNotFound,
 } from '@pages/home/utils/compareJobError';
@@ -26,7 +25,6 @@ interface ComparePresetFlow {
   isActive: boolean;
   view: CompareView | null;
   presetResult: PresetDetailResponse | null;
-  errorCode: number | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 preset 사유(존재하지 않음 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
@@ -93,7 +91,6 @@ export const useComparePreset = (
     view,
     // presetId가 없을 때도 RQ는 마지막 data를 돌려준다. job RESULT에 새지 않게 비활성이면 null
     presetResult: isActive ? (data ?? null) : null,
-    errorCode: getServerErrorCode(error),
     errorMessage: resolvePresetErrorMessage({
       hasError,
       isPresetMissing: isComparePresetNotFound(error),

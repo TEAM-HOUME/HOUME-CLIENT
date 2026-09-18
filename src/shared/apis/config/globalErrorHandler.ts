@@ -38,7 +38,8 @@ const showGlobalToast = (text: string, hasIcon = true) => {
 // React 외부 navigate (dynamic import로 순환 참조 방지)
 const redirectTo = async (path: string): Promise<void> => {
   const { router } = await import('@/routes/router');
-  router.navigate(path);
+  // Data Router의 navigate는 전환이 끝나면 resolve된다. 기다려야 호출부의 '이동 뒤에 캐시 삭제' 순서가 지켜진다
+  await router.navigate(path);
 };
 
 // 중복 방지 (여러 쿼리가 동시에 실패할 때)

@@ -1,6 +1,6 @@
 import { ROUTES } from '@routes/paths';
 
-import type { HomeTab } from '@shared/types/tabNavigation';
+import { HOME_TABS, type HomeTab } from '@shared/types/tabNavigation';
 
 import {
   COMPARE_JOB_ID_PARAM,
@@ -8,8 +8,6 @@ import {
   COMPARE_PRODUCT_URL_PARAM,
   HOME_TAB_PARAM,
 } from '@constants/compareParams';
-
-const HOME_TABS: readonly HomeTab[] = ['explore', 'product', 'compare'];
 
 /** URL의 tab 값을 HomeTab으로 읽는다. 없거나 모르는 값이면 null */
 export const parseHomeTab = (value: string | null): HomeTab | null =>

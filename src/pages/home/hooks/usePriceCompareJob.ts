@@ -11,7 +11,6 @@ import {
   type CompareJobStatus,
 } from '@pages/home/types/compare';
 import {
-  getServerErrorCode,
   getServerErrorMessage,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
@@ -23,7 +22,6 @@ import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 import type {
   JobResultResponse,
   OriginalProductResponse,
-  SourcesStatusResponse,
 } from '@apis/__generated__/data-contracts';
 
 import {
@@ -41,7 +39,6 @@ import {
 import type { SetURLSearchParams } from 'react-router-dom';
 
 interface PriceCompareJob {
-  jobId: string | null;
   /** 입력창에 채워둘 상품 URL. 딥링크 진입·로그인 복귀로 주소에 실려 온 값 */
   productUrl: string | null;
   view: CompareView;
@@ -53,10 +50,6 @@ interface PriceCompareJob {
    * 로딩 화면의 "검색한 상품" 카드가 생성 응답 즉시 그려지게 한다. 새로고침 복원처럼 생성 응답이 없으면 첫 폴링 응답부터 채워진다
    */
   originalProduct: OriginalProductResponse | null;
-  /** 3개 소스(catalog·coupang·ebay)가 각각 어디까지 갔는지. 서버가 파이프라인 단계를 따로 주지 않아 진행 표시는 이 값으로만 가능하다 */
-  sources: SourcesStatusResponse | null;
-  /** 생성·조회 요청이 거절됐을 때의 서버 비즈니스 코드. job이 FAILED로 끝난 응답에는 코드가 없다 */
-  errorCode: number | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
@@ -116,14 +109,15 @@ export const usePriceCompareJob = (
   // - 이때 아무런 피드백이 없으면 사용자는 요청이 어떻게 진행되었는지 알 수 없으므로 예외처리 필요
   const jobRequestError = jobCreateError ?? jobStatusError;
 
-  /** /?tab=compare&jobId=nextJobId로 URL을 쓴다. productUrl·presetId는 함께 지워진다 (applyCompareTabParams) */
+  /**
+   * /?tab=compare&jobId=nextJobId로 URL을 쓴다. productUrl·presetId는 함께 지워진다 (applyCompareTabParams).
+   * 항상 replace다. 뒤로가기 목적지는 이 시점 이전 항목(입력창에서 제출했으면 입력 화면, 딥링크로 들어왔으면 직전에 보던 사이트)이어야 한다
+   */
   const writeJobId = useCallback(
-    (nextJobId: string, replace: boolean) => {
+    (nextJobId: string) => {
       setSearchParams(
         (prev) => applyCompareTabParams(prev, { jobId: nextJobId }),
-        {
-          replace,
-        }
+        { replace: true }
       );
     },
     [setSearchParams]
@@ -142,14 +136,12 @@ export const usePriceCompareJob = (
         () => {
           createJob(
             { url },
-            // jobId는 항상 replace로 쓴다. 뒤로가기 목적지는 이 시점 이전 항목 (입력창에서 제출했으면 입력 화면, 딥링크로 들어왔으면 직전에 보던 사이트)이어야 한다
             {
+              // 전역 스토어 등록은 useCreateCompareJobMutation의 훅 수준 onSuccess가 한다 (언마운트돼도 실행)
+              // 여기서는 URL만 쓴다 — 이 콜백은 화면이 살아 있을 때만 실행되니 URL 쓰기에 딱 맞다
               onSuccess: (response) => {
                 // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
-                if (!response.jobId) return;
-                // 첫 폴링 응답 전에 다른 화면으로 가도 지켜볼 수 있게 생성 즉시 올린다. 진행 중이던 이전 job은 덮어쓴다
-                setActiveJobId(response.jobId);
-                writeJobId(response.jobId, true);
+                if (response.jobId) writeJobId(response.jobId);
               },
             }
           );
@@ -158,7 +150,7 @@ export const usePriceCompareJob = (
         returnPath
       );
     },
-    [createJob, requireLogin, setActiveJobId, writeJobId]
+    [createJob, requireLogin, writeJobId]
   );
 
   const dismissCreateError = useCallback(() => {
@@ -177,7 +169,7 @@ export const usePriceCompareJob = (
     // 0건 판정은 프리셋과 같이 totalCount로 한다 (similarProducts는 일부만 올 수 있다는 프리셋 명세와 맞춤)
     productCount:
       data?.status === COMPARE_JOB_STATUS.DONE
-        ? (data.result.totalCount ?? data.result.similarProducts?.length ?? 0)
+        ? (data.result?.totalCount ?? data.result?.similarProducts?.length ?? 0)
         : undefined,
   });
 
@@ -187,22 +179,20 @@ export const usePriceCompareJob = (
       ? {
           title: createdJob.title,
           imageUrl: createdJob.thumbnail,
-          price: createdJob.price ?? undefined,
+          price: createdJob.price,
         }
       : null;
 
   return {
-    jobId,
     productUrl,
     view,
-    result: data?.status === COMPARE_JOB_STATUS.DONE ? data.result : null,
+    result:
+      data?.status === COMPARE_JOB_STATUS.DONE ? (data.result ?? null) : null,
     originalProduct: data?.originalProduct ?? createdOriginalProduct,
-    sources: data?.sources ?? null,
-    // FAILED 응답에는 코드·문구가 없다(2026-09-17 실측). 요청 자체가 거절된 경우의 서버 코드·문구만 꺼낸다
-    errorCode: getServerErrorCode(jobRequestError),
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
+      // FAILED 응답에는 코드·문구가 없다(2026-09-17 실측). 요청 자체가 거절된 경우의 서버 문구만 꺼낸다
       serverMessage: getServerErrorMessage(jobRequestError),
     }),
     start,

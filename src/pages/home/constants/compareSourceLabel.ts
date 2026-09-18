@@ -11,7 +11,7 @@ export const COMPARE_SOURCE_LABEL: Record<CompareSource, string> = {
 };
 
 const isCompareSource = (value: string): value is CompareSource =>
-  Object.values<string>(COMPARE_SOURCE).includes(value);
+  Object.hasOwn(COMPARE_SOURCE_LABEL, value);
 
 /** 생성 타입의 source는 string이라 목록에 없는 값이 올 수 있다. 그때는 값을 그대로 보여준다 */
 export const getCompareSourceLabel = (

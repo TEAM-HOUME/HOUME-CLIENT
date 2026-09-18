@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -85,22 +85,20 @@ export const useCompareTab = (): CompareTabState => {
   // 프리셋은 job이 아니다. URL에 presetId가 있으면 job view보다 우선한다
   const view = presetView ?? jobView;
 
-  const resultViewModel = useMemo(() => {
-    if (isPresetActive) {
-      return presetResult ? mapComparePresetToView(presetResult) : null;
-    }
-    return jobResult
-      ? mapCompareJobToView(jobOriginalProduct ?? undefined, jobResult)
+  // 매핑은 객체 몇 개 만드는 수준이라 memo하지 않는다 (생성 응답으로 만든 originalProduct가 렌더마다 새 객체라 memo가 걸리지도 않는다)
+  const resultViewModel = isPresetActive
+    ? presetResult
+      ? mapComparePresetToView(presetResult)
+      : null
+    : jobResult
+      ? mapCompareJobToView(jobOriginalProduct, jobResult)
       : null;
-  }, [isPresetActive, presetResult, jobResult, jobOriginalProduct]);
 
-  const searchedProduct = useMemo(() => {
-    if (resultViewModel) return resultViewModel.searchedProduct;
-    if (isPresetActive) return null;
-    return jobOriginalProduct
+  const searchedProduct =
+    resultViewModel?.searchedProduct ??
+    (!isPresetActive && jobOriginalProduct
       ? toSearchedProductView(jobOriginalProduct)
-      : null;
-  }, [resultViewModel, isPresetActive, jobOriginalProduct]);
+      : null);
 
   return {
     view,

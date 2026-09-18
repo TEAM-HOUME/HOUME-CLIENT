@@ -62,7 +62,8 @@ const ExploreTab = ({
 
   const widgetProducts = useMemo(
     () =>
-      (presetsData?.presets ?? []).flatMap((preset) => {
+      // 비로그인이면 캐시에 이전 데이터가 있어도 그리지 않는다 (세션 만료 뒤 캐시 삭제까지 잠깐 남아 있을 수 있다)
+      (isLoggedIn ? (presetsData?.presets ?? []) : []).flatMap((preset) => {
         // 생성 타입은 전 필드가 optional이다. id가 없는 프리셋은 열 수 없으니 그리지 않는다
         const { presetId } = preset;
         if (presetId == null) return [];
@@ -76,7 +77,7 @@ const ExploreTab = ({
           },
         ];
       }),
-    [onNavigateToCompareTab, presetsData?.presets]
+    [isLoggedIn, onNavigateToCompareTab, presetsData?.presets]
   );
 
   const handlePromoBannerClick = () => {

@@ -26,10 +26,13 @@ const OutputLink = ({
     getPriceTexts(price?.original, price?.discount, price?.discountRate);
   const priceText = discountPriceText ?? originalPriceText;
 
+  // 클릭 동작이 없으면 버튼으로 그리지 않는다 — 포커스는 받는데 아무 일도 안 하는 요소가 되기 때문
+  const ContentTag = onProductClick ? 'button' : 'div';
+
   return (
     <section className={styles.container} aria-label="검색한 상품">
-      <button
-        type="button"
+      <ContentTag
+        type={onProductClick ? 'button' : undefined}
         className={styles.contentButton}
         onClick={onProductClick}
       >
@@ -68,7 +71,7 @@ const OutputLink = ({
             )}
           </span>
         </span>
-      </button>
+      </ContentTag>
 
       <button
         type="button"

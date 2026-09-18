@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 
 import { toCompareRequestUrl } from '@pages/home/utils/compareRequestUrl';
 
+import { useCompareJobStore } from '@store/useCompareJobStore';
+
 import type {
   CreateCompareJobRequest,
   CreateJobResponse,
@@ -29,5 +31,15 @@ export const postCompareJob = async (
 };
 
 export const useCreateCompareJobMutation = () => {
-  return useMutation({ mutationFn: postCompareJob });
+  return useMutation({
+    mutationFn: postCompareJob,
+    // 진행 중 job 등록은 여기(훅 수준)에서 한다. mutate()에 넘기는 콜백은 응답 전에 컴포넌트가 언마운트되면
+    // 실행되지 않아, 생성 직후 다른 탭으로 가면 등록이 빠진다. 훅 수준 콜백은 언마운트와 무관하게 실행된다.
+    // 첫 폴링 응답 전에 다른 화면으로 가도 지켜볼 수 있게 생성 즉시 올린다. 진행 중이던 이전 job은 덮어쓴다
+    onSuccess: (response) => {
+      if (response.jobId) {
+        useCompareJobStore.getState().setActiveJobId(response.jobId);
+      }
+    },
+  });
 };

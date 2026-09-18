@@ -22,6 +22,12 @@ export const TOASTER_ID = {
 
 export type ToasterId = (typeof TOASTER_ID)[keyof typeof TOASTER_ID];
 
+/**
+ * 액션 버튼이 있는 토스트가 떠 있는 시간. 기본값(TOASTER_DEFAULTS.duration, 2초)은 버튼을 누르기에 짧다.
+ * 비교 완료·실패·이미지 생성 가드 토스트가 쓴다
+ */
+export const TOAST_ACTION_DURATION_MS = 5_000;
+
 // sonner의 Toaster 기본 설정
 export const TOASTER_DEFAULTS = {
   visibleToasts: 1,

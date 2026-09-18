@@ -120,8 +120,13 @@ export const mapComparePresetToView = (
 ): CompareResultViewModel => {
   const { originalProduct, totalCount } = preset;
   const similarProducts = preset.similarProducts ?? [];
+  const original = {
+    price: originalProduct?.price,
+    currency: originalProduct?.currency,
+  };
 
   return {
+    // 프리셋 원본 상품은 이미지 필드명이 thumbnailUrl이라 job과 달리 직접 옮긴다
     searchedProduct: toSearchedProductView({
       title: originalProduct?.title,
       brand: originalProduct?.brand,
@@ -129,10 +134,11 @@ export const mapComparePresetToView = (
       price: originalProduct?.price,
     }),
     similarProducts: similarProducts.map((item, index) =>
-      toSimilarProductView({ ...item, siteLabel: item.siteName }, index, {
-        price: originalProduct?.price,
-        currency: originalProduct?.currency,
-      })
+      toSimilarProductView(
+        { ...item, siteLabel: item.siteName },
+        index,
+        original
+      )
     ),
     productCount: totalCount ?? similarProducts.length,
   };
@@ -144,22 +150,22 @@ export const mapComparePresetToView = (
  * 유사 상품에는 판매처명이 없어 source를 라벨로 바꾼다.
  */
 export const mapCompareJobToView = (
-  originalProduct: OriginalProductResponse | undefined,
+  originalProduct: OriginalProductResponse | null | undefined,
   result: JobResultResponse
 ): CompareResultViewModel => {
   const similarProducts = result.similarProducts ?? [];
+  const original = {
+    price: originalProduct?.price,
+    currency: originalProduct?.currency,
+  };
 
   return {
-    searchedProduct: toSearchedProductView({
-      title: originalProduct?.title,
-      imageUrl: originalProduct?.imageUrl,
-      price: originalProduct?.price,
-    }),
+    searchedProduct: toSearchedProductView(originalProduct ?? {}),
     similarProducts: similarProducts.map((item, index) =>
       toSimilarProductView(
         { ...item, siteLabel: getCompareSourceLabel(item.source) },
         index,
-        { price: originalProduct?.price, currency: originalProduct?.currency }
+        original
       )
     ),
     productCount: result.totalCount ?? similarProducts.length,

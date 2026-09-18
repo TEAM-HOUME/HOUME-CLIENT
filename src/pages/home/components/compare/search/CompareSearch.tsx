@@ -34,9 +34,9 @@ const CompareSearch = ({
   const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
   const { data: presetsData } = useComparePresetsQuery(isLoggedIn);
 
-  // 비로그인이면 캐시에 이전 데이터가 있어도 목록을 그리지 않는다.
+  // 비로그인이면 캐시에 이전 데이터가 있어도 목록을 그리지 않는다 (세션 만료 뒤 캐시 삭제까지 잠깐 남아 있을 수 있다)
   const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
-  const presets = presetsData?.presets ?? [];
+  const presets = isLoggedIn ? (presetsData?.presets ?? []) : [];
 
   const handleSubmit = (value: string) => onSubmit(value);
   const handlePresetClick = (presetId: number) => onSelectPreset(presetId);

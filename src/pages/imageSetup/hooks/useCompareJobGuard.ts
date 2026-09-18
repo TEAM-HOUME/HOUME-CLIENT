@@ -4,16 +4,17 @@ import { useNavigate } from 'react-router-dom';
 
 import { useCompareJobStore } from '@store/useCompareJobStore';
 
-import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
+import {
+  TOAST_ACTION_DURATION_MS,
+  TOAST_TYPE,
+  TOASTER_ID,
+} from '@shared/types/toast';
 
 import { useToast } from '@components/toast/useToast';
 
 import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';
 
 import { buildCompareTabPath } from '@utils/compareTabPath';
-
-/** 가드 토스트가 떠 있는 시간. 기본값(2초)은 "돌아가기"를 누르기에 짧다 */
-const GUARD_TOAST_DURATION_MS = 5_000;
 
 /**
  * 가격 비교가 진행 중이면 이미지 생성을 막는다.
@@ -26,12 +27,13 @@ const GUARD_TOAST_DURATION_MS = 5_000;
  * 토스트는 상단(TOP_4)에 띄운다. 바텀시트가 하단을 가린다.
  */
 export const useCompareJobGuard = () => {
-  const activeJobId = useCompareJobStore((state) => state.activeJobId);
   const navigate = useNavigate();
   const { notify } = useToast();
 
   /** 진행 중인 비교가 있으면 안내 토스트를 띄우고 true를 돌려준다. 호출부는 true면 진행을 멈춘다 */
   const blockIfComparing = useCallback((): boolean => {
+    // 클릭 시점에만 읽는다. 구독하면 job이 시작·종료될 때마다 공간 선택·활동 화면이 다시 렌더된다
+    const { activeJobId } = useCompareJobStore.getState();
     if (activeJobId === null) return false;
 
     notify({
@@ -41,11 +43,11 @@ export const useCompareJobGuard = () => {
       onClick: () => navigate(buildCompareTabPath({ jobId: activeJobId })),
       options: {
         toasterId: TOASTER_ID.TOP_4,
-        duration: GUARD_TOAST_DURATION_MS,
+        duration: TOAST_ACTION_DURATION_MS,
       },
     });
     return true;
-  }, [activeJobId, navigate, notify]);
+  }, [navigate, notify]);
 
   return { blockIfComparing };
 };

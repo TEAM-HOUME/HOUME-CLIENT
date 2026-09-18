@@ -33,17 +33,6 @@ export const COMPARE_JOB_STATUS = {
 export type CompareJobStatus =
   (typeof COMPARE_JOB_STATUS)[keyof typeof COMPARE_JOB_STATUS];
 
-/** 3개 소스(ebay·coupang·catalog)가 병렬로 도는 동안 각각의 상태 — 응답의 `sources` 값 */
-export const COMPARE_SOURCE_STATUS = {
-  WAITING: 'WAITING',
-  RUNNING: 'RUNNING',
-  DONE: 'DONE',
-  FAILED: 'FAILED',
-} as const;
-
-export type CompareSourceStatus =
-  (typeof COMPARE_SOURCE_STATUS)[keyof typeof COMPARE_SOURCE_STATUS];
-
 /** 유사 상품을 찾아온 곳 — 응답의 `similarProducts[].source` 값 */
 export const COMPARE_SOURCE = {
   CATALOG: 'CATALOG',
@@ -54,22 +43,11 @@ export const COMPARE_SOURCE = {
 export type CompareSource =
   (typeof COMPARE_SOURCE)[keyof typeof COMPARE_SOURCE];
 
-/** 원본 상품에서 뽑아낸 정보가 얼마나 채워졌는지 — 응답의 `originalProduct.quality` 값 */
-export const COMPARE_QUALITY = {
-  FULL: 'FULL',
-  PARTIAL: 'PARTIAL',
-  MINIMAL: 'MINIMAL',
-} as const;
-
-export type CompareQuality =
-  (typeof COMPARE_QUALITY)[keyof typeof COMPARE_QUALITY];
-
 type CompareJobStatusBase = Omit<CompareJobResponse, 'status' | 'result'>;
 
 /**
- * 상태 조회 응답. 생성 타입(CompareJobResponse)은 status가 string이고 result가 optional이라,
- * 화면에서 status로 갈라 쓰기 위해 좁힌다. 진행 중·실패일 때 result가 없다는 것을 타입에서 보장해
- * DONE 분기 안에서는 result에 옵셔널 체이닝을 쓰지 않는다.
+ * 상태 조회 응답. 생성 타입(CompareJobResponse)은 status가 string이라 화면에서 status로 갈라 쓰기 위해 좁힌다.
+ * 진행 중·실패일 때는 result가 없다. DONE일 때도 서버가 required를 선언하지 않아 optional로 두고 읽는 쪽이 방어한다.
  */
 export type CompareJobStatusResponse = CompareJobStatusBase &
   (
@@ -79,6 +57,6 @@ export type CompareJobStatusResponse = CompareJobStatusBase &
           | typeof COMPARE_JOB_STATUS.RUNNING;
         result?: undefined;
       }
-    | { status: typeof COMPARE_JOB_STATUS.DONE; result: JobResultResponse }
+    | { status: typeof COMPARE_JOB_STATUS.DONE; result?: JobResultResponse }
     | { status: typeof COMPARE_JOB_STATUS.FAILED; result?: undefined }
   );

@@ -1,10 +1,16 @@
 // ------------------------------
 // getSearchDayCount 검증 케이스
 // ------------------------------
-// 실행: node --experimental-strip-types src/pages/home/components/compare/utils/getSearchDayCount.check.ts
-// 서버 createdAt은 시간대 표기 없는 UTC(예: 2026-09-17T06:23:20.014789)로 온다. 한국(UTC+9) 기준으로 계산한다.
+// 실행: node --experimental-strip-types \
+//   src/pages/home/components/compare/utils/getSearchDayCount.check.ts
+// 서버 createdAt은 시간대 표기 없는 UTC(예: 2026-09-17T06:23:20.014789)로 온다.
+// 기대값은 한국(UTC+9) 기준이라 실행 환경의 시간대와 무관하게 아래에서 고정한다.
+
+import process from 'node:process';
 
 import { getSearchDayCount } from './getSearchDayCount.ts';
+
+process.env.TZ = 'Asia/Seoul';
 
 // 기준 시각: 2026-09-18 08:00 KST (= 2026-09-17T23:00Z)
 const NOW = new Date('2026-09-18T08:00:00+09:00');
@@ -30,7 +36,12 @@ for (const [label, input, expected] of cases) {
   const ok = actual === expected;
   if (!ok) failed += 1;
   console.log(
-    `${ok ? 'PASS' : 'FAIL'}  ${label}\n      입력: ${input}\n      기대: ${expected}\n      실제: ${actual}`
+    [
+      `${ok ? 'PASS' : 'FAIL'}  ${label}`,
+      `      입력: ${input}`,
+      `      기대: ${expected}`,
+      `      실제: ${actual}`,
+    ].join('\n')
   );
 }
 

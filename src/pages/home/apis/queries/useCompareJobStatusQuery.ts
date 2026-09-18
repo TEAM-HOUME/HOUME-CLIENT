@@ -4,7 +4,10 @@ import {
   COMPARE_JOB_STATUS,
   type CompareJobStatusResponse,
 } from '@pages/home/types/compare';
-import { isCompareJobNotFound } from '@pages/home/utils/compareJobError';
+import {
+  isCompareJobNotFound,
+  isCompareJobPermanentError,
+} from '@pages/home/utils/compareJobError';
 
 import { HTTPMethod, request } from '@apis/config/request';
 
@@ -55,9 +58,14 @@ export const useCompareJobStatusQuery = (
     refetchInterval: (query) => {
       if (!polling) return false;
 
-      // 요청이 실패하면 화면은 이미 에러로 넘어간 상태다. 여기서 멈추지 않으면
-      // 사용자가 떠난 화면에서 1초마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨)
-      if (query.state.status === 'error') return false;
+      // 다시 요청해도 같은 실패(없는 job·인증 거절·세션 만료)면 멈춘다. 여기서 멈추지 않으면
+      // 사용자가 떠난 화면에서 1초마다 요청이 계속 나간다 (다른 탭으로 가도 계속됨).
+      // 오프라인·일시적 5xx는 계속 폴링해 복구되면 이어서 본다
+      if (query.state.status === 'error') {
+        return isCompareJobPermanentError(query.state.error)
+          ? false
+          : COMPARE_POLLING_INTERVAL_MS;
+      }
 
       const status = query.state.data?.status;
       if (
