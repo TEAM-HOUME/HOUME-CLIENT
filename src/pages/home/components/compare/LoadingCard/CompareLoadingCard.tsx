@@ -1,0 +1,50 @@
+import { useEffect, useState } from 'react';
+
+import * as styles from './CompareLoadingCard.css';
+import {
+  COMPARE_LOADING_MESSAGES,
+  COMPARE_ROLL_INTERVAL_MS,
+  type CompareLoadingStage,
+} from './compareLoadingMessages';
+
+interface CompareLoadingCardProps {
+  stage: CompareLoadingStage;
+}
+
+const RollingMessage = ({ stage }: CompareLoadingCardProps) => {
+  const [index, setIndex] = useState(0);
+  const messages = COMPARE_LOADING_MESSAGES[stage];
+
+  useEffect(() => {
+    if (messages.length < 2) return;
+    const timer = window.setInterval(() => {
+      setIndex((previous) => (previous + 1) % messages.length);
+    }, COMPARE_ROLL_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [messages]);
+
+  if (messages.length === 0) return null;
+
+  return (
+    <span className={styles.message} key={index}>
+      {messages[index]}
+    </span>
+  );
+};
+
+const CompareLoadingCard = ({ stage }: CompareLoadingCardProps) => (
+  <div
+    className={styles.container}
+    role="status"
+    aria-label="비슷한 상품 검색 중"
+  >
+    <RollingMessage key={stage} stage={stage} />
+    <span className={styles.dots} aria-hidden="true">
+      <span className={styles.dot} />
+      <span className={styles.dot} />
+      <span className={styles.dot} />
+    </span>
+  </div>
+);
+
+export default CompareLoadingCard;
