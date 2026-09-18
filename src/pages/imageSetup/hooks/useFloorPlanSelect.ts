@@ -22,6 +22,7 @@ import { useToast } from '@components/toast/useToast';
 
 import { TOAST_MESSAGE } from '@constants/toastMessage';
 
+import { useCompareJobGuard } from './useCompareJobGuard';
 import { FILTER_CATEGORIES } from '../constants/floorPlanFilters';
 import { useFloorPlanRatioStore } from '../stores/useFloorPlanRatioStore';
 import { useFloorPlanStore } from '../stores/useFloorPlanStore';
@@ -36,6 +37,8 @@ export const useFloorPlanSelect = (
   // 비율은 별도 sessionStorage persist 스토어 — 퍼널 이탈/OAuth 리로드에도 탭 세션 동안 유지
   const { aspectRatio, setAspectRatio } = useFloorPlanRatioStore();
   const { notify } = useToast();
+  // 가격 비교가 진행 중이면 "공간 선택하기"에서 막는다 (기획: 공간 선택 화면까지는 허용)
+  const { blockIfComparing } = useCompareJobGuard();
 
   // 도면 전체 조회 (필터 변경 시 자동 refetch — queryKey에 appliedFilters 포함)
   const { data: houseTemplatesData, isFetched: isHouseTemplatesFetched } =
@@ -139,6 +142,7 @@ export const useFloorPlanSelect = (
   // 도면 선택 후 바텀시트 "공간 선택하기" CTA
   const handleConfirmFloorPlan = () => {
     if (store.selectedFloorPlanId === null) return;
+    if (blockIfComparing()) return;
 
     // 도면 swiper에서 사용자가 선택한 view(ex: 창가뷰)를 string으로 가져옴
     const floorPlanView =
@@ -162,6 +166,8 @@ export const useFloorPlanSelect = (
   // 최근 생성 공간 바텀시트 "공간 선택하기" CTA
   const handleConfirmRecentFloorPlan = () => {
     if (!recentFloorPlan?.floorPlanId) return;
+    // 시트를 닫기 전에 막는다 — 토스트를 보고 시트에서 이어서 판단할 수 있게
+    if (blockIfComparing()) return;
     store.closeRecentSheet();
 
     // 최근 생성한 도면도 multi-view 가능 → 사용자가 선택한 view 반영

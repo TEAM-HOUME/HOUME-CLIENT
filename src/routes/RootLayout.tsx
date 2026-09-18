@@ -9,6 +9,7 @@ import { useClaritySync } from '@hooks/useClaritySync';
 import { useScrollToTop } from '@hooks/useScrollToTop';
 import { useSentrySync } from '@hooks/useSentrySync';
 
+import CompareJobWatcher from './CompareJobWatcher';
 import * as styles from './RootLayout.css';
 
 function RootLayout() {
@@ -21,6 +22,8 @@ function RootLayout() {
 
   return (
     <OverlayProvider>
+      {/* 진행 중인 가격 비교 job을 어느 화면에서든 지켜보다가 끝나면 토스트로 알린다 */}
+      <CompareJobWatcher />
       <div className={styles.container}>
         <Outlet />
       </div>

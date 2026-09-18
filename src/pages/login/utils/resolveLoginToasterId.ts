@@ -2,6 +2,8 @@ import { ROUTES } from '@routes/paths';
 
 import { TOASTER_ID, type ToasterId } from '@shared/types/toast';
 
+import { HOME_TAB_PARAM } from '@constants/compareParams';
+
 /**
  * 로그인 성공/실패 토스트의 표시 위치를 복귀 경로에 따라 결정한다.
  * 복귀 페이지에 하단 고정 바텀시트가 떠 있으면 상단(TOP_4)에,
@@ -19,7 +21,7 @@ export const resolveLoginToasterId = (redirectPath: string): ToasterId => {
 
   if (
     pathname === ROUTES.HOME &&
-    new URLSearchParams(search).get('tab') === 'product'
+    new URLSearchParams(search).get(HOME_TAB_PARAM) === 'product'
   ) {
     return TOASTER_ID.TOP_4;
   }

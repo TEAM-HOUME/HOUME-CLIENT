@@ -3,14 +3,17 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import {
-  COMPARE_JOB_ID_PARAM,
-  COMPARE_PRESET_ID_PARAM,
-  COMPARE_PRODUCT_URL_PARAM,
-} from '@pages/home/constants/compareParams';
+  mapCompareJobToView,
+  mapComparePresetToView,
+  type CompareResultViewModel,
+  type CompareSearchedProductView,
+  toSearchedProductView,
+} from '@pages/home/components/compare/utils/mapCompareResultToView';
 import type { CompareView } from '@pages/home/constants/compareView';
 import { useComparePreset } from '@pages/home/hooks/useComparePreset';
 import { usePriceCompareJob } from '@pages/home/hooks/usePriceCompareJob';
-import type { ComparePresetResponse } from '@pages/home/types/compare';
+
+import { applyCompareTabParams } from '@utils/compareTabPath';
 
 export {
   COMPARE_VIEW,
@@ -21,7 +24,10 @@ interface CompareTabState {
   view: CompareView;
   productUrl: string | null;
   errorMessage: string | null;
-  presetResult: ComparePresetResponse | null;
+  /** RESULT 뷰가 그릴 값. job이든 프리셋이든 같은 형태로 맞춰 CompareResult는 출처를 모른다 */
+  resultViewModel: CompareResultViewModel | null;
+  /** 로딩 중에 먼저 그릴 "검색한 상품" 카드. job은 생성 응답 즉시, 프리셋은 응답이 오면 채워진다 */
+  searchedProduct: CompareSearchedProductView | null;
   start: (url: string) => void;
   selectPreset: (presetId: number) => void;
   reset: () => void;
@@ -43,6 +49,8 @@ export const useCompareTab = (): CompareTabState => {
     view: jobView,
     productUrl,
     errorMessage: jobErrorMessage,
+    result: jobResult,
+    originalProduct: jobOriginalProduct,
     start,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
@@ -69,26 +77,35 @@ export const useCompareTab = (): CompareTabState => {
     dismissCreateError();
     // jobId·presetId·productUrl을 한 번의 setSearchParams 호출로 같이 지운다.
     // 두 번 나눠 부르면 두 번째 호출이 첫 번째가 지운 파라미터를 되살릴 수 있다
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete(COMPARE_JOB_ID_PARAM);
-        next.delete(COMPARE_PRESET_ID_PARAM);
-        next.delete(COMPARE_PRODUCT_URL_PARAM);
-        return next;
-      },
-      { replace: false }
-    );
+    setSearchParams((prev) => applyCompareTabParams(prev, null), {
+      replace: false,
+    });
   }, [dismissCreateError, setSearchParams]);
 
   // 프리셋은 job이 아니다. URL에 presetId가 있으면 job view보다 우선한다
   const view = presetView ?? jobView;
 
+  // 매핑은 객체 몇 개 만드는 수준이라 memo하지 않는다 (생성 응답으로 만든 originalProduct가 렌더마다 새 객체라 memo가 걸리지도 않는다)
+  const resultViewModel = isPresetActive
+    ? presetResult
+      ? mapComparePresetToView(presetResult)
+      : null
+    : jobResult
+      ? mapCompareJobToView(jobOriginalProduct, jobResult)
+      : null;
+
+  const searchedProduct =
+    resultViewModel?.searchedProduct ??
+    (!isPresetActive && jobOriginalProduct
+      ? toSearchedProductView(jobOriginalProduct)
+      : null);
+
   return {
     view,
     productUrl,
     errorMessage: isPresetActive ? presetErrorMessage : jobErrorMessage,
-    presetResult,
+    resultViewModel,
+    searchedProduct,
     start,
     selectPreset,
     reset,

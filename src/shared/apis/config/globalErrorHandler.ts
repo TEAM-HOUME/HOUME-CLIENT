@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@routes/paths';
 
+import { useCompareJobStore } from '@store/useCompareJobStore';
+
 import {
   decideApiReport,
   type ApiCaptureMode,
@@ -36,20 +38,38 @@ const showGlobalToast = (text: string, hasIcon = true) => {
 // React 외부 navigate (dynamic import로 순환 참조 방지)
 const redirectTo = async (path: string): Promise<void> => {
   const { router } = await import('@/routes/router');
-  router.navigate(path);
+  // Data Router의 navigate는 전환이 끝나면 resolve된다. 기다려야 호출부의 '이동 뒤에 캐시 삭제' 순서가 지켜진다
+  await router.navigate(path);
 };
 
 // 중복 방지 (여러 쿼리가 동시에 실패할 때)
 let lastSessionExpiredAt = 0;
 const SESSION_EXPIRED_COOLDOWN = 5000;
 
+/**
+ * 로그인 화면으로 보낸 뒤 캐시를 비운다.
+ *
+ * 이전 사용자의 데이터가 다음 로그인 계정의 첫 렌더에 보이지 않게 한다 (명시적 로그아웃은 useLogoutMutation이 같은 일을 한다).
+ * redirect 전에 지우지 않는 이유: 이동까지 1초 동안 현재 화면의 쿼리들이 캐시를 잃고 다시 요청한다
+ * (useRecentFloorPlanQuery처럼 enabled 조건이 없는 쿼리가 있다). 로그인 화면으로 간 뒤에는 다시 요청할 쿼리가 없다.
+ * queryClient.ts가 이 파일을 import하므로 정적 import하면 순환 참조 — redirectTo처럼 dynamic import로 푼다.
+ */
+const redirectToLoginAndClearCache = async (): Promise<void> => {
+  await redirectTo(ROUTES.LOGIN);
+  const { queryClient } = await import('@apis/config/queryClient');
+  queryClient.clear();
+};
+
 const handleSessionExpired = () => {
   const now = Date.now();
   if (now - lastSessionExpiredAt < SESSION_EXPIRED_COOLDOWN) return;
   lastSessionExpiredAt = now;
 
+  // 진행 중인 비교 job은 이 세션의 것이라 더 지켜보지 않는다 (완료 토스트가 로그인 화면에 뜨지 않게)
+  useCompareJobStore.getState().clearActiveJob();
+
   showGlobalToast('세션이 만료되었습니다. 다시 로그인해주세요.');
-  setTimeout(() => redirectTo(ROUTES.LOGIN), 1000);
+  setTimeout(() => void redirectToLoginAndClearCache(), 1000);
 };
 
 /**

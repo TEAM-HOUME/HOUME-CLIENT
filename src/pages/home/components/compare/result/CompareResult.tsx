@@ -1,20 +1,12 @@
 import { useState } from 'react';
 
-import type { ComparePresetResponse } from '@pages/home/types/compare';
-
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
 
 import * as styles from './CompareResult.css';
-import {
-  MOCK_SEARCHED_PRODUCT,
-  MOCK_SIMILAR_PRODUCT_COUNT,
-  MOCK_SIMILAR_PRODUCTS,
-} from './mockCompareResult';
 import CompareSortDropdown from '../dropdown/SortDropdown';
 import OutputLink from '../linkOutput/OutputLink';
-import { mapCompareResultToView } from '../utils/mapCompareResultToView';
 import {
   DEFAULT_COMPARE_SORT_OPTION,
   sortCompareProducts,
@@ -26,28 +18,14 @@ import type { CompareResultViewModel } from '../utils/mapCompareResultToView';
 interface CompareResultProps {
   /** "새로운 링크 검색하기"를 누르면 호출된다. 입력 화면으로 되돌아간다 */
   onSearchNewLink?: () => void;
-  /**
-   * 프리셋 고정 결과. 있으면 프리셋 API 데이터를 그리고,
-   * 없으면 job 결과용 UI 목데이터(mockCompareResult)를 쓴다.
-   */
-  presetResult?: ComparePresetResponse;
+  /** job·프리셋 결과를 같은 형태로 맞춘 값(mapCompareResultToView). 이 컴포넌트는 출처를 모른다 */
+  viewModel: CompareResultViewModel;
 }
 
-const CompareResult = ({
-  onSearchNewLink,
-  presetResult,
-}: CompareResultProps) => {
+const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
   const [sortOption, setSortOption] = useState<CompareSortOption>(
     DEFAULT_COMPARE_SORT_OPTION
   );
-
-  const viewModel: CompareResultViewModel = presetResult
-    ? mapCompareResultToView(presetResult)
-    : {
-        searchedProduct: MOCK_SEARCHED_PRODUCT,
-        similarProducts: MOCK_SIMILAR_PRODUCTS,
-        productCount: MOCK_SIMILAR_PRODUCT_COUNT,
-      };
 
   const sortedProducts = sortCompareProducts(
     viewModel.similarProducts,

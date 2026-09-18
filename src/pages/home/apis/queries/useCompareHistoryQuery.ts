@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { USE_COMPARE_MOCK } from '@pages/home/apis/compareJobMock';
-import { MOCK_COMPARE_HISTORY } from '@pages/home/constants/compareMockData';
-import type { CompareHistoryResponse } from '@pages/home/types/compare';
-
+import type { CompareHistoryResponse } from '@apis/__generated__/data-contracts';
 import { HTTPMethod, request } from '@apis/config/request';
 
 import { API_ENDPOINT } from '@constants/apiEndpoints';
@@ -12,19 +9,10 @@ import { queryKeys } from '@constants/queryKey';
 /** 검색 화면 최근 비교 목록 기본 limit */
 export const COMPARE_HISTORY_LIMIT = 3;
 
-/**
- * 최근 비교 히스토리 조회.
- * 서버 API 연동 전 임시 — USE_COMPARE_MOCK 분기와 함께 지운다.
- */
+/** 최근 비교 히스토리 조회. 비로그인 요청은 서버가 403으로 거절한다 */
 export const getCompareHistory = async (
   limit: number
 ): Promise<CompareHistoryResponse> => {
-  if (USE_COMPARE_MOCK) {
-    return {
-      items: MOCK_COMPARE_HISTORY.items.slice(0, limit),
-    };
-  }
-
   return request<CompareHistoryResponse>({
     method: HTTPMethod.GET,
     url: API_ENDPOINT.COMPARE.HISTORY,
