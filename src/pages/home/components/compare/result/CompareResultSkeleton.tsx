@@ -4,6 +4,7 @@ import * as styles from './CompareResultSkeleton.css';
 import CompareSortDropdown from '../dropdown/SortDropdown';
 import OutputLink from '../linkOutput/OutputLink';
 import * as outputStyles from '../linkOutput/OutputLink.css';
+import CompareLoadingCard from '../LoadingCard/CompareLoadingCard';
 
 import type { CompareSearchedProductView } from '../utils/mapCompareResultToView';
 
@@ -70,41 +71,47 @@ const CompareResultSkeleton = ({
 }: CompareResultSkeletonProps) => {
   return (
     <div
-      className={styles.container}
+      className={styles.root}
       aria-busy="true"
       aria-label="비슷한 상품을 불러오는 중"
     >
-      {searchedProduct ? (
-        <OutputLink
-          product={searchedProduct.product}
-          price={searchedProduct.price}
-          onSearchNewLink={onSearchNewLink}
-        />
-      ) : (
-        <OutputLinkSkeleton />
-      )}
+      {/* TODO: 서버 상태 응답에 currentStage가 추가되면 usePriceCompareJob → useCompareTab에서
+          해당 단계를 전달한다. 현재는 단계 추정 없이 첫 단계 문구만 롤링한다. */}
+      <CompareLoadingCard stage="SCRAPING" />
 
-      <section className={styles.similarSection}>
-        <div className={styles.similarTitleRow}>
-          <Icon name="DoubleStarFillBlack" size="20" decorative />
-          <h2 className={styles.similarTitle}>비슷한 상품</h2>
-        </div>
+      <div className={styles.container}>
+        {searchedProduct ? (
+          <OutputLink
+            product={searchedProduct.product}
+            price={searchedProduct.price}
+            onSearchNewLink={onSearchNewLink}
+          />
+        ) : (
+          <OutputLinkSkeleton />
+        )}
 
-        <div className={styles.controls} aria-hidden>
-          <div className={styles.chipList}>
-            {Array.from({ length: SKELETON_CHIP_COUNT }, (_, index) => (
-              <span className={styles.chip} key={index} />
+        <section className={styles.similarSection}>
+          <div className={styles.similarTitleRow}>
+            <Icon name="DoubleStarFillBlack" size="20" decorative />
+            <h2 className={styles.similarTitle}>비슷한 상품</h2>
+          </div>
+
+          <div className={styles.controls} aria-hidden>
+            <div className={styles.chipList}>
+              {Array.from({ length: SKELETON_CHIP_COUNT }, (_, index) => (
+                <span className={styles.chip} key={index} />
+              ))}
+            </div>
+            <CompareSortDropdown disabled />
+          </div>
+
+          <div className={styles.productGrid}>
+            {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
+              <ProductCardSkeleton key={index} />
             ))}
           </div>
-          <CompareSortDropdown disabled />
-        </div>
-
-        <div className={styles.productGrid}>
-          {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-            <ProductCardSkeleton key={index} />
-          ))}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };
