@@ -1224,8 +1224,11 @@ export interface ApiResponseJjymV2ListResponse {
 }
 
 export interface JjymV2ItemResponse {
+  source?: string;
   /** @format int64 */
   rawProductId?: number;
+  /** @format int64 */
+  catalogItemId?: number;
   isJjym?: boolean;
   productImageUrl?: string;
   productSiteUrl?: string;
@@ -1495,7 +1498,11 @@ export interface ApiResponseCompareJobResponse {
 export interface CompareJobResponse {
   jobId?: string;
   status?: string;
+  currentStage?: string;
   sources?: SourcesStatusResponse;
+  /** @format int32 */
+  errorCode?: number;
+  errorMessage?: string;
   originalProduct?: OriginalProductResponse;
   result?: JobResultResponse;
 }
@@ -1517,6 +1524,7 @@ export interface OriginalProductResponse {
 
 export interface SimilarProductItemResponse {
   source?: string;
+  productId?: string;
   title?: string;
   imageUrl?: string;
   /** @format double */
