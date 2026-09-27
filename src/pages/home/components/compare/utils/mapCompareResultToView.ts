@@ -90,6 +90,7 @@ const toSimilarProductView = (
   return {
     id: index + 1,
     product: {
+      // TODO: 비교 상품 응답에 실제 brand가 추가되면 판매처명 대신 브랜드를 노출한다.
       brand: item.siteLabel,
       title: item.title ?? '',
       imageUrl: item.imageUrl,
@@ -99,7 +100,6 @@ const toSimilarProductView = (
     },
     link: {
       href: item.productUrl,
-      label: item.siteLabel,
     },
     benefitAmount,
     saveTarget: resolveCompareJjymTarget(item.productId, item.source),
@@ -153,6 +153,7 @@ export const mapCompareJobToView = (
   };
 
   return {
+    // TODO: 서버가 스크래핑 단계에서 originalProduct.brand 수집을 지원하면 검색한 상품 브랜드를 노출한다. 현재는 null이다.
     searchedProduct: toSearchedProductView(originalProduct ?? {}),
     similarProducts: similarProducts.map((item, index) =>
       toSimilarProductView(
