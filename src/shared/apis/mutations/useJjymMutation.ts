@@ -50,18 +50,9 @@ export const postJjym = async (
 
 const TOAST_OPTIONS = { toasterId: TOASTER_ID.BOTTOM_4 };
 
-const getSavedToastContent = (type: JjymSavedToast) => {
-  if (type === 'stored') {
-    return {
-      text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-      actionLabel: TOAST_ACTION_LABEL.VIEW,
-    };
-  }
-
-  return {
-    text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-    actionLabel: TOAST_ACTION_LABEL.VIEW,
-  };
+const SAVED_TOAST_CONTENT = {
+  text: TOAST_MESSAGE.SAVED_ITEM_STORED,
+  actionLabel: TOAST_ACTION_LABEL.VIEW,
 };
 
 const getCurrentScreenName = () =>
@@ -125,7 +116,6 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
           return;
         }
 
-        const toastContent = getSavedToastContent(savedToastType);
         const toastInput = {
           screenName,
           rawProductId,
@@ -135,9 +125,9 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
         trackToastSaveView(toastInput);
 
         notify({
-          text: toastContent.text,
+          text: SAVED_TOAST_CONTENT.text,
           type: TOAST_TYPE.ACTION,
-          actionLabel: toastContent.actionLabel,
+          actionLabel: SAVED_TOAST_CONTENT.actionLabel,
           onClick: () => {
             trackSaveToastToSeeClick(toastInput);
             options?.onSavedAction?.();
