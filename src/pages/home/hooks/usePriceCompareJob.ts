@@ -198,7 +198,7 @@ export const usePriceCompareJob = (
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
-      failedMessage: isJobFailed ? data.errorMessage : null,
+      failedMessage: isJobFailed ? data.errorMessage : null, // status === FAILED일 때만 data.errorMessage 표시
       requestMessage: getServerErrorMessage(jobRequestError),
     }),
     loadingStage: resolveCompareLoadingStage({
