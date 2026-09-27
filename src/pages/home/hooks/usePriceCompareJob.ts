@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
+import type { CompareLoadingStage } from '@pages/home/components/compare/LoadingCard/compareLoadingMessages';
 import {
   COMPARE_VIEW,
   type CompareView,
@@ -14,6 +15,10 @@ import {
   getServerErrorMessage,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
+import {
+  resolveCompareLoadingStage,
+  resolveJobErrorMessage,
+} from '@pages/home/utils/compareJobPresentation';
 
 import { useCompareJobStore } from '@store/useCompareJobStore';
 
@@ -53,6 +58,7 @@ interface PriceCompareJob {
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
+  loadingStage: CompareLoadingStage;
   start: (url: string) => void;
   /** job 생성 mutation 에러만 지운다. URL은 건드리지 않는다 */
   dismissCreateError: () => void;
@@ -192,8 +198,12 @@ export const usePriceCompareJob = (
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
-      // FAILED 응답에는 코드·문구가 없다(2026-09-17 실측). 요청 자체가 거절된 경우의 서버 문구만 꺼낸다
-      serverMessage: getServerErrorMessage(jobRequestError),
+      failedMessage: isJobFailed ? data.errorMessage : null,
+      requestMessage: getServerErrorMessage(jobRequestError),
+    }),
+    loadingStage: resolveCompareLoadingStage({
+      status: data?.status,
+      currentStage: data?.currentStage,
     }),
     start,
     dismissCreateError,
@@ -236,24 +246,4 @@ const resolveJobView = ({
     case COMPARE_JOB_STATUS.RUNNING:
       return COMPARE_VIEW.LOADING;
   }
-};
-
-interface ResolveJobErrorMessageParams {
-  hasError: boolean;
-  isJobMissing: boolean;
-  serverMessage: string | null;
-}
-
-/**
- * job 실패 문구도 이 함수 하나에서 완결한다 — CompareTab은 왜 실패했는지(isJobMissing) 몰라도 된다.
- * preset 쪽 동일 문구는 useComparePreset의 resolvePresetErrorMessage가 따로 담당한다.
- */
-const resolveJobErrorMessage = ({
-  hasError,
-  isJobMissing,
-  serverMessage,
-}: ResolveJobErrorMessageParams): string | null => {
-  if (!hasError) return null;
-  if (serverMessage) return serverMessage;
-  return isJobMissing ? '검색 결과가 만료되었어요' : '비교에 실패했어요';
 };

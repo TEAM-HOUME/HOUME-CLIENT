@@ -6,9 +6,11 @@ import OutputLink from '../linkOutput/OutputLink';
 import * as outputStyles from '../linkOutput/OutputLink.css';
 import CompareLoadingCard from '../LoadingCard/CompareLoadingCard';
 
+import type { CompareLoadingStage } from '../LoadingCard/compareLoadingMessages';
 import type { CompareSearchedProductView } from '../utils/mapCompareResultToView';
 
 interface CompareResultSkeletonProps {
+  stage: CompareLoadingStage;
   /** 값이 있으면 "검색한 상품" 카드를 실제 값으로 그린다(job 생성 응답 즉시). 없으면 그 자리도 스켈레톤 */
   searchedProduct?: CompareSearchedProductView | null;
   /** "새로운 링크 검색하기" — 로딩 중에도 입력 화면으로 돌아갈 수 있다 */
@@ -66,6 +68,7 @@ const ProductCardSkeleton = () => (
 );
 
 const CompareResultSkeleton = ({
+  stage,
   searchedProduct,
   onSearchNewLink,
 }: CompareResultSkeletonProps) => {
@@ -75,9 +78,7 @@ const CompareResultSkeleton = ({
       aria-busy="true"
       aria-label="비슷한 상품을 불러오는 중"
     >
-      {/* TODO: 서버 상태 응답에 currentStage가 추가되면 usePriceCompareJob → useCompareTab에서
-          해당 단계를 전달한다. 현재는 단계 추정 없이 첫 단계 문구만 롤링한다. */}
-      <CompareLoadingCard stage="SCRAPING" />
+      <CompareLoadingCard stage={stage} />
 
       <div className={styles.container}>
         {searchedProduct ? (
