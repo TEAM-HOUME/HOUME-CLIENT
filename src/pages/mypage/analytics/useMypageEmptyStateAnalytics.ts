@@ -8,11 +8,12 @@ import {
   trackMypageListEmptyGenImgView,
   trackMypageListEmptySavedItemView,
 } from '@pages/mypage/analytics/mypageAnalytics';
-import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
+
+import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
 
 interface UseMypageEmptyStateAnalyticsOptions {
   type: 'generatedImages' | 'savedItems';
-  savedItemsForParams: Pick<FurnitureItem, 'rawProductId'>[];
+  savedItemsForParams: Pick<JjymV2ItemResponse, 'rawProductId'>[];
   enabled: boolean;
 }
 

@@ -6,7 +6,6 @@ import {
   mypageReturnScreenParams,
   mypageScreenParams,
 } from '@pages/mypage/analytics/mypageAnalyticsParams';
-import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
 
 import { GA_EVENTS } from '@analytics/events';
 import {
@@ -21,11 +20,12 @@ import { trackEvent } from '@analytics/track';
 import type {
   DateGroupResponse,
   ItemResponse,
+  JjymV2ItemResponse,
   UsedProductResponse,
 } from '@apis/__generated__/data-contracts';
 
 export const trackMypageFeedCardView = (
-  items: Pick<FurnitureItem, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId'>[] = []
 ) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARD_VIEW, {
     ...mypageScreenParams(),
@@ -33,28 +33,28 @@ export const trackMypageFeedCardView = (
   });
 };
 
-export const trackMypageFeedCardGoSiteClick = (item: FurnitureItem) => {
+export const trackMypageFeedCardGoSiteClick = (item: JjymV2ItemResponse) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARD_GO_SITE_CLICK, {
     ...mypageScreenParams(),
     ...getProductCardIdNameParams(toProductCardInputFromJjymFeed(item)),
   });
 };
 
-export const trackMypageFeedCardSaveClick = (item: FurnitureItem) => {
+export const trackMypageFeedCardSaveClick = (item: JjymV2ItemResponse) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARD_SAVE_CLICK, {
     ...mypageScreenParams(),
     ...getProductCardIdNameParams(toProductCardInputFromJjymFeed(item)),
   });
 };
 
-export const trackMypageFeedCardUnsaveClick = (item: FurnitureItem) => {
+export const trackMypageFeedCardUnsaveClick = (item: JjymV2ItemResponse) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARD_UNSAVE_CLICK, {
     ...mypageScreenParams(),
     ...getProductCardIdNameParams(toProductCardInputFromJjymFeed(item)),
   });
 };
 
-export const trackMypageFeedCardOnCardClick = (item: FurnitureItem) => {
+export const trackMypageFeedCardOnCardClick = (item: JjymV2ItemResponse) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARDON_CARD_CLICK, {
     ...mypageScreenParams(),
     ...getProductCardIdNamePriceParams(toProductCardInputFromJjymFeed(item)),
@@ -123,7 +123,7 @@ export const trackMypageListGenImgView = (groups: DateGroupResponse[]) => {
   });
 };
 
-export const trackMypageListSavedItemView = (items: FurnitureItem[]) => {
+export const trackMypageListSavedItemView = (items: JjymV2ItemResponse[]) => {
   trackEvent(GA_EVENTS.mypage.LIST_SAVED_ITEM_VIEW, {
     ...mypageScreenParams(),
     ...getMypageSavedItemsListParams(items),
@@ -169,7 +169,7 @@ export const trackMypageListEmptyGenImgView = () => {
 };
 
 export const trackMypageListEmptySavedItemView = (
-  items: Pick<FurnitureItem, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId'>[] = []
 ) => {
   trackEvent(GA_EVENTS.mypage.LIST_EMPTY_SAVED_ITEM_VIEW, {
     ...mypageScreenParams(),

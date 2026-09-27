@@ -7,16 +7,24 @@ import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
+import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
+import { queryClient } from '@apis/config/queryClient';
+import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 
 import ProductCard from '@components/productCard/ProductCard';
 
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
+import { queryKeys } from '@constants/queryKey';
 
+import { resolveCompareJjymTarget } from '@utils/compareJjym';
 import { normalizeColorHexes } from '@utils/normalizeColorHexes';
 
 import * as styles from './SavedItemsSection.css';
 import EmptyStateSection from '../emptyState/EmptyStateSection';
+
+const getSavedItemKey = (item: JjymV2ItemResponse) =>
+  `${item.source ?? 'UNKNOWN'}:${item.rawProductId ?? item.catalogItemId ?? item.productSiteUrl ?? item.productName ?? 'UNKNOWN'}`;
 
 const SavedItemsSection = () => {
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
@@ -45,14 +53,31 @@ const SavedItemsSection = () => {
     invalidateSavedItemsList: false,
     loginEntryRoute: LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SAVE,
   });
+  const {
+    mutate: toggleCompareJjym,
+    isPending: isCompareJjymPending,
+    variables: pendingCompareTarget,
+  } = useCompareJjymMutation();
 
   const handleToggleSave = (
-    id: number,
     isSaved: boolean,
     item: (typeof savedItems)[number]
   ) => {
     handleFeedCardSaveToggle(item, isSaved);
-    toggleJjym(id, { productName: item.productName });
+    if (item.rawProductId != null) {
+      toggleJjym(item.rawProductId, { productName: item.productName });
+      return;
+    }
+
+    const target = resolveCompareJjymTarget(item.catalogItemId, item.source);
+    if (!target) return;
+    toggleCompareJjym(target, {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.mypage.jjymList(),
+        });
+      },
+    });
   };
 
   const itemFocusRef = useRef<HTMLDivElement | null>(null);
@@ -69,7 +94,11 @@ const SavedItemsSection = () => {
   useEffect(() => {
     if (!isFetched) return;
 
-    setSavedProductIds(savedItems.map((item) => item.rawProductId));
+    setSavedProductIds(
+      savedItems.flatMap((item) =>
+        item.rawProductId == null ? [] : [item.rawProductId]
+      )
+    );
     setIsSavedItemsSynced(true);
   }, [isFetched, savedItems, setSavedProductIds]);
 
@@ -90,24 +119,36 @@ const SavedItemsSection = () => {
     <section className={styles.container}>
       <div className={styles.gridContainer}>
         {savedItems.map((item) => {
+          const compareTarget = resolveCompareJjymTarget(
+            item.catalogItemId,
+            item.source
+          );
           const isTargetItem =
-            String(item.rawProductId) === String(focusItemId);
-          const isSaved = isSavedItemsSynced
-            ? savedProductIds.has(item.rawProductId)
-            : true;
+            String(item.rawProductId ?? item.catalogItemId) ===
+            String(focusItemId);
+          const isSaved =
+            item.rawProductId != null && isSavedItemsSynced
+              ? savedProductIds.has(item.rawProductId)
+              : (item.isJjym ?? true);
+          const itemJjymCount = item.jjymCount ?? 0;
           const jjymCount = isSaved
-            ? item.jjymCount
-            : Math.max(0, item.jjymCount - 1);
+            ? itemJjymCount
+            : Math.max(0, itemJjymCount - 1);
+          const isCompareItemPending =
+            compareTarget != null &&
+            isCompareJjymPending &&
+            pendingCompareTarget?.productId === compareTarget.productId &&
+            pendingCompareTarget.source === compareTarget.source;
 
           return (
             <div
-              key={item.rawProductId}
+              key={getSavedItemKey(item)}
               ref={isTargetItem ? itemFocusRef : null}
               className={styles.cardWrapper}
             >
               <ProductCard
                 product={{
-                  title: item.productName,
+                  title: item.productName ?? '',
                   brand: item.brandName,
                   imageUrl: item.productImageUrl,
                   colorHexes: normalizeColorHexes(item.colors),
@@ -119,9 +160,11 @@ const SavedItemsSection = () => {
                 }}
                 save={{
                   isSaved,
-                  onToggle: () =>
-                    handleToggleSave(item.rawProductId, isSaved, item),
+                  onToggle: () => handleToggleSave(isSaved, item),
                   count: jjymCount,
+                  disabled:
+                    (item.rawProductId == null && compareTarget == null) ||
+                    isCompareItemPending,
                 }}
                 link={{
                   href: item.productSiteUrl,
