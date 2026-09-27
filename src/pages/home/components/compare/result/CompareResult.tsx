@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useCompareResultJjym } from '@pages/home/hooks/useCompareResultJjym';
+
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
@@ -26,6 +28,7 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
   const [sortOption, setSortOption] = useState<CompareSortOption>(
     DEFAULT_COMPARE_SORT_OPTION
   );
+  const { getSaveInfo } = useCompareResultJjym();
 
   const sortedProducts = sortCompareProducts(
     viewModel.similarProducts,
@@ -74,7 +77,7 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
               key={item.id}
               product={item.product}
               price={item.price}
-              save={item.save}
+              save={getSaveInfo(item)}
               link={item.link}
               benefitAmount={item.benefitAmount}
               enableWholeCardLink

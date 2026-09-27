@@ -1,10 +1,10 @@
 import { getCompareSourceLabel } from '@pages/home/constants/compareSourceLabel';
+import { calculateCompareBenefitAmount } from '@pages/home/utils/compareJobPresentation';
 
 import type {
   LinkInfo,
   PriceInfo,
   ProductInfo,
-  SaveInfo,
 } from '@shared/types/productCard';
 
 import type {
@@ -13,18 +13,18 @@ import type {
   PresetDetailResponse,
 } from '@apis/__generated__/data-contracts';
 
-const NOOP_SAVE: SaveInfo = {
-  isSaved: false,
-  onToggle: () => undefined,
-};
+import {
+  resolveCompareJjymTarget,
+  type CompareJjymTarget,
+} from '@utils/compareJjym';
 
 export interface CompareResultViewProduct {
   id: number;
   product: ProductInfo;
   price: PriceInfo;
-  save: SaveInfo;
   link: LinkInfo;
   benefitAmount: number;
+  saveTarget: CompareJjymTarget | null;
 }
 
 /** 결과 화면 맨 위 "검색한 상품" 카드가 그리는 형태. 로딩 중에도 이 값만 있으면 먼저 그린다 */
@@ -66,15 +66,15 @@ interface SimilarProductSource {
   title?: string;
   imageUrl?: string;
   price?: number;
-  currency?: string;
   productUrl?: string;
   /** 판매처명. 프리셋은 siteName, job은 source를 라벨로 바꿔 넘긴다 */
   siteLabel?: string;
+  productId?: string;
+  source?: string;
 }
 
 interface OriginalPriceSource {
   price?: number;
-  currency?: string;
 }
 
 const toSimilarProductView = (
@@ -82,15 +82,10 @@ const toSimilarProductView = (
   index: number,
   original: OriginalPriceSource
 ): CompareResultViewProduct => {
-  // TODO: PriceInfo/ProductCard가 통화를 안 받아 KRW가 아닌 금액(eBay는 USD)도 원화처럼 표시된다.
-  // 환율 변환 없이 다른 통화끼리 빼면 절감액이 틀리므로, 통화가 같을 때만 계산한다.
-  const benefitAmount =
-    original.price != null &&
-    item.price != null &&
-    original.currency != null &&
-    original.currency === item.currency
-      ? Math.max(0, original.price - item.price)
-      : 0;
+  const benefitAmount = calculateCompareBenefitAmount(
+    original.price,
+    item.price
+  );
 
   return {
     id: index + 1,
@@ -102,12 +97,12 @@ const toSimilarProductView = (
     price: {
       original: item.price,
     },
-    save: NOOP_SAVE,
     link: {
       href: item.productUrl,
       label: item.siteLabel,
     },
     benefitAmount,
+    saveTarget: resolveCompareJjymTarget(item.productId, item.source),
   };
 };
 
@@ -122,7 +117,6 @@ export const mapComparePresetToView = (
   const similarProducts = preset.similarProducts ?? [];
   const original = {
     price: originalProduct?.price,
-    currency: originalProduct?.currency,
   };
 
   return {
@@ -156,7 +150,6 @@ export const mapCompareJobToView = (
   const similarProducts = result.similarProducts ?? [];
   const original = {
     price: originalProduct?.price,
-    currency: originalProduct?.currency,
   };
 
   return {
