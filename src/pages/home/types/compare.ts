@@ -10,11 +10,11 @@
 //   GET  /api/v1/price-compare/presets              — 프리셋 목록                   PresetListResponse
 //   GET  /api/v1/price-compare/presets/{presetId}   — 프리셋 고정 결과 조회         PresetDetailResponse
 //
-// 2026-09-17 dev 서버 실측 (Swagger와 일치):
-// - 진행 중(RUNNING) 응답에는 result 키가 없다(null이 아니라 없음). 파이프라인 단계·에러 코드·에러 문구 필드도 없다
+// 2026-09-27 서버 명세:
+// - RUNNING 응답은 currentStage(SEARCHING·MERGING·SORTING)를 제공한다. DONE·FAILED에서는 null이다
 // - 원본 상품 페이지를 못 긁으면 job이 만들어지지 않고 생성 요청이 HTTP 에러(502, code 50204)로 거절된다.
-//   비동기로 FAILED가 되는 응답은 재현하지 못해 모양을 모른다
-// - 유사 상품에는 판매처명·상품 id·유사도가 없다. 판매처는 source(EBAY·COUPANG·CATALOG)로 표기한다. eBay 결과는 USD로 온다
+// - 파이프라인 타임아웃·내부 예외는 FAILED가 되며 errorCode·errorMessage를 제공한다
+// - 유사 상품 가격은 서버가 KRW로 환산한다. productId·source는 비교 상품 찜에 사용한다
 // - Swagger에 enum이 없어 status·source 같은 값은 string으로 생성된다. 아래 상수가 실제 값 목록이다
 
 import type {
@@ -35,9 +35,9 @@ export type CompareJobStatus =
 
 /** 유사 상품을 찾아온 곳 — 응답의 `similarProducts[].source` 값 */
 export const COMPARE_SOURCE = {
-  CATALOG: 'CATALOG',
   COUPANG: 'COUPANG',
   EBAY: 'EBAY',
+  RAW: 'RAW',
 } as const;
 
 export type CompareSource =

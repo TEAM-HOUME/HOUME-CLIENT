@@ -154,7 +154,7 @@ const ProductCard = ({
             <IconButton
               name={save.isSaved ? 'HeartFillColor' : 'HeartStrokeWhite'}
               size="S"
-              disabled={disabled}
+              disabled={disabled || save.disabled}
               onClick={save.onToggle}
             />
           ) : (
