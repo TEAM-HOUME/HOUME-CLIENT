@@ -4,7 +4,6 @@ import { useMutation } from '@tanstack/react-query';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import type { SaveItemsRequest, SaveItemsResponse } from '@shared/types/jjym';
 import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
 
 import {
@@ -16,6 +15,7 @@ import {
 import type { LoginEntryRoute } from '@analytics/params/gate';
 import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
+import type { JjymToggleResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';
 import { HTTPMethod, request } from '@apis/config/request';
 
@@ -40,11 +40,11 @@ interface UseJjymMutationOptions {
 }
 
 export const postJjym = async (
-  jjymData: SaveItemsRequest
-): Promise<SaveItemsResponse> => {
-  return request<SaveItemsResponse>({
+  rawProductId: number
+): Promise<JjymToggleResponse> => {
+  return request<JjymToggleResponse>({
     method: HTTPMethod.POST,
-    url: API_ENDPOINT.GENERATE.JJYM_V2(jjymData.rawProductId),
+    url: API_ENDPOINT.GENERATE.JJYM_V2(rawProductId),
   });
 };
 
@@ -79,7 +79,7 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
     options?.invalidateSavedItemsList !== false;
 
   const syncSavedStateWithServer = async (rawProductId: number) => {
-    const response = await postJjym({ rawProductId });
+    const response = await postJjym(rawProductId);
     const isSavedNow = useSavedItemsStore
       .getState()
       .savedProductIds.has(rawProductId);
@@ -94,9 +94,9 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
     );
   };
 
-  const mutation = useMutation<SaveItemsResponse, AxiosError, number>({
+  const mutation = useMutation<JjymToggleResponse, AxiosError, number>({
     mutationKey: ['jjym'],
-    mutationFn: (rawProductId) => postJjym({ rawProductId }),
+    mutationFn: postJjym,
 
     onMutate: (rawProductId) => {
       toggleSaveProduct(rawProductId);
