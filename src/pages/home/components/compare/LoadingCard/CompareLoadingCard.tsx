@@ -26,8 +26,13 @@ const RollingMessage = ({ stage }: CompareLoadingCardProps) => {
   if (messages.length === 0) return null;
 
   return (
-    <span className={styles.message} key={index}>
-      {messages[index]}
+    <span className={styles.rollingContent} key={index}>
+      <span className={styles.message}>{messages[index]}</span>
+      <span className={styles.dots} aria-hidden="true">
+        <span className={styles.dot} />
+        <span className={styles.dot} />
+        <span className={styles.dot} />
+      </span>
     </span>
   );
 };
@@ -39,11 +44,6 @@ const CompareLoadingCard = ({ stage }: CompareLoadingCardProps) => (
     aria-label="비슷한 상품 검색 중"
   >
     <RollingMessage key={stage} stage={stage} />
-    <span className={styles.dots} aria-hidden="true">
-      <span className={styles.dot} />
-      <span className={styles.dot} />
-      <span className={styles.dot} />
-    </span>
   </div>
 );
 

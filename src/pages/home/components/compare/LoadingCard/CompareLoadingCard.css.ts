@@ -2,26 +2,17 @@ import { keyframes, style } from '@vanilla-extract/css';
 
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
-import {
-  interactionDurationValues,
-  interactionEasingValues,
-  interactionVars,
-} from '@styles/tokens/interaction/tokens.css';
+import { interactionVars } from '@styles/tokens/interaction/tokens.css';
 import { unitVars } from '@styles/tokens/unit.css';
-
-import { COMPARE_ROLL_INTERVAL_MS } from './compareLoadingMessages';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
   to: { opacity: 1 },
 });
 
-const dotEnterEnd = `${(interactionDurationValues.slower / COMPARE_ROLL_INTERVAL_MS) * 100}%`;
-
 const dotEnter = keyframes({
-  '0%': { transform: 'translateY(-10px)', opacity: 0 },
-  [dotEnterEnd]: { transform: 'translateY(0)', opacity: 1 },
-  '100%': { transform: 'translateY(0)', opacity: 1 },
+  from: { transform: 'translateY(-10px)', opacity: 0 },
+  to: { transform: 'translateY(0)', opacity: 1 },
 });
 
 export const container = style({
@@ -36,10 +27,16 @@ export const container = style({
   height: '4.8rem',
 });
 
+export const rollingContent = style({
+  display: 'flex',
+  alignItems: 'center',
+  minWidth: 0,
+});
+
 export const message = style({
   ...fontVars.font.body_r_14,
   overflow: 'hidden',
-  animation: `${fadeIn} ${interactionVars.interaction.duration.slowest} ${interactionEasingValues['bezier.inout']} both`,
+  animation: `${fadeIn} ${interactionVars.interaction.duration.slowest} ${interactionVars.interaction.easing['bezier.inout']} both`,
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
   color: colorVars.color.text.tertiary,
@@ -61,7 +58,7 @@ export const dot = style({
   backgroundColor: colorVars.color.fill.primary,
   width: '4px',
   height: '4px',
-  animation: `${dotEnter} ${COMPARE_ROLL_INTERVAL_MS}ms ${interactionEasingValues['bezier.back']} infinite both`,
+  animation: `${dotEnter} ${interactionVars.interaction.duration.slower} ${interactionVars.interaction.easing['bezier.back']} both`,
   selectors: {
     '&:nth-child(2)': {
       backgroundColor: colorVars.color.fill.tertiary,
