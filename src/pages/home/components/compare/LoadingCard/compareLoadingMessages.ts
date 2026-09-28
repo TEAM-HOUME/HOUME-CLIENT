@@ -1,8 +1,5 @@
 export const COMPARE_ROLL_INTERVAL_MS = 2_400;
 
-export const getNextCompareLoadingCycle = (currentCycle: number) =>
-  currentCycle + 1;
-
 export const COMPARE_LOADING_MESSAGES = {
   SCRAPING: [
     '붙여넣은 링크에 접속하고 있어요.',

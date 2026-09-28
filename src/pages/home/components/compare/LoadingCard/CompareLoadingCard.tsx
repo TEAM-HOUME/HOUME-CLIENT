@@ -4,7 +4,6 @@ import * as styles from './CompareLoadingCard.css';
 import {
   COMPARE_LOADING_MESSAGES,
   COMPARE_ROLL_INTERVAL_MS,
-  getNextCompareLoadingCycle,
   type CompareLoadingStage,
 } from './compareLoadingMessages';
 
@@ -19,7 +18,7 @@ const RollingMessage = ({ stage }: CompareLoadingCardProps) => {
   useEffect(() => {
     if (messages.length === 0) return;
     const timer = window.setInterval(() => {
-      setCycle(getNextCompareLoadingCycle);
+      setCycle((previous) => previous + 1);
     }, COMPARE_ROLL_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [messages]);
