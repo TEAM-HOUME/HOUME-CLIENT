@@ -73,16 +73,20 @@ const OutputLink = ({
         </span>
       </ContentTag>
 
-      <button
-        type="button"
-        className={styles.searchButton}
-        onClick={onSearchNewLink}
-      >
-        <span className={styles.searchButtonContent}>
-          <Icon name="Search" size="16" decorative />
-          <span className={styles.searchButtonText}>새로운 링크 검색하기</span>
-        </span>
-      </button>
+      {onSearchNewLink ? (
+        <button
+          type="button"
+          className={styles.searchButton}
+          onClick={onSearchNewLink}
+        >
+          <span className={styles.searchButtonContent}>
+            <Icon name="Search" size="16" decorative />
+            <span className={styles.searchButtonText}>
+              새로운 링크 검색하기
+            </span>
+          </span>
+        </button>
+      ) : null}
     </section>
   );
 };

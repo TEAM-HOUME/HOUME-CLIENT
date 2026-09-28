@@ -40,7 +40,6 @@ const CompareTab = () => {
           <CompareResultSkeleton
             stage={loadingStage}
             searchedProduct={searchedProduct}
-            onSearchNewLink={reset}
           />
         )}
 

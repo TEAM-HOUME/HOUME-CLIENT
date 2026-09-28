@@ -13,8 +13,6 @@ interface CompareResultSkeletonProps {
   stage: CompareLoadingStage;
   /** 값이 있으면 "검색한 상품" 카드를 실제 값으로 그린다(job 생성 응답 즉시). 없으면 그 자리도 스켈레톤 */
   searchedProduct?: CompareSearchedProductView | null;
-  /** "새로운 링크 검색하기" — 로딩 중에도 입력 화면으로 돌아갈 수 있다 */
-  onSearchNewLink?: () => void;
 }
 
 const SKELETON_CARD_COUNT = 4;
@@ -42,15 +40,6 @@ const OutputLinkSkeleton = () => (
         </div>
       </div>
     </div>
-
-    <div className={outputStyles.searchButton} aria-hidden>
-      <span className={outputStyles.searchButtonContent}>
-        <Icon name="Search" size="16" decorative />
-        <span className={outputStyles.searchButtonText}>
-          새로운 링크 검색하기
-        </span>
-      </span>
-    </div>
   </section>
 );
 
@@ -70,7 +59,6 @@ const ProductCardSkeleton = () => (
 const CompareResultSkeleton = ({
   stage,
   searchedProduct,
-  onSearchNewLink,
 }: CompareResultSkeletonProps) => {
   return (
     <div
@@ -85,7 +73,6 @@ const CompareResultSkeleton = ({
           <OutputLink
             product={searchedProduct.product}
             price={searchedProduct.price}
-            onSearchNewLink={onSearchNewLink}
           />
         ) : (
           <OutputLinkSkeleton />
