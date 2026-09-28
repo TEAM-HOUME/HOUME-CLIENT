@@ -55,6 +55,8 @@ interface PriceCompareJob {
    * 로딩 화면의 "검색한 상품" 카드가 생성 응답 즉시 그려지게 한다. 새로고침 복원처럼 생성 응답이 없으면 첫 폴링 응답부터 채워진다
    */
   originalProduct: OriginalProductResponse | null;
+  /** 생성 응답에 포함된 검색 원본 URL. 상태 응답 타입에는 아직 없어 현재 세션의 job에서만 사용할 수 있다 */
+  originalProductUrl: string | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
@@ -88,6 +90,9 @@ export const usePriceCompareJob = (
   const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
   // 생성 성공과 URL jobId 반영 사이의 짧은 구간에도 로딩 화면을 유지한다.
   const [pendingJobId, setPendingJobId] = useState<string | null>(null);
+  const [requestedProductUrl, setRequestedProductUrl] = useState<string | null>(
+    null
+  );
 
   const { requireLogin } = useLoginGate();
   const {
@@ -147,6 +152,7 @@ export const usePriceCompareJob = (
       requireLogin(
         () => {
           setPendingJobId(null);
+          setRequestedProductUrl(url);
           createJob(
             { url },
             {
@@ -171,6 +177,7 @@ export const usePriceCompareJob = (
 
   const dismissCreateError = useCallback(() => {
     setPendingJobId(null);
+    setRequestedProductUrl(null);
     resetCreateJob();
   }, [resetCreateJob]);
 
@@ -222,6 +229,10 @@ export const usePriceCompareJob = (
     result:
       data?.status === COMPARE_JOB_STATUS.DONE ? (data.result ?? null) : null,
     originalProduct,
+    originalProductUrl:
+      createdJob && createdJob.jobId === displayedJobId
+        ? (createdJob.sourceUrl ?? requestedProductUrl)
+        : null,
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),

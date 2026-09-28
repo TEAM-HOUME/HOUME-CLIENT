@@ -54,6 +54,7 @@ export const useCompareTab = (): CompareTabState => {
     loadingStage: jobLoadingStage,
     result: jobResult,
     originalProduct: jobOriginalProduct,
+    originalProductUrl: jobOriginalProductUrl,
     start,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
@@ -94,13 +95,20 @@ export const useCompareTab = (): CompareTabState => {
       ? mapComparePresetToView(presetResult)
       : null
     : jobResult
-      ? mapCompareJobToView(jobOriginalProduct, jobResult)
+      ? mapCompareJobToView(
+          jobOriginalProduct,
+          jobResult,
+          jobOriginalProductUrl ?? undefined
+        )
       : null;
 
   const searchedProduct =
     resultViewModel?.searchedProduct ??
     (!isPresetActive && jobOriginalProduct
-      ? toSearchedProductView(jobOriginalProduct)
+      ? toSearchedProductView({
+          ...jobOriginalProduct,
+          sourceUrl: jobOriginalProductUrl ?? undefined,
+        })
       : null);
 
   return {

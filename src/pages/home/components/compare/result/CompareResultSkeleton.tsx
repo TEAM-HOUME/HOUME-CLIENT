@@ -73,6 +73,7 @@ const CompareResultSkeleton = ({
           <OutputLink
             product={searchedProduct.product}
             price={searchedProduct.price}
+            href={searchedProduct.href}
           />
         ) : (
           <OutputLinkSkeleton />

@@ -44,6 +44,7 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
       <OutputLink
         product={viewModel.searchedProduct.product}
         price={viewModel.searchedProduct.price}
+        href={viewModel.searchedProduct.href}
         onSearchNewLink={onSearchNewLink}
       />
 

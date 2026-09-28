@@ -31,6 +31,7 @@ export interface CompareResultViewProduct {
 export interface CompareSearchedProductView {
   product: ProductInfo;
   price?: PriceInfo;
+  href?: string;
 }
 
 export interface CompareResultViewModel {
@@ -45,6 +46,7 @@ interface SearchedProductSource {
   brand?: string;
   imageUrl?: string;
   price?: number;
+  sourceUrl?: string;
 }
 
 export const toSearchedProductView = ({
@@ -52,6 +54,7 @@ export const toSearchedProductView = ({
   brand,
   imageUrl,
   price,
+  sourceUrl,
 }: SearchedProductSource): CompareSearchedProductView => ({
   product: {
     brand,
@@ -59,6 +62,7 @@ export const toSearchedProductView = ({
     imageUrl,
   },
   price: price != null ? { original: price } : undefined,
+  href: sourceUrl,
 });
 
 /** 유사 상품 한 건 → ProductCard 형태. job·프리셋 공통 */
@@ -126,6 +130,7 @@ export const mapComparePresetToView = (
       brand: originalProduct?.brand,
       imageUrl: originalProduct?.thumbnailUrl,
       price: originalProduct?.price,
+      sourceUrl: originalProduct?.sourceUrl,
     }),
     similarProducts: similarProducts.map((item, index) =>
       toSimilarProductView(
@@ -145,7 +150,8 @@ export const mapComparePresetToView = (
  */
 export const mapCompareJobToView = (
   originalProduct: OriginalProductResponse | null | undefined,
-  result: JobResultResponse
+  result: JobResultResponse,
+  sourceUrl?: string
 ): CompareResultViewModel => {
   const similarProducts = result.similarProducts ?? [];
   const original = {
@@ -154,7 +160,10 @@ export const mapCompareJobToView = (
 
   return {
     // TODO: 서버가 스크래핑 단계에서 originalProduct.brand 수집을 지원하면 검색한 상품 브랜드를 노출한다. 현재는 null이다.
-    searchedProduct: toSearchedProductView(originalProduct ?? {}),
+    searchedProduct: toSearchedProductView({
+      ...originalProduct,
+      sourceUrl,
+    }),
     similarProducts: similarProducts.map((item, index) =>
       toSimilarProductView(
         { ...item, siteLabel: getCompareSourceLabel(item.source) },
