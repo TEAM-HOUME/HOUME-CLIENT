@@ -7,20 +7,17 @@ import { useSavedItemsStore } from '@store/useSavedItemsStore';
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
 import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
-import { queryClient } from '@apis/config/queryClient';
-import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
 import { useJjymListQuery } from '@apis/queries/useJjymListQuery';
 
 import ProductCard from '@components/productCard/ProductCard';
 
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
-import { queryKeys } from '@constants/queryKey';
 
+import { useCompareJjymState } from '@hooks/useCompareJjymState';
 import { useJjymToast } from '@hooks/useJjymToast';
 
 import {
-  getCompareJjymKey,
   resolveCompareJjymTarget,
   type CompareJjymTarget,
 } from '@utils/compareJjym';
@@ -35,9 +32,6 @@ const getSavedItemKey = (item: JjymV2ItemResponse) =>
 const SavedItemsSection = () => {
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [isSavedItemsSynced, setIsSavedItemsSynced] = useState(false);
-  const [compareSavedStates, setCompareSavedStates] = useState<
-    Map<string, boolean>
-  >(() => new Map());
   const savedProductIds = useSavedItemsStore((state) => state.savedProductIds);
   const setSavedProductIds = useSavedItemsStore(
     (state) => state.setSavedProductIds
@@ -63,10 +57,10 @@ const SavedItemsSection = () => {
     loginEntryRoute: LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SAVE,
   });
   const {
-    mutate: toggleCompareJjym,
+    toggle: toggleCompareJjym,
+    getSavedState: getCompareSavedState,
     isPending: isCompareJjymPending,
-    variables: pendingCompareTarget,
-  } = useCompareJjymMutation();
+  } = useCompareJjymState();
   const { notifyJjymToast } = useJjymToast();
 
   const toggleCompareSavedItem = (
@@ -75,15 +69,6 @@ const SavedItemsSection = () => {
   ) => {
     toggleCompareJjym(target, {
       onSuccess: (favorited) => {
-        setCompareSavedStates((previous) => {
-          const next = new Map(previous);
-          next.set(getCompareJjymKey(target), favorited);
-          return next;
-        });
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.mypage.jjymList(),
-        });
-
         if (showRemovedToast && !favorited) {
           notifyJjymToast({
             favorited: false,
@@ -159,19 +144,14 @@ const SavedItemsSection = () => {
             item.rawProductId != null && isSavedItemsSynced
               ? savedProductIds.has(item.rawProductId)
               : compareTarget
-                ? (compareSavedStates.get(getCompareJjymKey(compareTarget)) ??
-                  item.isJjym ??
-                  true)
+                ? getCompareSavedState(compareTarget, item.isJjym ?? true)
                 : (item.isJjym ?? true);
           const itemJjymCount = item.jjymCount ?? 0;
           const jjymCount = isSaved
             ? itemJjymCount
             : Math.max(0, itemJjymCount - 1);
           const isCompareItemPending =
-            compareTarget != null &&
-            isCompareJjymPending &&
-            pendingCompareTarget?.productId === compareTarget.productId &&
-            pendingCompareTarget.source === compareTarget.source;
+            compareTarget != null && isCompareJjymPending(compareTarget);
 
           return (
             <div

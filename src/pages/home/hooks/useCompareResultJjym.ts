@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 
 import type { CompareResultViewProduct } from '@pages/home/components/compare/utils/mapCompareResultToView';
@@ -13,12 +11,9 @@ import type { SaveInfo } from '@shared/types/productCard';
 
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
-import { queryClient } from '@apis/config/queryClient';
-import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
 import { useJjymListQuery } from '@apis/queries/useJjymListQuery';
 
-import { queryKeys } from '@constants/queryKey';
-
+import { useCompareJjymState } from '@hooks/useCompareJjymState';
 import { useJjymToast } from '@hooks/useJjymToast';
 import { useLoginGate } from '@hooks/useLoginGate';
 
@@ -26,44 +21,19 @@ import { getCompareJjymKey, type CompareJjymTarget } from '@utils/compareJjym';
 
 export const useCompareResultJjym = () => {
   const navigate = useNavigate();
-  const [savedStates, setSavedStates] = useState<Map<string, boolean>>(
-    () => new Map()
-  );
-  const [pendingSaveKeys, setPendingSaveKeys] = useState<Set<string>>(
-    () => new Set()
-  );
   const isLoggedIn = Boolean(useUserStore((state) => state.accessToken));
   const { data: savedItems = [] } = useJjymListQuery({ enabled: isLoggedIn });
   const serverSavedKeys = getCompareJjymSavedKeys(savedItems);
-  const { mutate: toggleCompareJjym } = useCompareJjymMutation();
+  const { toggle, getSavedState, isPending } = useCompareJjymState();
   const { requireLogin } = useLoginGate();
   const { notifyJjymToast, notifyJjymError } = useJjymToast();
 
-  const updateSavedState = (key: string, favorited: boolean) => {
-    setSavedStates((previous) => {
-      const next = new Map(previous);
-      next.set(key, favorited);
-      return next;
-    });
-  };
-
-  const invalidateSavedItems = () => {
-    void queryClient.invalidateQueries({
-      queryKey: queryKeys.mypage.jjymList(),
-    });
-  };
-
   const executeToggle = (
     target: CompareJjymTarget,
-    key: string,
     showResultToast: boolean
   ) => {
-    setPendingSaveKeys((previous) => new Set(previous).add(key));
-    toggleCompareJjym(target, {
+    toggle(target, {
       onSuccess: (favorited) => {
-        updateSavedState(key, favorited);
-        invalidateSavedItems();
-
         if (!showResultToast) return;
         if (favorited) {
           notifyJjymToast({
@@ -78,19 +48,10 @@ export const useCompareResultJjym = () => {
 
         notifyJjymToast({
           favorited: false,
-          onAction: () => executeToggle(target, key, false),
+          onAction: () => executeToggle(target, false),
         });
       },
-      onError: () => {
-        notifyJjymError();
-      },
-      onSettled: () => {
-        setPendingSaveKeys((previous) => {
-          const next = new Set(previous);
-          next.delete(key);
-          return next;
-        });
-      },
+      onError: notifyJjymError,
     });
   };
 
@@ -98,11 +59,10 @@ export const useCompareResultJjym = () => {
     const target = item.saveTarget;
     if (!target) return;
 
-    const key = getCompareJjymKey(target);
-    if (pendingSaveKeys.has(key)) return;
+    if (isPending(target)) return;
 
     requireLogin(
-      () => executeToggle(target, key, true),
+      () => executeToggle(target, true),
       LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SAVE
     );
   };
@@ -113,10 +73,12 @@ export const useCompareResultJjym = () => {
       return { isSaved: false, disabled: true, onToggle: () => undefined };
     }
 
-    const key = getCompareJjymKey(target);
     return {
-      isSaved: savedStates.get(key) ?? serverSavedKeys.has(key),
-      disabled: pendingSaveKeys.has(key),
+      isSaved: getSavedState(
+        target,
+        serverSavedKeys.has(getCompareJjymKey(target))
+      ),
+      disabled: isPending(target),
       onToggle: () => handleToggle(item),
     };
   };
