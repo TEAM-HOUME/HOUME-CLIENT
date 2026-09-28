@@ -4,6 +4,9 @@ export type CompareJjymTarget = Required<
   Pick<SimilarProductItemResponse, 'productId' | 'source'>
 >;
 
+export const getCompareJjymKey = ({ productId, source }: CompareJjymTarget) =>
+  `${source}:${productId}`;
+
 export const resolveCompareJjymTarget = (
   productId: string | number | null | undefined,
   source: string | null | undefined

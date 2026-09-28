@@ -22,10 +22,7 @@ import { queryKeys } from '@constants/queryKey';
 import { useJjymToast } from '@hooks/useJjymToast';
 import { useLoginGate } from '@hooks/useLoginGate';
 
-import type { CompareJjymTarget } from '@utils/compareJjym';
-
-const getSaveKey = ({ productId, source }: CompareJjymTarget) =>
-  `${source}:${productId}`;
+import { getCompareJjymKey, type CompareJjymTarget } from '@utils/compareJjym';
 
 export const useCompareResultJjym = () => {
   const navigate = useNavigate();
@@ -101,7 +98,7 @@ export const useCompareResultJjym = () => {
     const target = item.saveTarget;
     if (!target) return;
 
-    const key = getSaveKey(target);
+    const key = getCompareJjymKey(target);
     if (pendingSaveKeys.has(key)) return;
 
     requireLogin(
@@ -116,7 +113,7 @@ export const useCompareResultJjym = () => {
       return { isSaved: false, disabled: true, onToggle: () => undefined };
     }
 
-    const key = getSaveKey(target);
+    const key = getCompareJjymKey(target);
     return {
       isSaved: savedStates.get(key) ?? serverSavedKeys.has(key),
       disabled: pendingSaveKeys.has(key),

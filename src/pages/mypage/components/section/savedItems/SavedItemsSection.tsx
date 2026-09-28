@@ -17,7 +17,13 @@ import ProductCard from '@components/productCard/ProductCard';
 import { SESSION_STORAGE_KEYS } from '@constants/bottomSheet';
 import { queryKeys } from '@constants/queryKey';
 
-import { resolveCompareJjymTarget } from '@utils/compareJjym';
+import { useJjymToast } from '@hooks/useJjymToast';
+
+import {
+  getCompareJjymKey,
+  resolveCompareJjymTarget,
+  type CompareJjymTarget,
+} from '@utils/compareJjym';
 import { normalizeColorHexes } from '@utils/normalizeColorHexes';
 
 import * as styles from './SavedItemsSection.css';
@@ -29,6 +35,9 @@ const getSavedItemKey = (item: JjymV2ItemResponse) =>
 const SavedItemsSection = () => {
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [isSavedItemsSynced, setIsSavedItemsSynced] = useState(false);
+  const [compareSavedStates, setCompareSavedStates] = useState<
+    Map<string, boolean>
+  >(() => new Map());
   const savedProductIds = useSavedItemsStore((state) => state.savedProductIds);
   const setSavedProductIds = useSavedItemsStore(
     (state) => state.setSavedProductIds
@@ -58,6 +67,32 @@ const SavedItemsSection = () => {
     isPending: isCompareJjymPending,
     variables: pendingCompareTarget,
   } = useCompareJjymMutation();
+  const { notifyJjymToast } = useJjymToast();
+
+  const toggleCompareSavedItem = (
+    target: CompareJjymTarget,
+    showRemovedToast: boolean
+  ) => {
+    toggleCompareJjym(target, {
+      onSuccess: (favorited) => {
+        setCompareSavedStates((previous) => {
+          const next = new Map(previous);
+          next.set(getCompareJjymKey(target), favorited);
+          return next;
+        });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.mypage.jjymList(),
+        });
+
+        if (showRemovedToast && !favorited) {
+          notifyJjymToast({
+            favorited: false,
+            onAction: () => toggleCompareSavedItem(target, false),
+          });
+        }
+      },
+    });
+  };
 
   const handleToggleSave = (
     isSaved: boolean,
@@ -71,13 +106,7 @@ const SavedItemsSection = () => {
 
     const target = resolveCompareJjymTarget(item.catalogItemId, item.source);
     if (!target) return;
-    toggleCompareJjym(target, {
-      onSuccess: () => {
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.mypage.jjymList(),
-        });
-      },
-    });
+    toggleCompareSavedItem(target, true);
   };
 
   const itemFocusRef = useRef<HTMLDivElement | null>(null);
@@ -129,7 +158,11 @@ const SavedItemsSection = () => {
           const isSaved =
             item.rawProductId != null && isSavedItemsSynced
               ? savedProductIds.has(item.rawProductId)
-              : (item.isJjym ?? true);
+              : compareTarget
+                ? (compareSavedStates.get(getCompareJjymKey(compareTarget)) ??
+                  item.isJjym ??
+                  true)
+                : (item.isJjym ?? true);
           const itemJjymCount = item.jjymCount ?? 0;
           const jjymCount = isSaved
             ? itemJjymCount
