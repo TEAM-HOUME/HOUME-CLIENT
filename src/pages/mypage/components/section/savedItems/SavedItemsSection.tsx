@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useMypageSavedItemsAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
@@ -11,6 +10,7 @@ import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';
 import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
 import { useJjymMutation } from '@apis/mutations/useJjymMutation';
+import { useJjymListQuery } from '@apis/queries/useJjymListQuery';
 
 import ProductCard from '@components/productCard/ProductCard';
 
