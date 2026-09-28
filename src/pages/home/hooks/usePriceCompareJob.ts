@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
@@ -86,6 +86,8 @@ export const usePriceCompareJob = (
 ): PriceCompareJob => {
   const jobId = searchParams.get(COMPARE_JOB_ID_PARAM);
   const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
+  // 생성 성공과 URL jobId 반영 사이의 짧은 구간에도 로딩 화면을 유지한다.
+  const [pendingJobId, setPendingJobId] = useState<string | null>(null);
 
   const { requireLogin } = useLoginGate();
   const {
@@ -97,6 +99,10 @@ export const usePriceCompareJob = (
   } = useCreateCompareJobMutation();
   const { data, error: jobStatusError } = useCompareJobStatusQuery(jobId);
   const setActiveJobId = useCompareJobStore((state) => state.setActiveJobId);
+
+  useEffect(() => {
+    if (jobId && pendingJobId) setPendingJobId(null);
+  }, [jobId, pendingJobId]);
 
   // 주소의 job이 진행 중이면 전역 스토어에 올린다 — 새로고침·공유 링크·뒤로가기로 들어온 job도 다른 화면에서 완료 토스트를 받는다.
   // 끝난 job은 CompareJobWatcher(routes/)가 스토어에서 비우므로 여기서는 올리기만 한다
@@ -140,6 +146,7 @@ export const usePriceCompareJob = (
 
       requireLogin(
         () => {
+          setPendingJobId(null);
           createJob(
             { url },
             {
@@ -147,7 +154,10 @@ export const usePriceCompareJob = (
               // 여기서는 URL만 쓴다 — 이 콜백은 화면이 살아 있을 때만 실행되니 URL 쓰기에 딱 맞다
               onSuccess: (response) => {
                 // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
-                if (response.jobId) writeJobId(response.jobId);
+                if (response.jobId) {
+                  setPendingJobId(response.jobId);
+                  writeJobId(response.jobId);
+                }
               },
             }
           );
@@ -160,6 +170,7 @@ export const usePriceCompareJob = (
   );
 
   const dismissCreateError = useCallback(() => {
+    setPendingJobId(null);
     resetCreateJob();
   }, [resetCreateJob]);
 
@@ -168,7 +179,7 @@ export const usePriceCompareJob = (
   const hasJobError = isJobFailed || Boolean(jobRequestError);
 
   const view = resolveJobView({
-    hasJobId: Boolean(jobId),
+    hasJobId: Boolean(jobId ?? pendingJobId),
     isCreatingJob,
     hasRequestError: Boolean(jobRequestError),
     status: data?.status,
@@ -180,12 +191,28 @@ export const usePriceCompareJob = (
   });
 
   // 생성 응답은 방금 만든 job의 것일 때만 쓴다. 뒤로가기 등으로 URL의 jobId가 다른 job이면 그 job의 상태 응답만 믿는다
+  const displayedJobId = jobId ?? pendingJobId;
   const createdOriginalProduct: OriginalProductResponse | null =
-    createdJob && createdJob.jobId === jobId
+    createdJob && createdJob.jobId === displayedJobId
       ? {
           title: createdJob.title,
           imageUrl: createdJob.thumbnail,
           price: createdJob.price,
+        }
+      : null;
+
+  // 상태 응답은 originalProduct 일부 필드만 먼저 채워질 수 있다.
+  // 객체 전체를 교체하면 생성 응답에 있던 가격이 사라져 검색 상품 가격과 절감액이 함께 숨겨지므로 필드별로 합친다.
+  const statusOriginalProduct = data?.originalProduct;
+  const originalProduct =
+    statusOriginalProduct || createdOriginalProduct
+      ? {
+          title: statusOriginalProduct?.title ?? createdOriginalProduct?.title,
+          imageUrl:
+            statusOriginalProduct?.imageUrl ?? createdOriginalProduct?.imageUrl,
+          price: statusOriginalProduct?.price ?? createdOriginalProduct?.price,
+          currency: statusOriginalProduct?.currency,
+          quality: statusOriginalProduct?.quality,
         }
       : null;
 
@@ -194,7 +221,7 @@ export const usePriceCompareJob = (
     view,
     result:
       data?.status === COMPARE_JOB_STATUS.DONE ? (data.result ?? null) : null,
-    originalProduct: data?.originalProduct ?? createdOriginalProduct,
+    originalProduct,
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
