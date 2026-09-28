@@ -10,7 +10,6 @@ import { ROUTES } from '@routes/paths';
 import { useUserStore } from '@store/useUserStore';
 
 import type { SaveInfo } from '@shared/types/productCard';
-import { TOASTER_ID, TOAST_TYPE } from '@shared/types/toast';
 
 import { LOGIN_ENTRY_ROUTE } from '@analytics/params/gate';
 
@@ -18,11 +17,9 @@ import { queryClient } from '@apis/config/queryClient';
 import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
 import { useJjymListQuery } from '@apis/queries/useJjymListQuery';
 
-import { useToast } from '@components/toast/useToast';
-
 import { queryKeys } from '@constants/queryKey';
-import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';
 
+import { useJjymToast } from '@hooks/useJjymToast';
 import { useLoginGate } from '@hooks/useLoginGate';
 
 import type { CompareJjymTarget } from '@utils/compareJjym';
@@ -43,7 +40,7 @@ export const useCompareResultJjym = () => {
   const serverSavedKeys = getCompareJjymSavedKeys(savedItems);
   const { mutate: toggleCompareJjym } = useCompareJjymMutation();
   const { requireLogin } = useLoginGate();
-  const { notify } = useToast();
+  const { notifyJjymToast, notifyJjymError } = useJjymToast();
 
   const updateSavedState = (key: string, favorited: boolean) => {
     setSavedStates((previous) => {
@@ -72,33 +69,23 @@ export const useCompareResultJjym = () => {
 
         if (!showResultToast) return;
         if (favorited) {
-          notify({
-            text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-            type: TOAST_TYPE.ACTION,
-            actionLabel: TOAST_ACTION_LABEL.VIEW,
-            onClick: () =>
+          notifyJjymToast({
+            favorited: true,
+            onAction: () =>
               navigate(ROUTES.MYPAGE, {
                 state: { activeTab: 'savedItems' },
               }),
-            options: { toasterId: TOASTER_ID.BOTTOM_4 },
           });
           return;
         }
 
-        notify({
-          text: TOAST_MESSAGE.SAVED_ITEM_REMOVED,
-          type: TOAST_TYPE.ACTION,
-          actionLabel: TOAST_ACTION_LABEL.UNDO,
-          onClick: () => executeToggle(target, key, false),
-          options: { toasterId: TOASTER_ID.BOTTOM_4 },
+        notifyJjymToast({
+          favorited: false,
+          onAction: () => executeToggle(target, key, false),
         });
       },
       onError: () => {
-        notify({
-          text: TOAST_MESSAGE.ACTION_SERVER_ERROR,
-          type: TOAST_TYPE.ERROR,
-          options: { toasterId: TOASTER_ID.BOTTOM_4 },
-        });
+        notifyJjymError();
       },
       onSettled: () => {
         setPendingSaveKeys((previous) => {

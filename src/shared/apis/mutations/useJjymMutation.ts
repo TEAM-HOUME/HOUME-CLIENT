@@ -4,8 +4,6 @@ import { useMutation } from '@tanstack/react-query';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
-
 import {
   trackSaveToastCancelClick,
   trackSaveToastToSeeClick,
@@ -19,11 +17,9 @@ import type { JjymToggleResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';
 import { HTTPMethod, request } from '@apis/config/request';
 
-import { useToast } from '@components/toast/useToast';
-
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';
 
+import { useJjymToast } from '@hooks/useJjymToast';
 import { useLoginGate } from '@hooks/useLoginGate';
 
 import { invalidateJjymRelatedQueries } from '@utils/invalidateJjymQueries';
@@ -48,19 +44,12 @@ export const postJjym = async (
   });
 };
 
-const TOAST_OPTIONS = { toasterId: TOASTER_ID.BOTTOM_4 };
-
-const SAVED_TOAST_CONTENT = {
-  text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-  actionLabel: TOAST_ACTION_LABEL.VIEW,
-};
-
 const getCurrentScreenName = () =>
   resolveScreenName(window.location.pathname + window.location.search);
 
 export const useJjymMutation = (options?: UseJjymMutationOptions) => {
   const toggleSaveProduct = useSavedItemsStore((s) => s.toggleSaveProduct);
-  const { notify } = useToast();
+  const { notifyJjymToast } = useJjymToast();
   const { requireLogin } = useLoginGate();
   const pendingJjymContextRef = useRef<
     Map<number, { productName?: string; screenName: string }>
@@ -124,15 +113,12 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
 
         trackToastSaveView(toastInput);
 
-        notify({
-          text: SAVED_TOAST_CONTENT.text,
-          type: TOAST_TYPE.ACTION,
-          actionLabel: SAVED_TOAST_CONTENT.actionLabel,
-          onClick: () => {
+        notifyJjymToast({
+          favorited: true,
+          onAction: () => {
             trackSaveToastToSeeClick(toastInput);
             options?.onSavedAction?.();
           },
-          options: TOAST_OPTIONS,
         });
       } else {
         const toastInput = {
@@ -143,11 +129,9 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
 
         trackToastUnsaveView(toastInput);
 
-        notify({
-          text: TOAST_MESSAGE.SAVED_ITEM_REMOVED,
-          type: TOAST_TYPE.ACTION,
-          actionLabel: TOAST_ACTION_LABEL.UNDO,
-          onClick: () => {
+        notifyJjymToast({
+          favorited: false,
+          onAction: () => {
             trackSaveToastCancelClick(toastInput);
             toggleSaveProduct(rawProductId);
 
@@ -155,7 +139,6 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
               toggleSaveProduct(rawProductId);
             });
           },
-          options: TOAST_OPTIONS,
         });
       }
 
