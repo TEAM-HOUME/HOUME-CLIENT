@@ -231,7 +231,7 @@ export const usePriceCompareJob = (
     originalProduct,
     originalProductUrl:
       createdJob && createdJob.jobId === displayedJobId
-        ? (createdJob.sourceUrl ?? requestedProductUrl)
+        ? createdJob.sourceUrl?.trim() || requestedProductUrl
         : null,
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
