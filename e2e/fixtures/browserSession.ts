@@ -114,6 +114,7 @@ export class BrowserTestSession {
         generationPostCount: this.http.generationCount,
         pendingAfterCancel: this.http.pendingCount,
         journal: this.http.journal,
+        sentryEvents: this.http.sentryEvents,
         violations: this.http.violations,
         history: this.history,
         browserVersion: this.context.browser()?.version(),

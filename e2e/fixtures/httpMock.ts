@@ -40,6 +40,7 @@ export class HttpMockController {
   readonly responses: Record<string, MockReply>;
   readonly journal: Exchange[] = [];
   readonly violations: string[] = [];
+  readonly sentryEvents: Record<string, unknown>[] = [];
   readonly counts = new Map<string, number>();
   readonly failure: Promise<never>;
   private fail!: (error: Error) => void;
@@ -115,6 +116,43 @@ export class HttpMockController {
       disposition: 'blocked',
     };
     this.journal.push(entry);
+    // Synthetic DSN only: SDK filtering/serialization/transport all run, but no Sentry server is contacted.
+    if (
+      url.origin === APP_ORIGIN &&
+      method === 'POST' &&
+      url.pathname === '/api/1/envelope/' &&
+      url.searchParams.get('sentry_key') === 'e2e'
+    ) {
+      try {
+        if (!rawBody) throw new Error('empty envelope');
+        const lines = rawBody.trimEnd().split('\n');
+        JSON.parse(lines[0]!);
+        for (let index = 1; index < lines.length; index += 2) {
+          const header = JSON.parse(lines[index]!) as { type?: string };
+          const payload: unknown = JSON.parse(lines[index + 1]!);
+          if (header.type === 'event') {
+            if (
+              !payload ||
+              typeof payload !== 'object' ||
+              Array.isArray(payload)
+            )
+              throw new Error('invalid event');
+            this.sentryEvents.push(payload as Record<string, unknown>);
+          }
+        }
+      } catch {
+        this.violation('Invalid synthetic Sentry envelope');
+        await route.abort();
+        return;
+      }
+      entry.disposition = 'mock-fulfilled';
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{}',
+      });
+      return;
+    }
     // 앱이 사용하는 애니메이션 엔진 파일도 외부 전송 없이 설치된 동일 버전으로 제공한다.
     const wasmUrls = [
       'https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web@0.76.0/dist/dotlottie-player.wasm',

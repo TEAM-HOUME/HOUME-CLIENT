@@ -51,7 +51,8 @@ Object.assign(env, {
   VITE_FIREBASE_PROJECT_ID: '',
   VITE_CLARITY_PROJECT_ID: '',
   VITE_META_PIXEL_ID: '',
-  VITE_SENTRY_DSN: '',
+  VITE_SENTRY_DSN: 'http://e2e@127.0.0.1:4173/1',
+  VITE_SENTRY_ENVIRONMENT: 'e2e-local',
   VITE_ANALYTICS_ENV: 'local',
   VITE_SENTRY_FORCE_ENABLE: 'false',
 });

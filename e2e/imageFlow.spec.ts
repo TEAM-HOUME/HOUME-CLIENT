@@ -318,3 +318,182 @@ test('오염된 A 이후 B는 클릭 전부터 독립된 상태와 응답을 사
     await b.dispose();
   }
 });
+
+const STALL_TOAST =
+  '이미지 생성에 문제가 발생했어요. 잠시 후에 다시 시도해 주세요.';
+function stallEvents(session: BrowserTestSession) {
+  return session.http.sentryEvents.filter(
+    (event) => event['message'] === 'image generation stalled'
+  );
+}
+async function advanceSeconds(session: BrowserTestSession, seconds: number) {
+  // Give React a render/effect turn between simulated seconds; avoid skipping interval callbacks.
+  for (let second = 0; second < seconds; second++) {
+    await session.page.clock.runFor(1000);
+    await session.page.evaluate(() => undefined);
+  }
+}
+async function expectStallRecovery(
+  session: BrowserTestSession,
+  completed: boolean,
+  hasNavigationData = completed
+) {
+  await expect(session.page).toHaveURL('http://127.0.0.1:4173/');
+  await session.page.clock.runFor(0);
+  await expect(
+    session.page.getByText(STALL_TOAST, { exact: true })
+  ).toHaveCount(1);
+  await expect(
+    session.page.getByText(STALL_TOAST, { exact: true })
+  ).toBeVisible();
+  await expect.poll(() => stallEvents(session).length).toBe(1);
+  expect(stallEvents(session)[0]).toMatchObject({
+    level: 'error',
+    fingerprint: ['generate-stalled'],
+    environment: 'e2e-local',
+    tags: { scope: 'imageGenerate' },
+    contexts: {
+      houme: {
+        elapsed_ms: 81000,
+        is_api_completed: completed,
+        has_navigation_data: hasNavigationData,
+      },
+    },
+  });
+  expect(session.history.some((url) => url.includes('/generate/result'))).toBe(
+    false
+  );
+  await advanceSeconds(session, 85);
+  expect(stallEvents(session)).toHaveLength(1);
+  expect(session.http.generationCount).toBe(1);
+  await expect(session.page).toHaveURL('http://127.0.0.1:4173/');
+}
+
+test('응답 없는 생성의 안내·홈 복귀·최종 Sentry event', async ({
+  browser,
+}, info) => {
+  const session = await createBrowserSession(browser, info);
+  try {
+    await session.run(async () => {
+      await selectFunnel(session, { moods: [21] });
+      await advanceSeconds(session, 79);
+      await expect(session.page).toHaveURL('http://127.0.0.1:4173/generate');
+      await expect(
+        session.page.getByText(STALL_TOAST, { exact: true })
+      ).toHaveCount(0);
+      expect(stallEvents(session)).toEqual([]);
+      await advanceSeconds(session, 3);
+      await expectStallRecovery(session, false);
+    });
+  } finally {
+    await session.dispose();
+  }
+});
+
+test('응답 후 이동 정지의 최신 진단·기존 deadline 유지', async ({
+  browser,
+}, info) => {
+  const session = await createBrowserSession(browser, info);
+  try {
+    await session.run(async () => {
+      await session.context.addInitScript(() => {
+        (globalThis as unknown as Record<string, unknown>)[
+          '__E2E_HOLD_RESULT__'
+        ] = true;
+      });
+      await selectFunnel(session, { moods: [21] });
+      await advanceSeconds(session, 60);
+      const delivered = session.page.waitForResponse((response) =>
+        response.url().endsWith('/api/v4/generated-images/generate')
+      );
+      session.http.release('success');
+      await delivered;
+      await advanceSeconds(session, 19);
+      expect(
+        await session.page.evaluate(
+          () =>
+            (globalThis as unknown as Record<string, unknown>)[
+              '__E2E_RESULT_HELD__'
+            ]
+        )
+      ).toBe(true);
+      await expect(session.page).toHaveURL('http://127.0.0.1:4173/generate');
+      expect(stallEvents(session)).toEqual([]);
+      await advanceSeconds(session, 3);
+      await expectStallRecovery(session, true);
+    });
+  } finally {
+    await session.dispose();
+  }
+});
+
+for (const [label, seconds] of [
+  ['즉시', 0],
+  ['지연', 60],
+] as const) {
+  test(`${label} 정상 완료 후 오탐·늦은 홈 복귀 없음`, async ({
+    browser,
+  }, info) => {
+    const session = await createBrowserSession(browser, info);
+    try {
+      await session.run(async () => {
+        await selectFunnel(session, { moods: [21] });
+        await advanceSeconds(session, seconds);
+        const delivered = session.page.waitForResponse((response) =>
+          response.url().endsWith('/api/v4/generated-images/generate')
+        );
+        session.http.release('success');
+        await delivered;
+        await expectResult(session, 9001);
+        await advanceSeconds(session, 85);
+        await expect(session.page).toHaveURL(
+          /\/generate\/result\?houseId=9001(?:&|$)/
+        );
+        await expect(
+          session.page.getByText(STALL_TOAST, { exact: true })
+        ).toHaveCount(0);
+        expect(stallEvents(session)).toEqual([]);
+        expect(session.http.generationCount).toBe(1);
+      });
+    } finally {
+      await session.dispose();
+    }
+  });
+}
+
+test('응답 완료·이동 데이터 누락을 구분하는 진단', async ({
+  browser,
+}, info) => {
+  const session = await createBrowserSession(browser, info);
+  try {
+    await session.run(async () => {
+      await session.context.addInitScript(() => {
+        (globalThis as unknown as Record<string, unknown>)[
+          '__E2E_DROP_NAVIGATION_DATA__'
+        ] = true;
+      });
+      await selectFunnel(session, { moods: [21] });
+      await advanceSeconds(session, 60);
+      const delivered = session.page.waitForResponse((response) =>
+        response.url().endsWith('/api/v4/generated-images/generate')
+      );
+      session.http.release('success');
+      await delivered;
+      await advanceSeconds(session, 19);
+      expect(
+        await session.page.evaluate(
+          () =>
+            (globalThis as unknown as Record<string, unknown>)[
+              '__E2E_NAVIGATION_DATA_DROPPED__'
+            ]
+        )
+      ).toBe(true);
+      await expect(session.page).toHaveURL('http://127.0.0.1:4173/generate');
+      expect(stallEvents(session)).toEqual([]);
+      await advanceSeconds(session, 3);
+      await expectStallRecovery(session, true, false);
+    });
+  } finally {
+    await session.dispose();
+  }
+});
