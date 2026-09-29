@@ -57,6 +57,8 @@ export default [
     ignores: [
       'dist',
       'node_modules/',
+      'test-results/**',
+      'playwright-report/**',
       '*.js',
       '*.d.ts',
       'src/shared/apis/__generated__/**',
@@ -65,7 +67,7 @@ export default [
     ],
   },
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx}', 'e2e/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
@@ -261,10 +263,10 @@ export default [
    * no-non-null-assertion 38건은 하우미가 쓰는 `!` 표기와 정면으로 충돌한다.
    */
   ...tseslint.configs.recommendedTypeChecked.map((c) =>
-    c.files ? c : { ...c, files: ['**/*.{ts,tsx}'] }
+    c.files ? c : { ...c, files: ['**/*.{ts,tsx}', 'e2e/**/*.mjs'] }
   ),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx}', 'e2e/**/*.mjs'],
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -340,6 +342,15 @@ export default [
       'vanilla-extract/no-zero-unit': 'off',
       'vanilla-extract/no-unknown-unit': 'error',
       'vanilla-extract/no-unitless-values': 'error',
+    },
+  },
+  {
+    files: ['e2e/**/*.{ts,mjs}'],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    settings: {
+      'import/resolver': {
+        typescript: { project: './e2e/tsconfig.json', alwaysTryTypes: true },
+      },
     },
   },
   eslintConfigPrettier,
