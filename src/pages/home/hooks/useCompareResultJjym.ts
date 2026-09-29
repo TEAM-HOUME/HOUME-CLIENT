@@ -78,7 +78,6 @@ export const useCompareResultJjym = () => {
         target,
         serverSavedKeys.has(getCompareJjymKey(target))
       ),
-      disabled: isPending(target),
       onToggle: () => handleToggle(item),
     };
   };
