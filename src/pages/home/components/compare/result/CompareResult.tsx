@@ -37,10 +37,6 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
 
   return (
     <div className={styles.container}>
-      {/*
-       * TODO: Comparison_default 구현 후 상품/재검색 버튼에
-       * 동일한 화면 전환 handler를 연결
-       */}
       <OutputLink
         product={viewModel.searchedProduct.product}
         price={viewModel.searchedProduct.price}

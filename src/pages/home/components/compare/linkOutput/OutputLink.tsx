@@ -17,7 +17,6 @@ interface OutputLinkProps {
   product: ProductInfo;
   price?: PriceInfo;
   href?: string;
-  onProductClick?: () => void;
   onSearchNewLink?: () => void;
 }
 
@@ -25,7 +24,6 @@ const OutputLink = ({
   product,
   price,
   href,
-  onProductClick,
   onSearchNewLink,
 }: OutputLinkProps) => {
   const { openProductLink } = useProductLink();
@@ -35,11 +33,7 @@ const OutputLink = ({
   const isProductClickable = Boolean(href);
   const handleProductClick = isProductClickable
     ? () =>
-        openProductLink(
-          href,
-          onProductClick,
-          LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SITE
-        )
+        openProductLink(href, undefined, LOGIN_ENTRY_ROUTE.PRODUCT_CARD_SITE)
     : undefined;
 
   // 클릭 동작이 없으면 버튼으로 그리지 않는다 — 포커스는 받는데 아무 일도 안 하는 요소가 되기 때문
