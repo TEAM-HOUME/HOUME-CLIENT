@@ -227,6 +227,7 @@ export interface CreateJobResponse {
   thumbnail?: string;
   /** @format int64 */
   price?: number;
+  brand?: string;
 }
 
 export interface HouseSelectRequest {
@@ -1520,6 +1521,7 @@ export interface OriginalProductResponse {
   price?: number;
   currency?: string;
   quality?: string;
+  brand?: string;
 }
 
 export interface SimilarProductItemResponse {
@@ -1531,6 +1533,7 @@ export interface SimilarProductItemResponse {
   price?: number;
   currency?: string;
   productUrl?: string;
+  brand?: string;
 }
 
 export interface SourcesStatusResponse {
@@ -2665,6 +2668,8 @@ export type CreatePresetData = ApiResponseLong;
 export type KeywordCheckData = ApiResponseKeywordCheckResponse;
 
 export type ImageSearchData = ApiResponseAdminSearchResult;
+
+export type TriggerEmbeddingData = ApiResponseString;
 
 export type GetMyPageProfileData = ApiResponseMyPageProfileResponse;
 
