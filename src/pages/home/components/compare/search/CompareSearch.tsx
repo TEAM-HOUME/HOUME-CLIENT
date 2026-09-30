@@ -80,6 +80,7 @@ const CompareSearch = ({
               <li key={presetId} className={styles.item}>
                 <SearchItem
                   type="popular"
+                  placement="compare"
                   name={preset.title ?? ''}
                   imageSrc={preset.thumbnailUrl}
                   onClick={() => handlePresetClick(presetId)}

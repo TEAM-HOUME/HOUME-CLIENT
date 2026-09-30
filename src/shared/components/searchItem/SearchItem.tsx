@@ -18,6 +18,7 @@ export type SearchItemProps =
     })
   | (SearchItemBaseProps & {
       type: 'popular';
+      placement: 'widget' | 'compare';
     });
 
 const TYPE_ICON = {
@@ -27,11 +28,12 @@ const TYPE_ICON = {
 
 const SearchItem = (props: SearchItemProps) => {
   const { type, name, imageSrc, onClick } = props;
+  const placement = props.type === 'popular' ? props.placement : undefined;
 
   return (
     <button
       type="button"
-      className={styles.wrapper({ type })}
+      className={styles.wrapper({ type, placement })}
       onClick={onClick}
     >
       <div className={styles.contents}>
