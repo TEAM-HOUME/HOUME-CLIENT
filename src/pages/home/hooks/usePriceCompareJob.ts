@@ -203,6 +203,7 @@ export const usePriceCompareJob = (
     createdJob && createdJob.jobId === displayedJobId
       ? {
           title: createdJob.title,
+          brand: createdJob.brand,
           imageUrl: createdJob.thumbnail,
           price: createdJob.price,
         }
@@ -215,6 +216,7 @@ export const usePriceCompareJob = (
     statusOriginalProduct || createdOriginalProduct
       ? {
           title: statusOriginalProduct?.title ?? createdOriginalProduct?.title,
+          brand: statusOriginalProduct?.brand ?? createdOriginalProduct?.brand,
           imageUrl:
             statusOriginalProduct?.imageUrl ?? createdOriginalProduct?.imageUrl,
           price: statusOriginalProduct?.price ?? createdOriginalProduct?.price,

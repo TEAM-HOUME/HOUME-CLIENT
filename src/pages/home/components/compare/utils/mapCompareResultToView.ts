@@ -68,10 +68,11 @@ export const toSearchedProductView = ({
 /** 유사 상품 한 건 → ProductCard 형태. job·프리셋 공통 */
 interface SimilarProductSource {
   title?: string;
+  brand?: string;
   imageUrl?: string;
   price?: number;
   productUrl?: string;
-  /** 판매처명. 프리셋은 siteName, job은 source를 라벨로 바꿔 넘긴다 */
+  /** brand가 비어 있을 때 사용할 판매처명. 프리셋은 siteName, job은 source 라벨 */
   siteLabel?: string;
   productId?: string;
   source?: string;
@@ -94,8 +95,7 @@ const toSimilarProductView = (
   return {
     id: index + 1,
     product: {
-      // TODO: 비교 상품 응답에 실제 brand가 추가되면 판매처명 대신 브랜드를 노출한다.
-      brand: item.siteLabel,
+      brand: item.brand ?? item.siteLabel,
       title: item.title ?? '',
       imageUrl: item.imageUrl,
     },
@@ -146,7 +146,7 @@ export const mapComparePresetToView = (
 /**
  * job 비교 결과 → CompareResult UI가 그리는 형태.
  * 원본 상품은 result 안이 아니라 상태 응답 최상위(originalProduct)에 있어 따로 받는다.
- * 유사 상품에는 판매처명이 없어 source를 라벨로 바꾼다.
+ * 유사 상품 brand가 비어 있으면 source를 판매처 라벨로 바꿔 대신 표시한다.
  */
 export const mapCompareJobToView = (
   originalProduct: OriginalProductResponse | null | undefined,
@@ -159,7 +159,6 @@ export const mapCompareJobToView = (
   };
 
   return {
-    // TODO: 서버가 스크래핑 단계에서 originalProduct.brand 수집을 지원하면 검색한 상품 브랜드를 노출한다. 현재는 null이다.
     searchedProduct: toSearchedProductView({
       ...originalProduct,
       sourceUrl,
