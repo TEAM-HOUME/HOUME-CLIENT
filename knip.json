@@ -1,6 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["scripts/*.mjs"],
-  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
+  "entry": [
+    "scripts/*.mjs",
+    "e2e/*.spec.ts",
+    "e2e/run.mjs",
+    "e2e/playwright.config.ts",
+    "e2e/vite.config.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs", "e2e/**/*.{ts,mjs}"],
   "ignoreExportsUsedInFile": true
 }

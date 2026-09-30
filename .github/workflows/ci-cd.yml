@@ -44,6 +44,41 @@ jobs:
       - name: knip
         run: pnpm knip:ci
 
+  # 이미지 생성 흐름의 E2E 회귀 테스트. 실제 서버 대신 테스트용 응답으로 실행한다.
+  e2e:
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E 테스트
+        run: pnpm test:e2e
+
+      - name: 실패 시 테스트 기록 업로드
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: test-results/image-flow/
+          retention-days: 7
+
   build:
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
     runs-on: ubuntu-latest # 24.04(Ubuntu LTS)

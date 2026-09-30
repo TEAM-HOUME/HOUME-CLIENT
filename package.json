@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:e2e": "node e2e/run.mjs",
+    "test:e2e:typecheck": "tsc -p e2e/tsconfig.json --noEmit",
+    "test:e2e:repeat": "node e2e/run.mjs --mode repeat",
+    "test:e2e:missing-mock": "node e2e/run.mjs --mode missing-mock",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
@@ -53,6 +57,7 @@
   "devDependencies": {
     "@antebudimir/eslint-plugin-vanilla-extract": "^1.16.0",
     "@eslint/js": "^9.29.0",
+    "@playwright/test": "1.63.0",
     "@sentry/vite-plugin": "^5.3.0",
     "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/node": "^24.0.7",
