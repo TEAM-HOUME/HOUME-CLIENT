@@ -95,7 +95,7 @@ const toSimilarProductView = (
   return {
     id: index + 1,
     product: {
-      brand: item.brand ?? item.siteLabel,
+      brand: item.brand || item.siteLabel,
       title: item.title ?? '',
       imageUrl: item.imageUrl,
     },
