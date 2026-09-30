@@ -68,16 +68,16 @@ export const linkBtnContainer = recipe({
   base: {
     position: 'absolute',
     zIndex: zIndex.button,
-    bottom: '0.6rem',
-    left: '0.6rem',
+    bottom: unitVars.unit.gapPadding['200'],
+    left: unitVars.unit.gapPadding['200'],
   },
 });
 
 export const saveBtnOverlay = style({
   position: 'absolute',
   zIndex: zIndex.button,
-  top: '0.6rem',
-  right: '0.6rem',
+  top: unitVars.unit.gapPadding['200'],
+  right: unitVars.unit.gapPadding['200'],
 });
 
 export const saveButton = style({
