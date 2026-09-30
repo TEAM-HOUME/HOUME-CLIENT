@@ -22,6 +22,8 @@ import type {
 } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
+import shoppingBanner from '@assets/images/ShoppingBanner.svg';
+
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';
 import EmptyView from '@components/emptyView/EmptyView';
@@ -346,6 +348,7 @@ const SearchSection = ({
           </div>
         </div>
       ) : null}
+      <img src={shoppingBanner} alt="" className={styles.shoppingBanner} />
       <div className={styles.searchHeader}>
         <div ref={searchBarRef} className={styles.searchBarContainer}>
           <SearchBar {...searchBarProps} />

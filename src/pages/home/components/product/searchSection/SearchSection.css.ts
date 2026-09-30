@@ -17,6 +17,12 @@ export const section = style({
   width: '100%',
 });
 
+export const shoppingBanner = style({
+  display: 'block',
+  width: '100%',
+  height: 'auto',
+});
+
 export const searchHeader = style({
   display: 'flex',
   flexDirection: 'column',
