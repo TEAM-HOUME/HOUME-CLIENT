@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { useCompareHistoryQuery } from '@pages/home/apis/queries/useCompareHistoryQuery';
 import { useComparePresetsQuery } from '@pages/home/apis/queries/useComparePresetsQuery';
+import { isValidProductUrl } from '@pages/home/utils/isValidProductUrl';
 
 import { useUserStore } from '@store/useUserStore';
 
@@ -29,6 +30,7 @@ const CompareSearch = ({
   onSelectPreset,
 }: CompareSearchProps) => {
   const [url, setUrl] = useState(initialUrl);
+  const [isUrlInvalid, setIsUrlInvalid] = useState(false);
   const isLoggedIn = !!useUserStore((state) => state.accessToken);
 
   const { data: historyData } = useCompareHistoryQuery(isLoggedIn);
@@ -36,9 +38,21 @@ const CompareSearch = ({
 
   // 비로그인이면 캐시에 이전 데이터가 있어도 히스토리를 그리지 않는다 (세션 만료 뒤 캐시 삭제까지 잠깐 남아 있을 수 있다)
   const historyItems = isLoggedIn ? (historyData?.items ?? []) : [];
-  const presets = isLoggedIn ? (presetsData?.presets ?? []) : [];
+  const presets = presetsData?.presets ?? [];
 
-  const handleSubmit = (value: string) => onSubmit(value);
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
+    setIsUrlInvalid(false);
+  };
+
+  const handleSubmit = (value: string) => {
+    if (!isValidProductUrl(value)) {
+      setIsUrlInvalid(true);
+      return;
+    }
+    onSubmit(value);
+  };
+
   const handlePresetClick = (presetId: number) => onSelectPreset(presetId);
 
   return (
@@ -50,7 +64,12 @@ const CompareSearch = ({
         <p className={styles.description}>설명을 입력하는 공간이에요.</p>
       </header>
       <div className={styles.contents}>
-        <LinkInput value={url} onChange={setUrl} onSubmit={handleSubmit} />
+        <LinkInput
+          value={url}
+          onChange={handleUrlChange}
+          onSubmit={handleSubmit}
+          errorMessage={isUrlInvalid ? '유효하지 않은 URL이에요.' : undefined}
+        />
         <ul className={styles.itemList}>
           {historyItems.map((item) => {
             // 생성 타입은 전 필드가 optional이다. URL이 없는 항목은 클릭해도 시작할 수 없으니 그리지 않는다

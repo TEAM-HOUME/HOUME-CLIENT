@@ -94,8 +94,7 @@ export const textGroup = style({
 });
 
 export const caption = style({
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  flexShrink: 0,
   whiteSpace: 'nowrap',
   color: colorVars.color.text.tertiary,
   ...fontVars.font.caption_r_12,

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 
 import IconButton from '@components/button/IconButton';
 
@@ -11,6 +11,7 @@ interface LinkInputProps
   > {
   value?: string;
   placeholder?: string;
+  errorMessage?: string;
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
 }
@@ -18,12 +19,14 @@ interface LinkInputProps
 const LinkInput = ({
   value: controlledValue,
   placeholder = '상품 링크를 붙여넣어주세요',
+  errorMessage,
   onChange: onControlledChange,
   onSubmit,
   ...props
 }: LinkInputProps) => {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const errorId = useId();
   const isControlled = controlledValue !== undefined;
   const inputValue = isControlled ? controlledValue : value;
   const hasValue = inputValue.trim() !== '';
@@ -56,26 +59,35 @@ const LinkInput = ({
   };
 
   return (
-    <div className={styles.wrapper}>
-      <textarea
-        ref={textareaRef}
-        className={styles.field}
-        value={inputValue}
-        placeholder={placeholder}
-        rows={1}
-        onChange={handleChange}
-        {...props}
-      />
-      <div className={styles.buttonArea}>
-        <IconButton
-          name={hasValue ? 'ArrowUpFillBlack' : 'ArrowUpFillGray'}
-          size="XL"
-          className={styles.submit}
-          disabled={!hasValue}
-          onClick={handleSubmit}
-          aria-label="전송"
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <textarea
+          ref={textareaRef}
+          className={styles.field}
+          value={inputValue}
+          placeholder={placeholder}
+          rows={1}
+          aria-invalid={errorMessage ? true : undefined}
+          aria-describedby={errorMessage ? errorId : undefined}
+          onChange={handleChange}
+          {...props}
         />
+        <div className={styles.buttonArea}>
+          <IconButton
+            name={hasValue ? 'ArrowUpFillBlack' : 'ArrowUpFillGray'}
+            size="XL"
+            className={styles.submit}
+            disabled={!hasValue}
+            onClick={handleSubmit}
+            aria-label="전송"
+          />
+        </div>
       </div>
+      {errorMessage ? (
+        <p id={errorId} role="alert" className={styles.errorMessage}>
+          {errorMessage}
+        </p>
+      ) : null}
     </div>
   );
 };
