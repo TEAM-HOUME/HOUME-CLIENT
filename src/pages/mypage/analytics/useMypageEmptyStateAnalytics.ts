@@ -13,7 +13,10 @@ import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
 
 interface UseMypageEmptyStateAnalyticsOptions {
   type: 'generatedImages' | 'savedItems';
-  savedItemsForParams: Pick<JjymV2ItemResponse, 'rawProductId'>[];
+  savedItemsForParams: Pick<
+    JjymV2ItemResponse,
+    'rawProductId' | 'catalogItemId'
+  >[];
   enabled: boolean;
 }
 

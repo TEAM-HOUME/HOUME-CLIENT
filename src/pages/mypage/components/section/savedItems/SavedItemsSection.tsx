@@ -84,14 +84,19 @@ const SavedItemsSection = () => {
     item: (typeof savedItems)[number]
   ) => {
     handleFeedCardSaveToggle(item, isSaved);
-    if (item.rawProductId != null) {
-      toggleJjym(item.rawProductId, { productName: item.productName });
+    const compareTarget = resolveCompareJjymTarget(
+      item.catalogItemId,
+      item.source
+    );
+
+    if (compareTarget) {
+      toggleCompareSavedItem(compareTarget, true);
       return;
     }
 
-    const target = resolveCompareJjymTarget(item.catalogItemId, item.source);
-    if (!target) return;
-    toggleCompareSavedItem(target, true);
+    if (item.rawProductId != null) {
+      toggleJjym(item.rawProductId, { productName: item.productName });
+    }
   };
 
   const itemFocusRef = useRef<HTMLDivElement | null>(null);
@@ -138,14 +143,16 @@ const SavedItemsSection = () => {
             item.source
           );
           const isTargetItem =
-            String(item.rawProductId ?? item.catalogItemId) ===
-            String(focusItemId);
-          const isSaved =
-            item.rawProductId != null && isSavedItemsSynced
+            focusItemId != null &&
+            ((item.rawProductId != null &&
+              String(item.rawProductId) === focusItemId) ||
+              (item.catalogItemId != null &&
+                String(item.catalogItemId) === focusItemId));
+          const isSaved = compareTarget
+            ? getCompareSavedState(compareTarget, item.isJjym ?? true)
+            : item.rawProductId != null && isSavedItemsSynced
               ? savedProductIds.has(item.rawProductId)
-              : compareTarget
-                ? getCompareSavedState(compareTarget, item.isJjym ?? true)
-                : (item.isJjym ?? true);
+              : (item.isJjym ?? true);
           const itemJjymCount = item.jjymCount ?? 0;
           const jjymCount = isSaved
             ? itemJjymCount

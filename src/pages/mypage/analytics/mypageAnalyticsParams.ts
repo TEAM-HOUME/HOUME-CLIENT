@@ -20,11 +20,11 @@ export const mypageReturnScreenParams = () =>
   getReturnScreenNameParams(SCREEN_NAME.HOME);
 
 export const getMypageSavedItemsListParams = (
-  items: Pick<JjymV2ItemResponse, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId' | 'catalogItemId'>[] = []
 ) => {
   const savedItemIds =
     items
-      .map((item) => item.rawProductId)
+      .map((item) => item.rawProductId ?? item.catalogItemId)
       .filter((id) => Number.isFinite(id))
       .join(', ') || undefined;
 

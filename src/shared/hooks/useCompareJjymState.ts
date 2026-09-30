@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { queryClient } from '@apis/config/queryClient';
 import { useCompareJjymMutation } from '@apis/mutations/useCompareJjymMutation';
@@ -17,18 +17,21 @@ export const useCompareJjymState = () => {
     () => new Map()
   );
   const [pendingKeys, setPendingKeys] = useState<Set<string>>(() => new Set());
-  const { mutate } = useCompareJjymMutation();
+  const pendingKeysRef = useRef<Set<string>>(new Set());
+  const { mutateAsync } = useCompareJjymMutation();
 
   const toggle = (
     target: CompareJjymTarget,
     options?: ToggleCompareJjymOptions
   ) => {
     const key = getCompareJjymKey(target);
-    if (pendingKeys.has(key)) return;
+    if (pendingKeysRef.current.has(key)) return;
 
+    pendingKeysRef.current.add(key);
     setPendingKeys((previous) => new Set(previous).add(key));
-    mutate(target, {
-      onSuccess: (favorited) => {
+
+    void mutateAsync(target)
+      .then((favorited) => {
         setSavedStates((previous) => {
           const next = new Map(previous);
           next.set(key, favorited);
@@ -38,16 +41,18 @@ export const useCompareJjymState = () => {
           queryKey: queryKeys.mypage.jjymList(),
         });
         options?.onSuccess?.(favorited);
-      },
-      onError: options?.onError,
-      onSettled: () => {
+      })
+      .catch(() => {
+        options?.onError?.();
+      })
+      .finally(() => {
+        pendingKeysRef.current.delete(key);
         setPendingKeys((previous) => {
           const next = new Set(previous);
           next.delete(key);
           return next;
         });
-      },
-    });
+      });
   };
 
   const getSavedState = (target: CompareJjymTarget, fallback: boolean) =>

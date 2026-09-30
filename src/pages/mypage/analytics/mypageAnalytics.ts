@@ -25,7 +25,7 @@ import type {
 } from '@apis/__generated__/data-contracts';
 
 export const trackMypageFeedCardView = (
-  items: Pick<JjymV2ItemResponse, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId' | 'catalogItemId'>[] = []
 ) => {
   trackEvent(GA_EVENTS.mypage.FEED_CARD_VIEW, {
     ...mypageScreenParams(),
@@ -169,7 +169,7 @@ export const trackMypageListEmptyGenImgView = () => {
 };
 
 export const trackMypageListEmptySavedItemView = (
-  items: Pick<JjymV2ItemResponse, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId' | 'catalogItemId'>[] = []
 ) => {
   trackEvent(GA_EVENTS.mypage.LIST_EMPTY_SAVED_ITEM_VIEW, {
     ...mypageScreenParams(),

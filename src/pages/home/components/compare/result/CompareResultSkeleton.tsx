@@ -61,14 +61,14 @@ const CompareResultSkeleton = ({
   searchedProduct,
 }: CompareResultSkeletonProps) => {
   return (
-    <div
-      className={styles.root}
-      aria-busy="true"
-      aria-label="비슷한 상품을 불러오는 중"
-    >
+    <div className={styles.root}>
       <CompareLoadingCard stage={stage} />
 
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        aria-busy="true"
+        aria-label="비슷한 상품을 불러오는 중"
+      >
         {searchedProduct ? (
           <OutputLink
             product={searchedProduct.product}
