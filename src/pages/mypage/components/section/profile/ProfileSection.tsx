@@ -1,6 +1,6 @@
 import CreditBox from '@pages/mypage/components/creditBox/CreditBox';
 
-import profileImage from '@assets/images/ProfileImage.svg';
+import profileImage from '@assets/images/ImgProfile.svg';
 
 import * as styles from './ProfileSection.css';
 

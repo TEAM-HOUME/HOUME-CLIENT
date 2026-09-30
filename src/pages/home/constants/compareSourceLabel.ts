@@ -7,7 +7,7 @@ import { COMPARE_SOURCE, type CompareSource } from '@pages/home/types/compare';
 export const COMPARE_SOURCE_LABEL: Record<CompareSource, string> = {
   [COMPARE_SOURCE.EBAY]: 'eBay',
   [COMPARE_SOURCE.COUPANG]: '쿠팡',
-  [COMPARE_SOURCE.CATALOG]: '하우미',
+  [COMPARE_SOURCE.RAW]: '하우미',
 };
 
 const isCompareSource = (value: string): value is CompareSource =>

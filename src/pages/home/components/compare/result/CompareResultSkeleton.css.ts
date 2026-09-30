@@ -76,6 +76,8 @@ export const animatedSkeleton = style({
   },
 });
 
+export const root = style({ width: '100%' });
+
 export const container = style({
   boxSizing: 'border-box',
   display: 'flex',

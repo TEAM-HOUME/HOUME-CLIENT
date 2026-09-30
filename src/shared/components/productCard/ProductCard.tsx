@@ -64,7 +64,8 @@ const ProductCard = ({
   const isDefault = cardType === 'default';
   const isShoppingDetailClickable =
     cardType === 'shopping' && Boolean(onShoppingViewDetailClick);
-  const isWholeCardLink = enableWholeCardLink && Boolean(link?.href);
+  const isWholeCardLink =
+    isDefault && enableWholeCardLink && Boolean(link?.href);
   const isClickable = isShoppingDetailClickable || isWholeCardLink;
 
   const linkHref = link?.href;
@@ -91,7 +92,7 @@ const ProductCard = ({
 
   const { handleWrapperClick, handleWrapperKeyDown } = createCardClickHandler({
     onCardClick,
-    enableWholeCardLink,
+    enableWholeCardLink: isWholeCardLink,
     linkHref,
     onNavigate: handleCardNavigate,
     onShoppingViewDetailClick: isShoppingDetailClickable
@@ -116,7 +117,7 @@ const ProductCard = ({
   return (
     <div
       className={`${styles.wrapper()} ${isClickable ? styles.clickable : ''} ${
-        isClickable && !disabled ? styles.pressable : ''
+        isWholeCardLink && !disabled ? styles.pressable : ''
       }`}
       onClick={handleWrapperClick}
       onKeyDown={handleWrapperKeyDown}
@@ -154,7 +155,8 @@ const ProductCard = ({
             <IconButton
               name={save.isSaved ? 'HeartFillColor' : 'HeartStrokeWhite'}
               size="S"
-              disabled={disabled}
+              className={styles.saveButton}
+              disabled={disabled || save.disabled}
               onClick={save.onToggle}
             />
           ) : (

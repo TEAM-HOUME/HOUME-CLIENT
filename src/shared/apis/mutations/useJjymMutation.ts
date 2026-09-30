@@ -4,9 +4,6 @@ import { useMutation } from '@tanstack/react-query';
 
 import { useSavedItemsStore } from '@store/useSavedItemsStore';
 
-import type { SaveItemsRequest, SaveItemsResponse } from '@shared/types/jjym';
-import { TOAST_TYPE, TOASTER_ID } from '@shared/types/toast';
-
 import {
   trackSaveToastCancelClick,
   trackSaveToastToSeeClick,
@@ -16,14 +13,13 @@ import {
 import type { LoginEntryRoute } from '@analytics/params/gate';
 import { resolveScreenName } from '@analytics/utils/screenName/resolveScreenName';
 
+import type { JjymToggleResponse } from '@apis/__generated__/data-contracts';
 import { queryClient } from '@apis/config/queryClient';
 import { HTTPMethod, request } from '@apis/config/request';
 
-import { useToast } from '@components/toast/useToast';
-
 import { API_ENDPOINT } from '@constants/apiEndpoints';
-import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';
 
+import { useJjymToast } from '@hooks/useJjymToast';
 import { useLoginGate } from '@hooks/useLoginGate';
 
 import { invalidateJjymRelatedQueries } from '@utils/invalidateJjymQueries';
@@ -40,28 +36,12 @@ interface UseJjymMutationOptions {
 }
 
 export const postJjym = async (
-  jjymData: SaveItemsRequest
-): Promise<SaveItemsResponse> => {
-  return request<SaveItemsResponse>({
+  rawProductId: number
+): Promise<JjymToggleResponse> => {
+  return request<JjymToggleResponse>({
     method: HTTPMethod.POST,
-    url: API_ENDPOINT.GENERATE.JJYM_V2(jjymData.rawProductId),
+    url: API_ENDPOINT.GENERATE.JJYM_V2(rawProductId),
   });
-};
-
-const TOAST_OPTIONS = { toasterId: TOASTER_ID.BOTTOM_4 };
-
-const getSavedToastContent = (type: JjymSavedToast) => {
-  if (type === 'stored') {
-    return {
-      text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-      actionLabel: TOAST_ACTION_LABEL.VIEW,
-    };
-  }
-
-  return {
-    text: TOAST_MESSAGE.SAVED_ITEM_STORED,
-    actionLabel: TOAST_ACTION_LABEL.VIEW,
-  };
 };
 
 const getCurrentScreenName = () =>
@@ -69,7 +49,7 @@ const getCurrentScreenName = () =>
 
 export const useJjymMutation = (options?: UseJjymMutationOptions) => {
   const toggleSaveProduct = useSavedItemsStore((s) => s.toggleSaveProduct);
-  const { notify } = useToast();
+  const { notifyJjymToast } = useJjymToast();
   const { requireLogin } = useLoginGate();
   const pendingJjymContextRef = useRef<
     Map<number, { productName?: string; screenName: string }>
@@ -79,7 +59,7 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
     options?.invalidateSavedItemsList !== false;
 
   const syncSavedStateWithServer = async (rawProductId: number) => {
-    const response = await postJjym({ rawProductId });
+    const response = await postJjym(rawProductId);
     const isSavedNow = useSavedItemsStore
       .getState()
       .savedProductIds.has(rawProductId);
@@ -94,9 +74,9 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
     );
   };
 
-  const mutation = useMutation<SaveItemsResponse, AxiosError, number>({
+  const mutation = useMutation<JjymToggleResponse, AxiosError, number>({
     mutationKey: ['jjym'],
-    mutationFn: (rawProductId) => postJjym({ rawProductId }),
+    mutationFn: postJjym,
 
     onMutate: (rawProductId) => {
       toggleSaveProduct(rawProductId);
@@ -125,7 +105,6 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
           return;
         }
 
-        const toastContent = getSavedToastContent(savedToastType);
         const toastInput = {
           screenName,
           rawProductId,
@@ -134,15 +113,12 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
 
         trackToastSaveView(toastInput);
 
-        notify({
-          text: toastContent.text,
-          type: TOAST_TYPE.ACTION,
-          actionLabel: toastContent.actionLabel,
-          onClick: () => {
+        notifyJjymToast({
+          favorited: true,
+          onAction: () => {
             trackSaveToastToSeeClick(toastInput);
             options?.onSavedAction?.();
           },
-          options: TOAST_OPTIONS,
         });
       } else {
         const toastInput = {
@@ -153,11 +129,9 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
 
         trackToastUnsaveView(toastInput);
 
-        notify({
-          text: TOAST_MESSAGE.SAVED_ITEM_REMOVED,
-          type: TOAST_TYPE.ACTION,
-          actionLabel: TOAST_ACTION_LABEL.UNDO,
-          onClick: () => {
+        notifyJjymToast({
+          favorited: false,
+          onAction: () => {
             trackSaveToastCancelClick(toastInput);
             toggleSaveProduct(rawProductId);
 
@@ -165,7 +139,6 @@ export const useJjymMutation = (options?: UseJjymMutationOptions) => {
               toggleSaveProduct(rawProductId);
             });
           },
-          options: TOAST_OPTIONS,
         });
       }
 

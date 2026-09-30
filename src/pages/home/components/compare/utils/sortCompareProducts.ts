@@ -1,9 +1,9 @@
 import type { PriceInfo } from '@shared/types/productCard';
 
 export const COMPARE_SORT_OPTIONS = [
+  '추천순',
   '낮은 가격순',
   '높은 가격순',
-  '추천순',
 ] as const;
 
 export type CompareSortOption = (typeof COMPARE_SORT_OPTIONS)[number];

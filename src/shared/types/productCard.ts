@@ -15,6 +15,7 @@ export interface SaveInfo {
   isSaved: boolean;
   onToggle: () => void;
   count?: number;
+  disabled?: boolean;
 }
 
 export interface LinkInfo {

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useCompareResultJjym } from '@pages/home/hooks/useCompareResultJjym';
+
 import ActionButton from '@components/button/actionButton/ActionButton';
 import Icon from '@components/icon/Icon';
 import ProductCard from '@components/productCard/ProductCard';
@@ -26,6 +28,7 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
   const [sortOption, setSortOption] = useState<CompareSortOption>(
     DEFAULT_COMPARE_SORT_OPTION
   );
+  const { getSaveInfo } = useCompareResultJjym();
 
   const sortedProducts = sortCompareProducts(
     viewModel.similarProducts,
@@ -34,13 +37,10 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
 
   return (
     <div className={styles.container}>
-      {/*
-       * TODO: Comparison_default 구현 후 상품/재검색 버튼에
-       * 동일한 화면 전환 handler를 연결
-       */}
       <OutputLink
         product={viewModel.searchedProduct.product}
         price={viewModel.searchedProduct.price}
+        href={viewModel.searchedProduct.href}
         onSearchNewLink={onSearchNewLink}
       />
 
@@ -59,7 +59,11 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
             </span>
           </div>
 
-          <div className={styles.sortRow}>
+          <div className={styles.controlRow}>
+            <p className={styles.priceNotice}>
+              <Icon name="InfoCircleGray" size="12" decorative />
+              판매처와 실시간 가격이 상이할 수 있습니다.
+            </p>
             <CompareSortDropdown value={sortOption} onChange={setSortOption} />
           </div>
         </header>
@@ -70,7 +74,7 @@ const CompareResult = ({ onSearchNewLink, viewModel }: CompareResultProps) => {
               key={item.id}
               product={item.product}
               price={item.price}
-              save={item.save}
+              save={getSaveInfo(item)}
               link={item.link}
               benefitAmount={item.benefitAmount}
               enableWholeCardLink

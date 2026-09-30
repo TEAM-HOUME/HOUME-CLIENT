@@ -3,7 +3,7 @@ import { recipe } from '@vanilla-extract/recipes';
 
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
-import { pressInteraction } from '@styles/tokens/interaction/presets';
+import { pressTransformInteraction } from '@styles/tokens/interaction/presets';
 import { unitVars } from '@styles/tokens/unit.css';
 import { zIndex } from '@styles/tokens/zIndex';
 
@@ -28,7 +28,18 @@ export const clickable = style({
 });
 
 export const pressable = style({
-  ...pressInteraction(0.95, '&:active:not(:has(button:active))'),
+  transition: pressTransformInteraction,
+  selectors: {
+    '&:active': {
+      transform: 'scale(0.95)',
+    },
+    '&:has(button:hover)': {
+      transform: 'none',
+    },
+    '&:has(button:active)': {
+      transform: 'none',
+    },
+  },
 });
 
 export const imgSection = recipe({
@@ -57,16 +68,24 @@ export const linkBtnContainer = recipe({
   base: {
     position: 'absolute',
     zIndex: zIndex.button,
-    bottom: '0.6rem',
-    left: '0.6rem',
+    bottom: unitVars.unit.gapPadding['200'],
+    left: unitVars.unit.gapPadding['200'],
   },
 });
 
 export const saveBtnOverlay = style({
   position: 'absolute',
   zIndex: zIndex.button,
-  top: '0.6rem',
-  right: '0.6rem',
+  top: unitVars.unit.gapPadding['200'],
+  right: unitVars.unit.gapPadding['200'],
+});
+
+export const saveButton = style({
+  selectors: {
+    '&:disabled': {
+      cursor: 'default',
+    },
+  },
 });
 
 export const infoSection = recipe({
