@@ -18,6 +18,7 @@ export type SearchItemProps =
     })
   | (SearchItemBaseProps & {
       type: 'popular';
+      placement: 'widget' | 'compare';
     });
 
 const TYPE_ICON = {
@@ -27,11 +28,12 @@ const TYPE_ICON = {
 
 const SearchItem = (props: SearchItemProps) => {
   const { type, name, imageSrc, onClick } = props;
+  const placement = props.type === 'popular' ? props.placement : undefined;
 
   return (
     <button
       type="button"
-      className={styles.wrapper({ type })}
+      className={styles.wrapper({ type, placement })}
       onClick={onClick}
     >
       <div className={styles.contents}>
@@ -52,7 +54,9 @@ const SearchItem = (props: SearchItemProps) => {
         <span className={styles.textGroup}>
           {props.type === 'recent' && (
             <span className={styles.caption}>
-              {props.searchDayCount}일 전 검색한
+              {props.searchDayCount === 0
+                ? '오늘'
+                : `${props.searchDayCount}일 전`}
             </span>
           )}
           <span className={styles.name}>{name}</span>

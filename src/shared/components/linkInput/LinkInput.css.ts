@@ -5,6 +5,20 @@ import { fontVars } from '@styles/tokens/font.css';
 import { pressInteraction } from '@styles/tokens/interaction/presets';
 import { unitVars } from '@styles/tokens/unit.css';
 
+export const container = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: unitVars.unit.gapPadding['200'],
+  width: '100%',
+});
+
+export const errorMessage = style({
+  margin: 0,
+  paddingLeft: unitVars.unit.gapPadding['300'],
+  color: colorVars.color.text.danger,
+  ...fontVars.font.caption_r_12,
+});
+
 export const wrapper = style({
   display: 'flex',
   gap: unitVars.unit.gapPadding['200'],

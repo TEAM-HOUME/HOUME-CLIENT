@@ -30,7 +30,22 @@ export const wrapper = recipe({
         backgroundColor: colorVars.color.fill.inverse,
       },
     },
+    // popular에서만 사용, recent는 maxWidth 100%(fill)
+    placement: {
+      widget: {},
+      compare: {},
+    },
   },
+  compoundVariants: [
+    {
+      variants: { type: 'popular', placement: 'widget' },
+      style: { maxWidth: '24rem' },
+    },
+    {
+      variants: { type: 'popular', placement: 'compare' },
+      style: { maxWidth: '26.7rem' },
+    },
+  ],
 });
 
 export const contents = style({
@@ -79,8 +94,7 @@ export const textGroup = style({
 });
 
 export const caption = style({
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  flexShrink: 0,
   whiteSpace: 'nowrap',
   color: colorVars.color.text.tertiary,
   ...fontVars.font.caption_r_12,

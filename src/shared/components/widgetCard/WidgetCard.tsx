@@ -43,6 +43,7 @@ const WidgetCard = ({ products, onSearchClick }: WidgetCardProps) => {
               <SearchItem
                 key={product.presetId}
                 type="popular"
+                placement="widget"
                 name={product.name}
                 imageSrc={product.imageSrc}
                 onClick={product.onClick}

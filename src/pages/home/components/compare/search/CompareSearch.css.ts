@@ -24,12 +24,6 @@ export const title = style({
   ...fontVars.font.title_sb_18,
 });
 
-export const description = style({
-  margin: 0,
-  color: colorVars.color.text.secondary,
-  ...fontVars.font.body_r_14,
-});
-
 export const contents = style({
   display: 'flex',
   flexDirection: 'column',

@@ -11,7 +11,7 @@ import { queryKeys } from '@constants/queryKey';
 /**
  * 프리셋 고정 결과 조회.
  * 라이브 계산이 아니라 DB에 저장해 둔 값을 그대로 가져온다. 폴링하지 않는다.
- * 비로그인 요청은 서버가 403으로 거절한다(2026-09-17 dev 실측).
+ * 비로그인도 조회할 수 있다(서버가 허용으로 변경).
  */
 export const getComparePreset = async (
   presetId: number
