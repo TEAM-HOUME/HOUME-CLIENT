@@ -58,3 +58,8 @@ export const description = style({
   color: colorVars.color.text.tertiary,
   ...fontVars.font.body_r_14,
 });
+
+export const email = style({
+  textDecoration: 'underline',
+  color: 'inherit',
+});

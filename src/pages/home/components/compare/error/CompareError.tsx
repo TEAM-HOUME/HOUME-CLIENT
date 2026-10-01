@@ -12,9 +12,12 @@ interface CompareErrorProps {
   onAction: () => void;
 }
 
+const SUPPORT_EMAIL = 'houme.dev@gmail.com';
+
 const CompareError = ({ errorCase, onAction }: CompareErrorProps) => {
   const { title, description, buttonLabel } = COMPARE_ERROR_CONTENT[errorCase];
   const [firstLine, secondLine] = description;
+  const [beforeEmail, afterEmail] = firstLine.split(SUPPORT_EMAIL);
 
   return (
     <div className={styles.container}>
@@ -24,7 +27,17 @@ const CompareError = ({ errorCase, onAction }: CompareErrorProps) => {
           <div className={styles.text}>
             <h2 className={styles.title}>{title}</h2>
             <p className={styles.description}>
-              {firstLine}
+              {firstLine.includes(SUPPORT_EMAIL) ? (
+                <>
+                  {beforeEmail}
+                  <a className={styles.email} href={`mailto:${SUPPORT_EMAIL}`}>
+                    {SUPPORT_EMAIL}
+                  </a>
+                  {afterEmail}
+                </>
+              ) : (
+                firstLine
+              )}
               <br />
               {secondLine}
             </p>
