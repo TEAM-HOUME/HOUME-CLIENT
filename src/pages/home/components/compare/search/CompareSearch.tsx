@@ -61,7 +61,6 @@ const CompareSearch = ({
         <h2 className={styles.title}>
           마음에 든 상품 링크를 붙여넣으면 <br /> 비슷한 상품을 찾아드려요
         </h2>
-        <p className={styles.description}>설명을 입력하는 공간이에요.</p>
       </header>
       <div className={styles.contents}>
         <LinkInput

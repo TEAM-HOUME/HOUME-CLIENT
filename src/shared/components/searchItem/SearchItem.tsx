@@ -54,7 +54,9 @@ const SearchItem = (props: SearchItemProps) => {
         <span className={styles.textGroup}>
           {props.type === 'recent' && (
             <span className={styles.caption}>
-              {props.searchDayCount}일 전 검색한
+              {props.searchDayCount === 0
+                ? '오늘'
+                : `${props.searchDayCount}일 전`}
             </span>
           )}
           <span className={styles.name}>{name}</span>
