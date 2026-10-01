@@ -5,10 +5,7 @@ import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
-import {
-  getServerErrorMessage,
-  isComparePresetNotFound,
-} from '@pages/home/utils/compareJobError';
+import { getServerErrorCode } from '@pages/home/utils/compareJobError';
 
 import type { PresetDetailResponse } from '@apis/__generated__/data-contracts';
 
@@ -25,11 +22,11 @@ interface ComparePresetFlow {
   isActive: boolean;
   view: CompareView | null;
   presetResult: PresetDetailResponse | null;
-  /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
-   * 서버 문구가 있으면 그걸, 없으면 이 훅이 preset 사유(존재하지 않음 등)에 맞는 기본 문구로 채운다 */
-  errorMessage: string | null;
+  errorCode: number | null;
   /** 프리셋 클릭 시 주소에 presetId를 넣어 고정 결과를 조회한다 */
   selectPreset: (presetId: number) => void;
+  /** 오류가 발생한 같은 프리셋을 다시 조회한다 */
+  retry: () => void;
 }
 
 /**
@@ -46,7 +43,7 @@ export const useComparePreset = (
 ): ComparePresetFlow => {
   const presetId = parsePresetId(searchParams.get(COMPARE_PRESET_ID_PARAM));
 
-  const { data, error, isLoading } = useComparePresetQuery(presetId);
+  const { data, error, isLoading, refetch } = useComparePresetQuery(presetId);
   const [isMinLoadingDone, setIsMinLoadingDone] = useState(false);
 
   useEffect(() => {
@@ -74,6 +71,10 @@ export const useComparePreset = (
     [setSearchParams]
   );
 
+  const retry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   const isActive = presetId !== null;
   const hasError = Boolean(error);
 
@@ -91,12 +92,9 @@ export const useComparePreset = (
     view,
     // presetId가 없을 때도 RQ는 마지막 data를 돌려준다. job RESULT에 새지 않게 비활성이면 null
     presetResult: isActive ? (data ?? null) : null,
-    errorMessage: resolvePresetErrorMessage({
-      hasError,
-      isPresetMissing: isComparePresetNotFound(error),
-      serverMessage: getServerErrorMessage(error),
-    }),
+    errorCode: getServerErrorCode(error),
     selectPreset,
+    retry,
   };
 };
 
@@ -123,24 +121,4 @@ const resolvePresetView = ({
   if (hasError) return COMPARE_VIEW.ERROR;
   if (totalCount === undefined) return COMPARE_VIEW.LOADING;
   return totalCount === 0 ? COMPARE_VIEW.EMPTY : COMPARE_VIEW.RESULT;
-};
-
-interface ResolvePresetErrorMessageParams {
-  hasError: boolean;
-  isPresetMissing: boolean;
-  serverMessage: string | null;
-}
-
-/**
- * preset 실패 문구도 이 함수 하나에서 완결한다 — CompareTab은 왜 실패했는지 몰라도 된다.
- * job 쪽 동일 문구는 usePriceCompareJob의 resolveJobErrorMessage가 따로 담당한다.
- */
-const resolvePresetErrorMessage = ({
-  hasError,
-  isPresetMissing,
-  serverMessage,
-}: ResolvePresetErrorMessageParams): string | null => {
-  if (!hasError) return null;
-  if (serverMessage) return serverMessage;
-  return isPresetMissing ? '존재하지 않는 프리셋이에요' : '비교에 실패했어요';
 };
