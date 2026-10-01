@@ -6,15 +6,25 @@ import { unitVars } from '@styles/tokens/unit.css';
 
 export const container = style({
   boxSizing: 'border-box',
+  position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  border: `1px solid ${colorVars.color.border.secondary}`,
   borderRadius: unitVars.unit.radius['600'],
   backgroundColor: colorVars.color.bg.primary,
   width: '100%',
   minWidth: '33.6rem',
   overflow: 'hidden',
+  selectors: {
+    '&::after': {
+      position: 'absolute',
+      inset: 0,
+      borderRadius: 'inherit',
+      boxShadow: `inset 0 0 0 1px ${colorVars.color.border.secondary}`,
+      pointerEvents: 'none',
+      content: '""',
+    },
+  },
 });
 
 export const contentButton = style({

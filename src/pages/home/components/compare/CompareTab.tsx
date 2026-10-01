@@ -14,6 +14,7 @@ const CompareTab = () => {
     view,
     productUrl,
     errorMessage,
+    loadingStage,
     start,
     selectPreset,
     resultViewModel,
@@ -37,8 +38,8 @@ const CompareTab = () => {
         {/* 로딩 중에도 "검색한 상품" 카드는 값이 오는 즉시 그리고, "비슷한 상품" 영역만 스켈레톤을 유지한다 */}
         {view === COMPARE_VIEW.LOADING && (
           <CompareResultSkeleton
+            stage={loadingStage}
             searchedProduct={searchedProduct}
-            onSearchNewLink={reset}
           />
         )}
 

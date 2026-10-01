@@ -1,7 +1,8 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useCreateCompareJobMutation } from '@pages/home/apis/mutations/useCreateCompareJobMutation';
 import { useCompareJobStatusQuery } from '@pages/home/apis/queries/useCompareJobStatusQuery';
+import type { CompareLoadingStage } from '@pages/home/components/compare/LoadingCard/compareLoadingMessages';
 import {
   COMPARE_VIEW,
   type CompareView,
@@ -14,6 +15,10 @@ import {
   getServerErrorMessage,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
+import {
+  resolveCompareLoadingStage,
+  resolveJobErrorMessage,
+} from '@pages/home/utils/compareJobPresentation';
 
 import { useCompareJobStore } from '@store/useCompareJobStore';
 
@@ -50,9 +55,12 @@ interface PriceCompareJob {
    * 로딩 화면의 "검색한 상품" 카드가 생성 응답 즉시 그려지게 한다. 새로고침 복원처럼 생성 응답이 없으면 첫 폴링 응답부터 채워진다
    */
   originalProduct: OriginalProductResponse | null;
+  /** 생성 응답에 포함된 검색 원본 URL. 상태 응답 타입에는 아직 없어 현재 세션의 job에서만 사용할 수 있다 */
+  originalProductUrl: string | null;
   /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
    * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
   errorMessage: string | null;
+  loadingStage: CompareLoadingStage;
   start: (url: string) => void;
   /** job 생성 mutation 에러만 지운다. URL은 건드리지 않는다 */
   dismissCreateError: () => void;
@@ -80,6 +88,11 @@ export const usePriceCompareJob = (
 ): PriceCompareJob => {
   const jobId = searchParams.get(COMPARE_JOB_ID_PARAM);
   const productUrl = searchParams.get(COMPARE_PRODUCT_URL_PARAM);
+  // 생성 성공과 URL jobId 반영 사이의 짧은 구간에도 로딩 화면을 유지한다.
+  const [pendingJobId, setPendingJobId] = useState<string | null>(null);
+  const [requestedProductUrl, setRequestedProductUrl] = useState<string | null>(
+    null
+  );
 
   const { requireLogin } = useLoginGate();
   const {
@@ -91,6 +104,10 @@ export const usePriceCompareJob = (
   } = useCreateCompareJobMutation();
   const { data, error: jobStatusError } = useCompareJobStatusQuery(jobId);
   const setActiveJobId = useCompareJobStore((state) => state.setActiveJobId);
+
+  useEffect(() => {
+    if (jobId && pendingJobId) setPendingJobId(null);
+  }, [jobId, pendingJobId]);
 
   // 주소의 job이 진행 중이면 전역 스토어에 올린다 — 새로고침·공유 링크·뒤로가기로 들어온 job도 다른 화면에서 완료 토스트를 받는다.
   // 끝난 job은 CompareJobWatcher(routes/)가 스토어에서 비우므로 여기서는 올리기만 한다
@@ -134,6 +151,8 @@ export const usePriceCompareJob = (
 
       requireLogin(
         () => {
+          setPendingJobId(null);
+          setRequestedProductUrl(url);
           createJob(
             { url },
             {
@@ -141,7 +160,10 @@ export const usePriceCompareJob = (
               // 여기서는 URL만 쓴다 — 이 콜백은 화면이 살아 있을 때만 실행되니 URL 쓰기에 딱 맞다
               onSuccess: (response) => {
                 // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
-                if (response.jobId) writeJobId(response.jobId);
+                if (response.jobId) {
+                  setPendingJobId(response.jobId);
+                  writeJobId(response.jobId);
+                }
               },
             }
           );
@@ -154,6 +176,8 @@ export const usePriceCompareJob = (
   );
 
   const dismissCreateError = useCallback(() => {
+    setPendingJobId(null);
+    setRequestedProductUrl(null);
     resetCreateJob();
   }, [resetCreateJob]);
 
@@ -162,7 +186,7 @@ export const usePriceCompareJob = (
   const hasJobError = isJobFailed || Boolean(jobRequestError);
 
   const view = resolveJobView({
-    hasJobId: Boolean(jobId),
+    hasJobId: Boolean(jobId ?? pendingJobId),
     isCreatingJob,
     hasRequestError: Boolean(jobRequestError),
     status: data?.status,
@@ -174,12 +198,30 @@ export const usePriceCompareJob = (
   });
 
   // 생성 응답은 방금 만든 job의 것일 때만 쓴다. 뒤로가기 등으로 URL의 jobId가 다른 job이면 그 job의 상태 응답만 믿는다
+  const displayedJobId = jobId ?? pendingJobId;
   const createdOriginalProduct: OriginalProductResponse | null =
-    createdJob && createdJob.jobId === jobId
+    createdJob && createdJob.jobId === displayedJobId
       ? {
           title: createdJob.title,
+          brand: createdJob.brand,
           imageUrl: createdJob.thumbnail,
           price: createdJob.price,
+        }
+      : null;
+
+  // 상태 응답은 originalProduct 일부 필드만 먼저 채워질 수 있다.
+  // 객체 전체를 교체하면 생성 응답에 있던 가격이 사라져 검색 상품 가격과 절감액이 함께 숨겨지므로 필드별로 합친다.
+  const statusOriginalProduct = data?.originalProduct;
+  const originalProduct =
+    statusOriginalProduct || createdOriginalProduct
+      ? {
+          title: statusOriginalProduct?.title ?? createdOriginalProduct?.title,
+          brand: statusOriginalProduct?.brand ?? createdOriginalProduct?.brand,
+          imageUrl:
+            statusOriginalProduct?.imageUrl ?? createdOriginalProduct?.imageUrl,
+          price: statusOriginalProduct?.price ?? createdOriginalProduct?.price,
+          currency: statusOriginalProduct?.currency,
+          quality: statusOriginalProduct?.quality,
         }
       : null;
 
@@ -188,12 +230,20 @@ export const usePriceCompareJob = (
     view,
     result:
       data?.status === COMPARE_JOB_STATUS.DONE ? (data.result ?? null) : null,
-    originalProduct: data?.originalProduct ?? createdOriginalProduct,
+    originalProduct,
+    originalProductUrl:
+      createdJob && createdJob.jobId === displayedJobId
+        ? createdJob.sourceUrl?.trim() || requestedProductUrl
+        : null,
     errorMessage: resolveJobErrorMessage({
       hasError: hasJobError,
       isJobMissing: isCompareJobNotFound(jobStatusError),
-      // FAILED 응답에는 코드·문구가 없다(2026-09-17 실측). 요청 자체가 거절된 경우의 서버 문구만 꺼낸다
-      serverMessage: getServerErrorMessage(jobRequestError),
+      failedMessage: isJobFailed ? data.errorMessage : null, // status === FAILED일 때만 data.errorMessage 표시
+      requestMessage: getServerErrorMessage(jobRequestError),
+    }),
+    loadingStage: resolveCompareLoadingStage({
+      status: data?.status,
+      currentStage: data?.currentStage,
     }),
     start,
     dismissCreateError,
@@ -236,24 +286,4 @@ const resolveJobView = ({
     case COMPARE_JOB_STATUS.RUNNING:
       return COMPARE_VIEW.LOADING;
   }
-};
-
-interface ResolveJobErrorMessageParams {
-  hasError: boolean;
-  isJobMissing: boolean;
-  serverMessage: string | null;
-}
-
-/**
- * job 실패 문구도 이 함수 하나에서 완결한다 — CompareTab은 왜 실패했는지(isJobMissing) 몰라도 된다.
- * preset 쪽 동일 문구는 useComparePreset의 resolvePresetErrorMessage가 따로 담당한다.
- */
-const resolveJobErrorMessage = ({
-  hasError,
-  isJobMissing,
-  serverMessage,
-}: ResolveJobErrorMessageParams): string | null => {
-  if (!hasError) return null;
-  if (serverMessage) return serverMessage;
-  return isJobMissing ? '검색 결과가 만료되었어요' : '비교에 실패했어요';
 };

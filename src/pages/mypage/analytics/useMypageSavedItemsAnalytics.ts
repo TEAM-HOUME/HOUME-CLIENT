@@ -8,10 +8,11 @@ import {
   trackMypageFeedCardView,
   trackMypageListSavedItemView,
 } from '@pages/mypage/analytics/mypageAnalytics';
-import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
+
+import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
 
 interface UseMypageSavedItemsAnalyticsOptions {
-  savedItems: FurnitureItem[];
+  savedItems: JjymV2ItemResponse[];
   isFetched: boolean;
 }
 
@@ -44,16 +45,16 @@ export const useMypageSavedItemsAnalytics = ({
     trackMypageFeedCardView(savedItems);
   }, [isFetched, savedItems]);
 
-  const handleFeedCardClick = useCallback((item: FurnitureItem) => {
+  const handleFeedCardClick = useCallback((item: JjymV2ItemResponse) => {
     trackMypageFeedCardOnCardClick(item);
   }, []);
 
-  const handleFeedCardGoSiteClick = useCallback((item: FurnitureItem) => {
+  const handleFeedCardGoSiteClick = useCallback((item: JjymV2ItemResponse) => {
     trackMypageFeedCardGoSiteClick(item);
   }, []);
 
   const handleFeedCardSaveToggle = useCallback(
-    (item: FurnitureItem, isSaved: boolean) => {
+    (item: JjymV2ItemResponse, isSaved: boolean) => {
       if (isSaved) {
         trackMypageFeedCardUnsaveClick(item);
       } else {

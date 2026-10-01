@@ -1,5 +1,3 @@
-import type { FurnitureItem } from '@pages/mypage/types/apis/saveItemsList';
-
 import { isCurationViewType } from '@store/imageFlow/flowConfig';
 
 import { joinAnalyticsIds } from '@analytics/params/builders/productCard';
@@ -8,6 +6,7 @@ import { SCREEN_NAME } from '@analytics/screenNames';
 import { getReturnScreenNameParams } from '@analytics/utils/screenName/buildReturnScreenParams';
 import { toAnalyticsNull } from '@analytics/utils/toAnalyticsNull';
 
+import type { JjymV2ItemResponse } from '@apis/__generated__/data-contracts';
 import type {
   DateGroupResponse,
   ItemResponse,
@@ -21,11 +20,11 @@ export const mypageReturnScreenParams = () =>
   getReturnScreenNameParams(SCREEN_NAME.HOME);
 
 export const getMypageSavedItemsListParams = (
-  items: Pick<FurnitureItem, 'rawProductId'>[] = []
+  items: Pick<JjymV2ItemResponse, 'rawProductId' | 'catalogItemId'>[] = []
 ) => {
   const savedItemIds =
     items
-      .map((item) => item.rawProductId)
+      .map((item) => item.rawProductId ?? item.catalogItemId)
       .filter((id) => Number.isFinite(id))
       .join(', ') || undefined;
 

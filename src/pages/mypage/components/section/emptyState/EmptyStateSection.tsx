@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useMypageEmptyStateAnalytics } from '@pages/mypage/analytics/useMypageAnalytics';
-import { useJjymListQuery } from '@pages/mypage/apis/queries/useJjymListQuery';
 
 import { ROUTES } from '@routes/paths';
 
 import { useImageFlowStore } from '@store/useImageFlowStore';
+
+import { useJjymListQuery } from '@apis/queries/useJjymListQuery';
 
 import emptyImage from '@assets/images/ImgEmpty.png';
 

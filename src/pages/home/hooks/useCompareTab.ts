@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
+import type { CompareLoadingStage } from '@pages/home/components/compare/LoadingCard/compareLoadingMessages';
 import {
   mapCompareJobToView,
   mapComparePresetToView,
@@ -24,6 +25,7 @@ interface CompareTabState {
   view: CompareView;
   productUrl: string | null;
   errorMessage: string | null;
+  loadingStage: CompareLoadingStage;
   /** RESULT 뷰가 그릴 값. job이든 프리셋이든 같은 형태로 맞춰 CompareResult는 출처를 모른다 */
   resultViewModel: CompareResultViewModel | null;
   /** 로딩 중에 먼저 그릴 "검색한 상품" 카드. job은 생성 응답 즉시, 프리셋은 응답이 오면 채워진다 */
@@ -49,8 +51,10 @@ export const useCompareTab = (): CompareTabState => {
     view: jobView,
     productUrl,
     errorMessage: jobErrorMessage,
+    loadingStage: jobLoadingStage,
     result: jobResult,
     originalProduct: jobOriginalProduct,
+    originalProductUrl: jobOriginalProductUrl,
     start,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
@@ -91,19 +95,27 @@ export const useCompareTab = (): CompareTabState => {
       ? mapComparePresetToView(presetResult)
       : null
     : jobResult
-      ? mapCompareJobToView(jobOriginalProduct, jobResult)
+      ? mapCompareJobToView(
+          jobOriginalProduct,
+          jobResult,
+          jobOriginalProductUrl ?? undefined
+        )
       : null;
 
   const searchedProduct =
     resultViewModel?.searchedProduct ??
     (!isPresetActive && jobOriginalProduct
-      ? toSearchedProductView(jobOriginalProduct)
+      ? toSearchedProductView({
+          ...jobOriginalProduct,
+          sourceUrl: jobOriginalProductUrl ?? undefined,
+        })
       : null);
 
   return {
     view,
     productUrl,
     errorMessage: isPresetActive ? presetErrorMessage : jobErrorMessage,
+    loadingStage: isPresetActive ? 'SCRAPING' : jobLoadingStage,
     resultViewModel,
     searchedProduct,
     start,

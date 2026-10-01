@@ -167,20 +167,21 @@ export const toProductCardInputFromSimilarItem = (
   finalPrice: item.finalPrice,
 });
 
-/** mypage 찜 피드 — FurnitureItem */
+/** mypage 찜 피드 — JjymV2ItemResponse */
 export const toProductCardInputFromJjymFeed = (
   item: Pick<
     ProductCardInput,
     'productId' | 'name' | 'brand' | 'originalPrice' | 'finalPrice'
   > & {
     rawProductId?: number;
+    catalogItemId?: number;
     productName?: string;
     brandName?: string;
     listPrice?: number;
     discountPrice?: number;
   }
 ): ProductCardInput => ({
-  productId: item.rawProductId ?? item.productId,
+  productId: item.rawProductId ?? item.catalogItemId ?? item.productId,
   name: item.productName ?? item.name,
   brand: item.brandName ?? item.brand,
   originalPrice: item.listPrice ?? item.originalPrice,
