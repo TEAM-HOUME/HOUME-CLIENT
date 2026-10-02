@@ -5,15 +5,14 @@ import {
 } from '../constants/compareErrorCode.ts';
 
 export const COMPARE_ERROR_ACTION = {
-  SEARCH_NEW_LINK: 'searchNewLink',
+  RESET: 'reset',
   RETRY: 'retry',
-  REENTER_LINK: 'reenterLink',
 } as const;
 
 type CompareErrorAction =
   (typeof COMPARE_ERROR_ACTION)[keyof typeof COMPARE_ERROR_ACTION];
 
-export interface CompareErrorContent {
+interface CompareErrorContent {
   title: string;
   description: readonly [string, string];
   buttonLabel: string;
@@ -31,7 +30,7 @@ export const COMPARE_ERROR_CONTENT: Record<
       '구매 가능한 링크인지 다시 확인해주세요.',
     ],
     buttonLabel: '다른 링크로 검색하기',
-    action: COMPARE_ERROR_ACTION.SEARCH_NEW_LINK,
+    action: COMPARE_ERROR_ACTION.RESET,
   },
   [COMPARE_ERROR_CASE.SCRAPING_BLOCKED]: {
     title: '이 사이트의 상품 정보는 가져올 수 없어요',
@@ -40,7 +39,7 @@ export const COMPARE_ERROR_CONTENT: Record<
       '다른 링크로 다시 시도해주세요.',
     ],
     buttonLabel: '다른 링크로 검색하기',
-    action: COMPARE_ERROR_ACTION.SEARCH_NEW_LINK,
+    action: COMPARE_ERROR_ACTION.RESET,
   },
   [COMPARE_ERROR_CASE.COMPARE_FAILED]: {
     title: '상품 비교 중 문제가 생겼어요',
@@ -49,7 +48,7 @@ export const COMPARE_ERROR_CONTENT: Record<
       '다른 링크로 다시 시도해주세요.',
     ],
     buttonLabel: '다른 링크로 검색하기',
-    action: COMPARE_ERROR_ACTION.SEARCH_NEW_LINK,
+    action: COMPARE_ERROR_ACTION.RESET,
   },
   [COMPARE_ERROR_CASE.BUSY]: {
     title: '잠시 대기 중이에요',
@@ -76,7 +75,7 @@ export const COMPARE_ERROR_CONTENT: Record<
       '다시 붙여넣어주세요.',
     ],
     buttonLabel: '링크 다시 입력하기',
-    action: COMPARE_ERROR_ACTION.REENTER_LINK,
+    action: COMPARE_ERROR_ACTION.RESET,
   },
   [COMPARE_ERROR_CASE.INVALID_LINK]: {
     title: '유효하지 않은 링크예요',
@@ -85,7 +84,7 @@ export const COMPARE_ERROR_CONTENT: Record<
       '다시 확인해주세요.',
     ],
     buttonLabel: '링크 다시 입력하기',
-    action: COMPARE_ERROR_ACTION.REENTER_LINK,
+    action: COMPARE_ERROR_ACTION.RESET,
   },
 };
 
