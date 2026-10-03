@@ -5,7 +5,10 @@ import {
   COMPARE_VIEW,
   type CompareView,
 } from '@pages/home/constants/compareView';
-import { getServerErrorCode } from '@pages/home/utils/compareJobError';
+import {
+  getServerErrorCode,
+  isComparePresetNotFound,
+} from '@pages/home/utils/compareJobError';
 
 import type { PresetDetailResponse } from '@apis/__generated__/data-contracts';
 
@@ -25,7 +28,7 @@ interface ComparePresetFlow {
   errorCode: number | null;
   /** 프리셋 클릭 시 주소에 presetId를 넣어 고정 결과를 조회한다 */
   selectPreset: (presetId: number) => void;
-  /** 오류가 발생한 같은 프리셋을 다시 조회한다 */
+  /** 일시적 오류는 같은 프리셋을 재조회하고, 없는 프리셋은 검색 화면으로 돌아간다 */
   retry: () => void;
 }
 
@@ -72,8 +75,15 @@ export const useComparePreset = (
   );
 
   const retry = useCallback(() => {
+    if (isComparePresetNotFound(error)) {
+      setSearchParams((prev) => applyCompareTabParams(prev, null), {
+        replace: false,
+      });
+      return;
+    }
+
     void refetch();
-  }, [refetch]);
+  }, [error, refetch, setSearchParams]);
 
   const isActive = presetId !== null;
   const hasError = Boolean(error);

@@ -11,7 +11,10 @@ import {
   COMPARE_JOB_STATUS,
   type CompareJobStatus,
 } from '@pages/home/types/compare';
-import { getServerErrorCode } from '@pages/home/utils/compareJobError';
+import {
+  getServerErrorCode,
+  isCompareJobNotFound,
+} from '@pages/home/utils/compareJobError';
 import { resolveCompareLoadingStage } from '@pages/home/utils/compareJobPresentation';
 
 import { useCompareJobStore } from '@store/useCompareJobStore';
@@ -186,6 +189,25 @@ export const usePriceCompareJob = (
   }, [resetCreateJob]);
 
   const retry = useCallback(() => {
+    dismissCreateError();
+
+    if (jobStatusError && jobId) {
+      if (isCompareJobNotFound(jobStatusError)) {
+        if (productUrl) {
+          start(productUrl);
+          return;
+        }
+
+        setSearchParams((prev) => applyCompareTabParams(prev, null), {
+          replace: false,
+        });
+        return;
+      }
+
+      void refetchJobStatus();
+      return;
+    }
+
     const isCreatedJobDisplayed = createdJob?.jobId === jobId;
     const retryUrl = jobCreateError
       ? requestedProductUrl
@@ -193,7 +215,6 @@ export const usePriceCompareJob = (
         ? (requestedProductUrl ?? createdJob.sourceUrl?.trim())
         : productUrl;
 
-    dismissCreateError();
     if (retryUrl) {
       start(retryUrl);
       return;
@@ -213,6 +234,7 @@ export const usePriceCompareJob = (
     dismissCreateError,
     jobCreateError,
     jobId,
+    jobStatusError,
     productUrl,
     refetchJobStatus,
     requestedProductUrl,
