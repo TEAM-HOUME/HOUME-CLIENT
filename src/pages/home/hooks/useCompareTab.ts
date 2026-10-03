@@ -24,7 +24,7 @@ export {
 interface CompareTabState {
   view: CompareView;
   productUrl: string | null;
-  errorMessage: string | null;
+  errorCode: number | null;
   loadingStage: CompareLoadingStage;
   /** RESULT 뷰가 그릴 값. job이든 프리셋이든 같은 형태로 맞춰 CompareResult는 출처를 모른다 */
   resultViewModel: CompareResultViewModel | null;
@@ -33,6 +33,7 @@ interface CompareTabState {
   start: (url: string) => void;
   selectPreset: (presetId: number) => void;
   reset: () => void;
+  retry: () => void;
 }
 
 /**
@@ -50,12 +51,13 @@ export const useCompareTab = (): CompareTabState => {
   const {
     view: jobView,
     productUrl,
-    errorMessage: jobErrorMessage,
+    errorCode: jobErrorCode,
     loadingStage: jobLoadingStage,
     result: jobResult,
     originalProduct: jobOriginalProduct,
     originalProductUrl: jobOriginalProductUrl,
     start,
+    retry: retryJob,
     dismissCreateError,
   } = usePriceCompareJob(searchParams, setSearchParams);
 
@@ -63,8 +65,9 @@ export const useCompareTab = (): CompareTabState => {
     isActive: isPresetActive,
     view: presetView,
     presetResult,
-    errorMessage: presetErrorMessage,
+    errorCode: presetErrorCode,
     selectPreset: writePresetId,
+    retry: retryPreset,
   } = useComparePreset(searchParams, setSearchParams);
 
   const selectPreset = useCallback(
@@ -114,12 +117,13 @@ export const useCompareTab = (): CompareTabState => {
   return {
     view,
     productUrl,
-    errorMessage: isPresetActive ? presetErrorMessage : jobErrorMessage,
+    errorCode: isPresetActive ? presetErrorCode : jobErrorCode,
     loadingStage: isPresetActive ? 'SCRAPING' : jobLoadingStage,
     resultViewModel,
     searchedProduct,
     start,
     selectPreset,
     reset,
+    retry: isPresetActive ? retryPreset : retryJob,
   };
 };

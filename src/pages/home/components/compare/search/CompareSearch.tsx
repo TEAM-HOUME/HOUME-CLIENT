@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { useCompareHistoryQuery } from '@pages/home/apis/queries/useCompareHistoryQuery';
 import { useComparePresetsQuery } from '@pages/home/apis/queries/useComparePresetsQuery';
+import { COMPARE_ERROR_CASE } from '@pages/home/constants/compareErrorCode';
 import { isValidProductUrl } from '@pages/home/utils/isValidProductUrl';
 
 import { useUserStore } from '@store/useUserStore';
@@ -10,6 +11,7 @@ import LinkInput from '@components/linkInput/LinkInput';
 import SearchItem from '@components/searchItem/SearchItem';
 
 import * as styles from './CompareSearch.css';
+import CompareError from '../error/CompareError';
 import { getSearchDayCount } from '../utils/getSearchDayCount';
 
 interface CompareSearchProps {
@@ -55,6 +57,15 @@ const CompareSearch = ({
 
   const handlePresetClick = (presetId: number) => onSelectPreset(presetId);
 
+  if (isUrlInvalid) {
+    return (
+      <CompareError
+        errorCase={COMPARE_ERROR_CASE.INVALID_FORMAT}
+        onAction={() => setIsUrlInvalid(false)}
+      />
+    );
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -67,7 +78,6 @@ const CompareSearch = ({
           value={url}
           onChange={handleUrlChange}
           onSubmit={handleSubmit}
-          errorMessage={isUrlInvalid ? '유효하지 않은 URL이에요.' : undefined}
         />
         <ul className={styles.itemList}>
           {historyItems.map((item) => {

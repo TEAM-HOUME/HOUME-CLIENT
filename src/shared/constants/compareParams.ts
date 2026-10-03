@@ -18,6 +18,6 @@ export const COMPARE_PRESET_ID_PARAM = 'presetId';
 /**
  * 입력창에 채워둘 상품 URL.
  * DeepLinkRoute가 상품 URL을 복원해 넣고 → CompareTab이 읽어 입력창을 채운다
- * → job이 만들어지면 productUrl은 지우고 jobId를 넣는다
+ * → job이 만들어지면 재시도에 사용할 productUrl과 jobId를 함께 유지한다
  */
 export const COMPARE_PRODUCT_URL_PARAM = 'productUrl';

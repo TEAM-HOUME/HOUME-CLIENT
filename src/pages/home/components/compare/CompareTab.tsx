@@ -1,10 +1,15 @@
 import { useCompareTab, COMPARE_VIEW } from '@pages/home/hooks/useCompareTab';
+import {
+  COMPARE_ERROR_ACTION,
+  COMPARE_ERROR_CONTENT,
+  resolveCompareErrorCase,
+} from '@pages/home/utils/compareErrorPresentation';
 
 import ActionButton from '@components/button/actionButton/ActionButton';
 import EmptyView from '@components/emptyView/EmptyView';
-import InlineError from '@components/inlineError/InlineError';
 
 import * as styles from './CompareTab.css';
+import CompareError from './error/CompareError';
 import CompareResult from './result/CompareResult';
 import CompareResultSkeleton from './result/CompareResultSkeleton';
 import CompareSearch from './search/CompareSearch';
@@ -13,14 +18,18 @@ const CompareTab = () => {
   const {
     view,
     productUrl,
-    errorMessage,
+    errorCode,
     loadingStage,
     start,
     selectPreset,
     resultViewModel,
     searchedProduct,
     reset,
+    retry,
   } = useCompareTab();
+
+  const errorCase = resolveCompareErrorCase(errorCode);
+  const errorAction = COMPARE_ERROR_CONTENT[errorCase].action;
 
   return (
     <section className={styles.container}>
@@ -60,9 +69,11 @@ const CompareTab = () => {
         )}
 
         {view === COMPARE_VIEW.ERROR && (
-          <InlineError
-            message={errorMessage ?? '비교에 실패했어요'}
-            onRetry={reset}
+          <CompareError
+            errorCase={errorCase}
+            onAction={
+              errorAction === COMPARE_ERROR_ACTION.RETRY ? retry : reset
+            }
           />
         )}
       </div>

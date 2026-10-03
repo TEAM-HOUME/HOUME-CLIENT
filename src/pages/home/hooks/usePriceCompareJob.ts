@@ -12,13 +12,10 @@ import {
   type CompareJobStatus,
 } from '@pages/home/types/compare';
 import {
-  getServerErrorMessage,
+  getServerErrorCode,
   isCompareJobNotFound,
 } from '@pages/home/utils/compareJobError';
-import {
-  resolveCompareLoadingStage,
-  resolveJobErrorMessage,
-} from '@pages/home/utils/compareJobPresentation';
+import { resolveCompareLoadingStage } from '@pages/home/utils/compareJobPresentation';
 
 import { useCompareJobStore } from '@store/useCompareJobStore';
 
@@ -57,11 +54,12 @@ interface PriceCompareJob {
   originalProduct: OriginalProductResponse | null;
   /** 생성 응답에 포함된 검색 원본 URL. 상태 응답 타입에는 아직 없어 현재 세션의 job에서만 사용할 수 있다 */
   originalProductUrl: string | null;
-  /** 실패했을 때 화면에 보여줄 완결된 문구. 실패가 아니면 null.
-   * 서버 문구가 있으면 그걸, 없으면 이 훅이 job 사유(만료 등)에 맞는 기본 문구로 채운다 */
-  errorMessage: string | null;
+  /** 화면 문구를 고르는 서버 비즈니스 에러 코드 */
+  errorCode: number | null;
   loadingStage: CompareLoadingStage;
   start: (url: string) => void;
+  /** 같은 링크를 다시 요청한다. 원본 링크가 없는 기존 주소는 현재 job 조회를 다시 시도한다 */
+  retry: () => void;
   /** job 생성 mutation 에러만 지운다. URL은 건드리지 않는다 */
   dismissCreateError: () => void;
 }
@@ -102,7 +100,11 @@ export const usePriceCompareJob = (
     error: jobCreateError,
     reset: resetCreateJob,
   } = useCreateCompareJobMutation();
-  const { data, error: jobStatusError } = useCompareJobStatusQuery(jobId);
+  const {
+    data,
+    error: jobStatusError,
+    refetch: refetchJobStatus,
+  } = useCompareJobStatusQuery(jobId);
   const setActiveJobId = useCompareJobStore((state) => state.setActiveJobId);
 
   useEffect(() => {
@@ -127,13 +129,18 @@ export const usePriceCompareJob = (
   const jobRequestError = jobCreateError ?? jobStatusError;
 
   /**
-   * /?tab=compare&jobId=nextJobId로 URL을 쓴다. productUrl·presetId는 함께 지워진다 (applyCompareTabParams).
+   * /?tab=compare&jobId=nextJobId&productUrl=sourceUrl로 URL을 쓴다. presetId는 함께 지워진다 (applyCompareTabParams).
+   * productUrl은 오류 화면의 "다시 시도하기"가 같은 링크로 새 job을 만들 수 있도록 유지한다.
    * 항상 replace다. 뒤로가기 목적지는 이 시점 이전 항목(입력창에서 제출했으면 입력 화면, 딥링크로 들어왔으면 직전에 보던 사이트)이어야 한다
    */
   const writeJobId = useCallback(
-    (nextJobId: string) => {
+    (nextJobId: string, sourceUrl: string) => {
       setSearchParams(
-        (prev) => applyCompareTabParams(prev, { jobId: nextJobId }),
+        (prev) =>
+          applyCompareTabParams(prev, {
+            jobId: nextJobId,
+            productUrl: sourceUrl,
+          }),
         { replace: true }
       );
     },
@@ -162,7 +169,7 @@ export const usePriceCompareJob = (
                 // 생성 타입은 jobId가 optional이지만 202 응답에는 항상 온다(실측). 없으면 진행할 수 없으니 입력 화면에 남긴다
                 if (response.jobId) {
                   setPendingJobId(response.jobId);
-                  writeJobId(response.jobId);
+                  writeJobId(response.jobId, response.sourceUrl?.trim() || url);
                 }
               },
             }
@@ -181,9 +188,61 @@ export const usePriceCompareJob = (
     resetCreateJob();
   }, [resetCreateJob]);
 
+  const retry = useCallback(() => {
+    dismissCreateError();
+
+    if (jobStatusError && jobId) {
+      if (isCompareJobNotFound(jobStatusError)) {
+        if (productUrl) {
+          start(productUrl);
+          return;
+        }
+
+        setSearchParams((prev) => applyCompareTabParams(prev, null), {
+          replace: false,
+        });
+        return;
+      }
+
+      void refetchJobStatus();
+      return;
+    }
+
+    const isCreatedJobDisplayed = createdJob?.jobId === jobId;
+    const retryUrl = jobCreateError
+      ? requestedProductUrl
+      : isCreatedJobDisplayed
+        ? (requestedProductUrl ?? createdJob.sourceUrl?.trim())
+        : productUrl;
+
+    if (retryUrl) {
+      start(retryUrl);
+      return;
+    }
+
+    if (jobId) {
+      void refetchJobStatus();
+      return;
+    }
+
+    setSearchParams((prev) => applyCompareTabParams(prev, null), {
+      replace: false,
+    });
+  }, [
+    createdJob?.sourceUrl,
+    createdJob?.jobId,
+    dismissCreateError,
+    jobCreateError,
+    jobId,
+    jobStatusError,
+    productUrl,
+    refetchJobStatus,
+    requestedProductUrl,
+    setSearchParams,
+    start,
+  ]);
+
   const isJobFailed = data?.status === COMPARE_JOB_STATUS.FAILED;
-  // 실패 문구를 보여줄 상황 전체 — job이 FAILED로 끝났거나, 생성·조회 요청이 거절됐거나
-  const hasJobError = isJobFailed || Boolean(jobRequestError);
 
   const view = resolveJobView({
     hasJobId: Boolean(jobId ?? pendingJobId),
@@ -235,17 +294,15 @@ export const usePriceCompareJob = (
       createdJob && createdJob.jobId === displayedJobId
         ? createdJob.sourceUrl?.trim() || requestedProductUrl
         : null,
-    errorMessage: resolveJobErrorMessage({
-      hasError: hasJobError,
-      isJobMissing: isCompareJobNotFound(jobStatusError),
-      failedMessage: isJobFailed ? data.errorMessage : null, // status === FAILED일 때만 data.errorMessage 표시
-      requestMessage: getServerErrorMessage(jobRequestError),
-    }),
+    errorCode: isJobFailed
+      ? (data.errorCode ?? null)
+      : getServerErrorCode(jobRequestError),
     loadingStage: resolveCompareLoadingStage({
       status: data?.status,
       currentStage: data?.currentStage,
     }),
     start,
+    retry,
     dismissCreateError,
   };
 };
