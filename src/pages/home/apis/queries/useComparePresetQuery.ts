@@ -32,7 +32,9 @@ export const useComparePresetQuery = (presetId: number | null) => {
       if (isComparePresetNotFound(error)) return false;
       return failureCount < 1;
     },
-    // 서버 고정 스냅샷 — 한 번 받으면 다시 안 받아도 된다
+    // 서버 고정 스냅샷 — 한 번 받으면 다시 안 받아도 된다.
+    // gcTime도 함께 늘린다. 기본 5분이면 비교 탭을 떠난 사이 캐시가 지워져 재진입 때 다시 조회한다
     staleTime: Infinity,
+    gcTime: Infinity,
   });
 };
