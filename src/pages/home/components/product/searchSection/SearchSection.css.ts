@@ -17,10 +17,20 @@ export const section = style({
   width: '100%',
 });
 
+// 배너 비율(375x220)만큼 영역을 먼저 잡아 이미지가 로드될 때 아래 내용이 밀리지 않게 한다.
+// OptimizedImage의 skeleton placeholder가 absolute로 이 영역을 덮는다
+export const shoppingBannerFrame = style({
+  aspectRatio: '375 / 220',
+  position: 'relative',
+  width: '100%',
+  overflow: 'hidden',
+});
+
 export const shoppingBanner = style({
   display: 'block',
+  objectFit: 'cover',
   width: '100%',
-  height: 'auto',
+  height: '100%',
 });
 
 export const searchHeader = style({
