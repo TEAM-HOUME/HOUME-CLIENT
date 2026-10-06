@@ -84,9 +84,33 @@ export function createResponses(variant: 'A' | 'B' = 'A') {
       CreditCount: 100,
       email: 'regression@example.invalid',
     }),
+    'GET /api/v2/jjyms': success({ items: [] }),
     'GET /api/v1/landings': success({ landings: [] }),
     'GET /api/v1/other-styles?size=4': success({ otherStyles: [] }),
     'GET /api/v1/price-compare/presets': success({ presets: [] }),
+    'GET /api/v1/price-compare/jobs/refresh-job': success({
+      jobId: 'refresh-job',
+      status: 'DONE',
+      originalProduct: {
+        title: '새로고침 검색 상품',
+        imageUrl: imagePath('carousel'),
+        price: 120000,
+        brand: '테스트 브랜드',
+      },
+      result: {
+        totalCount: 1,
+        similarProducts: [
+          {
+            source: 'RAW',
+            productId: 'compare-1',
+            title: '비슷한 상품',
+            imageUrl: imagePath('result9001'),
+            price: 100000,
+            productUrl: 'https://similar.example.invalid/product/1',
+          },
+        ],
+      },
+    }),
     'GET /api/v2/carousels': success({
       carousels: [{ rawProductId: 6001, url: imagePath('carousel') }],
     }),
