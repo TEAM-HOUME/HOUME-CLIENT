@@ -52,7 +52,7 @@ interface PriceCompareJob {
    * 로딩 화면의 "검색한 상품" 카드가 생성 응답 즉시 그려지게 한다. 새로고침 복원처럼 생성 응답이 없으면 첫 폴링 응답부터 채워진다
    */
   originalProduct: OriginalProductResponse | null;
-  /** 생성 응답에 포함된 검색 원본 URL. 상태 응답 타입에는 아직 없어 현재 세션의 job에서만 사용할 수 있다 */
+  /** 검색 원본 URL. 현재 세션에서는 생성 응답을, 새로고침 후에는 URL의 productUrl을 사용한다 */
   originalProductUrl: string | null;
   /** 화면 문구를 고르는 서버 비즈니스 에러 코드 */
   errorCode: number | null;
@@ -292,8 +292,8 @@ export const usePriceCompareJob = (
     originalProduct,
     originalProductUrl:
       createdJob && createdJob.jobId === displayedJobId
-        ? createdJob.sourceUrl?.trim() || requestedProductUrl
-        : null,
+        ? createdJob.sourceUrl?.trim() || requestedProductUrl || productUrl
+        : productUrl,
     errorCode: isJobFailed
       ? (data.errorCode ?? null)
       : getServerErrorCode(jobRequestError),

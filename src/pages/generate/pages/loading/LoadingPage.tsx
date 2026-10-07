@@ -125,6 +125,7 @@ const LoadingPage = () => {
         return (
           <Popup
             btnStyle="text"
+            containerSize="creditRequest"
             btnText="생성 기다리기"
             weakBtnText="나가기"
             topIconName="WarningFillDanger"
