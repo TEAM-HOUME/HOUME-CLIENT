@@ -188,3 +188,45 @@ test('등록 GET 응답과 미등록 HTTP 차단', async () => {
   });
   expect(calls.map((call) => call.kind)).toEqual(['fulfill', 'abort', 'abort']);
 });
+
+test('새로고침한 비교 결과는 상단 전체를 하나의 원본 상품 이동 버튼으로 노출한다', async ({
+  browser,
+}, info) => {
+  const session = await createBrowserSession(browser, info);
+  const sourceUrl = 'https://shop.example.invalid/product/1';
+
+  try {
+    await session.run(async () => {
+      await session.page.goto(
+        `/?tab=compare&jobId=refresh-job&productUrl=${encodeURIComponent(sourceUrl)}`
+      );
+
+      const output = session.page.getByRole('region', { name: '검색한 상품' });
+      const externalLinkButton = output.getByRole('button', {
+        name: '새로고침 검색 상품 상품 링크로 이동',
+      });
+
+      await expect(externalLinkButton).toBeVisible();
+      await expect(
+        externalLinkButton.getByText('새로고침 검색 상품')
+      ).toBeVisible();
+
+      await session.page.evaluate(() => {
+        const state = window as Window & { openedProductUrl?: string };
+        window.open = (url) => {
+          state.openedProductUrl = String(url);
+          return null;
+        };
+      });
+      await externalLinkButton.click();
+      expect(
+        await session.page.evaluate(
+          () =>
+            (window as Window & { openedProductUrl?: string }).openedProductUrl
+        )
+      ).toBe(sourceUrl);
+    });
+  } finally {
+    await session.dispose();
+  }
+});
