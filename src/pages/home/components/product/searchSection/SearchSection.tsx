@@ -22,12 +22,13 @@ import type {
 } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
-import shoppingBanner from '@assets/images/ShoppingBanner.svg';
+import shoppingBanner from '@assets/images/ShoppingBanner.webp';
 
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';
 import EmptyView from '@components/emptyView/EmptyView';
 import Icon from '@components/icon/Icon';
+import OptimizedImage from '@components/image/OptimizedImage';
 import InlineError from '@components/inlineError/InlineError';
 import Loading from '@components/loading/Loading';
 import ProductCard from '@components/productCard/ProductCard';
@@ -348,7 +349,16 @@ const SearchSection = ({
           </div>
         </div>
       ) : null}
-      <img src={shoppingBanner} alt="" className={styles.shoppingBanner} />
+      <div className={styles.shoppingBannerFrame}>
+        <OptimizedImage
+          src={shoppingBanner}
+          alt=""
+          className={styles.shoppingBanner}
+          placeholder="skeleton"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
       <div className={styles.searchHeader}>
         <div ref={searchBarRef} className={styles.searchBarContainer}>
           <SearchBar {...searchBarProps} />

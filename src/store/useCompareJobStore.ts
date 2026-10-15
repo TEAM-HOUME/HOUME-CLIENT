@@ -10,6 +10,14 @@ interface CompareJobStore {
   activeJobId: string | null;
   setActiveJobId: (jobId: string) => void;
   clearActiveJob: () => void;
+  /**
+   * 지금 로딩 화면을 보여주는 프리셋 조회. 없으면 null.
+   * 프리셋은 job이 아니지만 이미지 생성 가드(useCompareJobGuard)는 job처럼 막아야 해서 같은 스토어에 둔다.
+   * 로딩이 끝나거나 비교 탭을 떠나면 useComparePreset이 비운다. 새로고침 뒤에는 의미가 없어 저장하지 않는다.
+   */
+  activePresetId: number | null;
+  setActivePresetId: (presetId: number) => void;
+  clearActivePreset: () => void;
 }
 
 /**
@@ -22,10 +30,14 @@ export const useCompareJobStore = create<CompareJobStore>()(
       activeJobId: null,
       setActiveJobId: (jobId) => set({ activeJobId: jobId }),
       clearActiveJob: () => set({ activeJobId: null }),
+      activePresetId: null,
+      setActivePresetId: (presetId) => set({ activePresetId: presetId }),
+      clearActivePreset: () => set({ activePresetId: null }),
     }),
     {
       name: 'compare-job',
       storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({ activeJobId: state.activeJobId }),
     }
   )
 );

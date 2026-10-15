@@ -17,12 +17,12 @@ import { TOAST_ACTION_LABEL, TOAST_MESSAGE } from '@constants/toastMessage';
 import { buildCompareTabPath } from '@utils/compareTabPath';
 
 /**
- * 가격 비교가 진행 중이면 이미지 생성을 막는다.
+ * 가격 비교(job)나 프리셋 로딩이 진행 중이면 이미지 생성을 막는다.
  *
  * 기획: 공간 선택 퍼널 진입까지는 허용하고, 공간 선택 바텀시트의 "공간 선택하기"에서 막는다.
  * 그래서 startFlow 호출부(홈·배너·스타일 상세·상품 탭)에는 달지 않고 useFloorPlanSelect의 확인 핸들러 2곳에서 부른다.
  * 풀퍼널은 그 뒤 취향·활동 단계가 더 있어, 생성 요청 직전(useActivityInfo의 제출)에서 한 번 더 부른다.
- * "진행 중" 판정은 스토어에 jobId가 있는지로 한다 — 끝난 job은 CompareJobWatcher(routes/)가 스토어에서 비운다.
+ * "진행 중" 판정은 스토어에 jobId(또는 프리셋 id)가 있는지로 한다 — 끝난 job은 CompareJobWatcher(routes/)가, 프리셋 로딩은 useComparePreset이 스토어에서 비운다.
  *
  * 토스트는 상단(TOP_4)에 띄운다. 바텀시트가 하단을 가린다.
  */
@@ -33,14 +33,20 @@ export const useCompareJobGuard = () => {
   /** 진행 중인 비교가 있으면 안내 토스트를 띄우고 true를 돌려준다. 호출부는 true면 진행을 멈춘다 */
   const blockIfComparing = useCallback((): boolean => {
     // 클릭 시점에만 읽는다. 구독하면 job이 시작·종료될 때마다 공간 선택·활동 화면이 다시 렌더된다
-    const { activeJobId } = useCompareJobStore.getState();
-    if (activeJobId === null) return false;
+    const { activeJobId, activePresetId } = useCompareJobStore.getState();
+    const target =
+      activeJobId !== null
+        ? { jobId: activeJobId }
+        : activePresetId !== null
+          ? { presetId: activePresetId }
+          : null;
+    if (target === null) return false;
 
     notify({
       type: TOAST_TYPE.ACTION,
       text: TOAST_MESSAGE.COMPARE_JOB_IN_PROGRESS,
       actionLabel: TOAST_ACTION_LABEL.GO_BACK,
-      onClick: () => navigate(buildCompareTabPath({ jobId: activeJobId })),
+      onClick: () => navigate(buildCompareTabPath(target)),
       options: {
         toasterId: TOASTER_ID.TOP_4,
         duration: TOAST_ACTION_DURATION_MS,

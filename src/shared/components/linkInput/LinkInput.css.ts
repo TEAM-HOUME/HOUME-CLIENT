@@ -2,28 +2,11 @@ import { style } from '@vanilla-extract/css';
 
 import { colorVars } from '@styles/tokens/color.css';
 import { fontVars } from '@styles/tokens/font.css';
-import { pressInteraction } from '@styles/tokens/interaction/presets';
 import { unitVars } from '@styles/tokens/unit.css';
-
-export const container = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: unitVars.unit.gapPadding['200'],
-  width: '100%',
-});
-
-export const errorMessage = style({
-  margin: 0,
-  paddingLeft: unitVars.unit.gapPadding['300'],
-  color: colorVars.color.text.danger,
-  ...fontVars.font.caption_r_12,
-});
 
 export const wrapper = style({
   display: 'flex',
   gap: unitVars.unit.gapPadding['200'],
-  transformOrigin: 'center center',
-  ...pressInteraction(0.97, '&:active:not(:has(button:active))'),
   borderRadius: unitVars.unit.radius['600'],
   backgroundColor: colorVars.color.fill.whitish,
   padding: unitVars.unit.gapPadding['100'],
