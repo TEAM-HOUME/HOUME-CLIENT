@@ -22,7 +22,7 @@ import type {
 } from '@pages/home/types/productTab';
 import { withProductSubCategory } from '@pages/home/utils/productFilterUtils';
 
-import shoppingBanner from '@assets/images/ShoppingBanner.svg';
+import shoppingBanner from '@assets/images/ShoppingBanner.webp';
 
 import IconButton from '@components/button/IconButton';
 import Chip from '@components/chip/Chip';
